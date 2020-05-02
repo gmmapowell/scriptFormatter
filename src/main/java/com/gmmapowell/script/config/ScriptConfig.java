@@ -27,17 +27,31 @@ public class ScriptConfig implements Config {
 		String creds = vars.remove("credentials");
 		if (creds == null)
 			throw new ConfigException("credentials was not defined");
+		String folder = vars.remove("folder");
+		if (folder == null)
+			throw new ConfigException("folder was not defined");
 		String index = vars.remove("index");
 		if (index == null)
 			throw new ConfigException("index was not defined");
-		loader = new DriveLoader(creds, index);
+		String downloads = vars.remove("downloads");
+		if (downloads == null)
+			downloads = "downloads";
+		String debugS = vars.remove("debug");
+		boolean debug = false;
+		if ("true".equals(debugS))
+			debug = true;
+		loader = new DriveLoader(root, creds, folder, index, downloads, debug);
 	}
 
 	public void handleOutput(Map<String, String> vars) throws ConfigException {
 		String output = vars.remove("output");
 		if (output == null)
 			throw new ConfigException("output was not defined");
-		sink = new PDFSink(root, output);
+		String open = vars.remove("open");
+		boolean wantOpen = false;
+		if ("true".equals(open))
+			wantOpen = true;
+		sink = new PDFSink(root, output, wantOpen);
 	}
 
 	@SuppressWarnings("unchecked")
