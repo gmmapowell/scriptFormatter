@@ -1,6 +1,8 @@
 package com.gmmapowell.script;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 import com.gmmapowell.script.config.Config;
 import com.gmmapowell.script.config.ReadConfig;
@@ -25,7 +27,12 @@ public class Main {
 		Config cfg = new ReadConfig().read(new File(config));
 		if (cfg == null)
 			return;
-		cfg.updateIndex();
+		try {
+			cfg.updateIndex();
+		} catch (IOException | GeneralSecurityException e) {
+			System.out.println("Error updating index from Google Drive:\n  " + e.getMessage());
+			return;
+		}
 		cfg.generate();
 		cfg.show();
 	}

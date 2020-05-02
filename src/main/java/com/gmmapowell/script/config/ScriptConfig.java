@@ -1,8 +1,10 @@
 package com.gmmapowell.script.config;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
 import com.gmmapowell.script.loader.Loader;
@@ -69,7 +71,8 @@ public class ScriptConfig implements Config {
 	}
 
 	@Override
-	public void updateIndex() {
+	public void updateIndex() throws IOException, GeneralSecurityException {
+		loader.updateIndex();
 	}
 
 	@Override
