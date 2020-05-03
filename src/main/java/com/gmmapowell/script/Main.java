@@ -27,13 +27,14 @@ public class Main {
 		Config cfg = new ReadConfig().read(new File(config));
 		if (cfg == null)
 			return;
+		FilesToProcess files;
 		try {
-			cfg.updateIndex();
+			files = cfg.updateIndex();
 		} catch (IOException | GeneralSecurityException e) {
 			System.out.println("Error updating index from Google Drive:\n  " + e.getMessage());
 			return;
 		}
-		cfg.generate();
+		cfg.generate(files);
 		cfg.show();
 	}
 	

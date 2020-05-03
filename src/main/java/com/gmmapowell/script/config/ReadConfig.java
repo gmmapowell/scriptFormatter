@@ -35,10 +35,14 @@ public class ReadConfig {
 			System.out.println("Could not read configuration " + file);
 		}
 		ScriptConfig ret = new ScriptConfig(file.getParentFile());
+		String debugS = vars.remove("debug");
+		boolean debug = false;
+		if ("true".equals(debugS))
+			debug = true;
 		try {
-			ret.handleLoader(vars);
-			ret.handleOutput(vars);
-			ret.handleProcessor(vars);
+			ret.handleLoader(vars, debug);
+			ret.handleOutput(vars, debug);
+			ret.handleProcessor(vars, debug);
 		} catch (ConfigException ex) {
 			System.out.println(ex.getMessage());
 			return null;

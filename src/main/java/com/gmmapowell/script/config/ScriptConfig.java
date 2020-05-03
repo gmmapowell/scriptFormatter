@@ -7,6 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 
+import com.gmmapowell.script.FilesToProcess;
+import com.gmmapowell.script.elements.ElementFactory;
+import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.DriveLoader;
 import com.gmmapowell.script.processor.Processor;
@@ -18,12 +21,13 @@ public class ScriptConfig implements Config {
 	private Loader loader;
 	private Sink sink;
 	private Processor processor;
+	private ElementFactory elf = new BlockishElementFactory();
 
 	public ScriptConfig(File root) {
 		this.root = root;
 	}
 	
-	public void handleLoader(Map<String, String> vars) throws ConfigException {
+	public void handleLoader(Map<String, String> vars, boolean debug) throws ConfigException {
 		String creds = vars.remove("credentials");
 		if (creds == null)
 			throw new ConfigException("credentials was not defined");
@@ -36,14 +40,10 @@ public class ScriptConfig implements Config {
 		String downloads = vars.remove("downloads");
 		if (downloads == null)
 			downloads = "downloads";
-		String debugS = vars.remove("debug");
-		boolean debug = false;
-		if ("true".equals(debugS))
-			debug = true;
 		loader = new DriveLoader(root, creds, folder, index, downloads, debug);
 	}
 
-	public void handleOutput(Map<String, String> vars) throws ConfigException {
+	public void handleOutput(Map<String, String> vars, boolean debug) throws ConfigException {
 		String output = vars.remove("output");
 		if (output == null)
 			throw new ConfigException("output was not defined");
@@ -51,11 +51,11 @@ public class ScriptConfig implements Config {
 		boolean wantOpen = false;
 		if ("true".equals(open))
 			wantOpen = true;
-		sink = new PDFSink(root, output, wantOpen);
+		sink = new PDFSink(root, output, wantOpen, debug);
 	}
 
 	@SuppressWarnings("unchecked")
-	public void handleProcessor(Map<String, String> vars) throws ConfigException {
+	public void handleProcessor(Map<String, String> vars, boolean debug) throws ConfigException {
 		String proc = vars.remove("processor");
 		if (proc == null)
 			throw new ConfigException("processor was not defined");
@@ -69,12 +69,12 @@ public class ScriptConfig implements Config {
 			throw new ConfigException(proc + " is not a Processor");
 		Constructor<? extends Processor> ctor;
 		try {
-			ctor = clz.getConstructor(Sink.class, Map.class);
+			ctor = clz.getConstructor(File.class, ElementFactory.class, Sink.class, Map.class, boolean.class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new ConfigException(proc + " does not have a suitable constructor");
 		}
 		try {
-			processor = ctor.newInstance(sink, vars);
+			processor = ctor.newInstance(root, elf, sink, vars, debug);
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof ConfigException)
 				throw (ConfigException)e.getCause();
@@ -85,12 +85,13 @@ public class ScriptConfig implements Config {
 	}
 
 	@Override
-	public void updateIndex() throws IOException, GeneralSecurityException {
-		loader.updateIndex();
+	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException {
+		return loader.updateIndex();
 	}
 
 	@Override
-	public void generate() {
+	public void generate(FilesToProcess files) {
+		processor.process(files);
 	}
 
 	@Override

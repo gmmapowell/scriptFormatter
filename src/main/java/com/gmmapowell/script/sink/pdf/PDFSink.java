@@ -3,19 +3,26 @@ package com.gmmapowell.script.sink.pdf;
 import java.awt.Desktop;
 import java.io.File;
 
+import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.sink.Sink;
 
 public class PDFSink implements Sink {
 	private final File output;
 	private final boolean wantOpen;
 
-	public PDFSink(File root, String output, boolean wantOpen) {
+	public PDFSink(File root, String output, boolean wantOpen, boolean debug) {
 		File f = new File(output);
 		if (f.isAbsolute())
 			this.output = f;
 		else
 			this.output = new File(root, output);
 		this.wantOpen = wantOpen;
+	}
+
+	@Override
+	public void block(Block block) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
