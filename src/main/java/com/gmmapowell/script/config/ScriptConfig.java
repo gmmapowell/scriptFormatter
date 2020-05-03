@@ -15,6 +15,8 @@ import com.gmmapowell.script.loader.drive.DriveLoader;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
+import com.gmmapowell.script.styles.StyleCatalog;
+import com.gmmapowell.script.styles.simple.SimpleStyleCatalog;
 
 public class ScriptConfig implements Config {
 	private final File root;
@@ -51,7 +53,8 @@ public class ScriptConfig implements Config {
 		boolean wantOpen = false;
 		if ("true".equals(open))
 			wantOpen = true;
-		sink = new PDFSink(root, output, wantOpen, debug);
+		StyleCatalog catalog = new SimpleStyleCatalog();
+		sink = new PDFSink(root, catalog, output, wantOpen, debug);
 	}
 
 	@SuppressWarnings("unchecked")

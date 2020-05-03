@@ -2,7 +2,9 @@ package com.gmmapowell.script.processor.movie;
 
 import java.io.IOException;
 
+import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.ElementFactory;
+import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.sink.Sink;
 
 public class Formatter {
@@ -19,25 +21,37 @@ public class Formatter {
 	public void title(String title) throws IOException {
 		if (debug)
 			System.out.println("# " + title);
-		sink.block(factory.block("title", title.toUpperCase()));
+		Block block = factory.block("title");
+		Span span = factory.span(null, title.toUpperCase());
+		block.addSpan(span);
+		sink.block(block);
 	}
 
 	public void slug(String slug) throws IOException {
 		if (debug)
 			System.out.println("! " + slug);
-		sink.block(factory.block("slug", slug));
+		Block block = factory.block("slug");
+		Span span = factory.span(null, slug.toUpperCase());
+		block.addSpan(span);
+		sink.block(block);
 	}
 
 	public void speech(String speech) throws IOException {
 		if (debug)
 			System.out.println("<< " + speech);
-		sink.block(factory.block("speech", speech));
+		Block block = factory.block("speech");
+		Span span = factory.span(null, speech);
+		block.addSpan(span);
+		sink.block(block);
 	}
 
 	public void scene(String text) throws IOException {
 		if (debug)
 			System.out.println("... " + text);
-		sink.block(factory.block("scene", text));
+		Block block = factory.block("scene");
+		Span span = factory.span(null, text);
+		block.addSpan(span);
+		sink.block(block);
 	}
 
 	public void close() throws IOException {
