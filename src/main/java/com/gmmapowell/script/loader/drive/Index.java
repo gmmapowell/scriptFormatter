@@ -15,22 +15,15 @@ import com.gmmapowell.script.FilesToProcess;
 
 public class Index implements FilesToProcess {
 	private final File downloads;
-	private final String title;
 	private FileWriter appendTo;
 	private boolean writtenExcluded;
 	private Map<String, String> current = new LinkedHashMap<>();
 	private int included;
 
-	public Index(File downloads, String title) {
+	public Index(File downloads) {
 		this.downloads = downloads;
-		this.title = title;
 	}
 	
-	@Override
-	public String title() {
-		return title;
-	}
-
 	public void readFrom(FileReader fr) throws IOException {
 		LineNumberReader lnr = new LineNumberReader(fr);
 		String s;

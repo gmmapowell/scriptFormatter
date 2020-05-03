@@ -19,12 +19,16 @@ public class MoviePipeline implements Processor {
 	}
 
 	private final File dramatis;
+	private final String title;
 	private final boolean debug;
 	private final Formatter formatter;
 
 	public MoviePipeline(File root, ElementFactory ef, Sink outputTo, Map<String, String> options, boolean debug) throws ConfigException {
 		this.debug = debug;
 		this.formatter = new Formatter(ef, outputTo, debug);
+		this.title = options.remove("title");
+		if (title == null)
+			throw new ConfigException("There is no definition of title");
 		String d = options.remove("dramatis");
 		if (d == null)
 			throw new ConfigException("There is no definition of dramatis");
@@ -38,24 +42,33 @@ public class MoviePipeline implements Processor {
 	@Override
 	public void process(FilesToProcess files) {
 		DramatisPersonae dp = new DramatisPersonae(dramatis);
-		formatter.title(files.title());
+		try {
+			formatter.title(title);
+		} catch (IOException ex) {
+			System.out.println("Error writing title: " + ex.getMessage());
+		}
 		for (File f : files.included()) {
 			if (debug)
 				System.out.println("included " + f);
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
-				process(dp, lnr);
+				processFile(dp, lnr);
 				
 				// TODO: process other files as well!
-				return;
+				break;
 			} catch (FileNotFoundException ex) {
 				System.out.println("Could not process " + f);
 			} catch (IOException ex) {
 				System.out.println("Error processing " + f + ": " + ex.getMessage());
 			}
 		}
+		try {
+			formatter.close();
+		} catch (IOException ex) {
+			System.out.println("Error closing output document: " + ex.getMessage());
+		}
 	}
 
-	private void process(DramatisPersonae dp, LineNumberReader lnr) throws IOException {
+	private void processFile(DramatisPersonae dp, LineNumberReader lnr) throws IOException {
 		// We have the ability to insert random notes which we want to skip
 		// The start of the file is automatically in this mode
 		// A new slugline automatically gets you out of it
@@ -112,11 +125,13 @@ public class MoviePipeline implements Processor {
 		return s.equals("INT") || s.equals("EXT");
 	}
 
-	private void flush(StringBuilder para) {
+	private void flush(StringBuilder para) throws IOException {
 		if (para.length() > 0) {
 			String text = para.toString();
 			if (isSpeech(text)) {
+				// TODO: need to extract the speaker
 				// TODO: need to extract all the (...) and [...] bits
+				// TODO: will need many more formatter calls & blocks
 				formatter.speech(text);
 			} else
 				formatter.scene(text);

@@ -61,7 +61,7 @@ public class DriveLoader implements Loader {
 		// because it has been downloaded but not user "approved" or ordered
 		Drive service = connectToGoogleDrive();
         Item item = findTopFolder(service);
-        Index currentIndex = readIndex(item.folder);
+        Index currentIndex = readIndex();
         try {
         	// TODO: this needs to be here!  Just optimizing test speeds
 //	        downloadFolder(service, currentIndex, downloads, "    ", item.id);
@@ -90,11 +90,11 @@ public class DriveLoader implements Loader {
 		return new Item(id, folder);
 	}
 
-	private Index readIndex(String title) throws IOException {
+	private Index readIndex() throws IOException {
 		// TODO: read the current index & build a hashmap
 		// Index also wants to hold the set of files that are included, in order.
 		//
-		Index index = new Index(downloads, title);
+		Index index = new Index(downloads);
 		try (FileReader fr = new FileReader(indexFile)) {
 			index.readFrom(fr);
 		}
