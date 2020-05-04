@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -19,11 +21,18 @@ import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.styles.page.DefaultPageStyle;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 
 public class PDFSink implements Sink {
 	private final StyleCatalog styles;
 	private final File output;
 	private final boolean wantOpen;
+	private final String upload;
+	private final boolean debug;
 	private final PDDocument doc;
 	private PDPageContentStream currentPage;
 	
@@ -32,14 +41,16 @@ public class PDFSink implements Sink {
 	private float afterBlock;
 	private boolean showBorder = false;
 
-	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, boolean debug) {
+	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug) {
 		this.styles = styles;
+		this.debug = debug;
 		File f = new File(output);
 		if (f.isAbsolute())
 			this.output = f;
 		else
 			this.output = new File(root, output);
 		this.wantOpen = wantOpen;
+		this.upload = upload;
 		doc = new PDDocument();
 		pageStyle = new DefaultPageStyle();
 	}
@@ -73,7 +84,6 @@ public class PDFSink implements Sink {
 			fm = lm;
 		else
 			fm += pageStyle.getLeftMargin();
-		System.out.println(fm + " " + lm);
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
 		float wid = pageStyle.getPageWidth() - fm - rm;
 		for (Span s : block) {
@@ -176,9 +186,46 @@ public class PDFSink implements Sink {
 		if (!wantOpen)
 			return;
 		try {
+			if (debug)
+				System.out.println("Opening " + output);
 			Desktop.getDesktop().open(output);
 		} catch (Exception e) {
 			System.out.println("Failed to open " + output + " on desktop:\n  " + e.getMessage());
+		}
+	}
+	
+	@Override
+	public void upload() throws JSchException, SftpException {
+		if (upload != null) {
+			if (debug)
+				System.out.println("uploading to " + upload);
+			Pattern p = Pattern.compile("sftp:([a-zA-Z0-9_]+)@([a-zA-Z0-9_.]+)(:[0-9]+)?/(.+)");
+			Matcher matcher = p.matcher(upload);
+			if (!matcher.matches())
+				throw new RuntimeException("Could not match path " + upload);
+			
+			String username = matcher.group(1);
+			String host = matcher.group(2);
+			int port = 22;
+			if (matcher.group(3) != null)
+				port = Integer.parseInt(matcher.group(3).substring(1));
+			String to = matcher.group(4);
+			
+			File privateKeyPath = new File(System.getProperty("user.home"), ".ssh/id_rsa_dorothy");
+			JSch jsch = new JSch();
+			jsch.addIdentity(privateKeyPath.getPath());
+			Session s = null;
+			try {
+				s = jsch.getSession(username, host, port);
+				s.setConfig("StrictHostKeyChecking", "no");
+				s.connect();
+				ChannelSftp openChannel = (ChannelSftp) s.openChannel("sftp");
+				openChannel.connect();
+				openChannel.put(output.getPath(), to);
+			} finally {
+				if (s != null)
+					s.disconnect();
+			}
 		}
 	}
 

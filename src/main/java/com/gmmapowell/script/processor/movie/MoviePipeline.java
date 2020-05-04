@@ -58,9 +58,6 @@ public class MoviePipeline implements Processor {
 				System.out.println("included " + f);
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
 				processFile(dp, lnr);
-				
-				// TODO: REMOVE THIS TO process other files as well!
-				break;
 			} catch (FileNotFoundException ex) {
 				System.out.println("Could not process " + f);
 			} catch (IOException ex) {

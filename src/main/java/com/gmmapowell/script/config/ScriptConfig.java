@@ -17,6 +17,8 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.styles.simple.SimpleStyleCatalog;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 
 public class ScriptConfig implements Config {
 	private final File root;
@@ -53,8 +55,9 @@ public class ScriptConfig implements Config {
 		boolean wantOpen = false;
 		if ("true".equals(open))
 			wantOpen = true;
+		String upload = vars.remove("upload");
 		StyleCatalog catalog = new SimpleStyleCatalog();
-		sink = new PDFSink(root, catalog, output, wantOpen, debug);
+		sink = new PDFSink(root, catalog, output, wantOpen, upload, debug);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,4 +105,7 @@ public class ScriptConfig implements Config {
 		sink.showFinal();
 	}
 
+	public void upload() throws JSchException, SftpException {
+		sink.upload();
+	}
 }

@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="/personal-qb/mvncache/org/apache/pdfbox/pdfbox/2.0.11/pdfbox-2.0.11.jar" sourcepath="/personal-qb/mvncache/org/apache/pdfbox/pdfbox/2.0.11/pdfbox-2.0.11-sources.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/commons-logging/commons-logging/1.2/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/org/apache/pdfbox/fontbox/2.0.11/fontbox-2.0.11.jar"/>
+	<classpathentry kind="lib" path="/personal-qb/mvncache/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

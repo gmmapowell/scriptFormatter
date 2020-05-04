@@ -6,6 +6,8 @@ import java.security.GeneralSecurityException;
 
 import com.gmmapowell.script.config.Config;
 import com.gmmapowell.script.config.ReadConfig;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 
 public class Main {
 	public static void main(String[] args) {
@@ -36,6 +38,11 @@ public class Main {
 		}
 		cfg.generate(files);
 		cfg.show();
+		try {
+			cfg.upload();
+		} catch (JSchException | SftpException ex) {
+			System.out.println("Error uploading to DH: " + ex.getMessage());
+		}
 	}
 	
 	private static void help() {

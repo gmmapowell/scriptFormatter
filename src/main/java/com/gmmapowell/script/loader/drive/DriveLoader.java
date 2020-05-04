@@ -64,7 +64,7 @@ public class DriveLoader implements Loader {
         Index currentIndex = readIndex();
         try {
         	// TODO: this needs to be here!  Just optimizing test speeds
-//	        downloadFolder(service, currentIndex, downloads, "    ", item.id);
+	        downloadFolder(service, currentIndex, downloads, "    ", item.id);
 	        return currentIndex;
         } finally {
         	currentIndex.close();
@@ -91,9 +91,6 @@ public class DriveLoader implements Loader {
 	}
 
 	private Index readIndex() throws IOException {
-		// TODO: read the current index & build a hashmap
-		// Index also wants to hold the set of files that are included, in order.
-		//
 		Index index = new Index(downloads);
 		try (FileReader fr = new FileReader(indexFile)) {
 			index.readFrom(fr);
