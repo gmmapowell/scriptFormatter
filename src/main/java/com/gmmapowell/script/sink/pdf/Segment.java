@@ -41,4 +41,9 @@ public class Segment {
 	public float baseline() {
 		return style.getFontSize();
 	}
+	
+	@Override
+	public String toString() {
+		return text;
+	}
 }

@@ -28,6 +28,7 @@ public class PDFSink implements Sink {
 	private float y;
 	private PageStyle pageStyle;
 	private float afterBlock;
+	private boolean showBorder = false;
 
 	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, boolean debug) {
 		this.styles = styles;
@@ -47,9 +48,15 @@ public class PDFSink implements Sink {
 		afterBlock = Math.max(afterBlock, baseStyle.getBeforeBlock());
 		List<Line> lines = new ArrayList<>();
 		List<Segment> segments = new ArrayList<>();
+		Float fm = baseStyle.getFirstMargin();
 		float lm = pageStyle.getLeftMargin() + baseStyle.getLeftMargin();
+		if (fm == null)
+			fm = lm;
+		else
+			fm += pageStyle.getLeftMargin();
+		System.out.println(fm + " " + lm);
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
-		float wid = pageStyle.getPageWidth() - lm - rm;
+		float wid = pageStyle.getPageWidth() - fm - rm;
 		for (Span s : block) {
 			Style style = baseStyle.apply(s.getStyle());
 			String[] parts = s.getText().split(" ");
@@ -58,37 +65,41 @@ public class PDFSink implements Sink {
 				if (p == null || p.length() == 0)
 					continue;
 				if (!first) {
-					addSegment(lines, segments, wid, style, " ");
+					addSegment(lines, segments, wid, style, " ", false);
 				}
 				first = false;
-				addSegment(lines, segments, wid, style, p);
+				addSegment(lines, segments, wid, style, p, true);
+				if (!lines.isEmpty())
+					wid = pageStyle.getPageWidth() - lm - rm;
 			}
 		}
 		if (!segments.isEmpty())
 			lines.add(new Line(segments));
 		
-		if (!blockFits(pageStyle.getBottomMargin(), y, lines)) {
+		if (!blockFits(pageStyle.getBottomMargin(), y-afterBlock, lines)) {
 			closeCurrentPage();
 		}
 		boolean created = ensurePage();
 		if (!created) {
 			y -= afterBlock;
 		}
+		float xf = fm;
 		for (Line l : lines) {
 			y -= l.getBaseline();
 			float len = l.getLineWidth();
 			switch (baseStyle.getJustification()) {
 			case LEFT:
-				l.render(currentPage, lm, y);
+				l.render(currentPage, xf, y);
 				break;
 			case RIGHT:
 				l.render(currentPage, wid-len-rm, y);
 				break;
 			case CENTER:
-				l.render(currentPage, lm + (wid-len)/2, y);
+				l.render(currentPage, xf + (wid-len)/2, y);
 				break;
 			}
 			y -= l.height() - l.getBaseline();
+			xf = lm;
 		}
 		afterBlock = baseStyle.getAfterBlock();
 	}
@@ -100,14 +111,15 @@ public class PDFSink implements Sink {
 		return ypos >= bottom;
 	}
 
-	private void addSegment(List<Line> lines, List<Segment> segments, float wid, Style style, String p) throws IOException {
+	private void addSegment(List<Line> lines, List<Segment> segments, float wid, Style style, String p, boolean addToNext) throws IOException {
 		Segment segment = new Segment(style, p);
 		segments.add(segment);
 		if (segments.size() > 1 && !Line.canHandle(wid, segments)) {
 			segments.remove(segments.size()-1);
 			lines.add(new Line(segments));
 			segments.clear();
-			segments.add(segment);
+			if (addToNext)
+				segments.add(segment);
 		}
 	}
 
@@ -134,7 +146,7 @@ public class PDFSink implements Sink {
 			PDPage page = new PDPage();
 			doc.addPage(page);
 			currentPage = new PDPageContentStream(doc, page);
-			{
+			if (showBorder) {
 				currentPage.moveTo(pageStyle.getLeftMargin(), pageStyle.getBottomMargin());
 				currentPage.lineTo(pageStyle.getLeftMargin(), pageStyle.getPageHeight()-pageStyle.getTopMargin());
 				currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), pageStyle.getPageHeight()-pageStyle.getTopMargin());

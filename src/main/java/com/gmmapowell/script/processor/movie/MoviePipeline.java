@@ -41,7 +41,13 @@ public class MoviePipeline implements Processor {
 
 	@Override
 	public void process(FilesToProcess files) {
-		DramatisPersonae dp = new DramatisPersonae(dramatis);
+		DramatisPersonae dp;
+		try {
+			dp = new DramatisPersonae(dramatis);
+		} catch (IOException e) {
+			System.out.println("Error reading dramatis file: " + e.getMessage());
+			return;
+		}
 		try {
 			formatter.title(title);
 		} catch (IOException ex) {
@@ -53,7 +59,7 @@ public class MoviePipeline implements Processor {
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
 				processFile(dp, lnr);
 				
-				// TODO: process other files as well!
+				// TODO: REMOVE THIS TO process other files as well!
 				break;
 			} catch (FileNotFoundException ex) {
 				System.out.println("Could not process " + f);
@@ -79,11 +85,11 @@ public class MoviePipeline implements Processor {
 		while ((s = lnr.readLine()) != null) {
 			s = s.trim();
 			if (s.length() == 0) {
-				flush(para);
+				flush(dp, para);
 				continue;
 			}
 			if (isSlugLine(s)) {
-				flush(para);
+				flush(dp, para);
 				slug.delete(0, slug.length());
 				slug.append(s);
 				slug.append(".  ");
@@ -107,7 +113,7 @@ public class MoviePipeline implements Processor {
 			}
 			case NORMAL: {
 				if (isSpeech(s)) {
-					flush(para);
+					flush(dp, para);
 				}
 				para.append(s);
 				para.append(' ');
@@ -118,21 +124,49 @@ public class MoviePipeline implements Processor {
 				break;
 			}
 		}
-		flush(para);
+		flush(dp, para);
 	}
 
 	private boolean isSlugLine(String s) {
 		return s.equals("INT") || s.equals("EXT");
 	}
 
-	private void flush(StringBuilder para) throws IOException {
+	private void flush(DramatisPersonae dp, StringBuilder para) throws IOException {
 		if (para.length() > 0) {
 			String text = para.toString();
 			if (isSpeech(text)) {
-				// TODO: need to extract the speaker
+				int idxC = text.indexOf(":");
+				String spkr = text.substring(0, idxC);
+				String name = dp.getSpeaker(spkr);
+				if (name == null) {
+					System.out.println("There is no dramatis entry for " + spkr);
+					name = ":" + spkr + ":";
+				}
+				formatter.speaker(name);
+
+				text = text.substring(idxC+1).trim();
+				if (text.startsWith("(")) {
+					int idxP = text.indexOf(")");
+					formatter.direction(text.substring(0, idxP+1));
+					text = text.substring(idxP+1).trim();
+				}
+				int idxS;
+				while ((idxS = text.indexOf('[')) != -1) {
+					int idxClose = text.indexOf(']', idxS);
+					String before = text.substring(0, idxS).trim();
+					if (before.length() > 0)
+						formatter.speech(before);
+					String direction = "(" + text.substring(idxS+1, idxClose).trim() + ")";
+					if (direction.length() > 0)
+						formatter.direction(direction);
+					if (idxClose >= text.length())
+						text = "";
+					else
+						text = text.substring(idxClose+1).trim();
+				}
 				// TODO: need to extract all the (...) and [...] bits
-				// TODO: will need many more formatter calls & blocks
-				formatter.speech(text);
+				if (text.length() > 0)
+					formatter.speech(text);
 			} else
 				formatter.scene(text);
 			para.delete(0, para.length());

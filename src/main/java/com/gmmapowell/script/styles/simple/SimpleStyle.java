@@ -12,8 +12,11 @@ public class SimpleStyle implements Style, Builder {
 	private final StyleCatalog catalog;
 	private Float afterBlock;
 	private Float beforeBlock;
+	private Float first = null;
 	private Justification just = null;
+	private Float left = null;
 	private Float lineSpacing = null;
+	private Float right = null;
 	private Boolean underline = null;
 
 	public SimpleStyle(StyleCatalog catalog) {
@@ -36,6 +39,11 @@ public class SimpleStyle implements Style, Builder {
 	public Float getBeforeBlock() {
 		return beforeBlock;
 	}
+
+	@Override
+	public Float getFirstMargin() {
+		return first;
+	}
 	
 	@Override
 	public PDFont getFont() {
@@ -48,28 +56,28 @@ public class SimpleStyle implements Style, Builder {
 	}
 
 	@Override
+	public Justification getJustification() {
+		return just;
+	}
+	
+	@Override
+	public Float getLeftMargin() {
+		return left;
+	}
+
+	@Override
 	public Float getLineSpacing() {
 		return lineSpacing;
 	}
 
 	@Override
-	public Justification getJustification() {
-		return just;
+	public Float getRightMargin() {
+		return right;
 	}
 
 	@Override
 	public Boolean getUnderline() {
 		return underline;
-	}
-
-	@Override
-	public Float getLeftMargin() {
-		return 0f;
-	}
-
-	@Override
-	public Float getRightMargin() {
-		return 0f;
 	}
 
 	@Override
@@ -85,14 +93,32 @@ public class SimpleStyle implements Style, Builder {
 	}
 
 	@Override
+	public Builder setFirstMargin(float f) {
+		this.first = f;
+		return this;
+	}
+
+	@Override
 	public Builder setJustification(Justification just) {
 		this.just = just;
 		return this;
 	}
 
 	@Override
+	public Builder setLeftMargin(float f) {
+		this.left = f;
+		return this;
+	}
+
+	@Override
 	public Builder setLineSpacing(float f) {
 		lineSpacing = f;
+		return this;
+	}
+
+	@Override
+	public Builder setRightMargin(float f) {
+		this.right = f;
 		return this;
 	}
 

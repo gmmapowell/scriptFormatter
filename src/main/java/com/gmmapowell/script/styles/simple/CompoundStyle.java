@@ -41,6 +41,14 @@ public class CompoundStyle implements Style {
 	}
 
 	@Override
+	public Float getFirstMargin() {
+		Float maybe = override.getFirstMargin();
+		if (maybe != null)
+			return maybe;
+		return parent.getFirstMargin();
+	}
+
+	@Override
 	public PDFont getFont() {
 		PDFont maybe = override.getFont();
 		if (maybe != null)

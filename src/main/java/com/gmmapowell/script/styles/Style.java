@@ -8,6 +8,7 @@ public interface Style {
 
 	Float getAfterBlock();
 	Float getBeforeBlock();
+	Float getFirstMargin();
 	PDFont getFont();
 	Float getFontSize();
 	Justification getJustification();

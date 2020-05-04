@@ -36,6 +36,24 @@ public class Formatter {
 		sink.block(block);
 	}
 
+	public void speaker(String speaker) throws IOException {
+		if (debug)
+			System.out.println("| " + speaker);
+		Block block = factory.block("speaker");
+		Span span = factory.span(null, speaker);
+		block.addSpan(span);
+		sink.block(block);
+	}
+
+	public void direction(String text) throws IOException {
+		if (debug)
+			System.out.println("| " + text);
+		Block block = factory.block("direction");
+		Span span = factory.span(null, text);
+		block.addSpan(span);
+		sink.block(block);
+	}
+
 	public void speech(String speech) throws IOException {
 		if (debug)
 			System.out.println("<< " + speech);
