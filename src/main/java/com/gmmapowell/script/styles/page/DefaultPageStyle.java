@@ -24,4 +24,13 @@ public class DefaultPageStyle implements PageStyle {
 		return 72f;
 	}
 
+	@Override
+	public Float getLeftMargin() {
+		return 72f;
+	}
+
+	@Override
+	public Float getRightMargin() {
+		return 72f;
+	}
 }

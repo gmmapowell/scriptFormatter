@@ -37,4 +37,8 @@ public class Segment {
 	public float width() throws IOException {
 		return style.getFont().getStringWidth(text) * style.getFontSize() / 1000;
 	}
+
+	public float baseline() {
+		return style.getFontSize();
+	}
 }

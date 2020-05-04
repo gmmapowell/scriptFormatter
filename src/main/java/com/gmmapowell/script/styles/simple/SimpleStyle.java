@@ -64,12 +64,12 @@ public class SimpleStyle implements Style, Builder {
 
 	@Override
 	public Float getLeftMargin() {
-		return 72f;
+		return 0f;
 	}
 
 	@Override
 	public Float getRightMargin() {
-		return 72f;
+		return 0f;
 	}
 
 	@Override

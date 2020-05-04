@@ -6,5 +6,7 @@ public interface PageStyle {
 	Float getPageHeight();
 	Float getTopMargin();
 	Float getBottomMargin();
+	Float getLeftMargin();
+	Float getRightMargin();
 
 }
