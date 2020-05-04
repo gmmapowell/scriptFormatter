@@ -90,21 +90,24 @@ public class PDFSink implements Sink {
 		float wid = pageStyle.getPageWidth() - fm - rm;
 		for (Span s : block) {
 			Style style = baseStyle.apply(s.getStyle());
-			String[] parts = s.getText().split(" ");
+			String tx = s.getText();
+			String[] parts = tx.split(" ");
 			boolean first = true;
 			for (String p : parts) {
 				if (p == null || p.length() == 0)
 					continue;
-				if (!first) {
+				if (!first || tx.startsWith(" ")) {
 					addSegment(lines, segments, wid, baseStyle, style, fm, rm, " ", false);
 				}
-				first = false;
 				addSegment(lines, segments, wid, baseStyle, style, fm, rm, p, true);
 				if (!lines.isEmpty()) {
 					wid = pageStyle.getPageWidth() - lm - rm;
 					fm = lm;
 				}
+				first = false;
 			}
+			if (tx.endsWith(" "))
+				addSegment(lines, segments, wid, baseStyle, style, fm, rm, " ", false);
 		}
 		if (!segments.isEmpty())
 			finishLine(lines, segments, wid, baseStyle, fm, rm);

@@ -20,6 +20,7 @@ public class SimpleStyleCatalog implements StyleCatalog {
 		Builder setRightMargin(float f);
 		Builder setUnderline(boolean b);
 		Style build();
+		Builder setItalic(boolean b);
 	}
 
 	private final Map<String, Style> catalog = new TreeMap<>();
@@ -31,6 +32,7 @@ public class SimpleStyleCatalog implements StyleCatalog {
 			.setAfterBlock(0)
 			.setBeforeBlock(0)
 			.setJustification(Justification.LEFT)
+			.setItalic(false)
 			.setLeftMargin(0f)
 			.setLineSpacing(14f)
 			.setRightMargin(0f)
@@ -72,6 +74,10 @@ public class SimpleStyleCatalog implements StyleCatalog {
 				create().setLeftMargin(72f).setRightMargin(72f).build(),
 				defaultStyle
 		));
+
+		catalog.put("italic",
+				create().setItalic(true).build()
+		);
 	}
 	
 	public Builder create() {

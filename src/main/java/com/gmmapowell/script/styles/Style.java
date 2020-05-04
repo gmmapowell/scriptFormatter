@@ -11,9 +11,13 @@ public interface Style {
 	Float getFirstMargin();
 	PDFont getFont();
 	Float getFontSize();
+	Boolean getItalic();
 	Justification getJustification();
 	Float getLeftMargin();
 	Float getLineSpacing();
 	Float getRightMargin();
 	Boolean getUnderline();
+
+	PDFont getFontInternal(Style style);
+
 }

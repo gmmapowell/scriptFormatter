@@ -18,6 +18,7 @@ public class SimpleStyle implements Style, Builder {
 	private Float lineSpacing = null;
 	private Float right = null;
 	private Boolean underline = null;
+	private Boolean italic = null;
 
 	public SimpleStyle(StyleCatalog catalog) {
 		this.catalog = catalog;
@@ -47,7 +48,15 @@ public class SimpleStyle implements Style, Builder {
 	
 	@Override
 	public PDFont getFont() {
-		return PDType1Font.COURIER;
+		return getFontInternal(this);
+	}
+
+	@Override
+	public PDFont getFontInternal(Style style) {
+		if (style.getItalic())
+			return PDType1Font.COURIER_OBLIQUE;
+		else
+			return PDType1Font.COURIER;
 	}
 
 	@Override
@@ -55,6 +64,11 @@ public class SimpleStyle implements Style, Builder {
 		return 12.0f;
 	}
 
+	@Override
+	public Boolean getItalic() {
+		return this.italic;
+	}
+	
 	@Override
 	public Justification getJustification() {
 		return just;
@@ -95,6 +109,12 @@ public class SimpleStyle implements Style, Builder {
 	@Override
 	public Builder setFirstMargin(float f) {
 		this.first = f;
+		return this;
+	}
+
+	@Override
+	public Builder setItalic(boolean b) {
+		this.italic = b;
 		return this;
 	}
 

@@ -50,10 +50,15 @@ public class CompoundStyle implements Style {
 
 	@Override
 	public PDFont getFont() {
-		PDFont maybe = override.getFont();
+		return getFontInternal(this);
+	}
+
+	@Override
+	public PDFont getFontInternal(Style style) {
+		PDFont maybe = override.getFontInternal(this);
 		if (maybe != null)
 			return maybe;
-		return parent.getFont();
+		return parent.getFontInternal(this);
 	}
 
 	@Override
@@ -62,6 +67,16 @@ public class CompoundStyle implements Style {
 		if (maybe != null)
 			return maybe;
 		return parent.getFontSize();
+	}
+
+	@Override
+	public Boolean getItalic() {
+		Boolean italic = override.getItalic();
+		Boolean pi = parent.getItalic();
+		if (italic == null) {
+			return pi;
+		}
+		return italic ^ pi; // XOR to toggle them
 	}
 
 	@Override
