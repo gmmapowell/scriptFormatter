@@ -81,6 +81,8 @@ public class MoviePipeline implements Processor {
 		String s;
 		while ((s = lnr.readLine()) != null) {
 			s = s.trim();
+			if (s.startsWith("#"))
+				continue;
 			if (s.length() == 0) {
 				flush(dp, para);
 				continue;

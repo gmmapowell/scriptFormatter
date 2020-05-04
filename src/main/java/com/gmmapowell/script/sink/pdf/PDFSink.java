@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Group;
@@ -40,6 +41,7 @@ public class PDFSink implements Sink {
 	private PageStyle pageStyle;
 	private float afterBlock;
 	private boolean showBorder = false;
+	private int pageNum = 1;
 
 	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug) {
 		this.styles = styles;
@@ -240,6 +242,17 @@ public class PDFSink implements Sink {
 				currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), pageStyle.getPageHeight()-pageStyle.getTopMargin());
 				currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), pageStyle.getBottomMargin());
 				currentPage.closeAndStroke();
+			}
+			if (pageStyle.wantPageNumbers()) {
+				PDFont pnf = pageStyle.getPageNumberFont();
+				float pns = pageStyle.getPageNumberFontSize();
+				String tx = "Page " + pageNum++;
+				float txl = pnf.getStringWidth(tx)*pns/1000; 
+				currentPage.beginText();
+				currentPage.setFont(pnf, pns);
+				currentPage.newLineAtOffset(pageStyle.pageNumberCenterX() - txl/2, pageStyle.pageNumberBaselineY());
+				currentPage.showText(tx);
+				currentPage.endText();
 			}
 			y = pageStyle.getPageHeight() - pageStyle.getTopMargin();
 			afterBlock = 0;

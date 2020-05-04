@@ -32,7 +32,11 @@ public class DramatisPersonae {
 	}
 
 	public String getSpeaker(String spkr) {
-		return personae.get(spkr).getName();
+		Persona persona = personae.get(spkr);
+		if (persona == null)
+			return null;
+		else
+			return persona.getName();
 	}
 
 }

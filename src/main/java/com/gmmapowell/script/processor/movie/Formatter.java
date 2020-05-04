@@ -12,6 +12,7 @@ public class Formatter {
 	private final ElementFactory factory;
 	private final Sink sink;
 	private final boolean debug;
+	private Group slugBlock;
 	private Group speakingBlock;
 
 	public Formatter(ElementFactory factory, Sink outputTo, boolean debug) {
@@ -32,10 +33,11 @@ public class Formatter {
 	public void slug(String slug) throws IOException {
 		if (debug)
 			System.out.println("! " + slug);
+		slugBlock = factory.group();
 		SpanBlock block = factory.block("slug");
 		Span span = factory.span(null, slug.toUpperCase());
 		block.addSpan(span);
-		sink.block(block);
+		slugBlock.addBlock(block);
 	}
 
 	public void speaker(String speaker) throws IOException {
@@ -67,7 +69,13 @@ public class Formatter {
 	}
 
 	public void endSpeech() throws IOException {
-		sink.block(speakingBlock);
+		if (slugBlock != null) {
+			slugBlock.addBlock(speakingBlock);
+			sink.block(slugBlock);
+			slugBlock = null;
+		} else
+			sink.block(speakingBlock);
+		speakingBlock = null;
 	}
 
 	public void scene(String text) throws IOException {
@@ -76,7 +84,12 @@ public class Formatter {
 		SpanBlock block = factory.block("scene");
 		Span span = factory.span(null, text);
 		block.addSpan(span);
-		sink.block(block);
+		if (slugBlock != null) {
+			slugBlock.addBlock(block);
+			sink.block(slugBlock);
+			slugBlock = null;
+		} else
+			sink.block(block);
 	}
 
 	public void close() throws IOException {
