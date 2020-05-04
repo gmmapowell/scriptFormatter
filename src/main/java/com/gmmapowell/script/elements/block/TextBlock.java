@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Span;
+import com.gmmapowell.script.elements.SpanBlock;
 
-public class TextBlock implements Block {
+public class TextBlock implements SpanBlock {
 	private final String blockStyle;
 	private final List<Span> spans = new ArrayList<>();
 

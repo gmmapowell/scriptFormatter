@@ -11,7 +11,9 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import com.gmmapowell.script.elements.Block;
+import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
+import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
@@ -44,8 +46,25 @@ public class PDFSink implements Sink {
 
 	@Override
 	public void block(Block block) throws IOException {
+		List<RenderInfo> ris = new ArrayList<>();
+		collectRI(ris, block);
+		render(ris);
+	}
+	
+	private void collectRI(List<RenderInfo> ris, Block block) throws IOException {
+		if (block instanceof SpanBlock) {
+			RenderInfo ri = handleSpanBlock((SpanBlock)block);
+			ris.add(ri);
+		} else if (block instanceof Group) {
+			Group grp = (Group) block;
+			for (Block b : grp)
+				collectRI(ris, b);
+		} else
+			throw new RuntimeException("not implemented");
+	}
+
+	private RenderInfo handleSpanBlock(SpanBlock block) throws IOException {
 		Style baseStyle = styles.get(block.getStyle());
-		afterBlock = Math.max(afterBlock, baseStyle.getBeforeBlock());
 		List<Line> lines = new ArrayList<>();
 		List<Segment> segments = new ArrayList<>();
 		Float fm = baseStyle.getFirstMargin();
@@ -65,61 +84,83 @@ public class PDFSink implements Sink {
 				if (p == null || p.length() == 0)
 					continue;
 				if (!first) {
-					addSegment(lines, segments, wid, style, " ", false);
+					addSegment(lines, segments, wid, baseStyle, style, fm, rm, " ", false);
 				}
 				first = false;
-				addSegment(lines, segments, wid, style, p, true);
-				if (!lines.isEmpty())
+				addSegment(lines, segments, wid, baseStyle, style, fm, rm, p, true);
+				if (!lines.isEmpty()) {
 					wid = pageStyle.getPageWidth() - lm - rm;
+					fm = lm;
+				}
 			}
 		}
 		if (!segments.isEmpty())
-			lines.add(new Line(segments));
+			finishLine(lines, segments, wid, baseStyle, fm, rm);
 		
-		if (!blockFits(pageStyle.getBottomMargin(), y-afterBlock, lines)) {
+		RenderInfo ret = new RenderInfo(Math.max(afterBlock, baseStyle.getBeforeBlock()), lines);
+		afterBlock = baseStyle.getAfterBlock();
+		return ret;
+	}
+	
+	private void render(List<RenderInfo> ris) throws IOException {
+		if (!blocksFit(pageStyle.getBottomMargin(), y, ris)) {
 			closeCurrentPage();
 		}
 		boolean created = ensurePage();
-		if (!created) {
-			y -= afterBlock;
-		}
-		float xf = fm;
-		for (Line l : lines) {
-			y -= l.getBaseline();
-			float len = l.getLineWidth();
-			switch (baseStyle.getJustification()) {
-			case LEFT:
-				l.render(currentPage, xf, y);
-				break;
-			case RIGHT:
-				l.render(currentPage, wid-len-rm, y);
-				break;
-			case CENTER:
-				l.render(currentPage, xf + (wid-len)/2, y);
-				break;
+		for (RenderInfo ri : ris) {
+			if (!created) {
+				y -= ri.beforeBlock;
 			}
-			y -= l.height() - l.getBaseline();
-			xf = lm;
+			created = false;
+			for (Line l : ri.lines) {
+				y -= l.getBaseline();
+				l.render(currentPage, y);
+				y -= l.height() - l.getBaseline();
+			}
 		}
-		afterBlock = baseStyle.getAfterBlock();
 	}
 
-	private boolean blockFits(float bottom, float ypos, List<Line> lines) throws IOException {
-		for (Line l : lines) {
+	private boolean blocksFit(float bottomMargin, float ypos, List<RenderInfo> ris) throws IOException {
+		for (RenderInfo ri : ris) {
+			ypos = blockFits(ypos, ri);
+		}
+		return ypos >= bottomMargin;
+	}
+
+	private float blockFits(float ypos, RenderInfo ri) throws IOException {
+		ypos -= ri.beforeBlock;
+		for (Line l : ri.lines) {
 			ypos -= l.height();
 		}
-		return ypos >= bottom;
+		return ypos;
 	}
 
-	private void addSegment(List<Line> lines, List<Segment> segments, float wid, Style style, String p, boolean addToNext) throws IOException {
+	private void addSegment(List<Line> lines, List<Segment> segments, float wid, Style baseStyle, Style style, float fm, float rm, String p, boolean addToNext) throws IOException {
 		Segment segment = new Segment(style, p);
 		segments.add(segment);
 		if (segments.size() > 1 && !Line.canHandle(wid, segments)) {
 			segments.remove(segments.size()-1);
-			lines.add(new Line(segments));
+			finishLine(lines, segments, wid, baseStyle, fm, rm);
 			segments.clear();
 			if (addToNext)
 				segments.add(segment);
+		}
+	}
+
+	private void finishLine(List<Line> lines, List<Segment> segments, float wid, Style baseStyle, float fm, float rm) throws IOException {
+		Line l = new Line(segments);
+		lines.add(l);
+		float len = l.getLineWidth();
+		switch (baseStyle.getJustification()) {
+		case LEFT:
+			l.xpos(fm);
+			break;
+		case RIGHT:
+			l.xpos(wid-len-rm);
+			break;
+		case CENTER:
+			l.xpos(fm + (wid-len)/2);
+			break;
 		}
 	}
 

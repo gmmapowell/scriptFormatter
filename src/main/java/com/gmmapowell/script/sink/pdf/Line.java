@@ -8,15 +8,20 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 public class Line {
 	public final List<Segment> segments;
+	private float xf;
 
 	public Line(List<Segment> segments) {
 		this.segments = new ArrayList<>(segments);
 	}
 
-	public void render(PDPageContentStream page, float x, float y) throws IOException {
+	public void xpos(float xf) {
+		this.xf = xf;
+	}
+
+	public void render(PDPageContentStream page, float y) throws IOException {
 		for (Segment s : segments) {
-			s.render(page, x, y);
-			x += s.width();
+			s.render(page, xf, y);
+			xf += s.width();
 		}
 	}
 

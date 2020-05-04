@@ -167,6 +167,7 @@ public class MoviePipeline implements Processor {
 				// TODO: need to extract all the (...) and [...] bits
 				if (text.length() > 0)
 					formatter.speech(text);
+				formatter.endSpeech();
 			} else
 				formatter.scene(text);
 			para.delete(0, para.length());

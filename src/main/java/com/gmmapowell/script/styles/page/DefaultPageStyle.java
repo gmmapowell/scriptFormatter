@@ -16,7 +16,7 @@ public class DefaultPageStyle implements PageStyle {
 
 	@Override
 	public Float getTopMargin() {
-		return 60f;
+		return 72f;
 	}
 
 	@Override
