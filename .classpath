@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="/personal-qb/mvncache/commons-logging/commons-logging/1.2/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/org/apache/pdfbox/fontbox/2.0.11/fontbox-2.0.11.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar"/>
+	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/apis/google-api-services-blogger/v3-rev82-1.25.0/google-api-services-blogger-v3-rev82-1.25.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

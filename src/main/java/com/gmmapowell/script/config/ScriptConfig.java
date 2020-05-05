@@ -17,6 +17,7 @@ import com.gmmapowell.script.loader.drive.DriveLoader;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.styles.simple.SimpleStyleCatalog;
@@ -51,7 +52,8 @@ public class ScriptConfig implements Config {
 	}
 
 	public void handleOutput(Map<String, String> vars, String output, boolean debug) throws ConfigException {
-		if ("pdf".equals(output)) {
+		switch (output) {
+		case "pdf": {
 			String file = vars.remove("file");
 			if (file == null)
 				throw new ConfigException("output file was not defined");
@@ -62,8 +64,22 @@ public class ScriptConfig implements Config {
 			String upload = vars.remove("upload");
 			StyleCatalog catalog = new SimpleStyleCatalog();
 			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug));
-		} else
+			break;
+		}
+		case "blogger": {
+			String creds = vars.remove("credentials");
+			if (creds == null)
+				throw new ConfigException("credentials was not defined");
+			try {
+				sinks.add(new BloggerSink(root, new File(creds)));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			break;
+		}
+		default:
 			throw new ConfigException("Unrecognized output type " + output);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
