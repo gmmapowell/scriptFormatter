@@ -1,6 +1,7 @@
 package com.gmmapowell.script.loader.drive;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -94,6 +95,8 @@ public class DriveLoader implements Loader {
 		Index index = new Index(downloads);
 		try (FileReader fr = new FileReader(indexFile)) {
 			index.readFrom(fr);
+		} catch (FileNotFoundException ex) {
+			System.out.println(indexFile + " not found; creating");
 		}
 		
 		FileWriter fw = new FileWriter(indexFile, true);

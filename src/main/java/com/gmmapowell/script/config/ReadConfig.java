@@ -14,10 +14,18 @@ public class ReadConfig {
 			System.out.println("There is no file " + file);
 			return null;
 		}
-		Map<String, String> vars = new TreeMap<>();
+		ScriptConfig ret = new ScriptConfig(file.getParentFile());
+		Map<String, String> vars = null;
+		boolean debug = false;
+		String index = null, workdir = null;
+		String what = null, type = null;
+		int wline = 0;
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
 			String s;
 			while ((s = lnr.readLine()) != null) {
+				if (s.length() == 0 || s.startsWith("#"))
+					continue;
+				boolean nested = Character.isWhitespace(s.charAt(0));
 				s = s.trim();
 				if (s.length() == 0 || s.startsWith("#"))
 					continue;
@@ -27,33 +35,84 @@ public class ReadConfig {
 					System.out.println("  " + s);
 					return null;
 				}
-				String before = s.substring(0, idx);
-				String after = s.substring(idx+1).trim();
-				vars.put(before, after);
+				String key = s.substring(0, idx);
+				String value = s.substring(idx+1).trim();
+				if (!nested) {
+					// if a new block is starting, flush (any) previous block
+					if (!handleCreation(ret, vars, debug, index, workdir, what, type, wline))
+						return null;
+					vars = new TreeMap<>();
+					what = null;
+					switch (key) {
+					case "debug": {
+						debug = Boolean.parseBoolean(value);
+						break;
+					}
+					case "index": {
+						index = value;
+						break;
+					}
+					case "workdir": {
+						workdir = value;
+						break;
+					}
+					default: {
+						what = key;
+						type = value;
+						wline = lnr.getLineNumber();
+						break;
+					}
+					}
+				} else if (what == null) {
+					System.out.println(lnr.getLineNumber() + ": must have outer block to nest inside: " + s);
+				} else
+					vars.put(key, value);
 			}
+			if (!handleCreation(ret, vars, debug, index, workdir, what, type, wline))
+				return null;
 		} catch (IOException ex) {
 			System.out.println("Could not read configuration " + file);
-		}
-		ScriptConfig ret = new ScriptConfig(file.getParentFile());
-		String debugS = vars.remove("debug");
-		boolean debug = false;
-		if ("true".equals(debugS))
-			debug = true;
-		try {
-			ret.handleLoader(vars, debug);
-			ret.handleOutput(vars, debug);
-			ret.handleProcessor(vars, debug);
+			return null;
 		} catch (ConfigException ex) {
 			System.out.println(ex.getMessage());
 			return null;
 		}
+		return ret;
+	}
+
+	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, String index, String workdir,
+			String what, String type, int wline) throws ConfigException {
+		if (what == null)
+			return true;
+		switch (what) {
+		case "loader": {
+			if (index == null) {
+				System.out.println(wline + ": must specify index before loader");
+				return false;
+			}
+			ret.handleLoader(vars, type, index, workdir, debug);
+			break;
+		}
+		case "processor": {
+			ret.handleProcessor(vars, type, debug);
+			break;
+		}
+		case "output": {
+			ret.handleOutput(vars, type, debug);
+			break;
+		}
+		default: {
+			System.out.println(wline +": there is no block " + what);
+			return false;
+		}
+		}
 		if (!vars.isEmpty()) {
-			System.out.println("these vars were specified but not used:");
+			System.out.println(wline + ": block " + what + " was given vars but did not use them:");
 			for (String v : vars.keySet())
 				System.out.println("  " + v);
-			return null;
+			return false;
 		}
-		return ret;
+		return true;
 	}
 
 }
