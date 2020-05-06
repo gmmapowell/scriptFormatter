@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.sink.Sink;
@@ -64,10 +65,10 @@ public class BloggerSink implements Sink {
 
 	@Override
 	public void upload() throws Exception {
-//		if (title == null) {
-//			System.out.println("Cannot upload without a title");
-//			return;
-//		}
+		if (title == null) {
+			System.out.println("Cannot upload without a title");
+			return;
+		}
 		String idx = findInPosts();
 		if (idx == null) {
 			readAll();
@@ -89,7 +90,7 @@ public class BloggerSink implements Sink {
 	}
 
 	private String findInPosts() {
-		return null;
+		return index.find(title);
 	}
 
 	private void readAll() throws IOException, GeneralSecurityException {
@@ -105,9 +106,9 @@ public class BloggerSink implements Sink {
 			Posts posts = blogger.posts();
 			String npt = null;
 			while (true) {
-				PostList list = posts.list(blog.getId()).setPageToken(npt).execute();
+				PostList list = posts.list(blog.getId()).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
 				for (Post e : list.getItems()) {
-					index.have(e.getId(), e.getTitle());
+					index.have(e.getId(), e.getStatus(), e.getTitle());
 				}
 				npt = list.getNextPageToken();
 				if (npt == null)

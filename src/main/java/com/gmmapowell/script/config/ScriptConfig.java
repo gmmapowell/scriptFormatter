@@ -123,7 +123,7 @@ public class ScriptConfig implements Config {
 	}
 
 	@Override
-	public void generate(FilesToProcess files) {
+	public void generate(FilesToProcess files) throws IOException {
 		processor.process(files);
 	}
 

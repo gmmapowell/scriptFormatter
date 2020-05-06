@@ -7,7 +7,7 @@ import com.gmmapowell.script.FilesToProcess;
 
 public interface Config {
 	FilesToProcess updateIndex() throws IOException, GeneralSecurityException;
-	void generate(FilesToProcess files);
+	void generate(FilesToProcess files) throws IOException;
 	void show();
 	void upload() throws Exception;
 }

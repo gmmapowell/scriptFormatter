@@ -34,7 +34,12 @@ public class Main {
 			System.out.println("Error updating index from Google Drive:\n  " + e.getMessage());
 			return;
 		}
-		cfg.generate(files);
+		try {
+			cfg.generate(files);
+		} catch (IOException ex) {
+			System.out.println("Error processing:\n  " + ex.getMessage());
+			return;
+		}
 		cfg.show();
 		try {
 			cfg.upload();
