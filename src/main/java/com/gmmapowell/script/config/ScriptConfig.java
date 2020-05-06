@@ -21,8 +21,6 @@ import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.styles.simple.SimpleStyleCatalog;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 
 public class ScriptConfig implements Config {
 	private final File root;
@@ -70,10 +68,19 @@ public class ScriptConfig implements Config {
 			String creds = vars.remove("credentials");
 			if (creds == null)
 				throw new ConfigException("credentials was not defined");
+			String blogUrl = vars.remove("blogurl");
+			if (blogUrl == null)
+				throw new ConfigException("blogurl was not defined");
+			String posts = vars.remove("posts");
+			if (posts == null)
+				throw new ConfigException("posts was not defined");
+			File pf = new File(posts);
+			if (!pf.isAbsolute())
+				pf = new File(root, posts);
 			try {
-				sinks.add(new BloggerSink(root, new File(creds)));
+				sinks.add(new BloggerSink(root, new File(creds), blogUrl, pf));
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
 			}
 			break;
 		}
@@ -126,7 +133,7 @@ public class ScriptConfig implements Config {
 			sink.showFinal();
 	}
 
-	public void upload() throws JSchException, SftpException {
+	public void upload() throws Exception {
 		if (sink != null)
 			sink.upload();
 	}

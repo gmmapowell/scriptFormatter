@@ -1,10 +1,11 @@
 package com.gmmapowell.script.sink.blogger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Map.Entry;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.sink.Sink;
@@ -19,39 +20,28 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.blogger.Blogger;
 import com.google.api.services.blogger.Blogger.Blogs;
 import com.google.api.services.blogger.Blogger.Posts;
-import com.google.api.services.blogger.BloggerRequestInitializer;
 import com.google.api.services.blogger.BloggerScopes;
 import com.google.api.services.blogger.model.Blog;
 import com.google.api.services.blogger.model.Post;
 import com.google.api.services.blogger.model.PostList;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 
 public class BloggerSink implements Sink {
-	private File creds;
+	private final File creds;
+	private final String blogUrl;
+	private final File posts;
+	private final PostIndex index;
+	private String title;
 
-	public BloggerSink(File root, File creds) throws IOException, GeneralSecurityException {
+	public BloggerSink(File root, File creds, String blogUrl, File posts) throws IOException {
 		this.creds = creds;
-		Credential c = getCredential();
-		Blogger blogger = new Blogger.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), c)
-            .setApplicationName("ScriptFormatter")
-            .setBloggerRequestInitializer(new BloggerRequestInitializer())
-			.build();
-		Blogs conn = blogger.blogs();
-		Blog blog = conn.getByUrl("https://ignorancemaybestrength.blogspot.com/").execute();
-		Posts posts = blogger.posts();
-		String npt = null;
-		while (true) {
-			PostList list = posts.list(blog.getId()).setPageToken(npt).execute();
-			System.out.println("#items = " + list);
-			for (Post e : list.getItems()) {
-				System.out.println(e);
-			}
-			npt = list.getNextPageToken();
-			System.out.println(npt);
-			if (npt == null)
-				break;
-		}
+		this.blogUrl = blogUrl;
+		this.posts = posts;
+		index = readPosts();
+	}
+
+	@Override
+	public void title(String title) throws IOException {
+		this.title = title;
 	}
 
 	@Override
@@ -73,11 +63,58 @@ public class BloggerSink implements Sink {
 	}
 
 	@Override
-	public void upload() throws JSchException, SftpException {
-		// TODO Auto-generated method stub
-
+	public void upload() throws Exception {
+//		if (title == null) {
+//			System.out.println("Cannot upload without a title");
+//			return;
+//		}
+		String idx = findInPosts();
+		if (idx == null) {
+			readAll();
+			idx = findInPosts();
+		}
+		if (idx == null) {
+			System.out.println("Create " + title);
+		}
 	}
+
+	private PostIndex readPosts() throws IOException {
+		PostIndex index = new PostIndex();
+		try (FileReader fr = new FileReader(posts)) {
+			index.readFrom(fr);
+		} catch (FileNotFoundException ex) {
+			System.out.println(posts + " not found; creating");
+		}
+		return index;
+	}
+
+	private String findInPosts() {
+		return null;
+	}
+
+	private void readAll() throws IOException, GeneralSecurityException {
+		try (FileWriter fw = new FileWriter(posts, true)) {
+			index.appendTo(fw);
 	
+			Credential c = getCredential();
+			Blogger blogger = new Blogger.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), c)
+	            .setApplicationName("ScriptFormatter")
+				.build();
+			Blogs conn = blogger.blogs();
+			Blog blog = conn.getByUrl(blogUrl).execute();
+			Posts posts = blogger.posts();
+			String npt = null;
+			while (true) {
+				PostList list = posts.list(blog.getId()).setPageToken(npt).execute();
+				for (Post e : list.getItems()) {
+					index.have(e.getId(), e.getTitle());
+				}
+				npt = list.getNextPageToken();
+				if (npt == null)
+					break;
+			}
+		}
+	}
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));

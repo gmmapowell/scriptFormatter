@@ -4,14 +4,18 @@ import java.io.IOException;
 import java.util.List;
 
 import com.gmmapowell.script.elements.Block;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 
 public class MultiSink implements Sink {
 	private final List<Sink> sinks;
 
 	public MultiSink(List<Sink> sinks) {
 		this.sinks = sinks;
+	}
+
+	@Override
+	public void title(String title) throws IOException {
+		for (Sink s : sinks)
+			s.title(title);
 	}
 
 	@Override
@@ -33,7 +37,7 @@ public class MultiSink implements Sink {
 	}
 
 	@Override
-	public void upload() throws JSchException, SftpException {
+	public void upload() throws Exception {
 		for (Sink s : sinks)
 			s.upload();
 	}

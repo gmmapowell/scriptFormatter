@@ -58,6 +58,10 @@ public class PDFSink implements Sink {
 	}
 
 	@Override
+	public void title(String title) throws IOException {
+	}
+
+	@Override
 	public void block(Block block) throws IOException {
 		List<RenderInfo> ris = new ArrayList<>();
 		collectRI(ris, block);

@@ -14,10 +14,10 @@ import java.util.Map;
 import com.gmmapowell.script.FilesToProcess;
 
 public class Index implements FilesToProcess {
+	private final Map<String, String> current = new LinkedHashMap<>();
 	private final File downloads;
 	private FileWriter appendTo;
 	private boolean writtenExcluded;
-	private Map<String, String> current = new LinkedHashMap<>();
 	private int included;
 
 	public Index(File downloads) {
