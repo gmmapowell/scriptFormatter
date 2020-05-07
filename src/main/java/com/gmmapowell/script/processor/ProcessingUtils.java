@@ -1,5 +1,8 @@
 package com.gmmapowell.script.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
@@ -7,30 +10,62 @@ import com.gmmapowell.script.elements.SpanBlock;
 // This should be unit tested
 public class ProcessingUtils {
 	public static void addSpans(ElementFactory factory, SpanBlock block, String text) {
-		int startIdx;
-		while ((startIdx = text.indexOf(" _")) != -1) { // NOTE: this is <space> <underscore>
-			int endIdx = startIdx+2;
-			while ((endIdx = text.indexOf("_", endIdx)) != -1) {
-				if (endIdx == text.length()-1)
-					break;
-				else {
-					char c = text.charAt(endIdx+1);
-					if (!Character.isLetterOrDigit(c))
-						break;
+		text = addRecursiveSpans(factory, block, null, text, false);
+		if (text != null && text.length() > 0) {
+			Span span = factory.span(null, text);
+			block.addSpan(span);
+		}
+	}
+	
+	private static String addRecursiveSpans(ElementFactory factory, SpanBlock block, List<String> defaultStyle, String text, boolean inside) {
+		int i=0;
+		while (text != null && i<text.length()) {
+			char c = text.charAt(i);
+			if (c == '_' || c == '$' || c == '*') {
+				if (i == 0 || text.charAt(i-1) == ' ') {
+					if (i > 0) {
+						addSpan(factory, block, defaultStyle, text.substring(0, i));
+					}
+					text = addRecursiveSpans(factory, block, styleOf(defaultStyle, c), text.substring(i+1), true); 
+					i=0;
+					continue;
+				} else if (inside && (i == text.length()-1 || text.charAt(i+1) == ' ')) {
+					addSpan(factory, block, defaultStyle, text.substring(0, i));
+					return text.substring(i+1);
 				}
 			}
-			if (endIdx != -1) {
-				Span span = factory.span(null, text.substring(0, startIdx+1)); // +1 to include the space
-				block.addSpan(span);
-				
-				Span itspan = factory.span("italic", text.substring(startIdx+2, endIdx)); // +2 to skip the space & underscore, 
-				block.addSpan(itspan);
-				
-				text = text.substring(endIdx+1); // +1 skips the underscore but leaves the space in text
-			} else
-				break;
+			i++;
 		}
-		Span span = factory.span(null, text);
+		return text;
+	}
+
+	private static void addSpan(ElementFactory factory, SpanBlock block, List<String> defaultStyle, String toAdd) {
+		Span span;
+		if (defaultStyle == null || defaultStyle.isEmpty())
+			span = factory.span(null, toAdd);
+		else if (defaultStyle.size() == 1)
+			span = factory.span(defaultStyle.get(0), toAdd);
+		else
+			span = factory.lspan(defaultStyle, toAdd);
 		block.addSpan(span);
+	}
+
+	private static List<String> styleOf(List<String> defaultStyle, char c) {
+		String sty;
+		switch (c) {
+		case '_':
+			sty = "italic";
+			break;
+		case '$':
+			sty = "tt";
+			break;
+		default:
+			throw new RuntimeException("Cannot handle " + c);
+		}
+		List<String> ret = new ArrayList<>();
+		if (defaultStyle != null)
+			ret.addAll(defaultStyle);
+		ret.add(sty);
+		return ret;
 	}
 }

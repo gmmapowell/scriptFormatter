@@ -1,5 +1,7 @@
 package com.gmmapowell.script.styles.simple;
 
+import java.util.List;
+
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.styles.Justification;
@@ -17,11 +19,18 @@ public class CompoundStyle implements Style {
 		this.parent = parent;
 	}
 
-	@Override
-	public Style apply(String style) {
+	public static Style combine(StyleCatalog catalog, Style base, List<String> style) {
 		if (style == null)
-			return this;
-		return new CompoundStyle(catalog, catalog.get(style), this);
+			return base;
+		for (String s : style) {
+			base = new CompoundStyle(catalog, catalog.get(s), base);
+		}
+		return base;
+	}
+	
+	@Override
+	public Style apply(List<String> style) {
+		return combine(catalog, this, style);
 	}
 
 	@Override

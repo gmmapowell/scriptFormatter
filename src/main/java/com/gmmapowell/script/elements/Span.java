@@ -1,6 +1,9 @@
 package com.gmmapowell.script.elements;
 
+import java.util.List;
+
 public interface Span {
+	List<String> getStyles();
 	String getText();
-	String getStyle();
+	void addSpan(Span sub);
 }

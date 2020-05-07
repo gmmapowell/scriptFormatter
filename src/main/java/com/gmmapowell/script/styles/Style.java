@@ -1,10 +1,12 @@
 package com.gmmapowell.script.styles;
 
+import java.util.List;
+
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 public interface Style {
 
-	Style apply(String style);
+	Style apply(List<String> list);
 
 	Float getAfterBlock();
 	Float getBeforeBlock();

@@ -93,7 +93,7 @@ public class PDFSink implements Sink {
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
 		float wid = pageStyle.getPageWidth() - fm - rm;
 		for (Span s : block) {
-			Style style = baseStyle.apply(s.getStyle());
+			Style style = baseStyle.apply(s.getStyles());
 			String tx = s.getText();
 			String[] parts = tx.split(" ");
 			boolean first = true;

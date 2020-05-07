@@ -1,5 +1,7 @@
 package com.gmmapowell.script.elements.block;
 
+import java.util.List;
+
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
@@ -16,6 +18,11 @@ public class BlockishElementFactory implements ElementFactory {
 	@Override
 	public Span span(String format, String text) {
 		return new TextSpan(format, text);
+	}
+
+	@Override
+	public Span lspan(List<String> formats, String text) {
+		return new TextSpan(formats, text);
 	}
 
 	@Override

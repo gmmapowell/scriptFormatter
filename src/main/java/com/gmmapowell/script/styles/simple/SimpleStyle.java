@@ -1,5 +1,7 @@
 package com.gmmapowell.script.styles.simple;
 
+import java.util.List;
+
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
@@ -25,10 +27,8 @@ public class SimpleStyle implements Style, Builder {
 	}
 	
 	@Override
-	public Style apply(String style) {
-		if (style == null)
-			return this;
-		return new CompoundStyle(catalog, catalog.get(style), this);
+	public Style apply(List<String> styles) {
+		return CompoundStyle.combine(catalog, this, styles);
 	}
 
 	@Override
