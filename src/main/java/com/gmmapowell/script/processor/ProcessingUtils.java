@@ -56,6 +56,9 @@ public class ProcessingUtils {
 		case '_':
 			sty = "italic";
 			break;
+		case '*':
+			sty = "bold";
+			break;
 		case '$':
 			sty = "tt";
 			break;

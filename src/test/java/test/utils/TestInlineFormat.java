@@ -126,6 +126,24 @@ public class TestInlineFormat {
 		ProcessingUtils.addSpans(factory, block, "hello _this is $MY$ world_");
 	}
 
+	@Test
+	public void aNormalBold() {
+		ElementFactory factory = context.mock(ElementFactory.class);
+		SpanBlock block = context.mock(SpanBlock.class);
+		Span s1 = context.mock(Span.class, "s1");
+		Span s2 = context.mock(Span.class, "s2");
+		Span s3 = context.mock(Span.class, "s3");
+		context.checking(new Expectations() {{
+			oneOf(factory).span(null, "hello "); will(returnValue(s1));
+			oneOf(block).addSpan(s1);
+			oneOf(factory).span("bold", "there"); will(returnValue(s2));
+			oneOf(block).addSpan(s2);
+			oneOf(factory).span(null, " world"); will(returnValue(s3));
+			oneOf(block).addSpan(s3);
+		}});
+		ProcessingUtils.addSpans(factory, block, "hello *there* world");
+	}
+
 
 	// embedded underscore
 	// double underscore
