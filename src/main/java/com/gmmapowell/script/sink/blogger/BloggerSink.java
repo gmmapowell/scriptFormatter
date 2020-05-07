@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Group;
@@ -108,12 +110,31 @@ public class BloggerSink implements Sink {
 			break;
 		}
 		}
+		List<String> cf = new ArrayList<>();
 		for (Span s : block) {
+			List<String> styles = s.getStyles();
+			drawDownTo(cf, styles.size());
+			for (int i=0;i<styles.size();i++) {
+				if (cf.size() > i && cf.get(i).equals(styles.get(i)))
+					continue;
+				else if (cf.size() > i) {
+					drawDownTo(cf, i);
+				}
+				writer.print("<" + styles.get(i) + ">");
+				cf.add(styles.get(i));
+			}
 			writer.print(s.getText());
 		}
+		drawDownTo(cf, 0);
 		if (!wantBr)
 			writer.println("</" + block.getStyle() + ">");
 		return wantBr;
+	}
+
+	private void drawDownTo(List<String> cf, int to) {
+		while (cf.size() > to) {
+			writer.print("</" + cf.remove(cf.size()-1) + ">");
+		}
 	}
 
 	private boolean writeGroup(Group block) {

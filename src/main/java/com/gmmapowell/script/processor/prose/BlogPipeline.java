@@ -56,9 +56,8 @@ public class BlogPipeline implements Processor {
 					} else {
 						if (curr == null) {
 							curr = ef.block("text");
-						} else
-							curr.addSpan(ef.span(null, " "));
-						curr.addSpan(ef.span(null, s));
+						}
+						ProcessingUtils.addSpans(ef, curr, s);
 					}
 				}
 			}

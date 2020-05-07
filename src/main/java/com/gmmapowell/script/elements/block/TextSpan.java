@@ -1,5 +1,6 @@
 package com.gmmapowell.script.elements.block;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class TextSpan implements Span {
 	private final String text;
 
 	public TextSpan(String style, String text) {
-		this.formats = Arrays.asList(style);
+		this.formats = style == null ? new ArrayList<>() : Arrays.asList(style);
 		this.text = text;
 	}
 
