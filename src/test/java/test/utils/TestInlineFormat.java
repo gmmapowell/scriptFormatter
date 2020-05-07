@@ -144,11 +144,36 @@ public class TestInlineFormat {
 		ProcessingUtils.addSpans(factory, block, "hello *there* world");
 	}
 
+	@Test
+	public void doubleDollarIsEscape() {
+		ElementFactory factory = context.mock(ElementFactory.class);
+		SpanBlock block = context.mock(SpanBlock.class);
+		Span s1 = context.mock(Span.class);
+		context.checking(new Expectations() {{
+			oneOf(factory).span(null, "this cost me $$420$$ you see"); will(returnValue(s1));
+			oneOf(block).addSpan(s1);
+		}});
+		ProcessingUtils.addSpans(factory, block, "this cost me $$420$$ you see");
+	}
 
-	// embedded underscore
-	// double underscore
-	// inversion when you embed italic in italic
-	// $..$ for code
-	// mixing them
-	// need to support $$\n  ... \n$$\n for blockquote (see blogcode)
+	@Test
+	public void italicInversionWhenNested() { // actually, somebody downstream will have to do the inversion; we just observe the nesting
+		ElementFactory factory = context.mock(ElementFactory.class);
+		SpanBlock block = context.mock(SpanBlock.class);
+		Span s1 = context.mock(Span.class, "s1");
+		Span s2 = context.mock(Span.class, "s2");
+		Span s3 = context.mock(Span.class, "s3");
+		Span s4 = context.mock(Span.class, "s4");
+		context.checking(new Expectations() {{
+			oneOf(factory).span(null, "hello "); will(returnValue(s1));
+			oneOf(block).addSpan(s1);
+			oneOf(factory).span("italic", "this is "); will(returnValue(s2));
+			oneOf(block).addSpan(s2);
+			oneOf(factory).lspan(Arrays.asList("italic", "italic"), "MY"); will(returnValue(s3));
+			oneOf(block).addSpan(s3);
+			oneOf(factory).span("italic", " world"); will(returnValue(s4));
+			oneOf(block).addSpan(s4);
+		}});
+		ProcessingUtils.addSpans(factory, block, "hello _this is _MY_ world_");
+	}
 }

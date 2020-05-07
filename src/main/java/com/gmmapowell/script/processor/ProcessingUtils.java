@@ -22,6 +22,10 @@ public class ProcessingUtils {
 		while (text != null && i<text.length()) {
 			char c = text.charAt(i);
 			if (c == '_' || c == '$' || c == '*') {
+				if (i < text.length()-1 && c == text.charAt(i+1)) {
+					i+=2;
+					continue;
+				}
 				if (i == 0 || text.charAt(i-1) == ' ') {
 					if (i > 0) {
 						addSpan(factory, block, defaultStyle, text.substring(0, i));
