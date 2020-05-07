@@ -28,6 +28,7 @@ public class BlogPipeline implements Processor {
 		for (File x : files.included()) {
 			sink.title(x.getName().replace(".txt", ""));
 			SpanBlock curr = null;
+			boolean blockquote = false;
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(x))) {
 				String s;
 				while ((s = lnr.readLine()) != null) {
@@ -39,7 +40,10 @@ public class BlogPipeline implements Processor {
 						}
 						continue;
 					}
-					if (s.startsWith("+")) {
+					if (s.equals("$$")) {
+						blockquote = !blockquote;
+						continue;
+					} else if (s.startsWith("+")) {
 						if (curr != null) {
 							sink.block(curr);
 						}
@@ -54,7 +58,11 @@ public class BlogPipeline implements Processor {
 						curr.addSpan(ef.span(null, s.substring(s.indexOf(" ")+1).trim()));
 						continue;
 					} else {
-						if (curr == null) {
+						if (blockquote) {
+							if (curr != null)
+								sink.block(curr);
+							curr = ef.block("blockquote");
+						} else if (curr == null) {
 							curr = ef.block("text");
 						}
 						ProcessingUtils.addSpans(ef, curr, s);

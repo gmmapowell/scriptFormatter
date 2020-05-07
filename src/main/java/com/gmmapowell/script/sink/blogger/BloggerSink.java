@@ -35,7 +35,7 @@ import com.google.api.services.blogger.model.PostList;
 
 public class BloggerSink implements Sink {
 	public enum Mode {
-		START, NORMAL, LIST
+		START, NORMAL, LIST, BLOCKQUOTE
 	}
 
 	private final File creds;
@@ -84,7 +84,10 @@ public class BloggerSink implements Sink {
 		case "text": {
 			if (mode == Mode.LIST)
 				writer.println("</ul>");
-			else if (mode == Mode.NORMAL)
+			else if (mode == Mode.BLOCKQUOTE) {
+				writer.println("</span>");
+				writer.println("</blockquote>");
+			} else if (mode == Mode.NORMAL)
 				writer.println("<br/>");
 			mode = Mode.NORMAL;
 			break;
@@ -94,6 +97,16 @@ public class BloggerSink implements Sink {
 				writer.println("<ul>");
 			mode = Mode.LIST;
 			writer.print("  <li>");
+			break;
+		}
+		case "blockquote": {
+			if (mode == Mode.LIST) {
+				writer.println("</ul>");
+			} else if (mode != Mode.BLOCKQUOTE) {
+				writer.println("<blockquote class='tr_bq'>");
+				writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small;'>");
+				mode = Mode.BLOCKQUOTE;
+			}
 			break;
 		}
 		default: {
@@ -143,6 +156,17 @@ public class BloggerSink implements Sink {
 
 	@Override
 	public void close() throws IOException {
+		switch (mode) {
+		case LIST:
+			writer.println("</ul>");
+			break;
+		case BLOCKQUOTE:
+			writer.println("</span>");
+			writer.println("</blockquote>");
+			break;
+		default:
+			break;
+		}
 		writer.close();
 	}
 
