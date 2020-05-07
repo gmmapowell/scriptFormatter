@@ -65,7 +65,18 @@ public class BlogPipeline implements Processor {
 						} else if (curr == null) {
 							curr = ef.block("text");
 						}
-						ProcessingUtils.addSpans(ef, curr, s);
+						if (s.startsWith("&link ")) {
+							// do we need to add spaces?
+							int idx = s.indexOf(' ');
+							int idx2 = s.indexOf(' ', idx+1);
+							curr.addSpan(ef.span(null, " "));
+							curr.addSpan(ef.span("link", s.substring(idx+1, idx2).trim()));
+							ProcessingUtils.addSpans(ef, curr, s.substring(idx2+1).trim());
+							curr.addSpan(ef.span("endlink", ""));
+							curr.addSpan(ef.span(null, " "));
+						} else {
+							ProcessingUtils.addSpans(ef, curr, s);
+						}
 					}
 				}
 			}

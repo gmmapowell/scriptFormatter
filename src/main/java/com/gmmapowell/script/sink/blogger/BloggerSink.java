@@ -16,6 +16,7 @@ import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.block.TextBlock;
+import com.gmmapowell.script.elements.block.TextSpan;
 import com.gmmapowell.script.sink.Sink;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -126,6 +127,18 @@ public class BloggerSink implements Sink {
 		List<String> cf = new ArrayList<>();
 		for (Span s : block) {
 			List<String> styles = s.getStyles();
+			if (styles.size() == 1) {
+				switch(styles.get(0)) {
+				case "link": {
+					writer.print("<a href='" + s.getText() + "'>");
+					continue;
+				}
+				case "endlink": {
+					writer.print("</a>");
+					continue;
+				}
+				}
+			}
 			drawDownTo(cf, styles.size());
 			for (int i=0;i<styles.size();i++) {
 				if (cf.size() > i && cf.get(i).equals(styles.get(i)))
@@ -136,12 +149,37 @@ public class BloggerSink implements Sink {
 				writer.print("<" + styles.get(i) + ">");
 				cf.add(styles.get(i));
 			}
-			writer.print(s.getText());
+			writer.print(entitify(s.getText()));
 		}
 		drawDownTo(cf, 0);
 		if (!wantBr)
 			writer.println("</" + block.getStyle() + ">");
 		return wantBr;
+	}
+
+	private String entitify(String text) {
+		StringBuilder sb = new StringBuilder(text);
+		// it is sort of easier to work backwards
+		for (int i=sb.length()-1;i>=0;i--) {
+			switch (sb.charAt(i)) {
+			case '&': {
+				sb.replace(i, i+1, "&amp;");
+				break;
+			}
+			case '<': {
+				sb.replace(i, i+1, "&lt;");
+				break;
+			}
+			case '>': {
+				sb.replace(i, i+1, "&gt;");
+				break;
+			}
+			default: {
+				break;
+			}
+			}
+		}
+		return sb.toString();
 	}
 
 	private void drawDownTo(List<String> cf, int to) {
