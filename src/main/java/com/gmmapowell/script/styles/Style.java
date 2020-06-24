@@ -8,16 +8,25 @@ public interface Style {
 
 	Style apply(List<String> list);
 
+	Boolean beginNewPage();
+	Boolean showAtBottom();
+	Float getRequireAfter();
 	Float getAfterBlock();
 	Float getBeforeBlock();
 	Float getFirstMargin();
+	Float getWidth();
 	PDFont getFont();
 	String getFontName();
 	Float getFontSize();
+	Float getBaselineAdjust();
+	Boolean getBold();
 	Boolean getItalic();
 	Justification getJustification();
 	Float getLeftMargin();
 	Float getLineSpacing();
 	Float getRightMargin();
 	Boolean getUnderline();
+
+
+
 }

@@ -16,6 +16,9 @@ public class MovieStyleCatalog extends FontCatalog {
 
 	public MovieStyleCatalog() {
 		defaultStyle = create()
+			.beginNewPage(false)
+			.showAtBottom(false)
+			.setRequireAfter(0)
 			.setAfterBlock(0)
 			.setBeforeBlock(0)
 			.setJustification(Justification.LEFT)
@@ -23,6 +26,9 @@ public class MovieStyleCatalog extends FontCatalog {
 			.setLineSpacing(14f)
 			.setRightMargin(0f)
 			.setFont("courier")
+			.setFontSize(12.0f)
+			.setBaselineAdjust(0f)
+			.setBold(false)
 			.setItalic(false)
 			.setUnderline(false)
 			.build();

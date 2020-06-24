@@ -34,10 +34,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 					try {
 						s = trim(s);
 						if (s.length() == 0) {
-							if (st.curr != null) {
-								sink.block(st.curr);
-								st.curr = null;
-							}
+							endBlock(st);
 						} else
 							handleLine(st, s);
 					} catch (Exception ex) {
@@ -53,6 +50,13 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 				sink.block(st.curr);
 		}
 		sink.close();
+	}
+
+	protected void endBlock(T st) throws IOException {
+		if (st.curr != null) {
+			sink.block(st.curr);
+			st.curr = null;
+		}
 	}
 
 	protected abstract T begin();

@@ -15,22 +15,32 @@ public abstract class FontCatalog implements StyleCatalog {
 	}
 
 	@Override
-	public PDFont getFont(String font, Boolean italic) {
+	public PDFont getFont(String font, Boolean italic, Boolean bold) {
 		if (font == null)
 			return null;
 		switch (font) {
 		case "courier":
-			if (italic)
+			if (bold && italic)
+				return PDType1Font.COURIER_BOLD_OBLIQUE;
+			else if (bold)
+				return PDType1Font.COURIER_BOLD;
+			else if (italic)
 				return PDType1Font.COURIER_OBLIQUE;
 			else
 				return PDType1Font.COURIER;
 		case "helvetica":
-			if (italic)
+			if (bold && italic)
+				return PDType1Font.HELVETICA_BOLD_OBLIQUE;
+			else if (bold)
+				return PDType1Font.HELVETICA_BOLD;
+			else if (italic)
 				return PDType1Font.HELVETICA_OBLIQUE;
 			else
 				return PDType1Font.HELVETICA;
 		default:
 			String fn = font;
+			if (bold)
+				fn += "-bold";
 			if (italic)
 				fn += "-italic";
 			PDFont ret = fonts.get(fn);

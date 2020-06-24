@@ -25,6 +25,8 @@ public class BlogPipeline implements Processor {
 	
 	@Override
 	public void process(FilesToProcess files) throws IOException {
+		// TODO: this should be refactored to use ProsePipeline
+		CurrentState state = null;
 		for (File x : files.included()) {
 			sink.title(x.getName().replace(".txt", ""));
 			SpanBlock curr = null;
@@ -48,7 +50,7 @@ public class BlogPipeline implements Processor {
 							sink.block(curr);
 						}
 						curr = ef.block(headingLevel(s));
-						ProcessingUtils.addSpans(ef, curr, s.substring(s.indexOf(" ")+1).trim());
+						ProcessingUtils.addSpans(ef, state, curr, s.substring(s.indexOf(" ")+1).trim());
 						continue;
 					} else if (s.startsWith("*")) {
 						if (curr != null) {
@@ -71,11 +73,11 @@ public class BlogPipeline implements Processor {
 							int idx2 = s.indexOf(' ', idx+1);
 							curr.addSpan(ef.span(null, " "));
 							curr.addSpan(ef.span("link", s.substring(idx+1, idx2).trim()));
-							ProcessingUtils.addSpans(ef, curr, s.substring(idx2+1).trim());
+							ProcessingUtils.addSpans(ef, state, curr, s.substring(idx2+1).trim());
 							curr.addSpan(ef.span("endlink", ""));
 							curr.addSpan(ef.span(null, " "));
 						} else {
-							ProcessingUtils.addSpans(ef, curr, s);
+							ProcessingUtils.addSpans(ef, state, curr, s);
 						}
 					}
 				}

@@ -34,6 +34,30 @@ public class CompoundStyle implements Style {
 	}
 
 	@Override
+	public Boolean beginNewPage() {
+		Boolean maybe = override.beginNewPage();
+		if (maybe != null)
+			return maybe;
+		return parent.beginNewPage();
+	}
+
+	@Override
+	public Boolean showAtBottom() {
+		Boolean maybe = override.showAtBottom();
+		if (maybe != null)
+			return maybe;
+		return parent.showAtBottom();
+	}
+
+	@Override
+	public Float getRequireAfter() {
+		Float maybe = override.getRequireAfter();
+		if (maybe != null)
+			return maybe;
+		return parent.getRequireAfter();
+	}
+
+	@Override
 	public Float getAfterBlock() {
 		Float maybe = override.getAfterBlock();
 		if (maybe != null)
@@ -58,8 +82,16 @@ public class CompoundStyle implements Style {
 	}
 
 	@Override
+	public Float getWidth() {
+		Float maybe = override.getWidth();
+		if (maybe != null)
+			return maybe;
+		return parent.getWidth();
+	}
+
+	@Override
 	public PDFont getFont() {
-		return catalog.getFont(getFontName(), getItalic());
+		return catalog.getFont(getFontName(), getItalic(), getBold());
 	}
 
 	@Override
@@ -76,6 +108,24 @@ public class CompoundStyle implements Style {
 		if (maybe != null)
 			return maybe;
 		return parent.getFontSize();
+	}
+
+	@Override
+	public Float getBaselineAdjust() {
+		Float maybe = override.getBaselineAdjust();
+		if (maybe != null)
+			return maybe;
+		return parent.getBaselineAdjust();
+	}
+
+	@Override
+	public Boolean getBold() {
+		Boolean bold = override.getBold();
+		Boolean pb = parent.getBold();
+		if (bold == null) {
+			return pb;
+		}
+		return bold ^ pb; // XOR to toggle them
 	}
 
 	@Override

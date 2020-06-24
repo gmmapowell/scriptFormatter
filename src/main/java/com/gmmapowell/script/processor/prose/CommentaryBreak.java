@@ -1,4 +1,4 @@
-package com.gmmapowell.script.elements.block;
+package com.gmmapowell.script.processor.prose;
 
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
@@ -6,60 +6,60 @@ import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
-public class BoxyAdBreak implements Break {
+public class CommentaryBreak implements Break {
 
 	@Override
 	public String boxText() {
-		return "AD BREAK";
+		return "Commentary";
 	}
 
 	@Override
 	public float require() {
-		return 0;
+		return 200f; // we are planning on taking up 60pt, then allow 32 for the next heading & 108 for the section to get started
 	}
 
 	@Override
 	public float top() {
-		return 10;
+		return 20;
 	}
 
 	@Override
 	public float textY() {
-		return 27;
+		return 40;
 	}
 
 	@Override
 	public float bottom() {
-		return 42;
+		return 52;
 	}
 
 	@Override
 	public boolean box() {
-		return true;
-	}
-
-	@Override
-	public boolean horizLines() {
 		return false;
 	}
 
 	@Override
-	public PDFont textFont(StyleCatalog styles, PageStyle pageStyle) {
-		return pageStyle.getPageNumberFont();
-	}
-
-	@Override
-	public float fontSize(PageStyle pageStyle) {
-		return pageStyle.getPageNumberFontSize();
-	}
-
-	@Override
-	public boolean newPageAfter() {
+	public boolean horizLines() {
 		return true;
 	}
 
 	@Override
+	public PDFont textFont(StyleCatalog styles, PageStyle pageStyle) {
+		return styles.getFont("palatino", false, true);
+	}
+
+	@Override
+	public float fontSize(PageStyle pageStyle) {
+		return 16f;
+	}
+
+	@Override
+	public boolean newPageAfter() {
+		return false;
+	}
+
+	@Override
 	public float total() {
-		return 0;
+		return 60;
 	}
 }

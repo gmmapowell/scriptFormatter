@@ -10,6 +10,9 @@ import com.gmmapowell.script.styles.StyleCatalog;
 
 public class SimpleStyle implements Style, StyleBuilder {
 	private final StyleCatalog catalog;
+	private Boolean beginNewPage;
+	private Boolean showAtBottom;
+	private Float requireAfter;
 	private Float afterBlock;
 	private Float beforeBlock;
 	private Float first = null;
@@ -17,9 +20,13 @@ public class SimpleStyle implements Style, StyleBuilder {
 	private Float left = null;
 	private Float lineSpacing = null;
 	private Float right = null;
-	private Boolean underline = null;
+	private String font = null;
+	private Float fontSize = null;
+	private Float baselineAdjust = null;
+	private Boolean bold = null;
 	private Boolean italic = null;
-	private String font;
+	private Boolean underline = null;
+	private Float width;
 
 	public SimpleStyle(StyleCatalog catalog) {
 		this.catalog = catalog;
@@ -28,6 +35,21 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public Style apply(List<String> styles) {
 		return CompoundStyle.combine(catalog, this, styles);
+	}
+
+	@Override
+	public Boolean beginNewPage() {
+		return beginNewPage;
+	}
+	
+	@Override
+	public Boolean showAtBottom() {
+		return showAtBottom;
+	}
+
+	@Override
+	public Float getRequireAfter() {
+		return requireAfter;
 	}
 
 	@Override
@@ -49,7 +71,7 @@ public class SimpleStyle implements Style, StyleBuilder {
 	public PDFont getFont() {
 		if (font == null)
 			throw new RuntimeException("No font selected");
-		return catalog.getFont(font, getItalic());
+		return catalog.getFont(font, getItalic(), bold);
 	}
 
 	@Override
@@ -58,10 +80,26 @@ public class SimpleStyle implements Style, StyleBuilder {
 	}
 	
 	@Override
-	public Float getFontSize() {
-		return 12.0f;
+	public StyleBuilder setFontSize(Float f) {
+		this.fontSize = f;
+		return this;
 	}
 
+	@Override
+	public Float getFontSize() {
+		return fontSize;
+	}
+
+	@Override
+	public Float getBaselineAdjust() {
+		return baselineAdjust;
+	}
+	
+	@Override
+	public Boolean getBold() {
+		return this.bold;
+	}
+	
 	@Override
 	public Boolean getItalic() {
 		return this.italic;
@@ -90,6 +128,29 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public Boolean getUnderline() {
 		return underline;
+	}
+
+	@Override
+	public Float getWidth() {
+		return width;
+	}
+	
+	@Override
+	public StyleBuilder beginNewPage(boolean b) {
+		this.beginNewPage = b;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder showAtBottom(boolean b) {
+		this.showAtBottom = b;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setRequireAfter(float f) {
+		this.requireAfter = f;
+		return this;
 	}
 
 	@Override
@@ -141,6 +202,12 @@ public class SimpleStyle implements Style, StyleBuilder {
 	}
 
 	@Override
+	public StyleBuilder setBold(boolean b) {
+		this.bold = b;
+		return this;
+	}
+
+	@Override
 	public StyleBuilder setItalic(boolean b) {
 		this.italic = b;
 		return this;
@@ -149,6 +216,18 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public StyleBuilder setUnderline(boolean b) {
 		this.underline = b;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setWidth(float f) {
+		this.width = f;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setBaselineAdjust(float f) {
+		this.baselineAdjust = f;
 		return this;
 	}
 

@@ -1,44 +1,78 @@
 package com.gmmapowell.script.processor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
+import com.gmmapowell.script.processor.prose.CurrentState;
 
 // This should be unit tested
 public class ProcessingUtils {
-	public static void addSpans(ElementFactory factory, SpanBlock block, String text) {
-		text = addRecursiveSpans(factory, block, null, text, ' ');
+	public static void addSpans(ElementFactory factory, CurrentState state, SpanBlock block, String text) {
+		text = addRecursiveSpans(factory, state, block, null, text, ' ');
 		if (text != null && text.length() > 0) {
 			Span span = factory.span(null, text);
 			block.addSpan(span);
 		}
 	}
 	
-	private static String addRecursiveSpans(ElementFactory factory, SpanBlock block, List<String> defaultStyle, String text, char inside) {
+	private static String addRecursiveSpans(ElementFactory factory, CurrentState state, SpanBlock block, List<String> defaultStyle, String text, char inside) {
 		int i=0;
 		while (text != null && i<text.length()) {
 			char c = text.charAt(i);
 			if (c == '_' || c == '$' || c == '*') {
 				if (i < text.length()-1 && c == text.charAt(i+1)) {
-					i+=2; // I'm not sure this does what we expect ... I think it leaves the double character in :-(
-					continue;
-				}
-				if (i == 0 || text.charAt(i-1) == ' ') {
-					if (i > 0) {
-						addSpan(factory, block, defaultStyle, text.substring(0, i));
-					}
-					text = addRecursiveSpans(factory, block, styleOf(defaultStyle, c), text.substring(i+1), c); 
+					addSpan(factory, block, defaultStyle, text.substring(0, i));
+					text = text.substring(i+2);
 					i=0;
 					continue;
-				} else if (inside != ' '/* && (inside == '$' || i == text.length()-1 || text.charAt(i+1) == ' ') */) { 
+				}
+				if (inside == c /* && (inside == '$' || i == text.length()-1 || text.charAt(i+1) == ' ') */) { 
 					// There is a problem with using these characters: that they may be used inside words
 					// But at the same time it is very common to want to add a suffix to $..$s, so I've allowed that case.
 					// Really, I think we should insist that people use __ if that's what they mean in words.
 					addSpan(factory, block, defaultStyle, text.substring(0, i));
 					return text.substring(i+1);
+				} else {
+					if (i > 0) {
+						addSpan(factory, block, defaultStyle, text.substring(0, i));
+					}
+					text = addRecursiveSpans(factory, state, block, styleOf(defaultStyle, c), text.substring(i+1), c); 
+					i=0;
+					continue;
+				} 
+			} else if (c == '&') {
+				if (i == text.length()-1) {
+					// it's an & at the end of the line ... should just leave it there
+				} else if (text.charAt(i+1) == '&') {
+					// it's a && leave one of them
+					addSpan(factory, block, defaultStyle, text.substring(0, i));
+					text = text.substring(i+2);
+					i=0;
+					continue;
+				} else {
+					addSpan(factory, block, defaultStyle, text.substring(0, i));
+					int j=i+1;
+					while (j < text.length() && Character.isLetterOrDigit(text.charAt(j)))
+						j++;
+					String embed = text.substring(i+1, j);
+					switch (embed) {
+					case "footnote":
+						addSpan(factory, block, Arrays.asList("footnote-number"), Integer.toString(state.nextFootnoteMarker()));
+						break;
+					default:
+						System.out.println("handle embedded " + embed);
+						break;
+					}
+					if (j < text.length() && Character.isWhitespace(text.charAt(j)))
+						text = text.substring(j+1); // skip the space character as well - it is technically just an EOC marker
+					else
+						text = text.substring(j);
+					i = 0;
+					continue;
 				}
 			}
 			i++;

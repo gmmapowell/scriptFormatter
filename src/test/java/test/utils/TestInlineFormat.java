@@ -11,9 +11,11 @@ import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.prose.CurrentState;
 
 public class TestInlineFormat {
 	public @Rule JUnitRuleMockery context = new JUnitRuleMockery();
+	CurrentState state = new CurrentState();
 
 	@Test
 	public void aSimpleCaseWithNothingFancy() {
@@ -24,7 +26,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, "hello"); will(returnValue(s1));
 			oneOf(block).addSpan(s1);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello");
+		ProcessingUtils.addSpans(factory, state, block, "hello");
 	}
 
 	@Test
@@ -42,7 +44,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, " world"); will(returnValue(s3));
 			oneOf(block).addSpan(s3);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello _there_ world");
+		ProcessingUtils.addSpans(factory, state, block, "hello _there_ world");
 	}
 
 	@Test
@@ -57,7 +59,7 @@ public class TestInlineFormat {
 			oneOf(factory).span("italic", "there"); will(returnValue(s2));
 			oneOf(block).addSpan(s2);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello _there_");
+		ProcessingUtils.addSpans(factory, state, block, "hello _there_");
 	}
 
 	@Test
@@ -72,7 +74,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, " world"); will(returnValue(s3));
 			oneOf(block).addSpan(s3);
 		}});
-		ProcessingUtils.addSpans(factory, block, "_hello_ world");
+		ProcessingUtils.addSpans(factory, state, block, "_hello_ world");
 	}
 
 	@Test
@@ -84,7 +86,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, "CONSTANT_VALUE"); will(returnValue(s1));
 			oneOf(block).addSpan(s1);
 		}});
-		ProcessingUtils.addSpans(factory, block, "CONSTANT_VALUE");
+		ProcessingUtils.addSpans(factory, state, block, "CONSTANT_VALUE");
 	}
 
 	@Test
@@ -102,7 +104,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, " world"); will(returnValue(s3));
 			oneOf(block).addSpan(s3);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello $there$ world");
+		ProcessingUtils.addSpans(factory, state, block, "hello $there$ world");
 	}
 
 	@Test
@@ -123,7 +125,7 @@ public class TestInlineFormat {
 			oneOf(factory).span("italic", " world"); will(returnValue(s4));
 			oneOf(block).addSpan(s4);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello _this is $MY$ world_");
+		ProcessingUtils.addSpans(factory, state, block, "hello _this is $MY$ world_");
 	}
 
 	@Test
@@ -141,7 +143,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, " world"); will(returnValue(s3));
 			oneOf(block).addSpan(s3);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello *there* world");
+		ProcessingUtils.addSpans(factory, state, block, "hello *there* world");
 	}
 
 	@Test
@@ -153,7 +155,7 @@ public class TestInlineFormat {
 			oneOf(factory).span(null, "this cost me $$420$$ you see"); will(returnValue(s1));
 			oneOf(block).addSpan(s1);
 		}});
-		ProcessingUtils.addSpans(factory, block, "this cost me $$420$$ you see");
+		ProcessingUtils.addSpans(factory, state, block, "this cost me $$420$$ you see");
 	}
 
 	@Test
@@ -174,6 +176,6 @@ public class TestInlineFormat {
 			oneOf(factory).span("italic", " world"); will(returnValue(s4));
 			oneOf(block).addSpan(s4);
 		}});
-		ProcessingUtils.addSpans(factory, block, "hello _this is _MY_ world_");
+		ProcessingUtils.addSpans(factory, state, block, "hello _this is _MY_ world_");
 	}
 }

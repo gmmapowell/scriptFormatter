@@ -52,4 +52,11 @@ public class Line {
 			ret = Math.max(s.baseline(), ret);
 		return ret;
 	}
+
+	public boolean requiresMoreThan(float f) {
+		for (Segment s : segments)
+			if (!s.requiresMoreThan(f))
+				return false;
+		return true;
+	}
 }

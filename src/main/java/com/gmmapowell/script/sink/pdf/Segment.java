@@ -18,7 +18,7 @@ public class Segment {
 	public void render(PDPageContentStream page, float x, float y) throws IOException {
 		page.beginText();
 		page.setFont(style.getFont(), style.getFontSize());
-		page.newLineAtOffset(x, y);
+		page.newLineAtOffset(x, y+style.getBaselineAdjust());
 		page.showText(text);
 		page.endText();
 		
@@ -35,6 +35,9 @@ public class Segment {
 	}
 
 	public float width() throws IOException {
+		Float sw = style.getWidth();
+		if (sw != null)
+			return sw;
 		return style.getFont().getStringWidth(text) * style.getFontSize() / 1000;
 	}
 
@@ -45,5 +48,10 @@ public class Segment {
 	@Override
 	public String toString() {
 		return text;
+	}
+
+	public boolean requiresMoreThan(float f) {
+		Float ra =style.getRequireAfter();
+		return ra != null && ra > f;
 	}
 }

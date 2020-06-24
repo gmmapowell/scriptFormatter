@@ -9,5 +9,6 @@ public interface ElementFactory {
 	Span lspan(List<String> formats, String text);
 	Group group();
 	Break adbreak();
+	Break commentarybreak();
 
 }

@@ -10,6 +10,6 @@ public interface StyleCatalog {
 
 	Map<String, PDFont> fonts();
 
-	PDFont getFont(String font, Boolean italic);
+	PDFont getFont(String font, Boolean italic, Boolean bold);
 
 }

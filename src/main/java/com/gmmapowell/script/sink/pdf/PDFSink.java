@@ -38,6 +38,8 @@ public class PDFSink implements Sink {
 	private final boolean debug;
 	private final PDDocument doc;
 	private PDPageContentStream currentPage;
+	private float bottomY;
+	private List<Line> bottomLines = new ArrayList<>();
 	
 	private float y;
 	private PageStyle pageStyle;
@@ -98,9 +100,11 @@ public class PDFSink implements Sink {
 
 	private RenderInfo handleSpanBlock(SpanBlock block) throws IOException {
 		String bsname = block.getStyle();
-		if (debug)
-			System.out.println("base style is " + bsname);
+//		if (debug)
+//			System.out.println("base style is " + bsname);
 		Style baseStyle = styles.get(bsname);
+		if (baseStyle == null)
+			throw new RuntimeException("no style found for " + bsname);
 		List<Line> lines = new ArrayList<>();
 		List<Segment> segments = new ArrayList<>();
 		Float fm = baseStyle.getFirstMargin();
@@ -112,8 +116,8 @@ public class PDFSink implements Sink {
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
 		float wid = pageStyle.getPageWidth() - fm - rm;
 		for (Span s : block) {
-			if (debug)
-				System.out.println("span styles: " + s.getStyles());
+//			if (debug)
+//				System.out.println("span styles: " + s.getStyles());
 			Style style = baseStyle.apply(s.getStyles());
 			String tx = s.getText();
 			String[] parts = tx.split(" ");
@@ -137,17 +141,39 @@ public class PDFSink implements Sink {
 		if (!segments.isEmpty())
 			finishLine(lines, segments, wid, baseStyle, fm, rm);
 		
-		RenderInfo ret = new RenderInfo(Math.max(afterBlock, baseStyle.getBeforeBlock()), lines);
+		RenderInfo ret = new RenderInfo(baseStyle.beginNewPage(), baseStyle.showAtBottom(), Math.max(afterBlock, baseStyle.getBeforeBlock()), lines);
 		afterBlock = baseStyle.getAfterBlock();
 		return ret;
 	}
 	
+	private float blockht(List<Line> lines) throws IOException {
+		float ret = 0;
+		for (Line l : lines) {
+			ret += l.height();
+		}
+		return ret;
+	}
+
 	private void render(List<RenderInfo> ris) throws IOException {
-		if (!blocksFit(pageStyle.getBottomMargin(), y, ris)) {
+		int k =0;
+		while (k < ris.size()) {
+			if (ris.get(k).showAtBottom) {
+				RenderInfo ri = ris.remove(k);
+				if (bottomLines.isEmpty())
+					bottomY += 8; // to allow for the HR
+				bottomLines.addAll(ri.lines);
+				bottomY += blockht(ri.lines);
+			} else
+				k++;
+		}
+		if (!blocksFit(bottomY, y, ris)) {
 			closeCurrentPage();
 		}
-		boolean created = ensurePage();
 		for (RenderInfo ri : ris) {
+			if (ri.beginNewPage) {
+				closeCurrentPage();
+			}
+			boolean created = ensurePage();
 			if (!created) {
 				y -= ri.beforeBlock;
 			}
@@ -161,18 +187,21 @@ public class PDFSink implements Sink {
 	}
 
 	private boolean blocksFit(float bottomMargin, float ypos, List<RenderInfo> ris) throws IOException {
+		boolean ret = true;
 		for (RenderInfo ri : ris) {
-			ypos = blockFits(ypos, ri);
+			ret &= blockFits(ypos, bottomMargin, ri);
 		}
-		return ypos >= bottomMargin;
+		return ret;
 	}
 
-	private float blockFits(float ypos, RenderInfo ri) throws IOException {
+	private boolean blockFits(float ypos, float bottomMargin, RenderInfo ri) throws IOException {
 		ypos -= ri.beforeBlock;
 		for (Line l : ri.lines) {
+			if (l.requiresMoreThan(ypos-bottomMargin))
+				return false;
 			ypos -= l.height();
 		}
-		return ypos;
+		return ypos > bottomMargin;
 	}
 
 	private void addSegment(List<Line> lines, List<Segment> segments, float wid, Style baseStyle, Style style, float fm, float rm, String p, boolean addToNext) throws IOException {
@@ -205,24 +234,45 @@ public class PDFSink implements Sink {
 	}
 
 	@Override
-	public void brk(Break ad) throws IOException {
-		// I think the brk should have more info in it
-		currentPage.moveTo(pageStyle.getLeftMargin(), y-10);
-		currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-10);
-		currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-42);
-		currentPage.lineTo(pageStyle.getLeftMargin(), y-42);
-		currentPage.closeAndStroke();
-		PDFont pnf = pageStyle.getPageNumberFont();
-		float pns = pageStyle.getPageNumberFontSize();
+	public void brk(Break brk) throws IOException {
+		if (y-brk.require() < bottomY) {
+			closeCurrentPage();
+			ensurePage();
+		}
+		float top = brk.top();
+		float btm = brk.bottom();
+		float skip = brk.total();
+		if (brk.box()) {
+			currentPage.setLineWidth(1.0f);
+			currentPage.moveTo(pageStyle.getLeftMargin(), y-top);
+			currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-top);
+			currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-btm);
+			currentPage.lineTo(pageStyle.getLeftMargin(), y-btm);
+			currentPage.closeAndStroke();
+		} else if (brk.horizLines()) {
+			currentPage.setLineWidth(1.0f);
+			currentPage.moveTo(pageStyle.getLeftMargin(), y-top);
+			currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-top);
+			currentPage.moveTo(pageStyle.getLeftMargin(), y-btm);
+			currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-btm);
+			currentPage.closeAndStroke();
+		} else
+			throw new RuntimeException("What is the plan?");
+		PDFont pnf = brk.textFont(styles, pageStyle);
+		float pns = brk.fontSize(pageStyle);
 		currentPage.setFont(pnf, pns);
-		String tx = "AD BREAK";
+		String tx = brk.boxText();
 		float txl = pnf.getStringWidth(tx)*pns/1000; 
 		currentPage.beginText();
 		currentPage.setFont(pnf, pns);
-		currentPage.newLineAtOffset(pageStyle.pageNumberCenterX() - txl/2, y-27);
+		currentPage.newLineAtOffset(pageStyle.pageNumberCenterX() - txl/2, y-brk.textY());
 		currentPage.showText(tx);
 		currentPage.endText();
-		closeCurrentPage();
+		if (brk.newPageAfter()) {
+			closeCurrentPage();
+		} else {
+			y -= skip;
+		}
 	}
 
 	@Override
@@ -286,6 +336,7 @@ public class PDFSink implements Sink {
 			doc.addPage(page);
 			currentPage = new PDPageContentStream(doc, page);
 			if (showBorder) {
+				currentPage.setLineWidth(0.3f);
 				currentPage.moveTo(pageStyle.getLeftMargin(), pageStyle.getBottomMargin());
 				currentPage.lineTo(pageStyle.getLeftMargin(), pageStyle.getPageHeight()-pageStyle.getTopMargin());
 				currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), pageStyle.getPageHeight()-pageStyle.getTopMargin());
@@ -304,6 +355,11 @@ public class PDFSink implements Sink {
 				currentPage.endText();
 			}
 			y = pageStyle.getPageHeight() - pageStyle.getTopMargin();
+			bottomY = pageStyle.getBottomMargin();
+			// if we have straggling footnote content, consider that here
+			if (!bottomLines.isEmpty()) {
+				bottomY += blockht(bottomLines) + 8;
+			}
 			afterBlock = 0;
 			return true;
 		}
@@ -312,6 +368,25 @@ public class PDFSink implements Sink {
 
 	private void closeCurrentPage() throws IOException {
 		if (currentPage != null) {
+			if (!bottomLines.isEmpty()) {
+				float fromY = Math.min(this.y, bottomY);
+				float actualBottom = pageStyle.getBottomMargin();
+				currentPage.setLineWidth(0.5f);
+				currentPage.moveTo(pageStyle.getLeftMargin(), fromY);
+				currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), fromY);
+				currentPage.closeAndStroke();
+				fromY -= 5;
+				while (!bottomLines.isEmpty()) { // while they fit ...
+					Line l = bottomLines.remove(0);
+					fromY -= l.height();
+					if (fromY < actualBottom) {
+						bottomLines.add(0, l);
+						break;
+					}
+					l.render(currentPage, fromY);
+				}
+				// if they didn't all fit, some will be left over in the array
+			}
 			currentPage.close();
 			currentPage = null;
 			afterBlock = 0;

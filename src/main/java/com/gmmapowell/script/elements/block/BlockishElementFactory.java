@@ -8,6 +8,7 @@ import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.processor.movie.MultiBlock;
+import com.gmmapowell.script.processor.prose.CommentaryBreak;
 
 public class BlockishElementFactory implements ElementFactory {
 
@@ -34,6 +35,11 @@ public class BlockishElementFactory implements ElementFactory {
 	@Override
 	public Break adbreak() {
 		return new BoxyAdBreak();
+	}
+
+	@Override
+	public Break commentarybreak() {
+		return new CommentaryBreak();
 	}
 
 }
