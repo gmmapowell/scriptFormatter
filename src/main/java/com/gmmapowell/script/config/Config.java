@@ -6,7 +6,7 @@ import java.security.GeneralSecurityException;
 import com.gmmapowell.script.FilesToProcess;
 
 public interface Config {
-	FilesToProcess updateIndex() throws IOException, GeneralSecurityException;
+	FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException;
 	void generate(FilesToProcess files) throws IOException;
 	void show();
 	void upload() throws Exception;

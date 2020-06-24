@@ -76,12 +76,15 @@ public class ReadConfig {
 		} catch (ConfigException ex) {
 			System.out.println(ex.getMessage());
 			return null;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
 		}
 		return ret;
 	}
 
 	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, String index, String workdir,
-			String what, String type, int wline) throws ConfigException {
+			String what, String type, int wline) throws ConfigException, Exception {
 		if (what == null)
 			return true;
 		switch (what) {

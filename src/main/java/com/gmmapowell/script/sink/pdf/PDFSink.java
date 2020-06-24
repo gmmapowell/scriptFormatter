@@ -82,7 +82,10 @@ public class PDFSink implements Sink {
 	}
 
 	private RenderInfo handleSpanBlock(SpanBlock block) throws IOException {
-		Style baseStyle = styles.get(block.getStyle());
+		String bsname = block.getStyle();
+		if (debug)
+			System.out.println("base style is " + bsname);
+		Style baseStyle = styles.get(bsname);
 		List<Line> lines = new ArrayList<>();
 		List<Segment> segments = new ArrayList<>();
 		Float fm = baseStyle.getFirstMargin();
@@ -94,6 +97,8 @@ public class PDFSink implements Sink {
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
 		float wid = pageStyle.getPageWidth() - fm - rm;
 		for (Span s : block) {
+			if (debug)
+				System.out.println("span styles: " + s.getStyles());
 			Style style = baseStyle.apply(s.getStyles());
 			String tx = s.getText();
 			String[] parts = tx.split(" ");

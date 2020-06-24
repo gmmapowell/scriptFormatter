@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,23 +55,47 @@ public class DriveLoader implements Loader {
 	}
 
 	@Override
-	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException {
+	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
 		// When we download, if there is anything not in the index add it to the end
 		// Reverse the format so that it is <ID> <path>
 		// Use full path (from this.folder at least) for every file rather than depending on hierarchy
 		// Want a "marker" in the file that says "--excluded--"   
 		// because it has been downloaded but not user "approved" or ordered
 		Drive service = connectToGoogleDrive();
-        Item item = findTopFolder(service);
+		Item item = findFolder(service);
+        if (debug) {
+        	System.out.println("Downloading files from Google ...");
+        	System.out.println("  + " + item.folder + " (" + item.id + ")");
+        }
         Index currentIndex = readIndex();
         try {
         	// TODO: this needs to be here!  Just optimizing test speeds
-	        downloadFolder(service, currentIndex, downloads, "    ", item.id);
+	        downloadFolder(service, currentIndex, downloads, "    ", item);
 	        return currentIndex;
         } finally {
         	currentIndex.close();
         }
 	}
+
+	private Item findFolder(Drive service) throws IOException, ConfigException {
+		List<String> segments = folderSegments();
+        Item item = findTopFolder(service, segments.remove(0));
+        while (!segments.isEmpty()) {
+        	item = findNestedFolder(service, item, segments.remove(0));
+        }
+		return item;
+	}
+	
+	private List<String> folderSegments() {
+		File f = new File(folder);
+		List<String> ret = new ArrayList<>();
+		while (f != null) {
+			ret.add(0, f.getName());
+			f = f.getParentFile();
+		}
+		return ret;
+	}
+
 	private Drive connectToGoogleDrive() throws IOException, GeneralSecurityException {
 		Credential cred = getCredential();
         Drive service = new Drive.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), cred)
@@ -79,16 +104,25 @@ public class DriveLoader implements Loader {
 		return service;
 	}
 
-	private Item findTopFolder(Drive service) throws IOException {
-		FileList result = service.files().list().setQ("name='" + folder + "'").execute();
+	private Item findTopFolder(Drive service, String f) throws IOException, ConfigException {
+		if (debug) {
+			System.out.println("Loading root folder " + f);
+		}
+		FileList result = service.files().list().setQ("name='" + f + "'").execute();
         if (result.getFiles().size() != 1)
-        	throw new RuntimeException("Could not find root folder");
+        	throw new ConfigException("Could not find root folder: " + f);
         String id = result.getFiles().get(0).getId();
-        if (debug) {
-        	System.out.println("Downloading files from Google ...");
-        	System.out.println("  + " + folder + " (" + id + ")");
-        }
-		return new Item(id, folder);
+		return new Item(id, f);
+	}
+
+	private Item findNestedFolder(Drive service, Item item, String name) throws IOException, ConfigException {
+		if (debug) {
+			System.out.println("Loading nested folder " + name + " in " + item.id);
+		}
+		FileList children = service.files().list().setQ("'" + item.id + "' in parents and name='" + name + "'").execute();
+        if (children.getFiles().size() != 1)
+        	throw new ConfigException("Could not find nested folder: " + name);
+		return new Item(children.getFiles().get(0).getId(), name);
 	}
 
 	private Index readIndex() throws IOException {
@@ -104,8 +138,8 @@ public class DriveLoader implements Loader {
 		return index;
 	}
 
-	private void downloadFolder(Drive service, Index index, File into, String ind, String id) throws IOException {
-		FileList children = service.files().list().setQ("'" + id + "' in parents").setFields("files(id, name, mimeType)").execute();
+	private void downloadFolder(Drive service, Index index, File into, String ind, Item item) throws IOException {
+		FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();
         List<com.google.api.services.drive.model.File> files = children.getFiles();
         Collections.reverse(files);
         for (com.google.api.services.drive.model.File f : files) {
@@ -115,7 +149,7 @@ public class DriveLoader implements Loader {
             if (isFolder) {
             	File folderInto = new java.io.File(into, f.getName());
 				folderInto.mkdir();
-				downloadFolder(service, index, folderInto, ind+ "  ", f.getId());
+				downloadFolder(service, index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
             } else {
             	java.io.File name = new java.io.File(into, f.getName() + ".txt");
             	index.record(f.getId(), name);

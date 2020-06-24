@@ -10,30 +10,33 @@ import com.gmmapowell.script.elements.SpanBlock;
 // This should be unit tested
 public class ProcessingUtils {
 	public static void addSpans(ElementFactory factory, SpanBlock block, String text) {
-		text = addRecursiveSpans(factory, block, null, text, false);
+		text = addRecursiveSpans(factory, block, null, text, ' ');
 		if (text != null && text.length() > 0) {
 			Span span = factory.span(null, text);
 			block.addSpan(span);
 		}
 	}
 	
-	private static String addRecursiveSpans(ElementFactory factory, SpanBlock block, List<String> defaultStyle, String text, boolean inside) {
+	private static String addRecursiveSpans(ElementFactory factory, SpanBlock block, List<String> defaultStyle, String text, char inside) {
 		int i=0;
 		while (text != null && i<text.length()) {
 			char c = text.charAt(i);
 			if (c == '_' || c == '$' || c == '*') {
 				if (i < text.length()-1 && c == text.charAt(i+1)) {
-					i+=2;
+					i+=2; // I'm not sure this does what we expect ... I think it leaves the double character in :-(
 					continue;
 				}
 				if (i == 0 || text.charAt(i-1) == ' ') {
 					if (i > 0) {
 						addSpan(factory, block, defaultStyle, text.substring(0, i));
 					}
-					text = addRecursiveSpans(factory, block, styleOf(defaultStyle, c), text.substring(i+1), true); 
+					text = addRecursiveSpans(factory, block, styleOf(defaultStyle, c), text.substring(i+1), c); 
 					i=0;
 					continue;
-				} else if (inside && (i == text.length()-1 || text.charAt(i+1) == ' ')) {
+				} else if (inside != ' ' && (inside == '$' || i == text.length()-1 || text.charAt(i+1) == ' ')) { 
+					// There is a problem with using these characters: that they may be used inside words
+					// But at the same time it is very common to want to add a suffix to $..$s, so I've allowed that case.
+					// Really, I think we should insist that people use __ if that's what they mean in words.
 					addSpan(factory, block, defaultStyle, text.substring(0, i));
 					return text.substring(i+1);
 				}

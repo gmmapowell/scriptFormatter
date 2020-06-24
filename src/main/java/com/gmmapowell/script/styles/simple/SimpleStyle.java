@@ -8,9 +8,8 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
-import com.gmmapowell.script.styles.simple.SimpleStyleCatalog.Builder;
 
-public class SimpleStyle implements Style, Builder {
+public class SimpleStyle implements Style, StyleBuilder {
 	private final StyleCatalog catalog;
 	private Float afterBlock;
 	private Float beforeBlock;
@@ -21,6 +20,7 @@ public class SimpleStyle implements Style, Builder {
 	private Float right = null;
 	private Boolean underline = null;
 	private Boolean italic = null;
+	private String font;
 
 	public SimpleStyle(StyleCatalog catalog) {
 		this.catalog = catalog;
@@ -48,15 +48,29 @@ public class SimpleStyle implements Style, Builder {
 	
 	@Override
 	public PDFont getFont() {
+		if (font == null)
+			throw new RuntimeException("No font selected");
 		return getFontInternal(this);
 	}
 
 	@Override
 	public PDFont getFontInternal(Style style) {
-		if (style.getItalic())
-			return PDType1Font.COURIER_OBLIQUE;
-		else
-			return PDType1Font.COURIER;
+		if (font == null)
+			return null;
+		switch (font) {
+		case "courier":
+			if (style.getItalic())
+				return PDType1Font.COURIER_OBLIQUE;
+			else
+				return PDType1Font.COURIER;
+		case "helvetica":
+			if (style.getItalic())
+				return PDType1Font.HELVETICA_OBLIQUE;
+			else
+				return PDType1Font.HELVETICA;
+		default:
+			throw new RuntimeException("No such font: " + font);
+		}
 	}
 
 	@Override
@@ -95,55 +109,61 @@ public class SimpleStyle implements Style, Builder {
 	}
 
 	@Override
-	public Builder setAfterBlock(float f) {
+	public StyleBuilder setAfterBlock(float f) {
 		this.afterBlock = f;
 		return this;
 	}
 
 	@Override
-	public Builder setBeforeBlock(float f) {
+	public StyleBuilder setBeforeBlock(float f) {
 		this.beforeBlock = f;
 		return this;
 	}
 
 	@Override
-	public Builder setFirstMargin(float f) {
+	public StyleBuilder setFirstMargin(float f) {
 		this.first = f;
 		return this;
 	}
 
 	@Override
-	public Builder setItalic(boolean b) {
-		this.italic = b;
-		return this;
-	}
-
-	@Override
-	public Builder setJustification(Justification just) {
+	public StyleBuilder setJustification(Justification just) {
 		this.just = just;
 		return this;
 	}
 
 	@Override
-	public Builder setLeftMargin(float f) {
+	public StyleBuilder setLeftMargin(float f) {
 		this.left = f;
 		return this;
 	}
 
 	@Override
-	public Builder setLineSpacing(float f) {
+	public StyleBuilder setLineSpacing(float f) {
 		lineSpacing = f;
 		return this;
 	}
 
 	@Override
-	public Builder setRightMargin(float f) {
+	public StyleBuilder setRightMargin(float f) {
 		this.right = f;
 		return this;
 	}
 
 	@Override
-	public Builder setUnderline(boolean b) {
+	public StyleBuilder setFont(String font) {
+		this.font = font;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setItalic(boolean b) {
+		this.italic = b;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setUnderline(boolean b) {
 		this.underline = b;
 		return this;
 	}

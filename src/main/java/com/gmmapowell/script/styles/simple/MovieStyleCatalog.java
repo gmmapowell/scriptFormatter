@@ -9,33 +9,21 @@ import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
 
-public class SimpleStyleCatalog implements StyleCatalog {
-	public interface Builder {
-		Builder setAfterBlock(float f);
-		Builder setBeforeBlock(float f);
-		Builder setJustification(Justification center);
-		Builder setFirstMargin(float f);
-		Builder setLeftMargin(float f);
-		Builder setLineSpacing(float f);
-		Builder setRightMargin(float f);
-		Builder setUnderline(boolean b);
-		Style build();
-		Builder setItalic(boolean b);
-	}
-
+public class MovieStyleCatalog implements StyleCatalog {
 	private final Map<String, Style> catalog = new TreeMap<>();
 	private final Style defaultStyle;
 	private final Set<String> missed = new TreeSet<>();
 	
-	public SimpleStyleCatalog() {
+	public MovieStyleCatalog() {
 		defaultStyle = create()
 			.setAfterBlock(0)
 			.setBeforeBlock(0)
 			.setJustification(Justification.LEFT)
-			.setItalic(false)
 			.setLeftMargin(0f)
 			.setLineSpacing(14f)
 			.setRightMargin(0f)
+			.setFont("courier")
+			.setItalic(false)
 			.setUnderline(false)
 			.build();
 			
@@ -80,7 +68,7 @@ public class SimpleStyleCatalog implements StyleCatalog {
 		);
 	}
 	
-	public Builder create() {
+	public StyleBuilder create() {
 		return new SimpleStyle(this);
 	}
 

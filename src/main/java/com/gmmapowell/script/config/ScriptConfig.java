@@ -20,7 +20,6 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.styles.StyleCatalog;
-import com.gmmapowell.script.styles.simple.SimpleStyleCatalog;
 
 public class ScriptConfig implements Config {
 	private final File root;
@@ -49,7 +48,7 @@ public class ScriptConfig implements Config {
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}
 
-	public void handleOutput(Map<String, String> vars, String output, boolean debug) throws ConfigException {
+	public void handleOutput(Map<String, String> vars, String output, boolean debug) throws ConfigException, Exception {
 		switch (output) {
 		case "pdf": {
 			String file = vars.remove("file");
@@ -60,7 +59,10 @@ public class ScriptConfig implements Config {
 			if ("true".equals(open))
 				wantOpen = true;
 			String upload = vars.remove("upload");
-			StyleCatalog catalog = new SimpleStyleCatalog();
+			String styles = vars.remove("styles");
+			if (styles == null)
+				throw new ConfigException("style catalog was not defined");
+			StyleCatalog catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
 			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug));
 			break;
 		}
@@ -118,7 +120,9 @@ public class ScriptConfig implements Config {
 	}
 
 	@Override
-	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException {
+	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
+		if (loader == null)
+			throw new ConfigException("No loader was specified");
 		return loader.updateIndex();
 	}
 
