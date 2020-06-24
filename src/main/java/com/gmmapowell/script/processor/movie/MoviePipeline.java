@@ -124,6 +124,7 @@ public class MoviePipeline implements Processor {
 			}
 		}
 		flush(dp, para);
+		formatter.fileDone();
 	}
 
 	private boolean isSlugLine(String s) {

@@ -14,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.elements.Block;
+import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
@@ -181,6 +182,27 @@ public class PDFSink implements Sink {
 			l.xpos(fm + (wid-len)/2);
 			break;
 		}
+	}
+
+	@Override
+	public void brk(Break ad) throws IOException {
+		// I think the brk should have more info in it
+		currentPage.moveTo(pageStyle.getLeftMargin(), y-10);
+		currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-10);
+		currentPage.lineTo(pageStyle.getPageWidth() - pageStyle.getRightMargin(), y-42);
+		currentPage.lineTo(pageStyle.getLeftMargin(), y-42);
+		currentPage.closeAndStroke();
+		PDFont pnf = pageStyle.getPageNumberFont();
+		float pns = pageStyle.getPageNumberFontSize();
+		currentPage.setFont(pnf, pns);
+		String tx = "AD BREAK";
+		float txl = pnf.getStringWidth(tx)*pns/1000; 
+		currentPage.beginText();
+		currentPage.setFont(pnf, pns);
+		currentPage.newLineAtOffset(pageStyle.pageNumberCenterX() - txl/2, y-27);
+		currentPage.showText(tx);
+		currentPage.endText();
+		closeCurrentPage();
 	}
 
 	@Override

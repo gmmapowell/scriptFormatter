@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.block.TextBlock;
-import com.gmmapowell.script.elements.block.TextSpan;
 import com.gmmapowell.script.sink.Sink;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -68,6 +68,10 @@ public class BloggerSink implements Sink {
 	public void block(Block block) throws IOException {
 		if (writeBlock(block))
 			writer.println("<br/>");
+	}
+
+	@Override
+	public void brk(Break ad) {
 	}
 
 	private boolean writeBlock(Block block) {

@@ -2,6 +2,7 @@ package com.gmmapowell.script.processor.movie;
 
 import java.io.IOException;
 
+import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
@@ -90,6 +91,11 @@ public class Formatter {
 			slugBlock = null;
 		} else
 			sink.block(block);
+	}
+
+	public void fileDone() throws IOException {
+		Break ad= factory.adbreak();
+		sink.brk(ad);
 	}
 
 	public void close() throws IOException {

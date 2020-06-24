@@ -2,6 +2,7 @@ package com.gmmapowell.script.elements.block;
 
 import java.util.List;
 
+import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
@@ -28,6 +29,11 @@ public class BlockishElementFactory implements ElementFactory {
 	@Override
 	public Group group() {
 		return new MultiBlock();
+	}
+
+	@Override
+	public Break adbreak() {
+		return new BoxyAdBreak();
 	}
 
 }

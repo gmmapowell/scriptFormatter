@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.gmmapowell.script.elements.Block;
+import com.gmmapowell.script.elements.Break;
 
 public class MultiSink implements Sink {
 	private final List<Sink> sinks;
@@ -22,6 +23,13 @@ public class MultiSink implements Sink {
 	public void block(Block block) throws IOException {
 		for (Sink s : sinks)
 			s.block(block);
+	}
+
+	@Override
+	public void brk(Break ad) throws IOException {
+		for (Sink s: sinks) {
+			s.brk(ad);
+		}
 	}
 
 	@Override
