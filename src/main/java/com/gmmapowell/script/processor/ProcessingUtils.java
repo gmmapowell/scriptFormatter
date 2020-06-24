@@ -33,7 +33,7 @@ public class ProcessingUtils {
 					text = addRecursiveSpans(factory, block, styleOf(defaultStyle, c), text.substring(i+1), c); 
 					i=0;
 					continue;
-				} else if (inside != ' ' && (inside == '$' || i == text.length()-1 || text.charAt(i+1) == ' ')) { 
+				} else if (inside != ' '/* && (inside == '$' || i == text.length()-1 || text.charAt(i+1) == ' ') */) { 
 					// There is a problem with using these characters: that they may be used inside words
 					// But at the same time it is very common to want to add a suffix to $..$s, so I've allowed that case.
 					// Really, I think we should insist that people use __ if that's what they mean in words.

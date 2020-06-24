@@ -3,7 +3,6 @@ package com.gmmapowell.script.styles.simple;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.Style;
@@ -50,29 +49,14 @@ public class SimpleStyle implements Style, StyleBuilder {
 	public PDFont getFont() {
 		if (font == null)
 			throw new RuntimeException("No font selected");
-		return getFontInternal(this);
+		return catalog.getFont(font, getItalic());
 	}
 
 	@Override
-	public PDFont getFontInternal(Style style) {
-		if (font == null)
-			return null;
-		switch (font) {
-		case "courier":
-			if (style.getItalic())
-				return PDType1Font.COURIER_OBLIQUE;
-			else
-				return PDType1Font.COURIER;
-		case "helvetica":
-			if (style.getItalic())
-				return PDType1Font.HELVETICA_OBLIQUE;
-			else
-				return PDType1Font.HELVETICA;
-		default:
-			throw new RuntimeException("No such font: " + font);
-		}
+	public String getFontName() {
+		return font;
 	}
-
+	
 	@Override
 	public Float getFontSize() {
 		return 12.0f;

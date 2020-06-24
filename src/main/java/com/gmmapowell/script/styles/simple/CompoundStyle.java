@@ -59,15 +59,15 @@ public class CompoundStyle implements Style {
 
 	@Override
 	public PDFont getFont() {
-		return getFontInternal(this);
+		return catalog.getFont(getFontName(), getItalic());
 	}
 
 	@Override
-	public PDFont getFontInternal(Style style) {
-		PDFont maybe = override.getFontInternal(this);
+	public String getFontName() {
+		String maybe = override.getFontName();
 		if (maybe != null)
 			return maybe;
-		return parent.getFontInternal(this);
+		return parent.getFontName();
 	}
 
 	@Override

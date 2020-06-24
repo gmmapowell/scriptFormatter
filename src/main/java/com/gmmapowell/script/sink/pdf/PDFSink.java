@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Break;
@@ -44,7 +45,7 @@ public class PDFSink implements Sink {
 	private boolean showBorder = false;
 	private int pageNum = 1;
 
-	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug) {
+	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
 		this.styles = styles;
 		this.debug = debug;
 		File f = new File(output);
@@ -56,6 +57,20 @@ public class PDFSink implements Sink {
 		this.upload = upload;
 		doc = new PDDocument();
 		pageStyle = new DefaultPageStyle();
+		
+		try {
+			loadFonts();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			throw ex;
+		}
+	}
+
+	private void loadFonts() throws IOException {
+		styles.fonts().put("palatino", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino.ttf")));
+		styles.fonts().put("palatino-bold", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Bold.ttf")));
+		styles.fonts().put("palatino-italic", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Italic.ttf")));
+		styles.fonts().put("palatino-bolditalic", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Bold Italic.ttf")));
 	}
 
 	@Override

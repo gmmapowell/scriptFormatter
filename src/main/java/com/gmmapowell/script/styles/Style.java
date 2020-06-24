@@ -12,6 +12,7 @@ public interface Style {
 	Float getBeforeBlock();
 	Float getFirstMargin();
 	PDFont getFont();
+	String getFontName();
 	Float getFontSize();
 	Boolean getItalic();
 	Justification getJustification();
@@ -19,7 +20,4 @@ public interface Style {
 	Float getLineSpacing();
 	Float getRightMargin();
 	Boolean getUnderline();
-
-	PDFont getFontInternal(Style style);
-
 }

@@ -5,15 +5,15 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.gmmapowell.script.styles.FontCatalog;
 import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.Style;
-import com.gmmapowell.script.styles.StyleCatalog;
 
-public class MovieStyleCatalog implements StyleCatalog {
+public class MovieStyleCatalog extends FontCatalog {
 	private final Map<String, Style> catalog = new TreeMap<>();
 	private final Style defaultStyle;
 	private final Set<String> missed = new TreeSet<>();
-	
+
 	public MovieStyleCatalog() {
 		defaultStyle = create()
 			.setAfterBlock(0)
