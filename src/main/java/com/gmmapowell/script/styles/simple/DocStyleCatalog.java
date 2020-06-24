@@ -18,6 +18,7 @@ public class DocStyleCatalog extends FontCatalog {
 		defaultStyle = create()
 			.beginNewPage(false)
 			.showAtBottom(false)
+			.setPreformatted(false)
 			.setRequireAfter(0)
 			.setAfterBlock(0)
 			.setBeforeBlock(0)
@@ -52,6 +53,12 @@ public class DocStyleCatalog extends FontCatalog {
 				create().setFont("palatino").setBeforeBlock(6).setAfterBlock(6).build(),
 				defaultStyle
 		));
+
+		catalog.put("preformatted",
+				new CompoundStyle(this,
+					create().setFont("courier").setFontSize(11f).setLineSpacing(12.5f).setPreformatted(true).build(),
+					defaultStyle
+			));
 
 		catalog.put("bullet",
 				new CompoundStyle(this,

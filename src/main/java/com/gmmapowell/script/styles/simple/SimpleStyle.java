@@ -12,6 +12,7 @@ public class SimpleStyle implements Style, StyleBuilder {
 	private final StyleCatalog catalog;
 	private Boolean beginNewPage;
 	private Boolean showAtBottom;
+	private Boolean isPreformatted;
 	private Float requireAfter;
 	private Float afterBlock;
 	private Float beforeBlock;
@@ -45,6 +46,11 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public Boolean showAtBottom() {
 		return showAtBottom;
+	}
+
+	@Override
+	public Boolean isPreformatted() {
+		return isPreformatted;
 	}
 
 	@Override
@@ -138,6 +144,12 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public StyleBuilder beginNewPage(boolean b) {
 		this.beginNewPage = b;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setPreformatted(boolean b) {
+		this.isPreformatted = b;
 		return this;
 	}
 

@@ -10,6 +10,7 @@ public interface Style {
 
 	Boolean beginNewPage();
 	Boolean showAtBottom();
+	Boolean isPreformatted();
 	Float getRequireAfter();
 	Float getAfterBlock();
 	Float getBeforeBlock();
@@ -26,6 +27,7 @@ public interface Style {
 	Float getLineSpacing();
 	Float getRightMargin();
 	Boolean getUnderline();
+
 
 
 

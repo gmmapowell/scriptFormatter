@@ -42,6 +42,14 @@ public class CompoundStyle implements Style {
 	}
 
 	@Override
+	public Boolean isPreformatted() {
+		Boolean maybe = override.isPreformatted();
+		if (maybe != null)
+			return maybe;
+		return parent.isPreformatted();
+	}
+
+	@Override
 	public Boolean showAtBottom() {
 		Boolean maybe = override.showAtBottom();
 		if (maybe != null)

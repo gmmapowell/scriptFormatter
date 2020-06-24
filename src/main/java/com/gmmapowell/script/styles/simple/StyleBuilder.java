@@ -5,6 +5,7 @@ import com.gmmapowell.script.styles.Style;
 
 public interface StyleBuilder {
 	StyleBuilder beginNewPage(boolean b);
+	StyleBuilder setPreformatted(boolean b);
 	StyleBuilder showAtBottom(boolean b);
 	StyleBuilder setBeforeBlock(float f);
 	StyleBuilder setAfterBlock(float f);

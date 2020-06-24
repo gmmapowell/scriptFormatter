@@ -119,6 +119,10 @@ public class PDFSink implements Sink {
 //			if (debug)
 //				System.out.println("span styles: " + s.getStyles());
 			Style style = baseStyle.apply(s.getStyles());
+			if (baseStyle.isPreformatted()) {
+				addSegment(lines, segments, wid, baseStyle, style, fm, rm, s.getText(), false);
+				continue;
+			}
 			String tx = s.getText();
 			String[] parts = tx.split(" ");
 			boolean first = true;
