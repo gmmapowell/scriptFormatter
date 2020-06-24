@@ -78,15 +78,17 @@ public class TestInlineFormat {
 	}
 
 	@Test
-	public void inAWordUnderscoreIsJustPassedThrough() {
+	public void doubleUnderscoreIsPassedThrough() {
 		ElementFactory factory = context.mock(ElementFactory.class);
 		SpanBlock block = context.mock(SpanBlock.class);
 		Span s1 = context.mock(Span.class);
 		context.checking(new Expectations() {{
-			oneOf(factory).span(null, "CONSTANT_VALUE"); will(returnValue(s1));
+			oneOf(factory).span(null, "CONSTANT_"); will(returnValue(s1));
+			oneOf(block).addSpan(s1);
+			oneOf(factory).span(null, "VALUE"); will(returnValue(s1));
 			oneOf(block).addSpan(s1);
 		}});
-		ProcessingUtils.addSpans(factory, state, block, "CONSTANT_VALUE");
+		ProcessingUtils.addSpans(factory, state, block, "CONSTANT__VALUE");
 	}
 
 	@Test
@@ -152,14 +154,18 @@ public class TestInlineFormat {
 		SpanBlock block = context.mock(SpanBlock.class);
 		Span s1 = context.mock(Span.class);
 		context.checking(new Expectations() {{
-			oneOf(factory).span(null, "this cost me $$420$$ you see"); will(returnValue(s1));
+			oneOf(factory).span(null, "this cost me $"); will(returnValue(s1));
+			oneOf(factory).span(null, "420$"); will(returnValue(s1));
+			oneOf(factory).span(null, " you see"); will(returnValue(s1));
+			oneOf(block).addSpan(s1);
+			oneOf(block).addSpan(s1);
 			oneOf(block).addSpan(s1);
 		}});
 		ProcessingUtils.addSpans(factory, state, block, "this cost me $$420$$ you see");
 	}
 
 	@Test
-	public void italicInversionWhenNested() { // actually, somebody downstream will have to do the inversion; we just observe the nesting
+	public void italicInversionWhenNested() {
 		ElementFactory factory = context.mock(ElementFactory.class);
 		SpanBlock block = context.mock(SpanBlock.class);
 		Span s1 = context.mock(Span.class, "s1");
@@ -171,7 +177,7 @@ public class TestInlineFormat {
 			oneOf(block).addSpan(s1);
 			oneOf(factory).span("italic", "this is "); will(returnValue(s2));
 			oneOf(block).addSpan(s2);
-			oneOf(factory).lspan(Arrays.asList("italic", "italic"), "MY"); will(returnValue(s3));
+			oneOf(factory).span(null, "MY"); will(returnValue(s3));
 			oneOf(block).addSpan(s3);
 			oneOf(factory).span("italic", " world"); will(returnValue(s4));
 			oneOf(block).addSpan(s4);
