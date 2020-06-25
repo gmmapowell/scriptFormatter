@@ -47,7 +47,7 @@ public class IncludeCommand implements InlineCommand {
 			while ((line = lnr.readLine()) != null) {
 				int il = indent(line, lnr.getLineNumber());
 				if (curr != -1) {
-					System.out.println("comparing " + il + " to " + curr + " for " + line);
+//					System.out.println("comparing " + il + " to " + curr + " for " + line);
 					if (il >= curr) {
 						if (!haveSkipped) {
 							elideThis(sink, ef, il);
@@ -63,7 +63,7 @@ public class IncludeCommand implements InlineCommand {
 				if (lookFor != null && lookFor.pattern.matcher(line).find()) {
 					curr = il;
 					String what = lookFor.what;
-					System.out.println("Found " + lookFor.from + " removing " + what + " with curr = " + curr);
+//					System.out.println("Found " + lookFor.from + " removing " + what + " with curr = " + curr);
 					lookFor = nextElide(ei);
 					if (what.equals("inner"))
 						curr++;

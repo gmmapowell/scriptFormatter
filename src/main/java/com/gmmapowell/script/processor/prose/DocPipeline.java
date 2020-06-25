@@ -78,7 +78,17 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				if (f == null)
 					throw new RuntimeException("cannot find " + file + " in any of " + roots);
 				// TODO: we should configure this according to the params, possibly with this as a boring default
-				Formatter formatter = new BoringFormatter();
+				Formatter formatter;
+				if (!params.containsKey("formatter"))
+					 formatter = new BoringFormatter();
+				switch (params.get("formatter")) {
+				case "html":
+					formatter = new HTMLFormatter();
+					break;
+				default:
+					formatter = new BoringFormatter();
+					break;
+				}
 				state.inline = new IncludeCommand(f, formatter);
 				break;
 			}
