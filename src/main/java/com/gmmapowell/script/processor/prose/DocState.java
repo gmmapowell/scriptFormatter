@@ -2,6 +2,7 @@ package com.gmmapowell.script.processor.prose;
 
 public class DocState extends CurrentState {
 	public DocCommand cmd;
+	public InlineCommand inline;
 	public int chapter;
 	public int section;
 	public boolean commentary;

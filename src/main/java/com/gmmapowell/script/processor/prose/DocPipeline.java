@@ -1,10 +1,7 @@
 package com.gmmapowell.script.processor.prose;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,11 +35,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	protected void handleLine(DocState state, String s) throws IOException {
 		if (s.startsWith("@")) {
 			// it's a block starting command
-			if (state.curr != null) {
-				sink.block(state.curr);
-				state.curr = null;
-			}
+			endBlock(state);
 			state.cmd = new DocCommand(s.substring(1));
+			System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " @: " + s);
 		} else if (state.cmd != null) {
 			int pos = s.indexOf('=');
 			if (pos == -1)
@@ -61,20 +56,14 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			switch (cmd) {
 			case "footnote": {
-				if (state.curr != null) {
-					sink.block(state.curr);
-					state.curr = null;
-				}
+				endBlock(state);
 				state.curr = ef.block("footnote");
 				Span span = ef.span("footnote-number", Integer.toString(state.nextFootnoteText()) + " ");
 				state.curr.addSpan(span);
 				break;
 			}
 			case "include": {
-				if (state.curr != null) {
-					sink.block(state.curr);
-					state.curr = null;
-				}
+				endBlock(state);
 				String file = readString(args);
 				Map<String, String> params = readParams(args, "formatter");
 				System.out.println("want to include " + file + " with " + params);
@@ -90,13 +79,16 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					throw new RuntimeException("cannot find " + file + " in any of " + roots);
 				// TODO: we should configure this according to the params, possibly with this as a boring default
 				Formatter formatter = new BoringFormatter();
-				try (LineNumberReader lnr = new LineNumberReader(new FileReader(f, Charset.forName("UTF-8")))) {
-					String fs;
-					while ((fs = lnr.readLine()) != null) {
-						sink.block(formatter.format(ef, fs));
-					}
-				}
+				state.inline = new IncludeCommand(f, formatter);
 				break;
+			}
+			case "remove": {
+				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
+					throw new RuntimeException("&remove must immediately follow &include");
+				}
+				Map<String, String> params = readParams(args, "from", "what");
+				System.out.println("want to remove from " + state.inline + " with " + params);
+				((IncludeCommand)state.inline).butRemove(params.get("from"), params.get("what"));
 			}
 			default:
 				System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " handle inline command: " + s);
@@ -211,6 +203,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				System.out.println("handle " + st.cmd);
 			}
 			st.cmd = null;
+		} else if (st.inline != null) {
+			st.inline.execute(sink, ef);
+			st.inline = null;
 		} else
 			super.endBlock(st);
 	}
