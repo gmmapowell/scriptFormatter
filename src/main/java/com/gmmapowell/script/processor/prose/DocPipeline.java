@@ -3,10 +3,8 @@ package com.gmmapowell.script.processor.prose;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -26,8 +24,8 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	}
 	
 	@Override
-	protected DocState begin() {
-		root.reset();
+	protected DocState begin(String file) {
+		root.reset(file);
 		return root;
 	}
 
@@ -67,6 +65,13 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				state.curr = ef.block("footnote");
 				Span span = ef.span("footnote-number", Integer.toString(state.nextFootnoteText()) + " ");
 				state.curr.addSpan(span);
+				break;
+			}
+			case "sp": {
+				if (state.curr == null)
+					state.curr = ef.block("text");
+				state.curr.addSpan(ef.span(null, " "));
+				ProcessingUtils.addSpans(ef, state, state.curr, args.toString().trim());
 				break;
 			}
 			case "include": {
@@ -152,57 +157,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		}
 	}
 	
-	private String readString(DocState state, StringBuilder args) {
-		if (args == null || args.length() == 0)
-			throw new RuntimeException("cannot read from empty string at " + state.location());
-		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
-			args.delete(0, 1);
-		if (args.length() == 0)
-			throw new RuntimeException("cannot read from empty string at " + state.location());
-		char c = args.charAt(0);
-		if (c != '\'' && c != '"')
-			throw new RuntimeException("unquoted string at " + state.location());
-		args.delete(0, 1);
-		String ret = null;
-		for (int i=0;i<args.length();i++) {
-			if (args.charAt(i) == c) {
-				ret = args.substring(0, i);
-				args.delete(0, i+1);
-				break;
-			}
-		}
-		if (ret == null)
-			throw new RuntimeException("unterminated string at " + state.location());
-		return ret;
-	}
-	
-	private Map<String, String> readParams(DocState state, StringBuilder args, String... allowedStrings) {
-		Map<String, String> ret = new TreeMap<>();
-		if (args == null)
-			return ret;
-		List<String> allowed = Arrays.asList(allowedStrings);
-		while (args.length() > 0) {
-			while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
-				args.delete(0, 1);
-			if (args.length() == 0)
-				break;
-			int j=0;
-			while (j < args.length() && args.charAt(j) != '=')
-				j++;
-			if (j == args.length())
-				throw new RuntimeException("needed =");
-			String var = args.substring(0, j);
-			args.delete(0, j+1);
-			if (ret.containsKey(var))
-				throw new RuntimeException("duplicate definition of " + var);
-			else if (!allowed.contains(var))
-				throw new RuntimeException("unexpected definition of " + var + "; allowed = " + allowed);
-			else
-				ret.put(var, readString(state, args)); 
-		}
-		return ret;
-	}
-
 	@Override
 	protected void endBlock(DocState st) throws IOException {
 		if (st.cmd != null) {

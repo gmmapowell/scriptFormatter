@@ -15,7 +15,15 @@ import com.gmmapowell.script.processor.prose.CurrentState;
 
 public class TestInlineFormat {
 	public @Rule JUnitRuleMockery context = new JUnitRuleMockery();
-	CurrentState state = new CurrentState();
+	CurrentState state = new CurrentState() {
+		@Override
+		public String location() {
+			return "location";
+		}
+		@Override
+		public void line(int lineNumber) {
+		}
+	};
 
 	@Test
 	public void aSimpleCaseWithNothingFancy() {

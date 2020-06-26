@@ -50,11 +50,13 @@ public class BloggerSink implements Sink {
 	private Posts posts;
 	private StringWriter sw;
 
-	public BloggerSink(File root, File creds, String blogUrl, File posts) throws IOException {
+	public BloggerSink(File root, File creds, String blogUrl, File posts) throws IOException, GeneralSecurityException {
 		this.creds = creds;
 		this.blogUrl = blogUrl;
 		this.postsFile = posts;
 		index = readPosts();
+		connect();
+		readFromBlogger();
 	}
 
 	@Override
@@ -197,7 +199,7 @@ public class BloggerSink implements Sink {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void fileEnd() throws Exception {
 		switch (mode) {
 		case LIST:
 			writer.println("</ul>");
@@ -210,6 +212,32 @@ public class BloggerSink implements Sink {
 			break;
 		}
 		writer.close();
+
+		if (title == null) {
+			System.out.println("Cannot upload without a title");
+			return;
+		}
+		String idx = findInPosts();
+		Post p = new Post();
+		p.setTitle(title);
+		p.setContent(sw.toString());
+		// How do you say you don't want it to publish straight away?
+//		p.setStatus("DRAFT");
+		if (idx == null) {
+			System.out.println("Create " + title);
+			Post inserted = posts.insert(blogId, p).execute();
+			// revert it immediately
+			posts.revert(blogId, inserted.getId()).execute();
+			index.have(inserted.getId(), "DRAFT", title);
+		} else {
+			System.out.println("Upload to " + blogId + ":" + idx);
+			posts.update(blogId, idx, p).execute();
+		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		index.close();
 	}
 
 	@Override
@@ -220,24 +248,6 @@ public class BloggerSink implements Sink {
 	
 	@Override
 	public void upload() throws Exception {
-		if (title == null) {
-			System.out.println("Cannot upload without a title");
-			return;
-		}
-		String idx = findInPosts();
-		connect();
-		if (idx == null) {
-			readAll();
-			idx = findInPosts();
-		}
-		if (idx == null) {
-			System.out.println("Create " + title);
-		} else {
-			System.out.println("Upload to " + blogId + ":" + idx);
-			Post p = new Post();
-			p.setContent(sw.toString());
-			posts.update(blogId, idx, p).execute();
-		}
 	}
 
 	private PostIndex readPosts() throws IOException {
@@ -265,20 +275,19 @@ public class BloggerSink implements Sink {
 		posts = blogger.posts();
 	}
 	
-	private void readAll() throws IOException, GeneralSecurityException {
-		try (FileWriter fw = new FileWriter(postsFile, true)) {
-			index.appendTo(fw);
-	
-			String npt = null;
-			while (true) {
-				PostList list = posts.list(blogId).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
-				for (Post e : list.getItems()) {
-					index.have(e.getId(), e.getStatus(), e.getTitle());
-				}
-				npt = list.getNextPageToken();
-				if (npt == null)
-					break;
+	private void readFromBlogger() throws IOException, GeneralSecurityException {
+		FileWriter fw = new FileWriter(postsFile, true);
+		index.appendTo(fw);
+
+		String npt = null;
+		while (true) {
+			PostList list = posts.list(blogId).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
+			for (Post e : list.getItems()) {
+				index.have(e.getId(), e.getStatus(), e.getTitle());
 			}
+			npt = list.getNextPageToken();
+			if (npt == null)
+				break;
 		}
 	}
 

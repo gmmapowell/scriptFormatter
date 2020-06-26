@@ -8,7 +8,6 @@ import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.processor.ProcessingUtils;
-import com.gmmapowell.script.processor.prose.CurrentState;
 import com.gmmapowell.script.sink.Sink;
 
 public class Formatter {
@@ -17,13 +16,13 @@ public class Formatter {
 	private final boolean debug;
 	private Group slugBlock;
 	private Group speakingBlock;
-	private CurrentState state;
+	private MovieState state;
 
 	public Formatter(ElementFactory factory, Sink outputTo, boolean debug) {
 		this.factory = factory;
 		this.sink = outputTo;
 		this.debug = debug;
-		this.state = new CurrentState();
+		this.state = new MovieState();
 	}
 
 	public void title(String title) throws IOException {

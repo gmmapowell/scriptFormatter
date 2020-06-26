@@ -67,8 +67,7 @@ public class ProcessingUtils {
 						addSpan(factory, block, Arrays.asList("footnote-number"), Integer.toString(state.nextFootnoteMarker()));
 						break;
 					default:
-						System.out.println("handle embedded " + embed);
-						break;
+						throw new RuntimeException("handle embedded " + embed);
 					}
 					if (j < text.length() && Character.isWhitespace(text.charAt(j)))
 						text = text.substring(j+1); // skip the space character as well - it is technically just an EOC marker

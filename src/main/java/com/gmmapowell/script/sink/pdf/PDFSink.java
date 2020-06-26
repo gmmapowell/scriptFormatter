@@ -280,6 +280,11 @@ public class PDFSink implements Sink {
 	}
 
 	@Override
+	public void fileEnd() {
+		// no big deal
+	}
+
+	@Override
 	public void close() throws IOException {
 		closeCurrentPage();
 		doc.save(output);

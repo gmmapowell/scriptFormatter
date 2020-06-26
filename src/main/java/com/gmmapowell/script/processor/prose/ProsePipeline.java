@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
@@ -27,7 +30,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	public void process(FilesToProcess files) throws IOException {
 		for (File x : files.included()) {
 			sink.title(x.getName().replace(".txt", ""));
-			T st = begin();
+			T st = begin(x.getName());
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(x))) {
 				String s;
 				while ((s = lnr.readLine()) != null) {
@@ -35,8 +38,10 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						s = trim(s);
 						if (s.length() == 0) {
 							endBlock(st);
-						} else
+						} else {
+							st.line(lnr.getLineNumber());
 							handleLine(st, s);
+						}
 					} catch (Exception ex) {
 						System.out.println("Error encountered processing " + x + " before line " + lnr.getLineNumber());
 						System.out.println(ex.toString());
@@ -48,6 +53,13 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			}
 			if (st.curr != null)
 				sink.block(st.curr);
+			try {
+				sink.fileEnd();
+			} catch (Exception ex) {
+				System.out.println("Exception processing file end of " + x);
+				if (debug)
+					ex.printStackTrace();
+			}
 		}
 		sink.close();
 	}
@@ -59,7 +71,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		}
 	}
 
-	protected abstract T begin();
+	protected abstract T begin(String file);
 	protected abstract void handleLine(T state, String s) throws IOException;
 
 	private String trim(String s) {
@@ -71,5 +83,56 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 				i++;
 		}
 		return sb.toString().trim();
+	}
+
+	protected String readString(T state, StringBuilder args) {
+		if (args == null || args.length() == 0)
+			throw new RuntimeException("cannot read from empty string at " + state.location());
+		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
+			args.delete(0, 1);
+		if (args.length() == 0)
+			throw new RuntimeException("cannot read from empty string at " + state.location());
+		char c = args.charAt(0);
+		if (c != '\'' && c != '"')
+			throw new RuntimeException("unquoted string at " + state.location());
+		args.delete(0, 1);
+		String ret = null;
+		for (int i=0;i<args.length();i++) {
+			if (args.charAt(i) == c) {
+				ret = args.substring(0, i);
+				args.delete(0, i+1);
+				break;
+			}
+		}
+		if (ret == null)
+			throw new RuntimeException("unterminated string at " + state.location());
+		return ret;
+	}
+
+	protected Map<String, String> readParams(T state, StringBuilder args, String... allowedStrings) {
+		Map<String, String> ret = new TreeMap<>();
+		if (args == null)
+			return ret;
+		List<String> allowed = Arrays.asList(allowedStrings);
+		while (args.length() > 0) {
+			while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
+				args.delete(0, 1);
+			if (args.length() == 0)
+				break;
+			int j=0;
+			while (j < args.length() && args.charAt(j) != '=')
+				j++;
+			if (j == args.length())
+				throw new RuntimeException("needed =");
+			String var = args.substring(0, j);
+			args.delete(0, j+1);
+			if (ret.containsKey(var))
+				throw new RuntimeException("duplicate definition of " + var);
+			else if (!allowed.contains(var))
+				throw new RuntimeException("unexpected definition of " + var + "; allowed = " + allowed);
+			else
+				ret.put(var, readString(state, args)); 
+		}
+		return ret;
 	}
 }

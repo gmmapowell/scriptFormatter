@@ -2,7 +2,7 @@ package com.gmmapowell.script.processor.prose;
 
 import com.gmmapowell.script.elements.SpanBlock;
 
-public class CurrentState {
+public abstract class CurrentState {
 	public SpanBlock curr;
 	protected int nextFnMkr = 1;
 	protected int nextFnText = 1;
@@ -15,4 +15,6 @@ public class CurrentState {
 		return nextFnText++;
 	}
 
+	public abstract void line(int lineNumber);
+	public abstract String location();
 }

@@ -8,6 +8,7 @@ import com.gmmapowell.script.elements.Block;
 public interface Sink {
 	void title(String title) throws IOException;
 	void block(Block block) throws IOException;
+	void fileEnd() throws Exception;
 	void close() throws IOException;
 	void showFinal();
 	void upload() throws Exception;

@@ -33,6 +33,12 @@ public class MultiSink implements Sink {
 	}
 
 	@Override
+	public void fileEnd() throws Exception {
+		for (Sink s : sinks)
+			s.fileEnd();
+	}
+
+	@Override
 	public void close() throws IOException {
 		for (Sink s : sinks)
 			s.close();

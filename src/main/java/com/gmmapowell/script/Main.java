@@ -63,7 +63,8 @@ public class Main {
 		try {
 			cfg.upload();
 		} catch (Exception ex) {
-			System.out.println("Error uploading to DH: " + ex.getMessage());
+			System.out.println("Error uploading: " + ex.getMessage());
+			ex.printStackTrace();
 		}
 		return 0;
 	}

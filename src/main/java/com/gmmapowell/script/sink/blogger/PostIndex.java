@@ -41,7 +41,14 @@ public class PostIndex {
 	}
 
 	public void have(String id, String status, String title) throws IOException {
-		if (live.containsKey(id) || draft.containsKey(id)) {
+		if (live.containsKey(id)) {
+			if (!"live".equalsIgnoreCase(status))
+				System.out.println(id + " " + title + " is now draft");
+			return;
+		}
+		if (draft.containsKey(id)) {
+			if (!"draft".equalsIgnoreCase(status))
+				System.out.println(id + " " + title + " is now published");
 			return;
 		}
 		System.out.println("adding " + id + " (" + status +  ") => " + title);
@@ -63,5 +70,9 @@ public class PostIndex {
 				throw new RuntimeException("Cannot update live post");
 		}
 		return null;
+	}
+
+	public void close() throws IOException {
+		appendTo.close();
 	}
 }
