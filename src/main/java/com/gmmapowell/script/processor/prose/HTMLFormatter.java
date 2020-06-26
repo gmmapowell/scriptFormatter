@@ -22,7 +22,7 @@ public class HTMLFormatter implements Formatter {
 					inTag = false;
 					i = 1;
 				} else if (c == ' ') {
-					ret.addSpan(ef.span(isTag?"bold":"", text.substring(0, i)));
+					ret.addSpan(ef.span(isTag?"bold":null, text.substring(0, i)));
 					isTag = false;
 					text = text.substring(i);
 					i = 1;

@@ -60,6 +60,9 @@ public class ProcessingUtils {
 						j++;
 					String embed = text.substring(i+1, j);
 					switch (embed) {
+					case "sp":
+						addSpan(factory, block, defaultStyle, " ");
+						break;
 					case "footnote":
 						addSpan(factory, block, Arrays.asList("footnote-number"), Integer.toString(state.nextFootnoteMarker()));
 						break;

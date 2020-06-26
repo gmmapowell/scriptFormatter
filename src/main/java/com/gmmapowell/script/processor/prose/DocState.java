@@ -15,4 +15,8 @@ public class DocState extends CurrentState {
 		nextFnMkr = 1;
 		nextFnText = 1;
 	}
+
+	public String location() {
+		return (chapter-1) + "." + (section-1) + (commentary?"c":"");
+	}
 }

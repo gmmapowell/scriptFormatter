@@ -37,7 +37,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			// it's a block starting command
 			endBlock(state);
 			state.cmd = new DocCommand(s.substring(1));
-			System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " @: " + s);
+//			System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " @: " + s);
 		} else if (state.cmd != null) {
 			int pos = s.indexOf('=');
 			if (pos == -1)
@@ -55,6 +55,13 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				args = new StringBuilder(s.substring(idx+1));
 			}
 			switch (cmd) {
+			case "tt":
+				if (state.curr == null)
+					state.curr = ef.block("preformatted");
+				else
+					throw new RuntimeException("you need to set up to do preformatted text in an existing block");
+				state.curr.addSpan(ef.span(null, args.toString()));
+				break;
 			case "footnote": {
 				endBlock(state);
 				state.curr = ef.block("footnote");
@@ -64,9 +71,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			case "include": {
 				endBlock(state);
-				String file = readString(args);
-				Map<String, String> params = readParams(args, "formatter");
-				System.out.println("want to include " + file + " with " + params);
+				String file = readString(state, args);
+				Map<String, String> params = readParams(state, args, "formatter");
+//				System.out.println("want to include " + file + " with " + params);
 				File f = null;
 				for (File r : roots) {
 					File tf = new File(r, file);
@@ -85,6 +92,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				case "html":
 					formatter = new HTMLFormatter();
 					break;
+				case "flas":
+					formatter = new FLASFormatter();
+					break;
 				default:
 					formatter = new BoringFormatter();
 					break;
@@ -96,12 +106,31 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
 					throw new RuntimeException("&remove must immediately follow &include");
 				}
-				Map<String, String> params = readParams(args, "from", "what");
-				System.out.println("want to remove from " + state.inline + " with " + params);
+				Map<String, String> params = readParams(state, args, "from", "what");
+//				System.out.println("want to remove from " + state.inline + " with " + params);
 				((IncludeCommand)state.inline).butRemove(params.get("from"), params.get("what"));
+				break;
 			}
+			case "review":
+				if (args == null)
+					throw new RuntimeException("&review command needs something to review");
+				System.out.println("review '" + readString(state, args) + "' in " + state.location());
+				break;
+			case "future":
+				if (args == null)
+					throw new RuntimeException("&future command needs a comment");
+				System.out.println(state.location() + ": in the future, " + readString(state, args));
+				break;
+			case "morework":
+				if (args == null)
+					throw new RuntimeException("&morework command needs a description");
+				System.out.println("more work is required at " + state.location() + ": " + readString(state, args));
+				break;
+			case "outrageousclaim":
+				System.out.println("There is an outrageous claim at " + state.location());
+				break;
 			default:
-				System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " handle inline command: " + s);
+				throw new RuntimeException(state.location() + " handle inline command: " + s);
 			}
 		} else if (s.startsWith("*")) {
 			if (state.curr != null) {
@@ -123,16 +152,16 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		}
 	}
 	
-	private String readString(StringBuilder args) {
+	private String readString(DocState state, StringBuilder args) {
 		if (args == null || args.length() == 0)
-			throw new RuntimeException("cannot read from empty string");
+			throw new RuntimeException("cannot read from empty string at " + state.location());
 		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
 			args.delete(0, 1);
 		if (args.length() == 0)
-			throw new RuntimeException("cannot read from empty string");
+			throw new RuntimeException("cannot read from empty string at " + state.location());
 		char c = args.charAt(0);
 		if (c != '\'' && c != '"')
-			throw new RuntimeException("unquoted string");
+			throw new RuntimeException("unquoted string at " + state.location());
 		args.delete(0, 1);
 		String ret = null;
 		for (int i=0;i<args.length();i++) {
@@ -143,11 +172,11 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 		}
 		if (ret == null)
-			throw new RuntimeException("unterminated string");
+			throw new RuntimeException("unterminated string at " + state.location());
 		return ret;
 	}
 	
-	private Map<String, String> readParams(StringBuilder args, String... allowedStrings) {
+	private Map<String, String> readParams(DocState state, StringBuilder args, String... allowedStrings) {
 		Map<String, String> ret = new TreeMap<>();
 		if (args == null)
 			return ret;
@@ -169,7 +198,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			else if (!allowed.contains(var))
 				throw new RuntimeException("unexpected definition of " + var + "; allowed = " + allowed);
 			else
-				ret.put(var, readString(args)); 
+				ret.put(var, readString(state, args)); 
 		}
 		return ret;
 	}
