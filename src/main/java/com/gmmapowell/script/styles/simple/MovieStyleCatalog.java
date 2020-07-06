@@ -90,4 +90,8 @@ public class MovieStyleCatalog extends FontCatalog {
 		return catalog.get(style);
 	}
 
+	@Override
+	public Style getOptional(String style) {
+		return catalog.get(style);
+	}
 }

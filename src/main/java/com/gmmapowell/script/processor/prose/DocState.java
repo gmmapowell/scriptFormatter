@@ -6,6 +6,8 @@ public class DocState extends CurrentState {
 	public int chapter;
 	public int section;
 	public boolean commentary;
+	public boolean beginComment;
+	public boolean inRefComment;
 
 	public void reset(String file) {
 		cmd = null;

@@ -15,21 +15,37 @@ import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.sink.Sink;
 
 public class IncludeCommand implements InlineCommand {
-	public class Elide {
+	public class Indents {
+		private final int min;
+		private final int max;
+
+		public Indents(int min, int max) {
+			this.min = min;
+			this.max = max;
+		}
+	}
+
+	public class Region {
 		private final String from;
 		private final Pattern pattern;
 		private final String what;
+		private final int exdent;
 
-		public Elide(String from, String what) {
+		public Region(String from, String what, int exd) {
 			this.from = from;
 			this.pattern = Pattern.compile(from);
 			this.what = what;
+			this.exdent = exd;
 		}
 	}
 
 	private final File file;
 	private final Formatter formatter;
-	private final List<Elide> elides = new ArrayList<>();
+	private final List<Region> elides = new ArrayList<>();
+	private Region select;
+	private Indents indents;
+	private Pattern stopAt;
+	private boolean elideAtEnd;
 
 	public IncludeCommand(File file, Formatter formatter) {
 		this.file = file;
@@ -38,17 +54,44 @@ public class IncludeCommand implements InlineCommand {
 
 	@Override
 	public void execute(Sink sink, ElementFactory ef) throws IOException {
-		Iterator<Elide> ei = elides.iterator();
-		Elide lookFor = nextElide(ei);
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file, Charset.forName("UTF-8")))) {
-			String line;
+			String line = null;
+			int exdent = 0;
+			int selectionIndent = 0;
+			boolean primed = false;
+			if (select != null) {
+				exdent = select.exdent;
+				while ((line = lnr.readLine()) != null) {
+					if (select.pattern.matcher(line).find()) {
+						primed = true;
+						selectionIndent = indent(line, lnr.getLineNumber());
+						break;
+					}
+//					System.out.println("skipping line " + line + " before select");
+				}
+				if (!primed)
+					throw new RuntimeException("Never found selection beginning at " + select.from);
+			}
 			int curr = -1;
 			boolean haveSkipped = false;
-			while ((line = lnr.readLine()) != null) {
+			Iterator<Region> ei = elides.iterator();
+			Region lookFor = nextElide(ei);
+			while (primed || (line = lnr.readLine()) != null) {
 				int il = indent(line, lnr.getLineNumber());
+				if (stopAt != null && stopAt.matcher(line).find()) {
+					if (!haveSkipped && elideAtEnd) {
+						elideThis(sink, ef, il);
+					}
+					break;
+				}
+				if (select != null && !primed && !formatter.isBlockIndent(selectionIndent, il)) {
+//					System.out.println("selection over at " + line);
+					break;
+				}
+				primed = false;
 				if (curr != -1) {
 //					System.out.println("comparing " + il + " to " + curr + " for " + line);
-					if (il >= curr) {
+					if (formatter.isBlockIndent(curr, il)) {
 						if (!haveSkipped) {
 							elideThis(sink, ef, il);
 							haveSkipped = true;
@@ -58,7 +101,6 @@ public class IncludeCommand implements InlineCommand {
 					if (!haveSkipped)
 						throw new RuntimeException("nothing was elided at " + file + ":" + lnr.getLineNumber());
 					curr = -1;
-					haveSkipped = false;
 				}
 				if (lookFor != null && lookFor.pattern.matcher(line).find()) {
 					curr = il;
@@ -68,16 +110,25 @@ public class IncludeCommand implements InlineCommand {
 					if (what.equals("inner"))
 						curr++;
 					else {
-						elideThis(sink, ef, il);
-						haveSkipped = true;
+						if (!haveSkipped) {
+							elideThis(sink, ef, il);
+							haveSkipped = true;
+						}
 						continue; // skip this line
 					}
 				}
-				sink.block(formatter.format(ef, line));
+				if (indents == null || (il >= indents.min && il <= indents.max)) {
+//					System.out.println("sinking " + line);
+					sink.block(formatter.format(ef, line, exdent));
+					haveSkipped = false;
+				} else if (!haveSkipped) {
+					elideThis(sink, ef, il);
+					haveSkipped = true;
+				}
 			}
+			if (lookFor != null)
+				throw new RuntimeException("While processing " + file + ", did not come across " + lookFor.from);
 		}
-		if (lookFor != null)
-			throw new RuntimeException("While processing " + file + ", did not come across " + lookFor.from);
 	}
 
 	private void elideThis(Sink sink, ElementFactory ef, int il) throws IOException {
@@ -96,7 +147,8 @@ public class IncludeCommand implements InlineCommand {
 
 	private int indent(String line, int lineNo) {
 		int ret = 0;
-		for (int i=0;i<line.length() && Character.isWhitespace(line.charAt(i));i++) {
+		int i=0;
+		for (;i<line.length() && Character.isWhitespace(line.charAt(i));i++) {
 			if (line.charAt(i) == '\t') {
 				if (ret % 4 != 0)
 					throw new RuntimeException("invalid mixing of tabs and spaces in indent processing " + file + ": " + lineNo);
@@ -104,17 +156,42 @@ public class IncludeCommand implements InlineCommand {
 			} else
 				ret++;
 		}
+		if (i == line.length())
+			return -1; // it is all white space
 		return ret;
 	}
 
-	private Elide nextElide(Iterator<Elide> e) {
+	private Region nextElide(Iterator<Region> e) {
 		if (!e.hasNext())
 			return null;
 		return e.next();
 	}
+	
+	public void selectOnly(String from, String what, String exdent) {
+		if (select != null)
+			throw new RuntimeException("only one select is allowed");
+		if (!elides.isEmpty())
+			throw new RuntimeException("select must come before any &remove items");
+		int exd = 0;
+		if (exdent != null)
+			exd = Integer.parseInt(exdent);
+		select = new Region(from, what, exd);
+	}
 
 	public void butRemove(String from, String what) {
-		elides.add(new Elide(from, what));
+		elides.add(new Region(from, what, 0));
+	}
+
+	public void indents(int min, int max) {
+		if (indents != null)
+			throw new RuntimeException("indents may only be specified once");
+		indents = new Indents(min, max);
+	}
+
+	public void stopAt(String end, String elide) {
+		this.stopAt = Pattern.compile(end);
+		if (elide != null)
+			elideAtEnd = Boolean.parseBoolean(elide);
 	}
 
 }

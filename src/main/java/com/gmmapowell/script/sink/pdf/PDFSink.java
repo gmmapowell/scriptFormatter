@@ -3,8 +3,11 @@ package com.gmmapowell.script.sink.pdf;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +72,9 @@ public class PDFSink implements Sink {
 	}
 
 	private void loadFonts() throws IOException {
+		styles.fonts().put("monospace", (PDFont) PDType0Font.load(doc, new File("fonts/MonospaceRegular.ttf")));
+		styles.fonts().put("monospace-bold", (PDFont) PDType0Font.load(doc, new File("fonts/MonospaceBold.ttf")));
+		styles.fonts().put("monospace-oblique", (PDFont) PDType0Font.load(doc, new File("fonts/MonospaceOblique.ttf")));
 		styles.fonts().put("palatino", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino.ttf")));
 		styles.fonts().put("palatino-bold", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Bold.ttf")));
 		styles.fonts().put("palatino-italic", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Italic.ttf")));
@@ -102,7 +108,7 @@ public class PDFSink implements Sink {
 		String bsname = block.getStyle();
 //		if (debug)
 //			System.out.println("base style is " + bsname);
-		Style baseStyle = styles.get(bsname);
+		Style baseStyle = styles.getOptional(bsname);
 		if (baseStyle == null)
 			throw new RuntimeException("no style found for " + bsname);
 		List<Line> lines = new ArrayList<>();
@@ -115,9 +121,16 @@ public class PDFSink implements Sink {
 			fm += pageStyle.getLeftMargin();
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
 		float wid = pageStyle.getPageWidth() - fm - rm;
+		boolean inlink = false;
 		for (Span s : block) {
 //			if (debug)
 //				System.out.println("span styles: " + s.getStyles());
+			if (s.getStyles().contains("endlink"))
+				inlink = false;
+			else if (inlink)
+				continue;
+			else if (s.getStyles().contains("link"))
+				inlink = true;
 			Style style = baseStyle.apply(s.getStyles());
 			if (baseStyle.isPreformatted()) {
 				addSegment(lines, segments, wid, baseStyle, style, fm, rm, s.getText(), false);
@@ -307,7 +320,7 @@ public class PDFSink implements Sink {
 	@Override
 	public void upload() throws JSchException, SftpException {
 		if (upload != null) {
-			if (debug)
+//			if (debug)
 				System.out.println("uploading to " + upload);
 			Pattern p = Pattern.compile("sftp:([a-zA-Z0-9_]+)@([a-zA-Z0-9_.]+)(:[0-9]+)?/(.+)");
 			Matcher matcher = p.matcher(upload);
@@ -320,7 +333,16 @@ public class PDFSink implements Sink {
 			if (matcher.group(3) != null)
 				port = Integer.parseInt(matcher.group(3).substring(1));
 			String to = matcher.group(4);
-			
+
+			// version
+			SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			String version = sdf.format(new Date());
+			to = to.replace("$YYYYMMDD$", version);
+
+			System.out.println("uploading to " + host + " as " + username + " into file " + to);
+			File f = new File(to);
+
 			File privateKeyPath = new File(System.getProperty("user.home"), ".ssh/id_rsa_dorothy");
 			JSch jsch = new JSch();
 			jsch.addIdentity(privateKeyPath.getPath());
@@ -331,6 +353,13 @@ public class PDFSink implements Sink {
 				s.connect();
 				ChannelSftp openChannel = (ChannelSftp) s.openChannel("sftp");
 				openChannel.connect();
+				if (f.getParent() != null) {
+					try {
+						openChannel.stat(f.getParent());
+					} catch (SftpException ex) {
+						openChannel.mkdir(f.getParent());
+					}
+				}
 				openChannel.put(output.getPath(), to);
 			} finally {
 				if (s != null)

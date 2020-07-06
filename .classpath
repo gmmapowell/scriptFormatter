@@ -29,5 +29,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/rugbysim/libs/jmock-junit4-2.8.2.jar"/>
 	<classpathentry kind="lib" path="/rugbysim/libs/jmock-2.8.2.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/utils/bin/classes"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/FLAS2/bin" sourcepath="/Users/gareth/Ziniki/Over/FLAS2/src/main/java"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -17,6 +17,7 @@ public interface StyleBuilder {
 	StyleBuilder setRightMargin(float f);
 	StyleBuilder setFont(String font);
 	StyleBuilder setFontSize(Float f);
+	StyleBuilder setAdjustFontSize(Float f);
 	StyleBuilder setUnderline(boolean b);
 	StyleBuilder setBold(boolean b);
 	StyleBuilder setItalic(boolean b);

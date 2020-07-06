@@ -8,8 +8,10 @@ public class HTMLFormatter implements Formatter {
 	private boolean inTag = false;
 
 	@Override
-	public Block format(ElementFactory ef, String text) {
+	public Block format(ElementFactory ef, String text, int exdent) {
 		text = text.replace("\t", "    ");
+		if (exdent > 0)
+			text = text.substring(exdent);
 		SpanBlock ret = ef.block("preformatted");
 		int i = 0;
 		boolean isTag = false;
@@ -44,6 +46,11 @@ public class HTMLFormatter implements Formatter {
 		if (text.length() != 0)
 			ret.addSpan(ef.span(null, text));
 		return ret;
+	}
+
+	@Override
+	public boolean isBlockIndent(int firstline, int thisline) {
+		return thisline == -1 || thisline >= firstline;
 	}
 
 }

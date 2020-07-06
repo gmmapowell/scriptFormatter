@@ -9,6 +9,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class PostIndex {
+	public class BlogEntry {
+		public final String key;
+		public final boolean isLive;
+
+		public BlogEntry(String key, boolean isLive) {
+			this.key = key;
+			this.isLive = isLive;
+		}
+		
+		@Override
+		public String toString() {
+			return key;
+		}
+	}
+
 	private final Map<String, String> live = new LinkedHashMap<>();
 	private final Map<String, String> draft = new LinkedHashMap<>();
 	private FileWriter appendTo;
@@ -60,14 +75,14 @@ public class PostIndex {
 		appendTo.append("\n");
 	}
 
-	public String find(String title) {
+	public BlogEntry find(String title) {
 		for (Entry<String, String> i : draft.entrySet()) {
 			if (i.getValue().equals(title))
-				return i.getKey();
+				return new BlogEntry(i.getKey(), false);
 		}
-		for (Entry<String, String> i : draft.entrySet()) {
+		for (Entry<String, String> i : live.entrySet()) {
 			if (i.getValue().equals(title))
-				throw new RuntimeException("Cannot update live post");
+				return new BlogEntry(i.getKey(), true);
 		}
 		return null;
 	}

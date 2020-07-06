@@ -16,7 +16,7 @@ public class TextSpan implements Span {
 	}
 
 	public TextSpan(List<String> formats, String text) {
-		this.formats = formats;
+		this.formats = new ArrayList<>(formats);
 		this.text = text;
 	}
 

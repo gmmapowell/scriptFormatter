@@ -8,7 +8,7 @@ import com.gmmapowell.script.elements.SpanBlock;
 public class FLASFormatter implements Formatter {
 
 	@Override
-	public Block format(ElementFactory ef, String text) {
+	public Block format(ElementFactory ef, String text, int exdent) {
 		text = text.replace("\t", "    ");
 		SpanBlock ret = ef.block("preformatted");
 		int i = 0;
@@ -35,6 +35,11 @@ public class FLASFormatter implements Formatter {
 		if (text.length() != 0)
 			ret.addSpan(ef.span(isKW(first, text)?"bold":null, text));
 		return ret;
+	}
+
+	@Override
+	public boolean isBlockIndent(int firstline, int thisline) {
+		return thisline <= 0 || thisline > firstline;
 	}
 
 	private boolean isKW(boolean first, String tx) {

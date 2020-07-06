@@ -58,6 +58,14 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					args = new StringBuilder(s.substring(idx+1));
 				}
 				switch (cmd) {
+				case "bold":
+				case "italic": {
+					if (state.defaultSpans.isEmpty() || !state.defaultSpans.get(0).equals(cmd))
+						state.defaultSpans.add(0, cmd);
+					else
+						state.defaultSpans.remove(0);
+					break;
+				}
 				case "link": {
 					String lk = readString(state, args);
 					String tx = readString(state, args);
@@ -69,8 +77,19 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				case "sp": {
 					if (state.curr == null)
 						state.curr = ef.block("text");
-					state.curr.addSpan(ef.span(null, " "));
+					state.curr.addSpan(ef.lspan(state.defaultSpans, " "));
 					ProcessingUtils.addSpans(ef, state, state.curr, args.toString().trim());
+					break;
+				}
+				case "img": {
+					// Doing this properly may require another API (picker?)
+					// See: https://bloggerdev.narkive.com/SC3HJ3UM/upload-images-using-blogger-api
+					// For now, upload the image by hand and put the URL here
+					//  Obvs you can also use any absolute URL
+					String link = readString(state, args);
+					if (state.curr == null)
+						state.curr = ef.block("text");
+					state.curr.addSpan(ef.html("<img border='0' src=\'" + link + "' />"));
 					break;
 				}
 				default:

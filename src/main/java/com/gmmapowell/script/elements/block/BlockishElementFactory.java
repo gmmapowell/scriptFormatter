@@ -18,6 +18,11 @@ public class BlockishElementFactory implements ElementFactory {
 	}
 	
 	@Override
+	public Span html(String text) {
+		return new HTMLSpan(text);
+	}
+
+	@Override
 	public Span span(String format, String text) {
 		return new TextSpan(format, text);
 	}

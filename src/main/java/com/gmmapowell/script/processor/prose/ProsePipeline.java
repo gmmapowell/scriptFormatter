@@ -51,12 +51,17 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 					}
 				}
 			}
-			if (st.curr != null)
-				sink.block(st.curr);
+			try {
+				endBlock(st);
+			} catch (Exception ex) {
+				System.out.println("Exception processing block at end of " + x + ": " + ex);
+				if (debug)
+					ex.printStackTrace();
+			}
 			try {
 				sink.fileEnd();
 			} catch (Exception ex) {
-				System.out.println("Exception processing file end of " + x);
+				System.out.println("Exception processing file end of " + x + ": " + ex);
 				if (debug)
 					ex.printStackTrace();
 			}

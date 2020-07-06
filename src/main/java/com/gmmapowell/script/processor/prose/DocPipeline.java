@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flasck.flas.grammar.Grammar;
+import org.flasck.flas.grammar.Production;
+import org.zinutils.xml.XML;
+
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
@@ -16,11 +20,20 @@ import com.gmmapowell.script.sink.Sink;
 public class DocPipeline extends ProsePipeline<DocState> {
 	private final DocState root = new DocState();
 	private List<File> roots = new ArrayList<>();
+	private final Grammar grammar;
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
-		// TODO: this needs to come from "options"
-		this.roots.add(new File("/Users/gareth/Ziniki/Over/Demos/samples"));
+		if (options.containsKey("samples"))
+			this.roots.add(new File(options.remove("samples")));
+		if (options.containsKey("grammar")) {
+			String grammarName = options.remove("grammar");
+			File file = new File(grammarName);
+			if (!file.exists())
+				throw new RuntimeException("Grammar file " + grammarName + " does not exist");
+			this.grammar = Grammar.from(XML.fromFile(file));
+		} else
+			this.grammar = null;
 	}
 	
 	@Override
@@ -60,6 +73,18 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					throw new RuntimeException("you need to set up to do preformatted text in an existing block");
 				state.curr.addSpan(ef.span(null, args.toString()));
 				break;
+			case "link": {
+				String lk = readString(state, args);
+				String tx = readString(state, args);
+				List<String> lspan = new ArrayList<>(state.defaultSpans);
+				lspan.add(0, "link");
+				state.curr.addSpan(ef.lspan(lspan, lk));
+				ProcessingUtils.addSpans(ef, state, state.curr, tx);
+				lspan = new ArrayList<>(state.defaultSpans);
+				lspan.add(0, "endlink");
+				state.curr.addSpan(ef.lspan(lspan, ""));
+				break;
+			}
 			case "footnote": {
 				endBlock(state);
 				state.curr = ef.block("footnote");
@@ -116,6 +141,52 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				((IncludeCommand)state.inline).butRemove(params.get("from"), params.get("what"));
 				break;
 			}
+			case "select": {
+				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
+					throw new RuntimeException("&select must immediately follow &include");
+				}
+				Map<String, String> params = readParams(state, args, "from", "what", "exdent");
+				((IncludeCommand)state.inline).selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
+				break;
+			}
+			case "stop": {
+				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
+					throw new RuntimeException("&select must immediately follow &include");
+				}
+				Map<String, String> params = readParams(state, args, "at", "elide");
+				((IncludeCommand)state.inline).stopAt(params.get("at"), params.get("elide"));
+				break;
+			}
+			case "indents": {
+				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
+					throw new RuntimeException("&select must immediately follow &include");
+				}
+				Map<String, String> params = readParams(state, args, "from", "to");
+				((IncludeCommand)state.inline).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
+				break;
+			}
+			case "grammar": {
+				endBlock(state);
+				Map<String, String> params = readParams(state, args, "rule");
+				String ruleName = params.get("rule");
+				if (debug)
+					System.out.println("including grammar for production " + ruleName);
+				Production rule = grammar.findRule(ruleName);
+				state.inline = new GrammarCommand(ef, sink, rule);
+				// TODO: we need the ability to remove rules we don't like
+				// In particular, we need to move the Ziniki extensions into their own rules
+				// and then hide them in the FLAS manual
+				break;
+			}
+			case "removeOption": {
+				if (state.inline == null || !(state.inline instanceof GrammarCommand)) {
+					throw new RuntimeException("&removeOption must immediately follow &grammar");
+				}
+				Map<String, String> params = readParams(state, args, "prod");
+//				System.out.println("want to remove from " + state.inline + " with " + params);
+				((GrammarCommand)state.inline).removeProd(params.get("prod"));
+				break;
+			}
 			case "review":
 				if (args == null)
 					throw new RuntimeException("&review command needs something to review");
@@ -151,7 +222,14 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			ProcessingUtils.addSpans(ef, state, state.curr, text);
 		} else {
 			if (state.curr == null) {
-				state.curr = ef.block("text");
+				if (state.beginComment) {
+					state.curr = ef.block("beginRefComment");
+					state.curr.addSpan(ef.span("comment-sign", "\u25A0"));
+					state.beginComment = false;
+				} else if (state.inRefComment)
+					state.curr = ef.block("refComment");
+				else
+					state.curr = ef.block("text");
 			}
 			ProcessingUtils.addSpans(ef, state, state.curr, s);
 		}
@@ -186,10 +264,31 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				sink.block(blk);
 				break;
 			}
+			case "Subsection": {
+				String title = st.cmd.args.get("title");
+				if (title == null)
+					throw new RuntimeException("Section without title");
+				SpanBlock blk = ef.block("subsection-title");
+				ProcessingUtils.addSpans(ef, st, blk, title);
+				sink.block(blk);
+				break;
+			}
 			case "Commentary": {
 				sink.brk(new CommentaryBreak());
 				st.commentary = true;
 				st.section = 1;
+				break;
+			}
+			case "Comment": {
+				st.beginComment = true;
+				st.inRefComment = true;
+				break;
+			}
+			case "/": {
+				st.inRefComment = false;
+				SpanBlock blk = ef.block("endRefComment");
+				blk.addSpan(ef.span("comment-sign", "\u25A1"));
+				sink.block(blk);
 				break;
 			}
 			default:
@@ -197,9 +296,11 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			st.cmd = null;
 		} else if (st.inline != null) {
-			st.inline.execute(sink, ef);
+			InlineCommand inline = st.inline;
 			st.inline = null;
-		} else
+			inline.execute(sink, ef);
+		} else {
 			super.endBlock(st);
+		}
 	}
 }

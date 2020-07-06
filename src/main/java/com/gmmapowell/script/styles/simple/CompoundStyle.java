@@ -23,7 +23,9 @@ public class CompoundStyle implements Style {
 		if (style == null)
 			return base;
 		for (String s : style) {
-			base = new CompoundStyle(catalog, catalog.get(s), base);
+			Style nested = catalog.getOptional(s);
+			if (nested != null)
+				base = new CompoundStyle(catalog, nested, base);
 		}
 		return base;
 	}
@@ -115,7 +117,25 @@ public class CompoundStyle implements Style {
 		Float maybe = override.getFontSize();
 		if (maybe != null)
 			return maybe;
-		return parent.getFontSize();
+		
+		Float p = parent.getFontSize();
+		Float adj = override.getAdjustFontSize();
+		if (adj != null)
+			return p+adj;
+		else
+			return p;
+	}
+
+	@Override
+	public Float getAdjustFontSize() {
+		Float maybe = override.getAdjustFontSize();
+		Float adj = override.getAdjustFontSize();
+		if (maybe == null && adj == null)
+			return null;
+		else if (maybe != null)
+			return maybe;
+		else
+			return adj;
 	}
 
 	@Override

@@ -23,6 +23,7 @@ public class SimpleStyle implements Style, StyleBuilder {
 	private Float right = null;
 	private String font = null;
 	private Float fontSize = null;
+	private Float adjustFontSize = null;
 	private Float baselineAdjust = null;
 	private Boolean bold = null;
 	private Boolean italic = null;
@@ -86,16 +87,15 @@ public class SimpleStyle implements Style, StyleBuilder {
 	}
 	
 	@Override
-	public StyleBuilder setFontSize(Float f) {
-		this.fontSize = f;
-		return this;
-	}
-
-	@Override
 	public Float getFontSize() {
 		return fontSize;
 	}
 
+	@Override
+	public Float getAdjustFontSize() {
+		return adjustFontSize;
+	}
+	
 	@Override
 	public Float getBaselineAdjust() {
 		return baselineAdjust;
@@ -210,6 +210,18 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public StyleBuilder setFont(String font) {
 		this.font = font;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setFontSize(Float f) {
+		this.fontSize = f;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setAdjustFontSize(Float f) {
+		this.adjustFontSize = f;
 		return this;
 	}
 

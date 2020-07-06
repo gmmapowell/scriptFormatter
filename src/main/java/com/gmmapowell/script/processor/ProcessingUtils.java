@@ -12,10 +12,9 @@ import com.gmmapowell.script.processor.prose.CurrentState;
 // This should be unit tested
 public class ProcessingUtils {
 	public static void addSpans(ElementFactory factory, CurrentState state, SpanBlock block, String text) {
-		text = addRecursiveSpans(factory, state, block, null, text, ' ');
+		text = addRecursiveSpans(factory, state, block, state.defaultSpans, text, ' ');
 		if (text != null && text.length() > 0) {
-			Span span = factory.span(null, text);
-			block.addSpan(span);
+			addSpan(factory, block, state.defaultSpans, text);
 		}
 	}
 	

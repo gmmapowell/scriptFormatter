@@ -43,8 +43,13 @@ public class DocStyleCatalog extends FontCatalog {
 
 		catalog.put("section-title",
 				new CompoundStyle(this,
-						// want set new page
 					create().setFont("palatino").setFontSize(16f).setLineSpacing(20.0f).setBold(true).setBeforeBlock(18).setAfterBlock(12).setRequireAfter(108f).build(),
+					defaultStyle
+			));
+
+		catalog.put("subsection-title",
+				new CompoundStyle(this,
+					create().setFont("palatino").setFontSize(15f).setLineSpacing(19.0f).setBold(true).setBeforeBlock(15).setAfterBlock(12).setRequireAfter(108f).build(),
 					defaultStyle
 			));
 
@@ -54,21 +59,61 @@ public class DocStyleCatalog extends FontCatalog {
 				defaultStyle
 		));
 
-		catalog.put("preformatted",
+		catalog.put("refComment",
 				new CompoundStyle(this,
-					create().setFont("courier").setFontSize(11f).setLineSpacing(12.5f).setPreformatted(true).build(),
+					create().setFont("palatino").setFontSize(10f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(6).setAfterBlock(6).build(),
 					defaultStyle
 			));
 
+		catalog.put("beginRefComment",
+				new CompoundStyle(this,
+					create().setFont("palatino").setFontSize(10f).setFirstMargin(18f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(12).setAfterBlock(6).build(),
+					defaultStyle
+			));
+
+		catalog.put("endRefComment",
+				new CompoundStyle(this,
+					create().setFont("palatino").setFirstMargin(18f).setLeftMargin(36).setRightMargin(24).setAfterBlock(12).setAfterBlock(6).build(),
+					defaultStyle
+			));
+
+		catalog.put("preformatted",
+				new CompoundStyle(this,
+					create().setFont("monospace").setFontSize(11f).setLineSpacing(12.5f).setPreformatted(true).build(),
+					defaultStyle
+			));
+
+		catalog.put("grammar",
+				new CompoundStyle(this,
+					create().setFont("monospace").setFontSize(9f).setLineSpacing(12.5f).setPreformatted(true).setLeftMargin(192f).setFirstMargin(0f).build(),
+					defaultStyle
+			));
+
+		catalog.put("grammar-number",
+				create().setWidth(32.0f).setJustification(Justification.CENTER).build()
+		);
+
+		catalog.put("grammar-name",
+				create().setBold(true).setWidth(96.0f).setJustification(Justification.RIGHT).build()
+		);
+
+		catalog.put("grammar-blank",
+				create().setBold(true).setWidth(128.0f).setJustification(Justification.RIGHT).build()
+		);
+		
+		catalog.put("grammar-op",
+				create().setBold(true).setWidth(32.0f).setJustification(Justification.CENTER).build()
+		);
+
 		catalog.put("bullet",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFirstMargin(18f).setLeftMargin(32f).build(),
+					create().setFont("palatino").setBeforeBlock(2).setAfterBlock(2).setFirstMargin(18f).setLeftMargin(32f).build(),
 					defaultStyle
 			));
 
 		catalog.put("bullet2",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFirstMargin(36f).setLeftMargin(50f).build(),
+					create().setFont("palatino").setBeforeBlock(2).setAfterBlock(2).setFirstMargin(36f).setLeftMargin(50f).build(),
 					defaultStyle
 			));
 
@@ -82,8 +127,20 @@ public class DocStyleCatalog extends FontCatalog {
 				create().setWidth(14.0f).build()
 		);
 
+		catalog.put("comment-sign",
+				create().setFont("monospace").setWidth(18.0f).build()
+		);
+
 		catalog.put("tt",
-				create().setFont("courier").setFontSize(11f).build()
+				create().setFont("courier").setAdjustFontSize(-1f).build()
+		);
+
+		catalog.put("link",
+				create().setFont("courier").setAdjustFontSize(-1f).build()
+		);
+
+		catalog.put("endlink",
+				create().setFont("courier").setAdjustFontSize(-1f).build()
 		);
 
 		catalog.put("footnote-number",
@@ -115,4 +172,8 @@ public class DocStyleCatalog extends FontCatalog {
 		return catalog.get(style);
 	}
 
+	@Override
+	public Style getOptional(String style) {
+		return catalog.get(style);
+	}
 }

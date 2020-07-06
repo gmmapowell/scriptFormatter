@@ -16,8 +16,10 @@ import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
+import com.gmmapowell.script.elements.block.HTMLSpan;
 import com.gmmapowell.script.elements.block.TextBlock;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -133,29 +135,34 @@ public class BloggerSink implements Sink {
 		List<String> cf = new ArrayList<>();
 		for (Span s : block) {
 			List<String> styles = s.getStyles();
-			if (styles.size() == 1) {
-				switch(styles.get(0)) {
-				case "link": {
-					writer.print("<a href='" + s.getText() + "'>");
-					continue;
+			if (styles != null) {
+				if (styles.size() == 1) {
+					switch(styles.get(0)) {
+					case "link": {
+						writer.print("<a href='" + s.getText() + "'>");
+						continue;
+					}
+					case "endlink": {
+						writer.print("</a>");
+						continue;
+					}
+					}
 				}
-				case "endlink": {
-					writer.print("</a>");
-					continue;
-				}
+				drawDownTo(cf, styles.size());
+				for (int i=0;i<styles.size();i++) {
+					if (cf.size() > i && cf.get(i).equals(styles.get(i)))
+						continue;
+					else if (cf.size() > i) {
+						drawDownTo(cf, i);
+					}
+					writer.print("<" + mapStyle(styles.get(i)) + ">");
+					cf.add(styles.get(i));
 				}
 			}
-			drawDownTo(cf, styles.size());
-			for (int i=0;i<styles.size();i++) {
-				if (cf.size() > i && cf.get(i).equals(styles.get(i)))
-					continue;
-				else if (cf.size() > i) {
-					drawDownTo(cf, i);
-				}
-				writer.print("<" + styles.get(i) + ">");
-				cf.add(styles.get(i));
-			}
-			writer.print(entitify(s.getText()));
+			if (s instanceof HTMLSpan)
+				writer.print(s.getText());
+			else
+				writer.print(entitify(s.getText()));
 		}
 		drawDownTo(cf, 0);
 		if (!wantBr)
@@ -190,7 +197,18 @@ public class BloggerSink implements Sink {
 
 	private void drawDownTo(List<String> cf, int to) {
 		while (cf.size() > to) {
-			writer.print("</" + cf.remove(cf.size()-1) + ">");
+			writer.print("</" + mapStyle(cf.remove(cf.size()-1)) + ">");
+		}
+	}
+	
+	private String mapStyle(String sty) {
+		switch (sty) {
+		case "italic":
+			return "i";
+		case "bold":
+			return "b";
+		default:
+			return sty;
 		}
 	}
 
@@ -217,7 +235,9 @@ public class BloggerSink implements Sink {
 			System.out.println("Cannot upload without a title");
 			return;
 		}
-		String idx = findInPosts();
+		BlogEntry idx = findInPosts();
+		if (idx != null && idx.isLive)
+			return;
 		Post p = new Post();
 		p.setTitle(title);
 		p.setContent(sw.toString());
@@ -231,7 +251,7 @@ public class BloggerSink implements Sink {
 			index.have(inserted.getId(), "DRAFT", title);
 		} else {
 			System.out.println("Upload to " + blogId + ":" + idx);
-			posts.update(blogId, idx, p).execute();
+			posts.update(blogId, idx.key, p).execute();
 		}
 	}
 
@@ -260,7 +280,7 @@ public class BloggerSink implements Sink {
 		return index;
 	}
 
-	private String findInPosts() {
+	private BlogEntry findInPosts() {
 		return index.find(title);
 	}
 

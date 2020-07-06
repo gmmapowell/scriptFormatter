@@ -19,6 +19,7 @@ public interface Style {
 	PDFont getFont();
 	String getFontName();
 	Float getFontSize();
+	Float getAdjustFontSize();
 	Float getBaselineAdjust();
 	Boolean getBold();
 	Boolean getItalic();
@@ -27,8 +28,4 @@ public interface Style {
 	Float getLineSpacing();
 	Float getRightMargin();
 	Boolean getUnderline();
-
-
-
-
 }

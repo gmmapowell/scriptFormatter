@@ -19,6 +19,7 @@ import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
+import com.gmmapowell.script.sink.presenter.PresenterSink;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class ScriptConfig implements Config {
@@ -84,6 +85,18 @@ public class ScriptConfig implements Config {
 			} catch (Exception ex) {
 				throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
 			}
+			break;
+		}
+		case "presenter": {
+			String file = vars.remove("file");
+			if (file == null)
+				throw new ConfigException("output file was not defined");
+			String show = vars.remove("show");
+			boolean wantShow = false;
+			if ("true".equals(show))
+				wantShow = true;
+			String upload = vars.remove("upload");
+			sinks.add(new PresenterSink(root, file, wantShow, upload, debug));
 			break;
 		}
 		default:
