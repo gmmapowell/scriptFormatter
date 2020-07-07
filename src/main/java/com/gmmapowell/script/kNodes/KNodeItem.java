@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public interface KNodeItem {
-
+	String name();
+	String image();
 	void asJson(JsonGenerator gen) throws IOException;
-
 }

@@ -16,6 +16,11 @@ public class Slide implements KNodeItem {
 		return name;
 	}
 	
+	@Override
+	public String image() {
+		return "Alan-turing-statue.png";
+	}
+
 	public void setFormat(String name) {
 		// TODO Auto-generated method stub
 		

@@ -8,20 +8,23 @@ import java.util.Random;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public class KNode<T extends KNodeItem> {
-	private final int idx;
 	private final T item;
 	private final int x, y, z;
 	private float xpos, ypos, zpos;
 	private final List<Link<T>> links = new ArrayList<>();
 
-	public KNode(int idx, T item, int which, int ncells) {
-		this.idx = idx;
+	public KNode(T item, int which, int ncells) {
 		this.item = item;
 		this.x = which % ncells;
 		this.y = (which/ncells) % ncells;
 		this.z = which/ncells/ncells;
 	}
 	
+	public String name() {
+		// TODO Auto-generated method stub
+		return item.name();
+	}
+
 	public void locate(int ncells, KNode<T>[] occupation, Random r) {
 		float cx = (x-ncells/2f + 0.5f)*Galaxy.CellSize;
 		float cy = (y-ncells/2f + 0.5f)*Galaxy.CellSize;
@@ -123,26 +126,29 @@ public class KNode<T extends KNodeItem> {
 	
 	public void asJson(JsonGenerator gen) throws IOException {
 		gen.writeStartObject();
-		gen.writeFieldName("pos");
-		gen.writeArray(new double[] { xpos, ypos, zpos }, 0, 3);
-		if (!links.isEmpty()) {
-			boolean started = false;
-			for (Link<T> l : links) {
-				if (l.to != this) {
-					if (!started) {
-						started = true;
-						gen.writeFieldName("links");
-						gen.writeStartArray();
-					}
-					gen.writeNumber(l.to.idx);
-				}
-			}
-			if (started)
-				gen.writeEndArray();
-		}
+		gen.writeNumberField("x", xpos);
+		gen.writeNumberField("y", ypos);
+		gen.writeNumberField("z", zpos);
+		gen.writeStringField("title", name());
+		gen.writeStringField("img", item.image());
 		gen.writeFieldName("item");
 		item.asJson(gen);
 		gen.writeEndObject();
+	}
+
+	public void tunnels(JsonGenerator gen) throws IOException {
+		if (!links.isEmpty()) {
+			for (Link<T> l : links) {
+				if (l.to != this) {
+					gen.writeStartObject();
+					gen.writeStringField("from", name());
+					gen.writeStringField("to", l.to.name());
+					gen.writeFieldName("color");
+					gen.writeArray(new double[] { 1, 1, 1, 0.5 }, 0, 4);
+					gen.writeEndObject();
+				}
+			}
+		}
 	}
 
 	@Override

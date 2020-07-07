@@ -44,7 +44,7 @@ public class Galaxy<T extends KNodeItem> {
 			if (occupation[which] == null)
 				break;
 		}
-		KNode<T> kn = new KNode<T>(idx, item, which, ncells);
+		KNode<T> kn = new KNode<T>(item, which, ncells);
 		occupation[which] = kn;
 		sparse.add(kn);
 	}
@@ -59,11 +59,20 @@ public class Galaxy<T extends KNodeItem> {
 	public void asJson(Writer w) throws IOException {
 		JsonFactory jf = new JsonFactory();
 		JsonGenerator gen = jf.createGenerator(w);
+		gen.writeStartObject();
+		gen.writeFieldName("slides");
 		gen.writeStartArray();
 		for (KNode<T> kn : sparse) {
 			kn.asJson(gen);
 		}
 		gen.writeEndArray();
+		gen.writeFieldName("tunnels");
+		gen.writeStartArray();
+		for (KNode<T> kn : sparse) {
+			kn.tunnels(gen);
+		}
+		gen.writeEndArray();
+		gen.writeEndObject();
 		gen.flush();
 	}
 }
