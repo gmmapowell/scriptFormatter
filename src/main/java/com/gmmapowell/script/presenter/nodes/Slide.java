@@ -1,6 +1,15 @@
 package com.gmmapowell.script.presenter.nodes;
 
 public class Slide {
+	private final String name;
+
+	public Slide(String name) {
+		this.name = name;
+	}
+
+	public String name() {
+		return name;
+	}
 	
 	public void setFormat(String name) {
 		// TODO Auto-generated method stub

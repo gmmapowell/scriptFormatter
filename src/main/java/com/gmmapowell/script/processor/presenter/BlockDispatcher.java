@@ -11,15 +11,17 @@ import org.zinutils.exceptions.NotImplementedException;
 public class BlockDispatcher implements BlockConsumer {
 	private List<LineProcessor> stack;
 	private final ErrorReporter errors;
+	private final PresentationMapper mapper;
 
-	public BlockDispatcher(ErrorReporter errors) {
+	public BlockDispatcher(ErrorReporter errors, PresentationMapper mapper) {
 		this.errors = errors;
+		this.mapper = mapper;
 	}
 	
 	@Override
 	public void newFile() {
 		stack = new ArrayList<>();
-		this.stack.add(new PresentationProcessor(errors));
+		this.stack.add(new PresentationProcessor(errors, mapper));
 	}
 
 	@Override
@@ -44,5 +46,4 @@ public class BlockDispatcher implements BlockConsumer {
 			stack.remove(0).flush();
 		}
 	}
-
 }

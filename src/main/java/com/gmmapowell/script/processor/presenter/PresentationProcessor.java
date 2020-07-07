@@ -4,13 +4,17 @@ import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
+import com.gmmapowell.script.presenter.nodes.Presentation;
 import com.gmmapowell.script.presenter.nodes.Slide;
 
 public class PresentationProcessor implements LineProcessor {
 	private final ErrorReporter errors;
+	private final Presentation presentation = new Presentation();
+	private final PresentationMapper mapper;
 
-	public PresentationProcessor(ErrorReporter errors) {
+	public PresentationProcessor(ErrorReporter errors, PresentationMapper mapper) {
 		this.errors = errors;
+		this.mapper = mapper;
 	}
 
 	@Override
@@ -21,7 +25,21 @@ public class PresentationProcessor implements LineProcessor {
 			String kw = ((KeywordToken)t).kw;
 			switch (kw) {
 			case "slide": {
-				Slide slide = new Slide();
+				Token nt = Token.from(errors, tx);
+				if (nt == null) {
+					errors.message(tx, "need a name for the slide");
+					return new IgnoreNestingProcessor();
+				}
+				if (!(nt instanceof NameToken)) {
+					errors.message(nt.location(), "needs to be a name token");
+					return new IgnoreNestingProcessor();
+				}
+				if (tx.hasMore()) {
+					errors.message(tx, "end of line expected");
+					return new IgnoreNestingProcessor();
+				}
+				Slide slide = new Slide(((NameToken)nt).name);
+				presentation.add(slide);
 				return new SlideProcessor(errors, slide);
 			}
 			default:
@@ -36,7 +54,6 @@ public class PresentationProcessor implements LineProcessor {
 
 	@Override
 	public void flush() {
-		System.out.println("flushing top level handler");
+		mapper.present(presentation);
 	}
-
 }
