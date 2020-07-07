@@ -1,15 +1,21 @@
 package com.gmmapowell.script.kNodes;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import org.zinutils.exceptions.NotImplementedException;
+import com.fasterxml.jackson.core.JsonGenerator;
 
-public class KNode<T> {
+public class KNode<T extends KNodeItem> {
+	private final int idx;
 	private final T item;
 	private final int x, y, z;
 	private float xpos, ypos, zpos;
+	private final List<Link<T>> links = new ArrayList<>();
 
-	public KNode(T item, int which, int ncells) {
+	public KNode(int idx, T item, int which, int ncells) {
+		this.idx = idx;
 		this.item = item;
 		this.x = which % ncells;
 		this.y = (which/ncells) % ncells;
@@ -105,9 +111,38 @@ public class KNode<T> {
 	}
 
 	// This should probably be bi-directional
-	public void join(KNode<T> kNode) {
-		// TODO Auto-generated method stub
-		
+	public void join(KNode<T> target) {
+		for (Link<T> link : links) {
+			if (link.from == target || link.to == target)
+				return;
+		}
+		Link<T> l = new Link<T>(this, target);
+		links.add(l);
+		target.links.add(l);
+	}
+	
+	public void asJson(JsonGenerator gen) throws IOException {
+		gen.writeStartObject();
+		gen.writeFieldName("pos");
+		gen.writeArray(new double[] { xpos, ypos, zpos }, 0, 3);
+		if (!links.isEmpty()) {
+			boolean started = false;
+			for (Link<T> l : links) {
+				if (l.to != this) {
+					if (!started) {
+						started = true;
+						gen.writeFieldName("links");
+						gen.writeStartArray();
+					}
+					gen.writeNumber(l.to.idx);
+				}
+			}
+			if (started)
+				gen.writeEndArray();
+		}
+		gen.writeFieldName("item");
+		item.asJson(gen);
+		gen.writeEndObject();
 	}
 
 	@Override

@@ -12,16 +12,21 @@ public class BlockDispatcher implements BlockConsumer {
 	private List<LineProcessor> stack;
 	private final ErrorReporter errors;
 	private final PresentationMapper mapper;
+	private String nextName;
 
 	public BlockDispatcher(ErrorReporter errors, PresentationMapper mapper) {
 		this.errors = errors;
 		this.mapper = mapper;
 	}
+
+	public void fileIs(String name) {
+		this.nextName = name;
+	}
 	
 	@Override
 	public void newFile() {
 		stack = new ArrayList<>();
-		this.stack.add(new PresentationProcessor(errors, mapper));
+		this.stack.add(new PresentationProcessor(errors, mapper, nextName));
 	}
 
 	@Override

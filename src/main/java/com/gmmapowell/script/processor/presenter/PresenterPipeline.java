@@ -2,13 +2,17 @@ package com.gmmapowell.script.processor.presenter;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Map;
 
 import org.flasck.flas.blocker.Blocker;
 import org.flasck.flas.errors.ErrorResult;
+import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
@@ -20,20 +24,25 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 
 public class PresenterPipeline implements Processor, PresentationMapper {
-	private final Sink sink;
-	private final Blocker blocker;
-	private final ErrorResult errors = new ErrorResult();
+	private final File root;
 	private final boolean debug;
+	private final BlockDispatcher handler;
+	private final Blocker blocker;
+	private final Sink sink;
+	private final ErrorResult errors = new ErrorResult();
 
 	public PresenterPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+		this.root = root;
 		this.debug = debug;
-		this.blocker = new Blocker(errors, new BlockDispatcher(errors, this));
+		handler = new BlockDispatcher(errors, this);
+		this.blocker = new Blocker(errors, handler);
 		this.sink = sink;
 	}
 	
 	@Override
 	public void process(FilesToProcess files) throws IOException {
 		for (File f : files.included()) {
+			handler.fileIs(f.getName());
 			blocker.newFile();
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
 				String s;
@@ -68,5 +77,11 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 	@Override
 	public void present(Presentation presentation) {
 		Galaxy<Slide> g = new Galaxy<Slide>(presentation.slides());
+		File f = FileUtils.ensureExtension(new File(root, presentation.name), ".json");
+		try (Writer w = new FileWriter(f)) {
+			g.asJson(w);
+		} catch (Exception ex) {
+			ex.printStackTrace(System.out);
+		}
 	}
 }

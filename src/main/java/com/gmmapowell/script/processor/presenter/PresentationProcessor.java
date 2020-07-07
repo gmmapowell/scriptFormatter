@@ -9,12 +9,13 @@ import com.gmmapowell.script.presenter.nodes.Slide;
 
 public class PresentationProcessor implements LineProcessor {
 	private final ErrorReporter errors;
-	private final Presentation presentation = new Presentation();
 	private final PresentationMapper mapper;
+	private final Presentation presentation;
 
-	public PresentationProcessor(ErrorReporter errors, PresentationMapper mapper) {
+	public PresentationProcessor(ErrorReporter errors, PresentationMapper mapper, String name) {
 		this.errors = errors;
 		this.mapper = mapper;
+		this.presentation = new Presentation(name);
 	}
 
 	@Override

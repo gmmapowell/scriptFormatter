@@ -1,6 +1,11 @@
 package com.gmmapowell.script.presenter.nodes;
 
-public class Slide {
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.gmmapowell.script.kNodes.KNodeItem;
+
+public class Slide implements KNodeItem {
 	private final String name;
 
 	public Slide(String name) {
@@ -34,5 +39,13 @@ public class Slide {
 	public void field(String field, String value) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void asJson(JsonGenerator gen) throws IOException {
+		gen.writeStartObject();
+		gen.writeFieldName("name");
+		gen.writeString(name);
+		gen.writeEndObject();
 	}
 }
