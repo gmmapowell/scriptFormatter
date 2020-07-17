@@ -7,6 +7,9 @@ import com.gmmapowell.script.kNodes.KNodeItem;
 
 public class Slide implements KNodeItem {
 	private final String name;
+	private String image;
+	private Float xt;
+	private Float yt;
 
 	public Slide(String name) {
 		this.name = name;
@@ -15,10 +18,19 @@ public class Slide implements KNodeItem {
 	public String name() {
 		return name;
 	}
+
+	public void aspect(float xt, float yt) {
+		this.xt = xt;
+		this.yt = yt;
+	}
+
+	public void background(String value) {
+		this.image = value;
+	}
 	
 	@Override
 	public String image() {
-		return "Alan-turing-statue.png";
+		return image;
 	}
 
 	public void setFormat(String name) {
@@ -31,7 +43,7 @@ public class Slide implements KNodeItem {
 		
 	}
 
-	public void soeak(String value) {
+	public void speak(String value) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -49,8 +61,14 @@ public class Slide implements KNodeItem {
 	@Override
 	public void asJson(JsonGenerator gen) throws IOException {
 		gen.writeStartObject();
-		gen.writeFieldName("name");
-		gen.writeString(name);
+		gen.writeStringField("name", name);
+		if (xt != null) {
+			gen.writeFieldName("aspect");
+			gen.writeStartArray();
+			gen.writeNumber(xt);
+			gen.writeNumber(yt);
+			gen.writeEndArray();
+		}
 		gen.writeEndObject();
 	}
 }

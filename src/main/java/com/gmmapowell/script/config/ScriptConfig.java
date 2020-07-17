@@ -121,13 +121,18 @@ public class ScriptConfig implements Config {
 			throw new ConfigException(proc + " does not have a suitable constructor");
 		}
 		try {
-			this.sink = new MultiSink(sinks);
+			if (sinks.size() == 1)
+				this.sink = sinks.get(0);
+			else
+				this.sink = new MultiSink(sinks);
 			processor = ctor.newInstance(root, elf, sink, vars, debug);
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof ConfigException)
 				throw (ConfigException)e.getCause();
+			e.printStackTrace(System.out);
 			throw new ConfigException("could not create " + proc);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+			e.printStackTrace(System.out);
 			throw new ConfigException("could not create " + proc);
 		}
 	}

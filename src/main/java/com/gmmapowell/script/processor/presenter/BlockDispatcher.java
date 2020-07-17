@@ -12,11 +12,13 @@ public class BlockDispatcher implements BlockConsumer {
 	private List<LineProcessor> stack;
 	private final ErrorReporter errors;
 	private final PresentationMapper mapper;
+	private final String imagedir;
 	private String nextName;
 
-	public BlockDispatcher(ErrorReporter errors, PresentationMapper mapper) {
+	public BlockDispatcher(ErrorReporter errors, PresentationMapper mapper, String imagedir) {
 		this.errors = errors;
 		this.mapper = mapper;
+		this.imagedir = imagedir;
 	}
 
 	public void fileIs(String name) {
@@ -26,7 +28,7 @@ public class BlockDispatcher implements BlockConsumer {
 	@Override
 	public void newFile() {
 		stack = new ArrayList<>();
-		this.stack.add(new PresentationProcessor(errors, mapper, nextName));
+		this.stack.add(new PresentationProcessor(errors, mapper, imagedir, nextName));
 	}
 
 	@Override

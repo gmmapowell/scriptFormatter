@@ -3,7 +3,6 @@ package com.gmmapowell.script.kNodes;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -33,8 +32,6 @@ public class Galaxy<T extends KNodeItem> {
 		for (int i=1;i<sparse.size();i++) {
 			sparse.get(i-1).join(sparse.get(i));
 		}
-		System.out.println(Arrays.asList(occupation));
-		System.out.println(sparse);
 	}
 
 	private void place(int idx, int ncells, KNode<T>[] occupation, Random r, T item) {

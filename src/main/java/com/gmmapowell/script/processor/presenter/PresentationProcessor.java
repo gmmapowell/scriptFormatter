@@ -11,10 +11,12 @@ public class PresentationProcessor implements LineProcessor {
 	private final ErrorReporter errors;
 	private final PresentationMapper mapper;
 	private final Presentation presentation;
+	private final String imagedir;
 
-	public PresentationProcessor(ErrorReporter errors, PresentationMapper mapper, String name) {
+	public PresentationProcessor(ErrorReporter errors, PresentationMapper mapper, String imagedir, String name) {
 		this.errors = errors;
 		this.mapper = mapper;
+		this.imagedir = imagedir;
 		this.presentation = new Presentation(name);
 	}
 
@@ -41,7 +43,7 @@ public class PresentationProcessor implements LineProcessor {
 				}
 				Slide slide = new Slide(((NameToken)nt).name);
 				presentation.add(slide);
-				return new SlideProcessor(errors, slide);
+				return new SlideProcessor(errors, slide, imagedir);
 			}
 			default:
 				errors.message(tx, "invalid keyword: " + kw);

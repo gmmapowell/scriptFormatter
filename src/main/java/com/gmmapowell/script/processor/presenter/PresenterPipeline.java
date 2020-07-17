@@ -33,9 +33,14 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 	public PresenterPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		this.root = root;
 		this.debug = debug;
-		handler = new BlockDispatcher(errors, this);
-		this.blocker = new Blocker(errors, handler);
+		String imagedir = options.remove("imagedir");
+		if (imagedir == null)
+			imagedir = "";
+		else if (!imagedir.endsWith("/"))
+			imagedir += "/";
 		this.sink = sink;
+		handler = new BlockDispatcher(errors, this, imagedir);
+		this.blocker = new Blocker(errors, handler);
 	}
 	
 	@Override

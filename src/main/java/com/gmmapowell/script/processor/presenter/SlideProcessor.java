@@ -10,10 +10,12 @@ import com.gmmapowell.script.presenter.nodes.SlideStep;
 public class SlideProcessor implements LineProcessor {
 	private final ErrorReporter errors;
 	private final Slide slide;
+	private final String imagedir;
 
-	public SlideProcessor(ErrorReporter errors, Slide slide) {
+	public SlideProcessor(ErrorReporter errors, Slide slide, String imagedir) {
 		this.errors = errors;
 		this.slide = slide;
+		this.imagedir = imagedir;
 	}
 
 	@Override
@@ -23,6 +25,29 @@ public class SlideProcessor implements LineProcessor {
 		if (t instanceof KeywordToken) {
 			String kw = ((KeywordToken)t).kw;
 			switch (kw) {
+			case "aspect": {
+				Token xt = Token.from(errors, tx);
+				if (xt == null) {
+					errors.message(tx, "must specify an aspect x");
+					return new IgnoreNestingProcessor();
+				}
+				if (!(xt instanceof NumberToken)) {
+					errors.message(tx, "aspect x must be a number");
+					return new IgnoreNestingProcessor();
+				}
+				Token yt = Token.from(errors, tx);
+				if (yt == null) {
+					errors.message(tx, "must specify an aspect y");
+					return new IgnoreNestingProcessor();
+				}
+				if (!(yt instanceof NumberToken)) {
+					errors.message(tx, "aspect y must be a number");
+					return new IgnoreNestingProcessor();
+				}
+				Token.assertEnd(errors, tx);
+				slide.aspect(((NumberToken)xt).value, ((NumberToken)yt).value);
+				return new NoNestingProcessor();
+			}
 			case "format": {
 				Token name = Token.from(errors, tx);
 				if (name == null) {
@@ -49,6 +74,19 @@ public class SlideProcessor implements LineProcessor {
 					errors.message(name.location(), "title must be a string");
 				return new NoNestingProcessor();
 			}
+			case "img": {
+				Token name = Token.from(errors, tx);
+				if (name == null) {
+					errors.message(tx, "must specify an image");
+					return new IgnoreNestingProcessor();
+				}
+				Token.assertEnd(errors, tx);
+				if (name instanceof StringToken)
+					slide.background(imagedir + ((StringToken)name).value);
+				else
+					errors.message(name.location(), "image name must speak a string");
+				return new NoNestingProcessor();
+			}
 			case "speaker": {
 				Token name = Token.from(errors, tx);
 				if (name == null) {
@@ -57,7 +95,7 @@ public class SlideProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (name instanceof StringToken)
-					slide.soeak(((StringToken)name).value);
+					slide.speak(((StringToken)name).value);
 				else
 					errors.message(name.location(), "speaker must speak a string");
 				return new NoNestingProcessor();

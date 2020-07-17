@@ -29,6 +29,7 @@ public class Token {
 			line.advance();
 		String tok = line.fromMark(mark);
 		switch (tok) {
+		case "aspect":
 		case "format":
 		case "img":
 		case "remove":
@@ -41,6 +42,15 @@ public class Token {
 			return new OpToken(loc, tok);
 		default:
 			break;
+		}
+		if (Character.isDigit(tok.charAt(0))) {
+			try {
+				float f = Float.parseFloat(tok);
+				return new NumberToken(loc, f);
+			} catch (Exception ex) {
+				errors.message(line.locationAtText(mark), "invalid number");
+				return null;
+			}
 		}
 		if (Character.isLowerCase(tok.charAt(0))) {
 			boolean isName = true;
