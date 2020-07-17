@@ -1,11 +1,14 @@
 package com.gmmapowell.script.processor.presenter;
 
 import org.flasck.flas.blockForm.ContinuedLine;
+import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
 import com.gmmapowell.script.presenter.nodes.Slide;
 import com.gmmapowell.script.presenter.nodes.SlideStep;
+import com.gmmapowell.script.processor.presenter.slideformats.BoringSlideFormatter;
+import com.gmmapowell.script.processor.presenter.slideformats.TitleSlideFormatter;
 
 public class SlideProcessor implements LineProcessor {
 	private final ErrorReporter errors;
@@ -48,6 +51,19 @@ public class SlideProcessor implements LineProcessor {
 				slide.aspect(((NumberToken)xt).value, ((NumberToken)yt).value);
 				return new NoNestingProcessor();
 			}
+			case "background": {
+				Token name = Token.from(errors, tx);
+				if (name == null) {
+					errors.message(tx, "must specify a color");
+					return new IgnoreNestingProcessor();
+				}
+				Token.assertEnd(errors, tx);
+				if (name instanceof StringToken)
+					slide.backgroundColor(((StringToken)name).value);
+				else
+					errors.message(name.location(), "color must be a string");
+				return new NoNestingProcessor();
+			}
 			case "format": {
 				Token name = Token.from(errors, tx);
 				if (name == null) {
@@ -55,24 +71,17 @@ public class SlideProcessor implements LineProcessor {
 					return new IgnoreNestingProcessor();
 				}
 				Token.assertEnd(errors, tx);
-				if (name instanceof NameToken)
-					slide.setFormat(((NameToken)name).name);
-				else
+				if (name instanceof NameToken) {
+					String format = ((NameToken)name).name;
+					SlideFormatter sf = findSlideFormatter(name.location(), format);
+					if (sf == null)
+						return new IgnoreNestingProcessor();
+					slide.setFormat(sf);
+					return new FormatFieldProcessor(errors, sf, imagedir);
+				} else {
 					errors.message(name.location(), "format must be a name");
-				return new FormatFieldProcessor(errors, slide);
-			}
-			case "title": {
-				Token name = Token.from(errors, tx);
-				if (name == null) {
-					errors.message(tx, "must specify a title");
 					return new IgnoreNestingProcessor();
 				}
-				Token.assertEnd(errors, tx);
-				if (name instanceof StringToken)
-					slide.setTitle(((StringToken)name).value);
-				else
-					errors.message(name.location(), "title must be a string");
-				return new NoNestingProcessor();
 			}
 			case "img": {
 				Token name = Token.from(errors, tx);
@@ -82,7 +91,7 @@ public class SlideProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (name instanceof StringToken)
-					slide.background(imagedir + ((StringToken)name).value);
+					slide.backgroundImage(imagedir + ((StringToken)name).value);
 				else
 					errors.message(name.location(), "image name must speak a string");
 				return new NoNestingProcessor();
@@ -106,12 +115,24 @@ public class SlideProcessor implements LineProcessor {
 				return new StepProcessor(errors, step);
 			}
 			default:
-				errors.message(tx, "invalid keyword: " + kw);
+				errors.message(tx, "invalid keyword for slide: " + kw);
 				return new IgnoreNestingProcessor();
 			}
 		} else {
 			errors.message(tx, "expected keyword");
 			return new IgnoreNestingProcessor();
+		}
+	}
+
+	private SlideFormatter findSlideFormatter(InputPosition loc, String format) {
+		switch (format) {
+		case "title-slide":
+			return new TitleSlideFormatter(errors, slide);
+		case "boring-slide":
+			return new BoringSlideFormatter(errors, slide);
+		default:
+			errors.message(loc, "there is no formatter for slide " + format);
+			return null;
 		}
 	}
 

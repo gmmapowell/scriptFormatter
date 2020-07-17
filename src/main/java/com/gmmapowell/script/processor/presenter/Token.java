@@ -30,13 +30,13 @@ public class Token {
 		String tok = line.fromMark(mark);
 		switch (tok) {
 		case "aspect":
+		case "background":
 		case "format":
 		case "img":
 		case "remove":
 		case "slide":
 		case "speaker":
 		case "step":
-		case "title":
 			return new KeywordToken(loc, tok);
 		case "<-":
 			return new OpToken(loc, tok);

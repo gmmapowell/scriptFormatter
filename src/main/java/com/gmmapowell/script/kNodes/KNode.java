@@ -129,8 +129,9 @@ public class KNode<T extends KNodeItem> {
 		gen.writeNumberField("x", xpos);
 		gen.writeNumberField("y", ypos);
 		gen.writeNumberField("z", zpos);
-		gen.writeStringField("title", name());
 		gen.writeStringField("img", item.image());
+		if (item.overlayImage() != null)
+			gen.writeStringField("image", item.overlayImage());
 		gen.writeFieldName("item");
 		item.asJson(gen);
 		gen.writeEndObject();
