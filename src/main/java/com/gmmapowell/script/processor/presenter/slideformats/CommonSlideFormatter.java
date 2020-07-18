@@ -2,19 +2,31 @@ package com.gmmapowell.script.processor.presenter.slideformats;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.errors.ErrorReporter;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.gmmapowell.script.presenter.nodes.Slide;
+import com.gmmapowell.script.presenter.nodes.SlideStep;
 import com.gmmapowell.script.processor.presenter.SlideFormatter;
 
 public abstract class CommonSlideFormatter implements SlideFormatter {
+	public class Field {
+		public final String value;
+		public final Map<String, String> options = new HashMap<>();
+
+		public Field(String value) {
+			this.value = value;
+		}
+	}
+
 	protected final ErrorReporter errors;
 	protected final Slide slide;
-	protected final Map<String, String> fields = new HashMap<>();
+	protected final Map<String, Field> fields = new HashMap<>();
 
 	public CommonSlideFormatter(ErrorReporter errors, Slide slide) {
 		this.errors = errors;
@@ -25,12 +37,21 @@ public abstract class CommonSlideFormatter implements SlideFormatter {
 	public void field(InputPosition loc, String name, String value) {
 		if (fields.containsKey(name))
 			errors.message(loc, "duplicate field " + name);
-		fields.put(name, value);
+		fields.put(name, new Field(value));
+	}
+
+	@Override
+	public void fieldOption(InputPosition location, String field, String name, String value) {
+		Field f = fields.get(field);
+		f.options.put(name, value);
 	}
 
 	@Override
 	public String overlayImage() {
-		return fields.get("image");
+		if (fields.containsKey("image"))
+			return fields.get("image").value;
+		else
+			return null;
 	}
 
 	@Override
@@ -41,15 +62,42 @@ public abstract class CommonSlideFormatter implements SlideFormatter {
 		gen.writeStartArray();
 		jsonFields(gen, ax, ay);
 		gen.writeEndArray();
+		gen.writeFieldName("speaker");
+		gen.writeStartArray();
+		if (fields.containsKey("title")) {
+			gen.writeString(fields.get("title").value);
+		}
+		gen.writeEndArray();
+	}
+	
+	@Override
+	public void stepJson(JsonGenerator gen, SlideStep s) throws IOException {
+		float ax = slide.aspectx();
+		float ay = slide.aspecty();
+		gen.writeFieldName("slide");
+		gen.writeStartArray();
+		s.jsonFields(gen, this, ax, ay);
+		gen.writeEndArray();
+		gen.writeFieldName("speaker");
+		gen.writeStartArray();
+		s.speakerNotes(gen);
+		gen.writeEndArray();
 	}
 
+	@Override
+	public void showSpeakerNotes(JsonGenerator gen, List<String> speaker, float ax, float ay) throws IOException {
+		// generally ignored
+	}
+	
 	protected abstract void jsonFields(JsonGenerator gen, float ax, float ay) throws IOException;
 
-	protected void showText(JsonGenerator gen, String text, float[] pin, float[] origin, float wid, float ht, AndMore r) throws IOException {
+	protected void showText(JsonGenerator gen, Field field, float[] pin, float[] origin, float wid, float ht, AndMore r) throws IOException {
+		if (field == null)
+			return;
 		gen.writeStartObject();
 		gen.writeFieldName("showText");
 		gen.writeStartObject();
-		gen.writeStringField("text", text);
+		gen.writeStringField("text", field.value);
 		gen.writeArrayFieldStart("pin");
 		gen.writeNumber(pin[0]);
 		gen.writeNumber(pin[1]);
@@ -60,8 +108,30 @@ public abstract class CommonSlideFormatter implements SlideFormatter {
 		gen.writeEndArray();
 		gen.writeNumberField("width", wid);
 		gen.writeNumberField("height", ht);
+		for (Entry<String, String> e : field.options.entrySet()) {
+			handleOption(gen, e.getKey(), e.getValue());
+		}
 		r.run();
 		gen.writeEndObject();
 		gen.writeEndObject();
+	}
+
+	private void handleOption(JsonGenerator gen, String key, String value) throws IOException {
+		if (ignoreOption(key)) {
+			return;
+		}
+		switch (key) {
+		case "border":
+		case "box":
+			gen.writeStringField(key, value);
+			break;
+		default:
+			System.out.println("cannot handle field option " + key);
+			break;
+		}
+	}
+
+	protected boolean ignoreOption(String key) {
+		return false;
 	}
 }

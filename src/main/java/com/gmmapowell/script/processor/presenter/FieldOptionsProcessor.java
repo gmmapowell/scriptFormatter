@@ -4,15 +4,15 @@ import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
-public class FormatFieldProcessor implements LineProcessor {
+public class FieldOptionsProcessor implements LineProcessor {
 	private final ErrorReporter errors;
 	private final SlideFormatter slide;
-	private final String imagedir;
+	private final String field;
 
-	public FormatFieldProcessor(ErrorReporter errors, SlideFormatter sf, String imagedir) {
+	public FieldOptionsProcessor(ErrorReporter errors, SlideFormatter sf, String field) {
 		this.errors = errors;
 		this.slide = sf;
-		this.imagedir = imagedir;
+		this.field = field;
 	}
 
 	@Override
@@ -47,10 +47,8 @@ public class FormatFieldProcessor implements LineProcessor {
 		}
 		String name = ((NameToken)field).name;
 		String sval = ((StringToken)val).value;
-		if (name.equals("image"))
-			sval = imagedir + sval;
-		slide.field(field.location(), name, sval);
-		return new FieldOptionsProcessor(errors, slide, name);
+		slide.fieldOption(field.location(), this.field, name, sval);
+		return new NoNestingProcessor();
 	}
 
 	@Override

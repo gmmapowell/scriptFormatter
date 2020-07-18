@@ -1,6 +1,8 @@
 package com.gmmapowell.script.presenter.nodes;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.gmmapowell.script.kNodes.KNodeItem;
@@ -13,6 +15,7 @@ public class Slide implements KNodeItem {
 	private Float yt;
 	private String backgroundColor;
 	private SlideFormatter sf;
+	private List<SlideStep> steps = new ArrayList<>();
 
 	public Slide(String name) {
 		this.name = name;
@@ -69,8 +72,7 @@ public class Slide implements KNodeItem {
 	}
 
 	public void addStep(SlideStep step) {
-		// TODO Auto-generated method stub
-		
+		steps.add(step);		
 	}
 
 	@Override
@@ -93,6 +95,11 @@ public class Slide implements KNodeItem {
 		if (sf != null)
 			sf.asJson(gen);
 		gen.writeEndObject();
+		for (SlideStep s : steps) {
+			gen.writeStartObject();
+			sf.stepJson(gen, s);
+			gen.writeEndObject();
+		}
 		gen.writeEndArray();
 		gen.writeEndObject();
 	}
