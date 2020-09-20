@@ -34,4 +34,9 @@ public class TextSpan implements Span {
 	public void addSpan(Span sub) {
 		throw new RuntimeException("Not Implemented");
 	}
+	
+	@Override
+	public String toString() {
+		return "Text{" + formats + ":" + text + "}";
+	}
 }

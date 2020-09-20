@@ -55,7 +55,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	}
 
 	@Override
-	public void choices(OrProduction arg0, List<Definition> defns, List<Integer> arg2, int arg3) {
+	public void choices(OrProduction arg0, Object cxt, List<Definition> defns, List<Integer> probs, int arg3, boolean repeatVarName) {
 		try {
 			defns.get(0).visit(this);
 			// NOTE: I don't think it's as hard as this makes out ... modularize and rerun the initial setup"
@@ -113,7 +113,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	}
 
 	@Override
-	public void referTo(String prod) {
+	public void referTo(String prod, boolean resetToken) {
 		if (dontShow.contains(prod))
 			block = null;
 		else if (block != null)
@@ -121,7 +121,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	}
 
 	@Override
-	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3) {
+	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3, boolean repeatLast, boolean saveLast) {
 		if (block != null)
 			block.addSpan(ef.span("bold", " " + token));
 	}
@@ -134,7 +134,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	}
 
 	@Override
-	public void zeroOrMore(Definition child, boolean withEOL) {
+	public int zeroOrMore(Definition child, boolean withEOL) {
 		if (justIndented) {
 			handleIndentedList(">>");
 			child.visit(this);
@@ -144,6 +144,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 			if (block != null)
 				block.addSpan(ef.span(null, "*"));
 		}
+		return 0;
 	}
 
 	@Override
@@ -159,7 +160,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	}
 
 	@Override
-	public void oneOrMore(Definition child, boolean withEOL) {
+	public int oneOrMore(Definition child, boolean withEOL) {
 		if (justIndented) {
 			handleIndentedList(">>>");
 			child.visit(this);
@@ -168,8 +169,75 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 			if (block != null)
 				block.addSpan(ef.span(null, "+"));
 		}
+		return 0;
 	}
 	
+	@Override
+	public boolean indent(boolean force) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean complete(OrProduction prod, Object cxt, List<Definition> choices) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void exactly(int cnt, Definition child, boolean withEOL) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public OrProduction isOr(String child) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setDictEntry(String var, String val) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getDictValue(String var) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getTopDictValue(String var) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void clearDictEntry(String var) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void condNotEqual(String var, String ne, Definition inner) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void condNotSet(String var, Definition inner) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pushCaseNumber() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void handleIndentedList(String quant) {
 		if (!justIndented)
 			return;

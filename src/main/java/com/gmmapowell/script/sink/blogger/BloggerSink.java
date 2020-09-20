@@ -134,35 +134,44 @@ public class BloggerSink implements Sink {
 		}
 		List<String> cf = new ArrayList<>();
 		for (Span s : block) {
+			boolean writeText = true;
 			List<String> styles = s.getStyles();
 			if (styles != null) {
-				if (styles.size() == 1) {
-					switch(styles.get(0)) {
-					case "link": {
-						writer.print("<a href='" + s.getText() + "'>");
-						continue;
-					}
-					case "endlink": {
-						writer.print("</a>");
-						continue;
-					}
-					}
-				}
 				drawDownTo(cf, styles.size());
 				for (int i=0;i<styles.size();i++) {
-					if (cf.size() > i && cf.get(i).equals(styles.get(i)))
+					String sty = styles.get(i);
+					if (cf.size() > i && cf.get(i).equals(sty))
 						continue;
 					else if (cf.size() > i) {
 						drawDownTo(cf, i);
 					}
-					writer.print("<" + mapStyle(styles.get(i)) + ">");
-					cf.add(styles.get(i));
+					if ("link".equals(sty) || "endlink".equals(sty))
+						; // don't print these
+					else {
+						writer.print("<" + mapStyle(sty) + ">");
+						cf.add(sty);
+					}
+				}
+				if (styles.size() == 1) {
+					switch(styles.get(0)) {
+					case "link": {
+						writer.print("<a href='" + s.getText() + "'>");
+						writeText = false;
+						break;
+					}
+					case "endlink": {
+						writer.print("</a>");
+						break;
+					}
+					}
 				}
 			}
-			if (s instanceof HTMLSpan)
-				writer.print(s.getText());
-			else
-				writer.print(entitify(s.getText()));
+			if (writeText) {
+				if (s instanceof HTMLSpan)
+					writer.print(s.getText());
+				else
+					writer.print(entitify(s.getText()));
+			}
 		}
 		drawDownTo(cf, 0);
 		if (!wantBr)
@@ -250,7 +259,7 @@ public class BloggerSink implements Sink {
 			posts.revert(blogId, inserted.getId()).execute();
 			index.have(inserted.getId(), "DRAFT", title);
 		} else {
-			System.out.println("Upload to " + blogId + ":" + idx);
+			System.out.println("Upload " + title + " to " + blogId + ":" + idx);
 			posts.update(blogId, idx.key, p).execute();
 		}
 	}

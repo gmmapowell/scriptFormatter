@@ -65,6 +65,18 @@ public class ProcessingUtils {
 					case "footnote":
 						addSpan(factory, block, Arrays.asList("footnote-number"), Integer.toString(state.nextFootnoteMarker()));
 						break;
+					case "sup": {
+						int close = text.indexOf("&" + embed, j);
+						if (close == -1)
+							throw new RuntimeException("&" + embed + " without close");
+						List<String> inner = new ArrayList<>(defaultStyle);
+						inner.add(embed);
+						String r = addRecursiveSpans(factory, state, block, inner, text.substring(j+1, close), ' ');
+						if (r != null && r.length() > 0)
+							addSpan(factory, block, inner, r);
+						j = close + embed.length()+1;
+						break;
+					}
 					default:
 						throw new RuntimeException("handle embedded " + embed);
 					}

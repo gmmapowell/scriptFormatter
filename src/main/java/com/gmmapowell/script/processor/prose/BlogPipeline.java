@@ -35,7 +35,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				sink.block(state.curr);
 			}
 			state.curr = ef.block("bullet");
-			state.curr.addSpan(ef.span(null, s.substring(s.indexOf(" ")+1).trim()));
+			ProcessingUtils.addSpans(ef, state, state.curr, s.substring(s.indexOf(" ")+1).trim());
 		} else {
 			if (state.blockquote) {
 				if (state.curr != null)
