@@ -21,4 +21,8 @@ public abstract class CurrentState {
 
 	public abstract void line(int lineNumber);
 	public abstract String location();
+
+	protected boolean trimLine() {
+		return true;
+	}
 }

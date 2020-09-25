@@ -15,6 +15,11 @@ public class BlogState extends CurrentState {
 	}
 
 	@Override
+	protected boolean trimLine() {
+		return !blockquote;
+	}
+
+	@Override
 	public String location() {
 		return file + ":" + line;
 	}

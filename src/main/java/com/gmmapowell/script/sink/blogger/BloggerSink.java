@@ -181,9 +181,14 @@ public class BloggerSink implements Sink {
 
 	private String entitify(String text) {
 		StringBuilder sb = new StringBuilder(text);
+		int spaces = 0;
+		while (spaces < sb.length() && Character.isWhitespace(sb.charAt(spaces)))
+			spaces++;
 		// it is sort of easier to work backwards
 		for (int i=sb.length()-1;i>=0;i--) {
-			switch (sb.charAt(i)) {
+			if (i < spaces) {
+				sb.replace(i, i+1, "&nbsp;");
+			} else switch (sb.charAt(i)) {
 			case '&': {
 				sb.replace(i, i+1, "&amp;");
 				break;

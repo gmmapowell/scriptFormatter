@@ -14,6 +14,7 @@ import java.util.List;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.loader.Loader;
+import com.gmmapowell.script.loader.drive.Index.Status;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -144,16 +145,17 @@ public class DriveLoader implements Loader {
         Collections.reverse(files);
         for (com.google.api.services.drive.model.File f : files) {
         	boolean isFolder = f.getMimeType().equals("application/vnd.google-apps.folder");
-        	if (debug)
-        		System.out.printf("%s%s%s (%s)\n", ind, isFolder?"+ ":"", f.getName(), f.getId());
             if (isFolder) {
             	File folderInto = new java.io.File(into, f.getName());
 				folderInto.mkdir();
 				downloadFolder(service, index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
             } else {
             	java.io.File name = new java.io.File(into, f.getName() + ".txt");
-            	index.record(f.getId(), name);
-				service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(new FileOutputStream(name));
+            	Status record = index.record(f.getId(), name);
+            	if (debug)
+            		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
+            	if (record != Status.EXCLUDED)
+            		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(new FileOutputStream(name));
             }
         }
 	}

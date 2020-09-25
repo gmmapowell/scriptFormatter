@@ -35,7 +35,8 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 				String s;
 				while ((s = lnr.readLine()) != null) {
 					try {
-						s = trim(s);
+						if (st.trimLine())
+							s = trim(s);
 						if (s.length() == 0) {
 							endBlock(st);
 						} else {

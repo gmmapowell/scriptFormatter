@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +13,43 @@ import java.util.Map;
 import com.gmmapowell.script.FilesToProcess;
 
 public class Index implements FilesToProcess {
-	private final Map<String, String> current = new LinkedHashMap<>();
+	public enum Status {
+		RECORDED {
+			@Override
+			String flag() {
+				return "+";
+			}
+		}, INCLUDED {
+			@Override
+			String flag() {
+				return "*";
+			}
+		}, EXCLUDED {
+			@Override
+			String flag() {
+				return "-";
+			}
+		};
+
+		abstract String flag();
+	}
+
+	public class Known {
+		String id;
+		String label;
+		Status stat;
+		
+		public Known(String id, String label, Status stat) {
+			this.id = id;
+			this.label = label;
+			this.stat = stat;
+		}
+	}
+
+	private final Map<String, Known> current = new LinkedHashMap<>();
 	private final File downloads;
 	private FileWriter appendTo;
 	private boolean writtenExcluded;
-	private int included;
 
 	public Index(File downloads) {
 		this.downloads = downloads;
@@ -32,12 +63,12 @@ public class Index implements FilesToProcess {
 			if (s.length() == 0 || s.startsWith("#"))
 				continue;
 			if (s.equals("--excluded--")) {
-				included = current.size();
 				writtenExcluded = true;
 				continue;
 			}
 			int idx = s.indexOf(" ");
-			current.put(s.substring(0, idx), s.substring(idx+1));
+			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED);
+			current.put(n.id, n);
 		}
 	}
 
@@ -45,9 +76,9 @@ public class Index implements FilesToProcess {
 		this.appendTo = fw;
 	}
 
-	public void record(String id, File name) throws IOException {
+	public Status record(String id, File name) throws IOException {
 		if (current.containsKey(id)) {
-			return;
+			return current.get(id).stat;
 		}
 		if (!writtenExcluded) {
 			appendTo.append("--excluded--\n");
@@ -57,14 +88,15 @@ public class Index implements FilesToProcess {
 		appendTo.append(" ");
 		appendTo.append(name.getPath().replace(downloads.getPath() + "/", ""));
 		appendTo.append("\n");
+		return Status.RECORDED;
 	}
 
 	@Override
 	public Iterable<File> included() {
 		List<File> fs = new ArrayList<>();
-		Iterator<String> it = current.values().iterator();
-		for (int i=0; i<included; i++) {
-			fs.add(new File(downloads, it.next()));
+		for (Known k : current.values()) {
+			if (k.stat == Status.INCLUDED)
+				fs.add(new File(downloads, k.label));
 		}
 		return fs;
 	}
