@@ -171,8 +171,12 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String ruleName = params.get("rule");
 				if (debug)
 					System.out.println("including grammar for production " + ruleName);
-				Production rule = grammar.findRule(ruleName);
-				state.inline = new GrammarCommand(ef, sink, rule);
+				try {
+					Production rule = grammar.findRule(ruleName);
+					state.inline = new GrammarCommand(ef, sink, rule);
+				} catch (RuntimeException ex) {
+					System.out.println(state.inputLocation() + ": " + ex.getMessage());
+				}
 				// TODO: we need the ability to remove rules we don't like
 				// In particular, we need to move the Ziniki extensions into their own rules
 				// and then hide them in the FLAS manual

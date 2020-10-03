@@ -8,8 +8,11 @@ public class DocState extends CurrentState {
 	public boolean commentary;
 	public boolean beginComment;
 	public boolean inRefComment;
+	private String file;
+	private int line;
 
 	public void reset(String file) {
+		this.file = file;
 		cmd = null;
 		curr = null;
 		section = 0;
@@ -20,9 +23,13 @@ public class DocState extends CurrentState {
 
 	@Override
 	public void line(int lineNumber) {
-		
+		this.line = lineNumber;
 	}
 
+	public String inputLocation() {
+		return file + ":" + line;
+	}
+	
 	public String location() {
 		return (chapter-1) + "." + (section-1) + (commentary?"c":"");
 	}

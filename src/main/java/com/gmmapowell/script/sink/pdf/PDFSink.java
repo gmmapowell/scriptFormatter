@@ -343,7 +343,7 @@ public class PDFSink implements Sink {
 			System.out.println("uploading to " + host + " as " + username + " into file " + to);
 			File f = new File(to);
 
-			File privateKeyPath = new File(System.getProperty("user.home"), ".ssh/id_rsa_dorothy");
+			File privateKeyPath = new File(System.getProperty("user.home"), ".ssh/cata_rsa");
 			JSch jsch = new JSch();
 			jsch.addIdentity(privateKeyPath.getPath());
 			Session s = null;

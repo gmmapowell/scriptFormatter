@@ -104,6 +104,10 @@ public class ReadConfig {
 			ret.handleOutput(vars, type, debug);
 			break;
 		}
+		case "webedit": {
+			ret.handleWebedit(vars, type, debug);
+			break;
+		}
 		default: {
 			System.out.println(wline +": there is no block " + what);
 			return false;

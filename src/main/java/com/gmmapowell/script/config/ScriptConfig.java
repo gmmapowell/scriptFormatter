@@ -29,6 +29,7 @@ public class ScriptConfig implements Config {
 	private Processor processor;
 	private ElementFactory elf = new BlockishElementFactory();
 	private Sink sink;
+	private WebEdit webedit;
 
 	public ScriptConfig(File root) {
 		this.root = root;
@@ -104,6 +105,17 @@ public class ScriptConfig implements Config {
 		}
 	}
 
+	public void handleWebedit(Map<String, String> vars, String option, boolean debug) throws ConfigException {
+		String file = vars.remove("file");
+		if (file == null)
+			throw new ConfigException("output file was not defined");
+		String upload = vars.remove("upload");
+		if (upload == null)
+			throw new ConfigException("output file was not defined");
+		this.webedit = new WebEdit(new File(root, file), upload);
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	public void handleProcessor(Map<String, String> vars, String proc, boolean debug) throws ConfigException {
 		Class<? extends Processor> clz;
@@ -141,6 +153,8 @@ public class ScriptConfig implements Config {
 	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
 		if (loader == null)
 			throw new ConfigException("No loader was specified");
+		if (webedit != null)
+			loader.createWebeditIn(webedit.file);
 		return loader.updateIndex();
 	}
 
@@ -158,5 +172,8 @@ public class ScriptConfig implements Config {
 	public void upload() throws Exception {
 		if (sink != null)
 			sink.upload();
+		if (webedit != null) {
+			webedit.upload();
+		}
 	}
 }

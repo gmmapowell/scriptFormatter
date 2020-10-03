@@ -33,6 +33,7 @@ public class DriveLoader implements Loader {
 	private final File indexFile;
 	private final File downloads;
 	private final boolean debug;
+	private File webeditFile;
 
 	public DriveLoader(File root, String creds, String folder, String index, String downloads, boolean debug) throws ConfigException {
 		this.creds = new File(creds);
@@ -56,6 +57,11 @@ public class DriveLoader implements Loader {
 	}
 
 	@Override
+	public void createWebeditIn(File file) {
+		this.webeditFile = file;
+	}
+
+	@Override
 	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
 		// When we download, if there is anything not in the index add it to the end
 		// Reverse the format so that it is <ID> <path>
@@ -70,8 +76,9 @@ public class DriveLoader implements Loader {
         }
         Index currentIndex = readIndex();
         try {
-        	// TODO: this needs to be here!  Just optimizing test speeds
 	        downloadFolder(service, currentIndex, downloads, "    ", item);
+	        if (webeditFile != null)
+	        	currentIndex.generateWebeditFile(webeditFile);
 	        return currentIndex;
         } finally {
         	currentIndex.close();
