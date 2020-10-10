@@ -94,7 +94,7 @@ public class DocStyleCatalog extends FontCatalog {
 		);
 
 		catalog.put("grammar-name",
-				create().setBold(true).setWidth(96.0f).setJustification(Justification.RIGHT).build()
+				create().setBold(true).setWidth(96.0f).setJustification(Justification.RIGHT).setOverflowNewLine(128.0f).build()
 		);
 
 		catalog.put("grammar-blank",

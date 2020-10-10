@@ -13,10 +13,12 @@ import com.jcraft.jsch.SftpException;
 public class WebEdit {
 	public final File file;
 	public final String upload;
+	public final String title;
 
-	public WebEdit(File file, String upload) {
+	public WebEdit(File file, String upload, String title) {
 		this.file = file;
 		this.upload = upload;
+		this.title = title;
 	}
 
 	public void upload() throws SftpException, JSchException {

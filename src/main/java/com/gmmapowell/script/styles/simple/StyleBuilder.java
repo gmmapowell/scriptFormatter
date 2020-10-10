@@ -23,5 +23,6 @@ public interface StyleBuilder {
 	StyleBuilder setItalic(boolean b);
 	StyleBuilder setBaselineAdjust(float f);
 	StyleBuilder setWidth(float f);
+	StyleBuilder setOverflowNewLine(float f);
 	Style build();
 }

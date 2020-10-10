@@ -112,7 +112,10 @@ public class ScriptConfig implements Config {
 		String upload = vars.remove("upload");
 		if (upload == null)
 			throw new ConfigException("output file was not defined");
-		this.webedit = new WebEdit(new File(root, file), upload);
+		String title = vars.remove("title");
+		if (title == null)
+			throw new ConfigException("title was not defined");
+		this.webedit = new WebEdit(new File(root, file), upload, title);
 	}
 	
 	
@@ -154,7 +157,7 @@ public class ScriptConfig implements Config {
 		if (loader == null)
 			throw new ConfigException("No loader was specified");
 		if (webedit != null)
-			loader.createWebeditIn(webedit.file);
+			loader.createWebeditIn(webedit.file, webedit.title);
 		return loader.updateIndex();
 	}
 

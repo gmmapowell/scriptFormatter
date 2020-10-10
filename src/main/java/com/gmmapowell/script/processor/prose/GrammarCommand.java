@@ -83,7 +83,6 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void futurePattern(String arg0, String arg1) {
-		throw new NotImplementedException();
 	}
 
 	@Override
@@ -104,7 +103,6 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void nestName(int arg0) {
-		throw new NotImplementedException();
 	}
 
 	@Override
@@ -121,7 +119,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	}
 
 	@Override
-	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3, boolean repeatLast, boolean saveLast) {
+	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3, boolean repeatLast, boolean saveLast, String generator, boolean space) {
 		if (block != null)
 			block.addSpan(ef.span("bold", " " + token));
 	}

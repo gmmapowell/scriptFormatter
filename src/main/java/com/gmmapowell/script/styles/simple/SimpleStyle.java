@@ -28,7 +28,8 @@ public class SimpleStyle implements Style, StyleBuilder {
 	private Boolean bold = null;
 	private Boolean italic = null;
 	private Boolean underline = null;
-	private Float width;
+	private Float width = null;
+	private Float overflowNewLine = null;
 
 	public SimpleStyle(StyleCatalog catalog) {
 		this.catalog = catalog;
@@ -140,6 +141,11 @@ public class SimpleStyle implements Style, StyleBuilder {
 	public Float getWidth() {
 		return width;
 	}
+
+	@Override
+	public Float getOverflowNewLine() {
+		return overflowNewLine;
+	}
 	
 	@Override
 	public StyleBuilder beginNewPage(boolean b) {
@@ -246,6 +252,12 @@ public class SimpleStyle implements Style, StyleBuilder {
 	@Override
 	public StyleBuilder setWidth(float f) {
 		this.width = f;
+		return this;
+	}
+
+	@Override
+	public StyleBuilder setOverflowNewLine(float f) {
+		this.overflowNewLine  = f;
 		return this;
 	}
 

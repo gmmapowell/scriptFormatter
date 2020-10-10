@@ -100,6 +100,14 @@ public class CompoundStyle implements Style {
 	}
 
 	@Override
+	public Float getOverflowNewLine() {
+		Float maybe = override.getOverflowNewLine();
+		if (maybe != null)
+			return maybe;
+		return parent.getOverflowNewLine();
+	}
+
+	@Override
 	public PDFont getFont() {
 		return catalog.getFont(getFontName(), getItalic(), getBold());
 	}

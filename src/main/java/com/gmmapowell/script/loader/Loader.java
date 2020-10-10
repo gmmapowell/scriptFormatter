@@ -8,6 +8,6 @@ import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 
 public interface Loader {
-	void createWebeditIn(File file);
+	void createWebeditIn(File file, String title);
 	FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException;
 }

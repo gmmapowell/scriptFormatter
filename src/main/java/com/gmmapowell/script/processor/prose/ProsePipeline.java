@@ -59,6 +59,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 				if (debug)
 					ex.printStackTrace();
 			}
+			fileDone();
 			try {
 				sink.fileEnd();
 			} catch (Exception ex) {
@@ -67,6 +68,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 					ex.printStackTrace();
 			}
 		}
+		done();
 		sink.close();
 	}
 
@@ -79,6 +81,8 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 
 	protected abstract T begin(String file);
 	protected abstract void handleLine(T state, String s) throws IOException;
+	protected void fileDone() {}
+	protected void done() {}
 
 	private String trim(String s) {
 		StringBuilder sb = new StringBuilder(s.trim());

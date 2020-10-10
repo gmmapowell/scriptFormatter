@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.gmmapowell.script.FilesToProcess;
 
@@ -104,17 +103,17 @@ public class Index implements FilesToProcess {
 		return fs;
 	}
 	
-	public void generateWebeditFile(File webeditFile) throws FileNotFoundException {
+	public void generateWebeditFile(File webeditFile, String title) throws FileNotFoundException {
 		try (PrintWriter pw = new PrintWriter(webeditFile)) {
 			pw.println("<html>");
 			pw.println("  <head>");
-			pw.println("    <title>Contents of ??</title>");
+			pw.println("    <title>Contents of " + title + "</title>");
 			pw.println("    <style>");
 			pw.println("      a { display: block; }");
 			pw.println("    </style>");
 			pw.println("  </head>");
 			pw.println("  <body>");
-			pw.println("    <h1>Contents of ??</h1>");
+			pw.println("    <h1>Contents of " + title + "</h1>");
 			for (Known k : current.values()) {
 				if (k.stat == Status.INCLUDED) {
 					pw.println("    <a href='https://docs.google.com/document/d/" + k.id + "'/edit>" + k.label + "</a>");

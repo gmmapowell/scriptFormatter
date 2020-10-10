@@ -21,11 +21,15 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	private final DocState root = new DocState();
 	private List<File> roots = new ArrayList<>();
 	private final Grammar grammar;
+	private final TableOfContents toc;
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
+		File tocfile = null;
 		if (options.containsKey("samples"))
 			this.roots.add(new File(options.remove("samples")));
+		if (options.containsKey("toc"))
+			tocfile = new File(root, options.remove("toc"));
 		if (options.containsKey("grammar")) {
 			String grammarName = options.remove("grammar");
 			File file = new File(grammarName);
@@ -34,6 +38,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			this.grammar = Grammar.from(XML.fromFile(file));
 		} else
 			this.grammar = null;
+		toc = new TableOfContents(tocfile);
 	}
 	
 	@Override
@@ -254,6 +259,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				SpanBlock blk = ef.block("chapter-title");
 				ProcessingUtils.addSpans(ef, st, blk, title);
 				sink.block(blk);
+				toc.chapter(title);
 				break;
 			}
 			case "Section": {
@@ -266,6 +272,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				SpanBlock blk = ef.block("section-title");
 				ProcessingUtils.addSpans(ef, st, blk, title);
 				sink.block(blk);
+				toc.section(title);
 				break;
 			}
 			case "Subsection": {
@@ -275,6 +282,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				SpanBlock blk = ef.block("subsection-title");
 				ProcessingUtils.addSpans(ef, st, blk, title);
 				sink.block(blk);
+				toc.subsection(title);
 				break;
 			}
 			case "Commentary": {
@@ -305,6 +313,15 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			inline.execute(sink, ef);
 		} else {
 			super.endBlock(st);
+		}
+	}
+	
+	@Override
+	protected void done() {
+		try {
+			toc.write();
+		} catch (Exception ex) {
+			System.out.println("Could not write table of contents" + ex.getMessage());
 		}
 	}
 }

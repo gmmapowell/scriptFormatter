@@ -52,5 +52,4 @@ public class HTMLFormatter implements Formatter {
 	public boolean isBlockIndent(int firstline, int thisline) {
 		return thisline == -1 || thisline >= firstline;
 	}
-
 }

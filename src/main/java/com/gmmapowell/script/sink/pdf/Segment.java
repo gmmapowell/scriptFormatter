@@ -21,10 +21,12 @@ public class Segment {
 		float nw = naturalWidth();
 		switch (style.getJustification()) {
 		case RIGHT:
-			x += width()-nw;
+			if (nw < width())
+				x += width()-nw;
 			break;
 		case CENTER:
-			x += (width()-nw)/2;
+			if (nw < width())
+				x += (width()-nw)/2;
 			break;
 		default:
 			break;

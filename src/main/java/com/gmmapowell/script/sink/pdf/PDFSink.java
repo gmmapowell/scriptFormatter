@@ -113,12 +113,13 @@ public class PDFSink implements Sink {
 			throw new RuntimeException("no style found for " + bsname);
 		List<Line> lines = new ArrayList<>();
 		List<Segment> segments = new ArrayList<>();
-		Float fm = baseStyle.getFirstMargin();
+		Float ifm = baseStyle.getFirstMargin();
 		float lm = pageStyle.getLeftMargin() + baseStyle.getLeftMargin();
-		if (fm == null)
-			fm = lm;
+		if (ifm == null)
+			ifm = lm;
 		else
-			fm += pageStyle.getLeftMargin();
+			ifm += pageStyle.getLeftMargin();
+		float fm = ifm;
 		float rm = pageStyle.getRightMargin() + baseStyle.getRightMargin();
 		float wid = pageStyle.getPageWidth() - fm - rm;
 		boolean inlink = false;
@@ -134,10 +135,20 @@ public class PDFSink implements Sink {
 			Style style = baseStyle.apply(s.getStyles());
 			if (baseStyle.isPreformatted()) {
 				addSegment(lines, segments, wid, baseStyle, style, fm, rm, s.getText(), false);
+				Float onl = style.getOverflowNewLine();
+				if (onl != null && new Segment(baseStyle, s.getText()).width() > style.getWidth()) {
+					finishLine(lines, segments, wid, baseStyle, fm, rm);
+					segments.clear();
+					fm = ifm + onl;
+				}
 				continue;
 			}
 			String tx = s.getText();
 			String[] parts = tx.split(" ");
+			/** TODO: we need to revisit this in such a way that we collect together one or more segments from parts
+			 * and then either add them all or none of them (and move to the next line).
+			 * We don't want to split except at designated splitting points (i.e. " ").
+			 */
 			boolean first = true;
 			for (String p : parts) {
 				if (p == null || p.length() == 0)

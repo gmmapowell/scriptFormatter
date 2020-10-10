@@ -34,6 +34,7 @@ public class DriveLoader implements Loader {
 	private final File downloads;
 	private final boolean debug;
 	private File webeditFile;
+	private String wetitle;
 
 	public DriveLoader(File root, String creds, String folder, String index, String downloads, boolean debug) throws ConfigException {
 		this.creds = new File(creds);
@@ -57,8 +58,9 @@ public class DriveLoader implements Loader {
 	}
 
 	@Override
-	public void createWebeditIn(File file) {
+	public void createWebeditIn(File file, String title) {
 		this.webeditFile = file;
+		this.wetitle = title;
 	}
 
 	@Override
@@ -78,7 +80,7 @@ public class DriveLoader implements Loader {
         try {
 	        downloadFolder(service, currentIndex, downloads, "    ", item);
 	        if (webeditFile != null)
-	        	currentIndex.generateWebeditFile(webeditFile);
+	        	currentIndex.generateWebeditFile(webeditFile, wetitle);
 	        return currentIndex;
         } finally {
         	currentIndex.close();

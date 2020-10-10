@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 public interface Style {
-
 	Style apply(List<String> list);
 
 	Boolean beginNewPage();
@@ -16,6 +15,7 @@ public interface Style {
 	Float getBeforeBlock();
 	Float getFirstMargin();
 	Float getWidth();
+	Float getOverflowNewLine();
 	PDFont getFont();
 	String getFontName();
 	Float getFontSize();
