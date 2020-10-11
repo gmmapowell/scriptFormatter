@@ -3,13 +3,8 @@ package com.gmmapowell.script.sink.pdf;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -27,10 +22,8 @@ import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.styles.page.DefaultPageStyle;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
+import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class PDFSink implements Sink {
@@ -39,6 +32,7 @@ public class PDFSink implements Sink {
 	private final boolean wantOpen;
 	private final String upload;
 	private final boolean debug;
+	private final String sshid;
 	private final PDDocument doc;
 	private PDPageContentStream currentPage;
 	private float bottomY;
@@ -50,9 +44,10 @@ public class PDFSink implements Sink {
 	private boolean showBorder = false;
 	private int pageNum = 1;
 
-	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
+	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid) throws IOException {
 		this.styles = styles;
 		this.debug = debug;
+		this.sshid = sshid;
 		File f = new File(output);
 		if (f.isAbsolute())
 			this.output = f;
@@ -72,13 +67,13 @@ public class PDFSink implements Sink {
 	}
 
 	private void loadFonts() throws IOException {
-		styles.fonts().put("monospace", (PDFont) PDType0Font.load(doc, new File("fonts/MonospaceRegular.ttf")));
-		styles.fonts().put("monospace-bold", (PDFont) PDType0Font.load(doc, new File("fonts/MonospaceBold.ttf")));
-		styles.fonts().put("monospace-oblique", (PDFont) PDType0Font.load(doc, new File("fonts/MonospaceOblique.ttf")));
-		styles.fonts().put("palatino", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino.ttf")));
-		styles.fonts().put("palatino-bold", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Bold.ttf")));
-		styles.fonts().put("palatino-italic", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Italic.ttf")));
-		styles.fonts().put("palatino-bolditalic", (PDFont) PDType0Font.load(doc, new File("fonts/Palatino Bold Italic.ttf")));
+		styles.fonts().put("monospace", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
+		styles.fonts().put("monospace-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceBold.ttf")));
+		styles.fonts().put("monospace-oblique", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceOblique.ttf")));
+		styles.fonts().put("palatino", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino.ttf")));
+		styles.fonts().put("palatino-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold.ttf")));
+		styles.fonts().put("palatino-italic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Italic.ttf")));
+		styles.fonts().put("palatino-bolditalic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold Italic.ttf")));
 	}
 
 	@Override
@@ -331,51 +326,7 @@ public class PDFSink implements Sink {
 	@Override
 	public void upload() throws JSchException, SftpException {
 		if (upload != null) {
-//			if (debug)
-				System.out.println("uploading to " + upload);
-			Pattern p = Pattern.compile("sftp:([a-zA-Z0-9_]+)@([a-zA-Z0-9_.]+)(:[0-9]+)?/(.+)");
-			Matcher matcher = p.matcher(upload);
-			if (!matcher.matches())
-				throw new RuntimeException("Could not match path " + upload);
-			
-			String username = matcher.group(1);
-			String host = matcher.group(2);
-			int port = 22;
-			if (matcher.group(3) != null)
-				port = Integer.parseInt(matcher.group(3).substring(1));
-			String to = matcher.group(4);
-
-			// version
-			SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
-			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-			String version = sdf.format(new Date());
-			to = to.replace("$YYYYMMDD$", version);
-
-			System.out.println("uploading to " + host + " as " + username + " into file " + to);
-			File f = new File(to);
-
-			File privateKeyPath = new File(System.getProperty("user.home"), ".ssh/cata_rsa");
-			JSch jsch = new JSch();
-			jsch.addIdentity(privateKeyPath.getPath());
-			Session s = null;
-			try {
-				s = jsch.getSession(username, host, port);
-				s.setConfig("StrictHostKeyChecking", "no");
-				s.connect();
-				ChannelSftp openChannel = (ChannelSftp) s.openChannel("sftp");
-				openChannel.connect();
-				if (f.getParent() != null) {
-					try {
-						openChannel.stat(f.getParent());
-					} catch (SftpException ex) {
-						openChannel.mkdir(f.getParent());
-					}
-				}
-				openChannel.put(output.getPath(), to);
-			} finally {
-				if (s != null)
-					s.disconnect();
-			}
+			new Upload(output, upload, sshid, true).send();
 		}
 	}
 

@@ -15,6 +15,7 @@ import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.Index.Status;
+import com.gmmapowell.script.utils.Utils;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -37,7 +38,7 @@ public class DriveLoader implements Loader {
 	private String wetitle;
 
 	public DriveLoader(File root, String creds, String folder, String index, String downloads, boolean debug) throws ConfigException {
-		this.creds = new File(creds);
+		this.creds = new File(Utils.subenvs(creds));
 		this.folder = folder;
 		File i = new File(index);
 		if (i.isAbsolute())

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.zinutils.exceptions.UtilException;
+
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
@@ -50,7 +52,7 @@ public class ScriptConfig implements Config {
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}
 
-	public void handleOutput(Map<String, String> vars, String output, boolean debug) throws ConfigException, Exception {
+	public void handleOutput(Map<String, String> vars, String output, boolean debug, String sshid) throws ConfigException, Exception {
 		switch (output) {
 		case "pdf": {
 			String file = vars.remove("file");
@@ -65,7 +67,7 @@ public class ScriptConfig implements Config {
 			if (styles == null)
 				throw new ConfigException("style catalog was not defined");
 			StyleCatalog catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
-			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug));
+			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug, sshid));
 			break;
 		}
 		case "blogger": {
@@ -105,7 +107,7 @@ public class ScriptConfig implements Config {
 		}
 	}
 
-	public void handleWebedit(Map<String, String> vars, String option, boolean debug) throws ConfigException {
+	public void handleWebedit(Map<String, String> vars, String option, boolean debug, String sshid) throws ConfigException {
 		String file = vars.remove("file");
 		if (file == null)
 			throw new ConfigException("output file was not defined");
@@ -115,7 +117,7 @@ public class ScriptConfig implements Config {
 		String title = vars.remove("title");
 		if (title == null)
 			throw new ConfigException("title was not defined");
-		this.webedit = new WebEdit(new File(root, file), upload, title);
+		this.webedit = new WebEdit(new File(root, file), upload, sshid, title);
 	}
 	
 	
@@ -144,10 +146,11 @@ public class ScriptConfig implements Config {
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof ConfigException)
 				throw (ConfigException)e.getCause();
-			e.printStackTrace(System.out);
+			Throwable t = UtilException.unwrap(e);
+			t.printStackTrace(System.out);
 			throw new ConfigException("could not create " + proc);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-			e.printStackTrace(System.out);
+			UtilException.unwrap(e).printStackTrace(System.out);
 			throw new ConfigException("could not create " + proc);
 		}
 	}

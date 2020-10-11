@@ -16,6 +16,7 @@ import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.utils.Utils;
 
 public class DocPipeline extends ProsePipeline<DocState> {
 	private final DocState root = new DocState();
@@ -27,11 +28,11 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		super(root, ef, sink, options, debug);
 		File tocfile = null;
 		if (options.containsKey("samples"))
-			this.roots.add(new File(options.remove("samples")));
+			this.roots.add(new File(Utils.subenvs(options.remove("samples"))));
 		if (options.containsKey("toc"))
-			tocfile = new File(root, options.remove("toc"));
+			tocfile = new File(root, Utils.subenvs(options.remove("toc")));
 		if (options.containsKey("grammar")) {
-			String grammarName = options.remove("grammar");
+			String grammarName = Utils.subenvs(options.remove("grammar"));
 			File file = new File(grammarName);
 			if (!file.exists())
 				throw new RuntimeException("Grammar file " + grammarName + " does not exist");

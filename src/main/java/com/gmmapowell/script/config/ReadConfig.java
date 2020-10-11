@@ -7,6 +7,8 @@ import java.io.LineNumberReader;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.gmmapowell.script.utils.Utils;
+
 public class ReadConfig {
 
 	public Config read(File file) {
@@ -17,7 +19,7 @@ public class ReadConfig {
 		ScriptConfig ret = new ScriptConfig(file.getParentFile());
 		Map<String, String> vars = null;
 		boolean debug = false;
-		String index = null, workdir = null;
+		String index = null, workdir = null, sshid = null;
 		String what = null, type = null;
 		int wline = 0;
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
@@ -39,7 +41,7 @@ public class ReadConfig {
 				String value = s.substring(idx+1).trim();
 				if (!nested) {
 					// if a new block is starting, flush (any) previous block
-					if (!handleCreation(ret, vars, debug, index, workdir, what, type, wline))
+					if (!handleCreation(ret, vars, debug, index, sshid, workdir, what, type, wline))
 						return null;
 					vars = new TreeMap<>();
 					what = null;
@@ -50,6 +52,10 @@ public class ReadConfig {
 					}
 					case "index": {
 						index = value;
+						break;
+					}
+					case "sshid": {
+						sshid = Utils.subenvs(value);
 						break;
 					}
 					case "workdir": {
@@ -68,7 +74,7 @@ public class ReadConfig {
 				} else
 					vars.put(key, value);
 			}
-			if (!handleCreation(ret, vars, debug, index, workdir, what, type, wline))
+			if (!handleCreation(ret, vars, debug, index, sshid, workdir, what, type, wline))
 				return null;
 		} catch (IOException ex) {
 			System.out.println("Could not read configuration " + file);
@@ -83,8 +89,7 @@ public class ReadConfig {
 		return ret;
 	}
 
-	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, String index, String workdir,
-			String what, String type, int wline) throws ConfigException, Exception {
+	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, String index, String sshid, String workdir, String what, String type, int wline) throws ConfigException, Exception {
 		if (what == null)
 			return true;
 		switch (what) {
@@ -101,11 +106,11 @@ public class ReadConfig {
 			break;
 		}
 		case "output": {
-			ret.handleOutput(vars, type, debug);
+			ret.handleOutput(vars, type, debug, sshid);
 			break;
 		}
 		case "webedit": {
-			ret.handleWebedit(vars, type, debug);
+			ret.handleWebedit(vars, type, debug, sshid);
 			break;
 		}
 		default: {
