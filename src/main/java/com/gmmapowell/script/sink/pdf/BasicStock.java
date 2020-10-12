@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import com.gmmapowell.script.styles.StyleCatalog;
+
 public class BasicStock implements Stock {
 	private PDDocument doc;
 
@@ -15,8 +17,8 @@ public class BasicStock implements Stock {
 	}
 
 	@Override
-	public PageCompositor getPage(Map<String, String> current) {
-		return new SimplePageCompositor(doc);
+	public PageCompositor getPage(StyleCatalog styles, Map<String, String> current) {
+		return new SimplePageCompositor(styles, doc);
 	}
 	
 	@Override

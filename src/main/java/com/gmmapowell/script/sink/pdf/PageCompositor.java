@@ -6,7 +6,7 @@ public interface PageCompositor {
 
 	void begin() throws IOException;
 
-	Acceptance token(StyledToken next);
+	Acceptance token(StyledToken next) throws IOException;
 
 	void close() throws IOException;
 

@@ -102,12 +102,12 @@ public class PDFSink implements Sink {
 			if (f.sections.size() > i) {
 				Section si = f.sections.get(i);
 				current.put(f.name, si.format);
-				sections.add(new Cursor(si));
+				sections.add(new Cursor(f.name, si));
 			}
 			i++;
 			
 			while (!sections.isEmpty()) {
-				PageCompositor page = stock.getPage(current);
+				PageCompositor page = stock.getPage(styles, current);
 				page.begin();
 				List<Cursor> active = new ArrayList<>(sections);
 				while (!active.isEmpty()) {
@@ -127,10 +127,12 @@ public class PDFSink implements Sink {
 							case PENDING: // it thinks it may accept it but it may end up having to reject it
 								break;
 							case PROCESSED: // it has taken it and fully processed it
-								c.processed(null);
 								break;
+							case BACKUP: // we are being asked to try again, probably new region
+								c.backTo(a.lastAccepted);
+								continue;
 							case NOROOM: // we are done; the outlet is full
-								c.processed(a.lastAccepted);
+								c.backTo(a.lastAccepted);
 								remove.add(c);
 								continue flows;
 							case SUSPEND: // we cannot proceed until we have seen something from elsewhere

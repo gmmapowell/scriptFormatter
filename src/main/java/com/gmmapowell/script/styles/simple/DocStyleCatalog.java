@@ -27,7 +27,7 @@ public class DocStyleCatalog extends FontCatalog {
 			.setLineSpacing(14f)
 			.setRightMargin(0f)
 			.setFont("courier")
-			.setFontSize(12.0f)
+			.setFontSize(10.0f)
 			.setBaselineAdjust(0f)
 			.setBold(false)
 			.setItalic(false)
@@ -37,19 +37,19 @@ public class DocStyleCatalog extends FontCatalog {
 		catalog.put("chapter-title",
 				new CompoundStyle(this,
 						// want set new page
-					create().setFont("palatino").beginNewPage(true).setFontSize(18f).setLineSpacing(22.0f).setBold(true).setBeforeBlock(0).setAfterBlock(12).build(),
+					create().setFont("palatino").beginNewPage(true).setFontSize(16f).setLineSpacing(20.0f).setBold(true).setBeforeBlock(0).setAfterBlock(12).build(),
 					defaultStyle
 			));
 
 		catalog.put("section-title",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFontSize(16f).setLineSpacing(20.0f).setBold(true).setBeforeBlock(18).setAfterBlock(12).setRequireAfter(108f).build(),
+					create().setFont("palatino").setFontSize(14f).setLineSpacing(18.0f).setBold(true).setBeforeBlock(18).setAfterBlock(12).setRequireAfter(108f).build(),
 					defaultStyle
 			));
 
 		catalog.put("subsection-title",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFontSize(15f).setLineSpacing(19.0f).setBold(true).setBeforeBlock(15).setAfterBlock(12).setRequireAfter(108f).build(),
+					create().setFont("palatino").setFontSize(13f).setLineSpacing(17.0f).setBold(true).setBeforeBlock(15).setAfterBlock(12).setRequireAfter(108f).build(),
 					defaultStyle
 			));
 
@@ -61,13 +61,13 @@ public class DocStyleCatalog extends FontCatalog {
 
 		catalog.put("refComment",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFontSize(10f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(6).setAfterBlock(6).build(),
+					create().setFont("palatino").setFontSize(9f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(6).setAfterBlock(6).build(),
 					defaultStyle
 			));
 
 		catalog.put("beginRefComment",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFontSize(10f).setFirstMargin(18f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(12).setAfterBlock(6).build(),
+					create().setFont("palatino").setFontSize(9f).setFirstMargin(18f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(12).setAfterBlock(6).build(),
 					defaultStyle
 			));
 
@@ -79,13 +79,13 @@ public class DocStyleCatalog extends FontCatalog {
 
 		catalog.put("preformatted",
 				new CompoundStyle(this,
-					create().setFont("monospace").setFontSize(11f).setLineSpacing(12.5f).setPreformatted(true).build(),
+					create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).build(),
 					defaultStyle
 			));
 
 		catalog.put("grammar",
 				new CompoundStyle(this,
-					create().setFont("monospace").setFontSize(9f).setLineSpacing(12.5f).setPreformatted(true).setLeftMargin(192f).setFirstMargin(0f).build(),
+					create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setLeftMargin(192f).setFirstMargin(0f).build(),
 					defaultStyle
 			));
 
@@ -119,7 +119,7 @@ public class DocStyleCatalog extends FontCatalog {
 
 		catalog.put("footnote",
 				new CompoundStyle(this,
-					create().setFont("palatino").setFontSize(9.5f).setLineSpacing(11f).setBeforeBlock(2f).setFirstMargin(0).setLeftMargin(6).showAtBottom(true).build(),
+					create().setFont("palatino").setFontSize(8f).setLineSpacing(9.5f).setBeforeBlock(2f).setFirstMargin(0).setLeftMargin(6).showAtBottom(true).build(),
 					defaultStyle
 			));
 

@@ -7,16 +7,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.NestedSpan;
 import com.gmmapowell.script.flow.Para;
+import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 
 public class Cursor {
+	private final String flow;
 	private final Section si;
 	private int para;
 	private int span;
 	private List<AtomicInteger> item;
 
-	public Cursor(Section si) {
+	public Cursor(String name, Section si) {
+		this.flow = name;
 		this.si = si;
 		this.para = 0;
 		this.span = 0;
@@ -35,13 +38,13 @@ public class Cursor {
 			List<String> styles = new ArrayList<>();
 			if (this.para >= si.paras.size())
 				return null;
-			System.out.println("  para = " + para);
+//			System.out.println("  para = " + para);
 			Para p = si.paras.get(para);
 			styles.addAll(p.formats);
 			if (span >= p.spans.size()) {
 				this.para++;
 				this.span = 0;
-				continue;
+				return new StyledToken(flow, para, span, item, styles, new ParaBreak());
 			}
 //			System.out.println("  span = " + span);
 			HorizSpan hs = p.spans.get(span);
@@ -77,13 +80,20 @@ public class Cursor {
 			if (k == 0) {
 				item.get(0).incrementAndGet();
 			}
-			return new StyledToken(styles, it);
+			return new StyledToken(flow, para, span, item, styles, it);
 		}
 	}
 
-	public void processed(StyledToken lastAccepted) {
-		// TODO Auto-generated method stub
-		
+	public void backTo(StyledToken lastAccepted) {
+		lastAccepted.resetMe(this);
+	}
+
+	public void resetTo(int para, int span, List<Integer> item) {
+		this.para = para;
+		this.span = span;
+		this.item = new ArrayList<>();
+		for (int i=0;i<item.size();i++)
+			this.item.add(new AtomicInteger(item.get(i)));
 	}
 
 }
