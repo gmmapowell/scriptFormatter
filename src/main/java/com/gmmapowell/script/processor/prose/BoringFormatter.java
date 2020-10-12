@@ -1,16 +1,18 @@
 package com.gmmapowell.script.processor.prose;
 
-import com.gmmapowell.script.elements.Block;
-import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.elements.SpanBlock;
+import com.gmmapowell.script.processor.ProcessingUtils;
 
 public class BoringFormatter implements Formatter {
+	private final DocState state;
+
+	public BoringFormatter(DocState state) {
+		this.state = state;
+	}
 
 	@Override
-	public Block format(ElementFactory ef, String text, int exdent) {
-		SpanBlock ret = ef.block("preformatted");
-		ret.addSpan(ef.span(null, text.replace("\t", "    ")));
-		return ret;
+	public void format(String text, int exdent) {
+		state.newPara("preformatted");
+		ProcessingUtils.process(state, text.replace("\t", "    "));
 	}
 
 	@Override

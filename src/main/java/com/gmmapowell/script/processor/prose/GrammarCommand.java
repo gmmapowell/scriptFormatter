@@ -12,26 +12,22 @@ import org.flasck.flas.grammar.SentenceProducer.UseNameForScoping;
 import org.flasck.flas.grammar.TokenDefinition.Matcher;
 import org.zinutils.exceptions.NotImplementedException;
 
-import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.SpanBlock;
-import com.gmmapowell.script.sink.Sink;
 
 public class GrammarCommand implements ProductionVisitor, InlineCommand {
-	private final ElementFactory ef;
 	private final Production rule;
 	private SpanBlock block;
 	private List<String> dontShow = new ArrayList<String>();
 	private boolean justIndented;
 	private DocState state;
 
-	public GrammarCommand(ElementFactory ef, Sink sink, Production rule, DocState state) {
-		this.ef = ef;
+	public GrammarCommand(Production rule, DocState state) {
 		this.rule = rule;
 		this.state = state;
 	}
 
 	@Override
-	public void execute(Sink sink, ElementFactory ef) throws IOException {
+	public void execute() throws IOException {
 		state.newPara("grammar");
 		state.newSpan("grammar-number");
 		state.text("(" + rule.number + ")");
@@ -99,13 +95,16 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		if (dontShow.contains(prod))
 			block = null;
 		else if (block != null)
-			block.addSpan(ef.span(null, " " + prod));
+			state.text(" " + prod);
 	}
 
 	@Override
 	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3, boolean repeatLast, boolean saveLast, String generator, boolean space) {
-		if (block != null)
-			block.addSpan(ef.span("bold", " " + token));
+		if (block != null) {
+			state.nestSpan("bold");
+			state.text(" " + token);
+			state.popSpan();
+		}
 	}
 
 	@Override
@@ -123,8 +122,9 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		} else {
 			child.visit(this);
 			// I think "withEOL" is only relevant to the sentence producer
-			if (block != null)
-				block.addSpan(ef.span(null, "*"));
+			if (block != null) {
+				state.text("*");
+			}
 		}
 		return 0;
 	}
@@ -137,7 +137,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		} else {
 			child.visit(this);
 			if (block != null)
-				block.addSpan(ef.span(null, "?"));
+				state.text("?");
 		}
 	}
 
@@ -149,7 +149,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		} else {
 			child.visit(this);
 			if (block != null)
-				block.addSpan(ef.span(null, "+"));
+				state.text("+");
 		}
 		return 0;
 	}

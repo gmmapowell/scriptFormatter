@@ -10,10 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.elements.SpanBlock;
-import com.gmmapowell.script.sink.Sink;
-
 public class IncludeCommand implements InlineCommand {
 	public class Indents {
 		private final int min;
@@ -39,6 +35,7 @@ public class IncludeCommand implements InlineCommand {
 		}
 	}
 
+	private final DocState state;
 	private final File file;
 	private final Formatter formatter;
 	private final List<Region> elides = new ArrayList<>();
@@ -47,13 +44,14 @@ public class IncludeCommand implements InlineCommand {
 	private Pattern stopAt;
 	private boolean elideAtEnd;
 
-	public IncludeCommand(File file, Formatter formatter) {
+	public IncludeCommand(DocState state, File file, Formatter formatter) {
+		this.state = state;
 		this.file = file;
 		this.formatter = formatter;
 	}
 
 	@Override
-	public void execute(Sink sink, ElementFactory ef) throws IOException {
+	public void execute() throws IOException {
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file, Charset.forName("UTF-8")))) {
 			String line = null;
 			int exdent = 0;
@@ -80,7 +78,7 @@ public class IncludeCommand implements InlineCommand {
 				int il = indent(line, lnr.getLineNumber());
 				if (stopAt != null && stopAt.matcher(line).find()) {
 					if (!haveSkipped && elideAtEnd) {
-						elideThis(sink, ef, il);
+						elideThis(il);
 					}
 					break;
 				}
@@ -93,7 +91,7 @@ public class IncludeCommand implements InlineCommand {
 //					System.out.println("comparing " + il + " to " + curr + " for " + line);
 					if (formatter.isBlockIndent(curr, il)) {
 						if (!haveSkipped) {
-							elideThis(sink, ef, il);
+							elideThis(il);
 							haveSkipped = true;
 						}
 						continue;  // skip this line
@@ -111,7 +109,7 @@ public class IncludeCommand implements InlineCommand {
 						curr++;
 					else {
 						if (!haveSkipped) {
-							elideThis(sink, ef, il);
+							elideThis(il);
 							haveSkipped = true;
 						}
 						continue; // skip this line
@@ -119,10 +117,10 @@ public class IncludeCommand implements InlineCommand {
 				}
 				if (indents == null || (il >= indents.min && il <= indents.max)) {
 //					System.out.println("sinking " + line);
-					sink.block(formatter.format(ef, line, exdent));
+					formatter.format(line, exdent);
 					haveSkipped = false;
 				} else if (!haveSkipped) {
-					elideThis(sink, ef, il);
+					elideThis(il);
 					haveSkipped = true;
 				}
 			}
@@ -131,10 +129,11 @@ public class IncludeCommand implements InlineCommand {
 		}
 	}
 
-	private void elideThis(Sink sink, ElementFactory ef, int il) throws IOException {
-		SpanBlock eb = ef.block("preformatted");
-		eb.addSpan(ef.span(null, makeElide(il)));
-		sink.block(eb);
+	private void elideThis(int il) throws IOException {
+		state.newPara("preformatted");
+		state.newSpan();
+		state.text(makeElide(il));
+		state.endPara();
 	}
 
 	private String makeElide(int il) {

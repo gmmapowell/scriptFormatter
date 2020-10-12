@@ -12,7 +12,7 @@ import org.zinutils.xml.XML;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.elements.Span;
+import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
@@ -56,7 +56,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	protected void handleLine(DocState state, String s) throws IOException {
 		if (s.startsWith("@")) {
 			// it's a block starting command
-			endBlock(state);
+			commitCurrentCommand();
 			state.cmd = new DocCommand(s.substring(1));
 //			System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " @: " + s);
 		} else if (state.cmd != null) {
@@ -76,41 +76,38 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				args = new StringBuilder(s.substring(idx+1));
 			}
 			switch (cmd) {
-			case "tt":
-				if (state.curr == null)
-					state.curr = ef.block("preformatted");
-				else
-					throw new RuntimeException("you need to set up to do preformatted text in an existing block");
-				state.curr.addSpan(ef.span(null, args.toString()));
+			case "tt": {
+				state.nestSpan("preformatted");
+				state.text(args.toString());
+				state.popSpan();
 				break;
+			}
 			case "link": {
 				String lk = readString(state, args);
 				String tx = readString(state, args);
-				List<String> lspan = new ArrayList<>(state.defaultSpans);
-				lspan.add(0, "link");
-				state.curr.addSpan(ef.lspan(lspan, lk));
-				ProcessingUtils.addSpans(ef, state, state.curr, tx);
-				lspan = new ArrayList<>(state.defaultSpans);
-				lspan.add(0, "endlink");
-				state.curr.addSpan(ef.lspan(lspan, ""));
-				break;
-			}
-			case "footnote": {
-				endBlock(state);
-				state.curr = ef.block("footnote");
-				Span span = ef.span("footnote-number", Integer.toString(state.nextFootnoteText()) + " ");
-				state.curr.addSpan(span);
+				state.nestSpan("link");
+				ProcessingUtils.process(state, tx);
+				state.popSpan();
+				// TODO: would something here be better as an operator?
+				state.nestSpan("endlink");
+				state.popSpan();
 				break;
 			}
 			case "sp": {
-				if (state.curr == null)
-					state.curr = ef.block("text");
-				state.curr.addSpan(ef.span(null, " "));
-				ProcessingUtils.addSpans(ef, state, state.curr, args.toString().trim());
+				state.op(new BreakingSpace());
+				ProcessingUtils.process(state, args.toString().trim());
+				break;
+			}
+			case "footnote": {
+				commitCurrentCommand();
+				state.switchToFlow("footnotes");
+				state.newPara("footnote");
+				state.newSpan("footnote-number");
+				state.text(Integer.toString(state.nextFootnoteText()) + " ");
 				break;
 			}
 			case "include": {
-				endBlock(state);
+				commitCurrentCommand();
 				String file = readString(state, args);
 				Map<String, String> params = readParams(state, args, "formatter");
 //				System.out.println("want to include " + file + " with " + params);
@@ -127,19 +124,19 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				// TODO: we should configure this according to the params, possibly with this as a boring default
 				Formatter formatter;
 				if (!params.containsKey("formatter"))
-					 formatter = new BoringFormatter();
+					 formatter = new BoringFormatter(state);
 				switch (params.get("formatter")) {
 				case "html":
-					formatter = new HTMLFormatter();
+					formatter = new HTMLFormatter(state);
 					break;
 				case "flas":
-					formatter = new FLASFormatter();
+					formatter = new FLASFormatter(state);
 					break;
 				default:
-					formatter = new BoringFormatter();
+					formatter = new BoringFormatter(state);
 					break;
 				}
-				state.inline = new IncludeCommand(f, formatter);
+				state.inline = new IncludeCommand(state, f, formatter);
 				break;
 			}
 			case "remove": {
@@ -176,14 +173,14 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				break;
 			}
 			case "grammar": {
-				endBlock(state);
+				commitCurrentCommand();
 				Map<String, String> params = readParams(state, args, "rule");
 				String ruleName = params.get("rule");
 				if (debug)
 					System.out.println("including grammar for production " + ruleName);
 				try {
 					Production rule = grammar.findRule(ruleName);
-					state.inline = new GrammarCommand(ef, sink, rule, state);
+					state.inline = new GrammarCommand(rule, state);
 				} catch (RuntimeException ex) {
 					System.out.println(state.inputLocation() + ": " + ex.getMessage());
 				}
@@ -204,7 +201,8 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			case "review":
 				if (args == null)
 					throw new RuntimeException("&review command needs something to review");
-				System.out.println("review '" + readString(state, args) + "' in " + state.location());
+				System.out.println("review in " + state.location() + ": " + readString(state, args));
+				assertArgsDone(args);
 				break;
 			case "future":
 				if (args == null)
@@ -241,81 +239,81 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	}
 	
 	@Override
-	protected void endBlock(DocState st) throws IOException {
-		if (st.cmd != null) {
-			switch(st.cmd.name) {
+	protected void commitCurrentCommand() throws IOException {
+		if (state.cmd != null) {
+			switch(state.cmd.name) {
 			case "Chapter": {
-				String title = st.cmd.args.get("title");
+				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Chapter without title");
-				if (st.chapter > 0)
-					title = Integer.toString(st.chapter) + " " + title;
+				if (state.chapter > 0)
+					title = Integer.toString(state.chapter) + " " + title;
 				toc.chapter(title);
-				st.newSection("main");
-				st.newPara("chapter-title");
-				ProcessingUtils.process(st, title);
+				state.newSection("main");
+				state.newPara("chapter-title");
+				ProcessingUtils.process(state, title);
 
-				st.chapter++;
-				st.section = 1;
+				state.chapter++;
+				state.section = 1;
 				break;
 			}
 			case "Section": {
-				String title = st.cmd.args.get("title");
+				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Section without title");
-				if (st.chapter > 1)
-					title = Integer.toString(st.chapter-1) + "." + Integer.toString(st.section) + (st.commentary?"c":"") + " " + title;
+				if (state.chapter > 1)
+					title = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"") + " " + title;
 				toc.section(title);
-				st.newPara("section-title");
-				ProcessingUtils.process(st, title);
+				state.newPara("section-title");
+				ProcessingUtils.process(state, title);
 				
-				st.section++;
+				state.section++;
 				break;
 			}
 			case "Subsection": {
-				String title = st.cmd.args.get("title");
+				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Section without title");
 				toc.subsection(title);
-				st.newPara("subsection-title");
-				ProcessingUtils.process(st, title);
+				state.newPara("subsection-title");
+				ProcessingUtils.process(state, title);
 				break;
 			}
 			case "Commentary": {
-				st.endSpan();
-				st.newPara();
-				st.newSpan();
-				st.op(new CommentaryBreak());
-				st.commentary = true;
-				st.section = 1;
+				state.endSpan();
+				state.newPara();
+				state.newSpan();
+				state.op(new CommentaryBreak());
+				state.commentary = true;
+				state.section = 1;
 				break;
 			}
 			case "Comment": {
-				st.newPara("beginRefComment");
-				st.newSpan("comment-sign");
-				st.text("\u25A0");
-				st.endSpan();
-				st.inRefComment = true;
+				state.newPara("beginRefComment");
+				state.newSpan("comment-sign");
+				state.text("\u25A0");
+				state.endSpan();
+				state.inRefComment = true;
 				break;
 			}
 			case "/": {
-				st.newPara("endRefComment");
-				st.newSpan("comment-sign");
-				st.text("\u25A1");
-				st.endSpan();
-				st.inRefComment = false;
+				state.newPara("endRefComment");
+				state.newSpan("comment-sign");
+				state.text("\u25A1");
+				state.endSpan();
+				state.inRefComment = false;
 				break;
 			}
 			default:
-				System.out.println("handle " + st.cmd);
+				System.out.println("handle " + state.cmd);
 			}
-			st.cmd = null;
-		} else if (st.inline != null) {
-			InlineCommand inline = st.inline;
-			st.inline = null;
-			inline.execute(sink, ef);
+			state.cmd = null;
+		} else if (state.inline != null) {
+			InlineCommand inline = state.inline;
+			state.inline = null;
+			inline.execute();
 		} else {
-			super.endBlock(st);
+			super.commitCurrentCommand();
 		}
 	}
 	

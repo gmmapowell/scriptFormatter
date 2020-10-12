@@ -38,7 +38,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						if (st.trimLine())
 							s = trim(s);
 						if (s.length() == 0) {
-							endBlock(st);
+							commitCurrentCommand();
 						} else {
 							st.line(lnr.getLineNumber());
 							handleLine(st, s);
@@ -53,27 +53,19 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 				}
 			}
 			try {
-				endBlock(st);
+				commitCurrentCommand();
 			} catch (Exception ex) {
 				System.out.println("Exception processing block at end of " + x + ": " + ex);
 				if (debug)
 					ex.printStackTrace();
 			}
 			fileDone();
-			try {
-				sink.fileEnd();
-			} catch (Exception ex) {
-				System.out.println("Exception processing file end of " + x + ": " + ex);
-				if (debug)
-					ex.printStackTrace();
-			}
 		}
 		done();
 		sink.close();
 	}
 
-	@Deprecated	// not really, just TODO: rename this to "commitCommand"
-	protected void endBlock(T st) throws IOException {
+	protected void commitCurrentCommand() throws IOException {
 	}
 
 	protected abstract T begin(String file);
@@ -106,6 +98,10 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		String ret = null;
 		for (int i=0;i<args.length();i++) {
 			if (args.charAt(i) == c) {
+				if (i+1<args.length() && args.charAt(i+1) == c) {
+					args.delete(i, i+1);
+					continue;
+				}
 				ret = args.substring(0, i);
 				args.delete(0, i+1);
 				break;
@@ -141,5 +137,10 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 				ret.put(var, readString(state, args)); 
 		}
 		return ret;
+	}
+	
+	protected void assertArgsDone(StringBuilder args) {
+		if (args.toString().trim().length() > 0)
+			throw new RuntimeException("command had junk at end: " + args);
 	}
 }

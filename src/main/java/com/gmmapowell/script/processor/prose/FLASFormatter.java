@@ -1,22 +1,24 @@
 package com.gmmapowell.script.processor.prose;
 
-import com.gmmapowell.script.elements.Block;
-import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.elements.SpanBlock;
-
 // To do this job properly, you should pull in the FLAS TDA parser as we do in the plugin ...
 public class FLASFormatter implements Formatter {
+	private final DocState state;
+
+	public FLASFormatter(DocState state) {
+		this.state = state;
+	}
 
 	@Override
-	public Block format(ElementFactory ef, String text, int exdent) {
+	public void format(String text, int exdent) {
 		text = text.replace("\t", "    ");
-		SpanBlock ret = ef.block("preformatted");
+		state.newPara("preformatted");
+		state.newSpan();
 		int i = 0;
 		
 		// process indent
 		while (i < text.length() && Character.isWhitespace(text.charAt(i)))
 			i++;
-		ret.addSpan(ef.span(null, text.substring(0, i)));
+		state.text(text.substring(0, i));
 		text = text.substring(i);
 		
 		i = 0;
@@ -25,16 +27,26 @@ public class FLASFormatter implements Formatter {
 			char c = text.charAt(i);
 			if (c == ' ') {
 				String tx = text.substring(0, i);
-				ret.addSpan(ef.span(isKW(first, tx)?"bold":null, tx));
-				ret.addSpan(ef.span(null, " "));
+				if (isKW(first, tx)) {
+					state.nestSpan("bold");
+					state.text(tx);
+					state.popSpan();
+				} else
+					state.text(tx);
+				state.text(" ");
 				text = text.substring(i+1);
 				i = 0;
 			} else
 				i++;
 		}
-		if (text.length() != 0)
-			ret.addSpan(ef.span(isKW(first, text)?"bold":null, text));
-		return ret;
+		if (text.length() != 0) {
+			if (isKW(first, text)) {
+				state.nestSpan("bold");
+				state.text(text);
+				state.popSpan();
+			} else
+				state.text(text);
+		}
 	}
 
 	@Override
@@ -66,5 +78,4 @@ public class FLASFormatter implements Formatter {
 		}
 		return false;
 	}
-
 }

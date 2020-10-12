@@ -64,6 +64,19 @@ public class DocState extends CurrentState {
 		currSpan = null;
 	}
 	
+	public void switchToFlow(String flow) {
+		Flow f = flows.get(flow);
+		if (f == null) {
+			throw new CantHappenException("there is no flow " + flow);
+		}
+		if (f.sections.isEmpty()) {
+			currSection = new Section();
+			f.sections.add(currSection);
+		} else {
+			currSection = f.sections.get(f.sections.size()-1);
+		}
+	}
+	
 	public void newPara(List<String> formats) {
 		if (currSection == null) {
 			throw new CantHappenException("no current section");
