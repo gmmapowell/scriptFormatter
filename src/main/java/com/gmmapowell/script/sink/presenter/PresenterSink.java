@@ -7,11 +7,22 @@ import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.sink.pdf.Stock;
 
 public class PresenterSink implements Sink {
 	public PresenterSink(File root, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
 	}
+
+	@Override
+	public void flow(Flow flow) {
+		// TODO Auto-generated method stub
+		
+	}
 	
+	@Override
+	public void render(Stock stock) {
+	}
+
 	@Override
 	public void title(String title) throws IOException {
 	}
@@ -38,11 +49,5 @@ public class PresenterSink implements Sink {
 
 	@Override
 	public void upload() throws Exception {
-	}
-
-	@Override
-	public void flow(String name, Flow flow) {
-		// TODO Auto-generated method stub
-		
 	}
 }

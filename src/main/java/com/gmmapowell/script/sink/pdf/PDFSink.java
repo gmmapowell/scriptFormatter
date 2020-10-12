@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -18,6 +20,7 @@ import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
@@ -35,6 +38,7 @@ public class PDFSink implements Sink {
 	private final boolean debug;
 	private final String sshid;
 	private final PDDocument doc;
+	private final List<Flow> flows = new ArrayList<>();
 	private PDPageContentStream currentPage;
 	private float bottomY;
 	private List<Line> bottomLines = new ArrayList<>();
@@ -68,13 +72,78 @@ public class PDFSink implements Sink {
 	}
 
 	private void loadFonts() throws IOException {
-		styles.fonts().put("monospace", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
-		styles.fonts().put("monospace-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceBold.ttf")));
-		styles.fonts().put("monospace-oblique", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceOblique.ttf")));
-		styles.fonts().put("palatino", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino.ttf")));
-		styles.fonts().put("palatino-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold.ttf")));
-		styles.fonts().put("palatino-italic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Italic.ttf")));
-		styles.fonts().put("palatino-bolditalic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold Italic.ttf")));
+		styles.font("monospace", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
+		styles.font("monospace-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceBold.ttf")));
+		styles.font("monospace-oblique", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceOblique.ttf")));
+		styles.font("palatino", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino.ttf")));
+		styles.font("palatino-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold.ttf")));
+		styles.font("palatino-italic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Italic.ttf")));
+		styles.font("palatino-bolditalic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold Italic.ttf")));
+	}
+
+	@Override
+	public void flow(Flow flow) {
+		this.flows.add(flow);
+	}
+	
+	@Override
+	public void render(Stock stock) throws IOException {
+		stock.newDocument();
+		List<Flow> mainFlows = new ArrayList<>();
+		for (Flow f : flows) {
+			if (f.isMain()) {
+				mainFlows.add(f);
+			}
+		}
+		int i=0;
+		Map<String, String> current = new TreeMap<>();
+		List<Cursor> sections = new ArrayList<>();
+		for (Flow f : mainFlows) {
+			if (f.sections.size() > i) {
+				Section si = f.sections.get(i);
+				current.put(f.name, si.format);
+				sections.add(new Cursor(si));
+			}
+			i++;
+			
+			while (!sections.isEmpty()) {
+				PageCompositor page = stock.getPage(current);
+				page.begin();
+				List<Cursor> active = new ArrayList<>(sections);
+				while (!active.isEmpty()) {
+					List<Cursor> remove = new ArrayList<>();
+					flows:
+					for (Cursor c : active) { // try and populate each main section
+						while (true) {
+							StyledToken tok = c.next();
+							System.out.println(tok);
+							if (tok == null) {
+								sections.remove(c);
+								remove.add(c);
+								continue flows;
+							}
+							Acceptance a = page.token(tok);
+							switch (a.status) {
+							case PENDING: // it thinks it may accept it but it may end up having to reject it
+								break;
+							case PROCESSED: // it has taken it and fully processed it
+								c.processed(null);
+								break;
+							case NOROOM: // we are done; the outlet is full
+								c.processed(a.lastAccepted);
+								remove.add(c);
+								continue flows;
+							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
+								break;
+							}
+						}
+					}
+					active.removeAll(remove);
+				}
+				page.close();
+			}
+		}
+		stock.close(output);
 	}
 
 	@Override
@@ -306,9 +375,9 @@ public class PDFSink implements Sink {
 
 	@Override
 	public void close() throws IOException {
-		closeCurrentPage();
-		doc.save(output);
-		doc.close();
+//		closeCurrentPage();
+//		doc.save(output);
+//		doc.close();
 	}
 
 	@Override
@@ -392,11 +461,5 @@ public class PDFSink implements Sink {
 			currentPage = null;
 			afterBlock = 0;
 		}
-	}
-
-	@Override
-	public void flow(String name, Flow flow) {
-		// TODO Auto-generated method stub
-		
 	}
 }

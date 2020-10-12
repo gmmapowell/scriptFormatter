@@ -14,6 +14,7 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.sink.pdf.BasicStock;
 
 public abstract class ProsePipeline<T extends CurrentState> implements Processor {
 	protected final Sink sink;
@@ -62,12 +63,13 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			fileDone();
 		}
 		done();
+		// TODO: this needs to be configured
+		// And it particular we want to significantly distinguish between blog stocks and PDF stocks ...
+		sink.render(new BasicStock());
 		sink.close();
 	}
 
-	protected void commitCurrentCommand() throws IOException {
-	}
-
+	protected abstract void commitCurrentCommand() throws IOException;
 	protected abstract T begin(String file);
 	protected abstract void handleLine(T state, String s) throws IOException;
 	protected void fileDone() {}

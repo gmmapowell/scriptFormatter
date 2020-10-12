@@ -9,6 +9,7 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
+import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.processor.prose.CurrentState;
 import com.gmmapowell.script.processor.prose.DocState;
 
@@ -137,26 +138,37 @@ public class ProcessingUtils {
 
 	private static void processPart(DocState st, String tx, int i, int to) {
 		int from = i;
-		for (;i<tx.length();i++) {
+		for (;i<to;i++) {
 			int q;
 			if ((q = findRange(tx, i, to)) >= 0) {
-				st.text(tx.substring(from, i));
+				if (i > from)
+					st.text(tx.substring(from, i));
 				makeSpan(st, tx.charAt(i));
-				processPart(st, tx, i+1, q-1);
+				processPart(st, tx, i+1, q);
 				st.popSpan();
-				from = i = q;
+				i = q;
+				from = i+1;
 			} else if (q == -2) { // a double character; throw it away
 				st.text(tx.substring(from, i));
 				from = i+1;
 			} else if ((q = getCommand(tx, i, to)) >= 0) {
-				st.text(tx.substring(from, i));
+				if (i > from)
+					st.text(tx.substring(from, i));
 				processCommand(st, tx.substring(i+1, q));
-				from = i = q-1;
+				i = q;
+				from = i+1;
 			} else if (q == -2) { // a double &; throw it away
 				st.text(tx.substring(from, i));
 				from = i+1;
+			} else if (Character.isWhitespace(tx.charAt(i))) {
+				if (i > from)
+					st.text(tx.substring(from, i));
+				st.op(new BreakingSpace());
+				from = i+1;
 			}
 		}
+		if (to > from)
+			st.text(tx.substring(from, to));
 	}
 
 	private static int findRange(String tx, int i, int to) {
@@ -199,19 +211,19 @@ public class ProcessingUtils {
 		if (tx.charAt(i) != '&')
 			return -1;
 		// last on the line can't be a command
-		if (i+1 >= to)
+		if (++i >= to)
 			return -1;
 		// it's a double ... return the magic value "-2"
-		if (tx.charAt(i+1) != '&')
+		if (tx.charAt(i) == '&')
 			return -2;
 
 		while (i < to && Character.isLetterOrDigit(tx.charAt(i)))
 			i++;
 
-		return i+1;
+		return i;
 	}
 
-	private static void processCommand(DocState st, String substring) {
+	private static void processCommand(DocState st, String cmd) {
 		// handle commands that started with &
 	}
 }

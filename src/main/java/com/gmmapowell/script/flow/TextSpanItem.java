@@ -6,4 +6,9 @@ public class TextSpanItem implements SpanItem {
 	public TextSpanItem(String tx) {
 		this.text = tx;
 	}
+	
+	@Override
+	public String toString() {
+		return "Tx[" + text + "]";
+	}
 }

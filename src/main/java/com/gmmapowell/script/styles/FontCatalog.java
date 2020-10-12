@@ -10,8 +10,8 @@ public abstract class FontCatalog implements StyleCatalog {
 	private Map<String, PDFont> fonts = new HashMap<>();
 
 	@Override
-	public Map<String, PDFont> fonts() {
-		return fonts;
+	public void font(String name, PDFont f) {
+		this.fonts.put(name, f);
 	}
 
 	@Override

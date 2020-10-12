@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.Production;
@@ -40,10 +41,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		} else
 			this.grammar = null;
 		toc = new TableOfContents(tocfile);
-		state.flows.put("header", new Flow()); // needs to be a "callback" flow
-		state.flows.put("main", new Flow());
-		state.flows.put("footnotes", new Flow());
-		state.flows.put("footer", new Flow()); // needs to be a "callback" flow
+		state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
+		state.flows.put("main", new Flow("main", true));
+		state.flows.put("footnotes", new Flow("footnotes", false));
+		state.flows.put("footer", new Flow("footer", false)); // needs to be a "callback" flow
 	}
 	
 	@Override
@@ -246,13 +247,21 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Chapter without title");
-				if (state.chapter > 0)
+				String style = state.cmd.args.get("style");
+				if (style == null)
+					style = "chapter";
+				if (state.chapter > 0) {
 					title = Integer.toString(state.chapter) + " " + title;
+					state.wantNumbering = true;
+				} else {
+					state.wantNumbering = false;
+				}
+				state.newSection("main", style);
 				toc.chapter(title);
-				state.newSection("main");
 				state.newPara("chapter-title");
 				ProcessingUtils.process(state, title);
-
+				state.endPara();
+				
 				state.chapter++;
 				state.section = 1;
 				break;
@@ -261,11 +270,12 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Section without title");
-				if (state.chapter > 1)
+				if (state.wantNumbering)
 					title = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"") + " " + title;
 				toc.section(title);
 				state.newPara("section-title");
 				ProcessingUtils.process(state, title);
+				state.endPara();
 				
 				state.section++;
 				break;
@@ -277,6 +287,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				toc.subsection(title);
 				state.newPara("subsection-title");
 				ProcessingUtils.process(state, title);
+				state.endPara();
 				break;
 			}
 			case "Commentary": {
@@ -284,6 +295,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				state.newPara();
 				state.newSpan();
 				state.op(new CommentaryBreak());
+				state.endPara();
 				state.commentary = true;
 				state.section = 1;
 				break;
@@ -313,12 +325,15 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			state.inline = null;
 			inline.execute();
 		} else {
-			super.commitCurrentCommand();
+			state.endPara();
 		}
 	}
 	
 	@Override
 	protected void done() {
+		for (Entry<String, Flow> e : state.flows.entrySet()) {
+			sink.flow(e.getValue());
+		}
 		try {
 			toc.write();
 		} catch (Exception ex) {

@@ -21,6 +21,7 @@ import com.gmmapowell.script.elements.block.TextBlock;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
+import com.gmmapowell.script.sink.pdf.Stock;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -60,6 +61,18 @@ public class BloggerSink implements Sink {
 		index = readPosts();
 		connect();
 		readFromBlogger();
+	}
+
+	@Override
+	public void flow(Flow flow) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void render(Stock stock) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -334,11 +347,5 @@ public class BloggerSink implements Sink {
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-	}
-
-	@Override
-	public void flow(String name, Flow flow) {
-		// TODO Auto-generated method stub
-		
 	}
 }

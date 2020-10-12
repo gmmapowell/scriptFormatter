@@ -101,6 +101,10 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 		}
 	}
 
+	@Override
+	protected void commitCurrentCommand() throws IOException {
+	}
+	
 	private String headingLevel(String s) {
 		int level = 1;
 		while (s.length() > level && s.charAt(level) == '+')

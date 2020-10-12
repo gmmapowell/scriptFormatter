@@ -29,6 +29,7 @@ public class DocState extends CurrentState {
 	private Section currSection;
 	private Para currPara;
 	private HorizSpan currSpan;
+	public boolean wantNumbering;
 
 	public void reset(String file) {
 		this.file = file;
@@ -53,12 +54,12 @@ public class DocState extends CurrentState {
 		return (chapter-1) + "." + (section-1) + (commentary?"c":"");
 	}
 	
-	public void newSection(String flow) {
+	public void newSection(String flow, String format) {
 		Flow f = flows.get(flow);
 		if (f == null) {
 			throw new CantHappenException("there is no flow " + flow);
 		}
-		currSection = new Section();
+		currSection = new Section(format);
 		f.sections.add(currSection);
 		currPara = null;
 		currSpan = null;
@@ -70,7 +71,7 @@ public class DocState extends CurrentState {
 			throw new CantHappenException("there is no flow " + flow);
 		}
 		if (f.sections.isEmpty()) {
-			currSection = new Section();
+			currSection = new Section(null);
 			f.sections.add(currSection);
 		} else {
 			currSection = f.sections.get(f.sections.size()-1);
