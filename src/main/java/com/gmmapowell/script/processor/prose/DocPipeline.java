@@ -13,14 +13,14 @@ import org.zinutils.xml.XML;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
-import com.gmmapowell.script.elements.SpanBlock;
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Utils;
 
 public class DocPipeline extends ProsePipeline<DocState> {
-	private final DocState root = new DocState();
-	private List<File> roots = new ArrayList<>();
+	private final DocState state = new DocState();
+	private final List<File> samples = new ArrayList<>();
 	private final Grammar grammar;
 	private final TableOfContents toc;
 	
@@ -28,7 +28,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		super(root, ef, sink, options, debug);
 		File tocfile = null;
 		if (options.containsKey("samples"))
-			this.roots.add(new File(Utils.subenvs(options.remove("samples"))));
+			this.samples.add(new File(Utils.subenvs(options.remove("samples"))));
 		if (options.containsKey("toc"))
 			tocfile = new File(root, Utils.subenvs(options.remove("toc")));
 		if (options.containsKey("grammar")) {
@@ -40,12 +40,16 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		} else
 			this.grammar = null;
 		toc = new TableOfContents(tocfile);
+		state.flows.put("header", new Flow()); // needs to be a "callback" flow
+		state.flows.put("main", new Flow());
+		state.flows.put("footnotes", new Flow());
+		state.flows.put("footer", new Flow()); // needs to be a "callback" flow
 	}
 	
 	@Override
 	protected DocState begin(String file) {
-		root.reset(file);
-		return root;
+		state.reset(file);
+		return state;
 	}
 
 	@Override
@@ -111,7 +115,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				Map<String, String> params = readParams(state, args, "formatter");
 //				System.out.println("want to include " + file + " with " + params);
 				File f = null;
-				for (File r : roots) {
+				for (File r : samples) {
 					File tf = new File(r, file);
 					if (tf.isFile() && tf.canRead()) {
 						f = tf;
@@ -119,7 +123,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					}
 				}
 				if (f == null)
-					throw new RuntimeException("cannot find " + file + " in any of " + roots);
+					throw new RuntimeException("cannot find " + file + " in any of " + samples);
 				// TODO: we should configure this according to the params, possibly with this as a boring default
 				Formatter formatter;
 				if (!params.containsKey("formatter"))
@@ -179,7 +183,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					System.out.println("including grammar for production " + ruleName);
 				try {
 					Production rule = grammar.findRule(ruleName);
-					state.inline = new GrammarCommand(ef, sink, rule);
+					state.inline = new GrammarCommand(ef, sink, rule, state);
 				} catch (RuntimeException ex) {
 					System.out.println(state.inputLocation() + ": " + ex.getMessage());
 				}
@@ -219,29 +223,20 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				throw new RuntimeException(state.location() + " handle inline command: " + s);
 			}
 		} else if (s.startsWith("*")) {
-			if (state.curr != null) {
-				sink.block(state.curr);
-			}
 			int idx = s.indexOf(" ");
 			if (idx == 1)
-				state.curr = ef.block("bullet");
+				state.newPara("bullet");
 			else
-				state.curr = ef.block("bullet" + idx);
-			String text = s.substring(idx+1).trim();
-			state.curr.addSpan(ef.span("bullet-sign", "\u2022"));
-			ProcessingUtils.addSpans(ef, state, state.curr, text);
+				state.newPara("bullet" + idx);
+			ProcessingUtils.process(state, s.substring(idx+1).trim());
 		} else {
-			if (state.curr == null) {
-				if (state.beginComment) {
-					state.curr = ef.block("beginRefComment");
-					state.curr.addSpan(ef.span("comment-sign", "\u25A0"));
-					state.beginComment = false;
-				} else if (state.inRefComment)
-					state.curr = ef.block("refComment");
+			if (!state.inPara()) {
+				if (state.inRefComment)
+					state.newPara("refComment");
 				else
-					state.curr = ef.block("text");
+					state.newPara("text");
 			}
-			ProcessingUtils.addSpans(ef, state, state.curr, s);
+			ProcessingUtils.process(state, s);
 		}
 	}
 	
@@ -255,12 +250,13 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					throw new RuntimeException("Chapter without title");
 				if (st.chapter > 0)
 					title = Integer.toString(st.chapter) + " " + title;
+				toc.chapter(title);
+				st.newSection("main");
+				st.newPara("chapter-title");
+				ProcessingUtils.process(st, title);
+
 				st.chapter++;
 				st.section = 1;
-				SpanBlock blk = ef.block("chapter-title");
-				ProcessingUtils.addSpans(ef, st, blk, title);
-				sink.block(blk);
-				toc.chapter(title);
 				break;
 			}
 			case "Section": {
@@ -269,39 +265,45 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					throw new RuntimeException("Section without title");
 				if (st.chapter > 1)
 					title = Integer.toString(st.chapter-1) + "." + Integer.toString(st.section) + (st.commentary?"c":"") + " " + title;
-				st.section++;
-				SpanBlock blk = ef.block("section-title");
-				ProcessingUtils.addSpans(ef, st, blk, title);
-				sink.block(blk);
 				toc.section(title);
+				st.newPara("section-title");
+				ProcessingUtils.process(st, title);
+				
+				st.section++;
 				break;
 			}
 			case "Subsection": {
 				String title = st.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Section without title");
-				SpanBlock blk = ef.block("subsection-title");
-				ProcessingUtils.addSpans(ef, st, blk, title);
-				sink.block(blk);
 				toc.subsection(title);
+				st.newPara("subsection-title");
+				ProcessingUtils.process(st, title);
 				break;
 			}
 			case "Commentary": {
-				sink.brk(new CommentaryBreak());
+				st.endSpan();
+				st.newPara();
+				st.newSpan();
+				st.op(new CommentaryBreak());
 				st.commentary = true;
 				st.section = 1;
 				break;
 			}
 			case "Comment": {
-				st.beginComment = true;
+				st.newPara("beginRefComment");
+				st.newSpan("comment-sign");
+				st.text("\u25A0");
+				st.endSpan();
 				st.inRefComment = true;
 				break;
 			}
 			case "/": {
+				st.newPara("endRefComment");
+				st.newSpan("comment-sign");
+				st.text("\u25A1");
+				st.endSpan();
 				st.inRefComment = false;
-				SpanBlock blk = ef.block("endRefComment");
-				blk.addSpan(ef.span("comment-sign", "\u25A1"));
-				sink.block(blk);
 				break;
 			}
 			default:

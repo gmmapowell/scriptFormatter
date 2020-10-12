@@ -110,10 +110,10 @@ public class ScriptConfig implements Config {
 	public void handleWebedit(Map<String, String> vars, String option, boolean debug, String sshid) throws ConfigException {
 		String file = vars.remove("file");
 		if (file == null)
-			throw new ConfigException("output file was not defined");
+			throw new ConfigException("webedit output file was not defined");
 		String upload = vars.remove("upload");
 		if (upload == null)
-			throw new ConfigException("output file was not defined");
+			throw new ConfigException("upload dir was not defined");
 		String title = vars.remove("title");
 		if (title == null)
 			throw new ConfigException("title was not defined");

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Break;
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 
 public class PresenterSink implements Sink {
@@ -37,5 +38,11 @@ public class PresenterSink implements Sink {
 
 	@Override
 	public void upload() throws Exception {
+	}
+
+	@Override
+	public void flow(String name, Flow flow) {
+		// TODO Auto-generated method stub
+		
 	}
 }

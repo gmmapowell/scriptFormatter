@@ -18,6 +18,7 @@ import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.block.HTMLSpan;
 import com.gmmapowell.script.elements.block.TextBlock;
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
 import com.google.api.client.auth.oauth2.Credential;
@@ -333,5 +334,11 @@ public class BloggerSink implements Sink {
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+	}
+
+	@Override
+	public void flow(String name, Flow flow) {
+		// TODO Auto-generated method stub
+		
 	}
 }

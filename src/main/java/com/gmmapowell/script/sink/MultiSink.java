@@ -5,12 +5,19 @@ import java.util.List;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Break;
+import com.gmmapowell.script.flow.Flow;
 
 public class MultiSink implements Sink {
 	private final List<Sink> sinks;
 
 	public MultiSink(List<Sink> sinks) {
 		this.sinks = sinks;
+	}
+
+	@Override
+	public void flow(String name, Flow flow) {
+		for (Sink s : sinks)
+			s.flow(name, flow);
 	}
 
 	@Override

@@ -3,10 +3,11 @@ package com.gmmapowell.script.processor.prose;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.elements.Break;
+import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
-public class CommentaryBreak implements Break {
+public class CommentaryBreak implements Break, SpanItem {
 
 	@Override
 	public String boxText() {

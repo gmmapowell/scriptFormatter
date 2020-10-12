@@ -17,6 +17,7 @@ import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
@@ -391,5 +392,11 @@ public class PDFSink implements Sink {
 			currentPage = null;
 			afterBlock = 0;
 		}
+	}
+
+	@Override
+	public void flow(String name, Flow flow) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -79,9 +79,10 @@ public class DriveLoader implements Loader {
         }
         Index currentIndex = readIndex();
         try {
-	        downloadFolder(service, currentIndex, downloads, "    ", item);
-	        if (webeditFile != null)
-	        	currentIndex.generateWebeditFile(webeditFile, wetitle);
+        	System.out.println("skipping downloading ...");
+//	        downloadFolder(service, currentIndex, downloads, "    ", item);
+//	        if (webeditFile != null)
+//	        	currentIndex.generateWebeditFile(webeditFile, wetitle);
 	        return currentIndex;
         } finally {
         	currentIndex.close();

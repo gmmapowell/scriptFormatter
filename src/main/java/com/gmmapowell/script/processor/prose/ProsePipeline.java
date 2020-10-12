@@ -72,11 +72,8 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		sink.close();
 	}
 
+	@Deprecated	// not really, just TODO: rename this to "commitCommand"
 	protected void endBlock(T st) throws IOException {
-		if (st.curr != null) {
-			sink.block(st.curr);
-			st.curr = null;
-		}
 	}
 
 	protected abstract T begin(String file);

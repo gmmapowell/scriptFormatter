@@ -11,7 +11,6 @@ import org.flasck.flas.grammar.ProductionVisitor;
 import org.flasck.flas.grammar.SentenceProducer.UseNameForScoping;
 import org.flasck.flas.grammar.TokenDefinition.Matcher;
 import org.zinutils.exceptions.NotImplementedException;
-import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.SpanBlock;
@@ -21,28 +20,28 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	private final ElementFactory ef;
 	private final Production rule;
 	private SpanBlock block;
-	private Sink sink;
 	private List<String> dontShow = new ArrayList<String>();
 	private boolean justIndented;
+	private DocState state;
 
-	// I think we are also going to need ef and sink to process the (multiple) blocks we work through
-	// We might even want to bring the rest of the block creation here
-	public GrammarCommand(ElementFactory ef, Sink sink, Production rule) {
+	public GrammarCommand(ElementFactory ef, Sink sink, Production rule, DocState state) {
 		this.ef = ef;
-		this.sink = sink;
 		this.rule = rule;
+		this.state = state;
 	}
 
 	@Override
 	public void execute(Sink sink, ElementFactory ef) throws IOException {
-		this.block = ef.block("grammar");
-		block.addSpan(ef.span("grammar-number", "(" + rule.number + ")"));
-		block.addSpan(ef.span("grammar-name", rule.name));
-		block.addSpan(ef.span("grammar-op", "::="));
+		state.newPara("grammar");
+		state.newSpan("grammar-number");
+		state.text("(" + rule.number + ")");
+		state.newSpan("grammar-name");
+		state.text(rule.name);
+		state.newSpan("grammar-op");
+		state.text("::=");
 		try {
 			rule.visit(this);
-			if (block != null)
-				sink.block(block);
+			state.endPara();
 		} catch (NotImplementedException ex) {
 			ex.printStackTrace(System.out);
 		} catch (NullPointerException ex) {
@@ -56,23 +55,13 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void choices(OrProduction arg0, Object cxt, List<Definition> defns, List<Integer> probs, int arg3, boolean repeatVarName) {
-		try {
-			defns.get(0).visit(this);
-			// NOTE: I don't think it's as hard as this makes out ... modularize and rerun the initial setup"
-			if (block == null)
-				throw new NotImplementedException("Revise the grammar to have the first case not be one you want to remove because it's hard to remove it");
-			sink.block(block);
-			for (int i=1;i<defns.size();i++) {
-				block = ef.block("grammar");
-				block.addSpan(ef.span("grammar-blank", ""));
-				block.addSpan(ef.span("grammar-op", "|"));
-				defns.get(i).visit(this);
-				if (block != null)
-					sink.block(block);
-				block = null;
-			}
-		} catch (IOException e) {
-			throw WrappedException.wrap(e);
+		defns.get(0).visit(this);
+		for (int i=1;i<defns.size();i++) {
+			state.newPara("grammar");
+			state.newSpan("grammar-blank");
+			state.newSpan("grammar-op");
+			state.text("|");
+			block = null;
 		}
 	}
 
@@ -88,21 +77,16 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	@Override
 	public boolean indent() {
 		this.justIndented = true;
-		try {
-			if (block != null) {
-				sink.block(block);
-				block = ef.block("grammar");
-			}
-			block.addSpan(ef.span("grammar-op", ">>"));
-			// always return true - this value is part of the SentenceProducer logic
-			return true;
-		} catch (IOException ex) {
-			throw WrappedException.wrap(ex);
-		}
+		state.newPara("grammar");
+		state.newSpan("grammar-op");
+		state.text(">>");
+		// always return true - this value is part of the SentenceProducer logic
+		return true;
 	}
 
 	@Override
 	public void nestName(int arg0) {
+		System.out.println("this is for the >>! cases");
 	}
 
 	@Override
@@ -240,8 +224,9 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		if (!justIndented)
 			return;
 		justIndented = false;
-		block = ef.block("grammar");
-		block.addSpan(ef.span("grammar-blank", ""));
-		block.addSpan(ef.span("grammar-op", quant));
+		state.newPara("grammar");
+		state.newSpan("grammar-blank");
+		state.newSpan("grammar-op");
+		state.text(quant);
 	}
 }
