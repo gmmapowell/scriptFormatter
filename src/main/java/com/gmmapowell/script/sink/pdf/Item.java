@@ -27,10 +27,15 @@ public class Item {
 
 	public void shove(PDPageContentStream page, float x, float y) throws IOException {
 		page.beginText();
-		page.setFont(font, fontsz);
-		page.newLineAtOffset(x+xpos, y);
-		page.showText(text);
-		page.endText();
+		try {
+			page.setFont(font, fontsz);
+			page.newLineAtOffset(x+xpos, y);
+			page.showText(text);
+		} catch (IllegalArgumentException ex) {
+			ex.printStackTrace(System.out);
+		} finally {
+			page.endText();
+		}
 	}
 
 }

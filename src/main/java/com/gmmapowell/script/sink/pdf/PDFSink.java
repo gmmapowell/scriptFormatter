@@ -98,53 +98,75 @@ public class PDFSink implements Sink {
 		int i=0;
 		Map<String, String> current = new TreeMap<>();
 		List<Cursor> sections = new ArrayList<>();
-		for (Flow f : mainFlows) {
-			if (f.sections.size() > i) {
-				Section si = f.sections.get(i);
-				current.put(f.name, si.format);
-				sections.add(new Cursor(f.name, si));
-			}
-			i++;
-			
-			while (!sections.isEmpty()) {
-				PageCompositor page = stock.getPage(styles, current);
-				page.begin();
-				List<Cursor> active = new ArrayList<>(sections);
-				while (!active.isEmpty()) {
-					List<Cursor> remove = new ArrayList<>();
-					flows:
-					for (Cursor c : active) { // try and populate each main section
-						while (true) {
-							StyledToken tok = c.next();
-							System.out.println(tok);
-							if (tok == null) {
-								sections.remove(c);
-								remove.add(c);
-								continue flows;
-							}
-							Acceptance a = page.token(tok);
-							switch (a.status) {
-							case PENDING: // it thinks it may accept it but it may end up having to reject it
-								break;
-							case PROCESSED: // it has taken it and fully processed it
-								break;
-							case BACKUP: // we are being asked to try again, probably new region
-								c.backTo(a.lastAccepted);
-								continue;
-							case NOROOM: // we are done; the outlet is full
-								c.backTo(a.lastAccepted);
-								remove.add(c);
-								continue flows;
-							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
-								break;
+		PageCompositor page = null;
+		forever:
+		while (true) {
+			for (Flow f : mainFlows) {
+				if (f.sections.size() > i) {
+					Section si = f.sections.get(i);
+					current.put(f.name, si.format);
+					sections.add(new Cursor(f.name, si));
+				}
+				i++;
+				if (sections.isEmpty())
+					break forever;
+				
+				boolean newSection = true;
+				while (!sections.isEmpty()) {
+					if (page == null) {
+						page = stock.getPage(styles, current);
+						page.begin();
+						if (newSection)
+							page.nextRegions(); // advance to RHS in double-page mode
+					}
+					newSection = false;
+					List<Cursor> active = new ArrayList<>(sections);
+					while (!active.isEmpty()) {
+						List<Cursor> remove = new ArrayList<>();
+						flows:
+						for (Cursor c : active) { // try and populate each main section
+							while (true) {
+								StyledToken tok = c.next();
+								System.out.println(tok);
+								if (tok == null) {
+									sections.remove(c);
+									remove.add(c);
+									continue flows;
+								}
+								Acceptance a = page.token(tok);
+								if (a == null) {
+									System.out.println("---- a == null, for " + tok);
+									continue;
+								}
+								switch (a.status) {
+								case PENDING: // it thinks it may accept it but it may end up having to reject it
+									break;
+								case PROCESSED: // it has taken it and fully processed it
+									break;
+								case BACKUP: // we are being asked to try again, probably new region
+									c.backTo(a.lastAccepted);
+									continue;
+								case NOROOM: // we are done; the outlet is full
+									c.backTo(a.lastAccepted);
+									remove.add(c);
+									continue flows;
+								case SUSPEND: // we cannot proceed until we have seen something from elsewhere
+									break;
+								}
 							}
 						}
+						active.removeAll(remove);
 					}
-					active.removeAll(remove);
+					boolean advanced = page.nextRegions();
+					if (!advanced) {
+						page.close();
+						page = null;
+					}
 				}
-				page.close();
 			}
 		}
+		if (page != null)
+			page.close();
 		stock.close(output);
 	}
 

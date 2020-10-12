@@ -24,12 +24,15 @@ public class Outlet {
 		while (currentRegion < regions.size()) {
 			ret = regions.get(currentRegion).place(token);
 			if (ret.status == Acceptability.NOROOM) {
-				currentRegion++;
-				return new Acceptance(Acceptability.BACKUP, ret.lastAccepted);
+				if (nextRegion())
+					return new Acceptance(Acceptability.BACKUP, ret.lastAccepted);
 			}
 			return ret;
 		}
 		return ret;
 	}
 
+	public boolean nextRegion() {
+		return ++currentRegion < regions.size();
+	}
 }

@@ -1,5 +1,8 @@
 package com.gmmapowell.script.processor.prose;
 
+import java.io.IOException;
+
+import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.elements.Break;
@@ -62,5 +65,15 @@ public class CommentaryBreak implements Break, SpanItem {
 	@Override
 	public float total() {
 		return 60;
+	}
+	
+	@Override
+	public String toString() {
+		return "COMMENTARY";
+	}
+
+	@Override
+	public BoundingBox bbox(PDFont font, float sz) throws IOException {
+		return new BoundingBox(0, 0, 200, 200);
 	}
 }

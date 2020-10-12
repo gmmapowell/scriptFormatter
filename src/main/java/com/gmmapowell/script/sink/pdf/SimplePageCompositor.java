@@ -45,6 +45,15 @@ public class SimplePageCompositor implements PageCompositor {
 	}
 
 	@Override
+	public boolean nextRegions() {
+		boolean ret = true;
+		for (Outlet o : outlets.values()) {
+			ret &= o.nextRegion();
+		}
+		return ret;
+	}
+
+	@Override
 	public void close() throws IOException {
 		currentPage.close();
 		currentPage = null;

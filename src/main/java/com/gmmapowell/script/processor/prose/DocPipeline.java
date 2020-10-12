@@ -95,7 +95,11 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				break;
 			}
 			case "sp": {
-				state.op(new BreakingSpace());
+				if (state.inPara())
+					state.op(new BreakingSpace());
+				else {
+					state.newPara("text");
+				}
 				ProcessingUtils.process(state, args.toString().trim());
 				break;
 			}
@@ -292,7 +296,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			case "Commentary": {
 				state.endSpan();
-				state.newPara();
+				state.newPara("text");
 				state.newSpan();
 				state.op(new CommentaryBreak());
 				state.endPara();

@@ -46,9 +46,10 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						}
 					} catch (Exception ex) {
 						System.out.println("Error encountered processing " + x + " before line " + lnr.getLineNumber());
-						System.out.println(ex.toString());
-						if (debug)
-							ex.printStackTrace();
+//						if (debug)
+							ex.printStackTrace(System.out);
+						// else
+//							System.out.println(ex.toString());
 						st.curr = null;
 					}
 				}

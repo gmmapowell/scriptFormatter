@@ -158,4 +158,9 @@ public class DocState extends CurrentState {
 	public boolean inPara() {
 		return this.currPara != null;
 	}
+
+	public boolean inSpan() {
+		return this.currSpan != null;
+	}
+	
 }
