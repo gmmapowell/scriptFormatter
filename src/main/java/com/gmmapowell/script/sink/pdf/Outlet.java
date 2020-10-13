@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.script.styles.StyleCatalog;
 
@@ -14,6 +15,8 @@ public class Outlet {
 	private int currentRegion = 0;
 	
 	public Outlet(StyleCatalog styles, PDPageContentStream page, PDRectangle location) throws IOException {
+		if (page == null)
+			throw new CantHappenException("page must be non-null");
 		// stop hacking this
 		// numbers are in pts
 		regions.add(new Region(styles, page, location.getLowerLeftX(), location.getLowerLeftY(), location.getUpperRightX(), location.getUpperRightY()));

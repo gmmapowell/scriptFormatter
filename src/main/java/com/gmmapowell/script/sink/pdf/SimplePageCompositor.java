@@ -8,23 +8,28 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class SimplePageCompositor implements PageCompositor {
 	private final StyleCatalog styles;
+	private final PDPageContentStream currentPage;
 	private final PDRectangle location;
+	private final PageStyle pageStyle;
 	private final Map<String, Outlet> outlets = new TreeMap<>();
-	private PDPageContentStream currentPage;
 
-	public SimplePageCompositor(StyleCatalog styles, PDPageContentStream page, PDRectangle location) {
+	public SimplePageCompositor(StyleCatalog styles, PDPageContentStream page, PDRectangle location, PageStyle style) {
+		if (page == null)
+			throw new CantHappenException("page must be non-null");
 		this.styles = styles;
-		currentPage = page;
+		this.currentPage = page;
 		this.location = location;
+		this.pageStyle = style;
 	}
 
 	@Override
 	public void begin() throws IOException {
-		// unhack this
+		// unhack this - it should all come from pageStyle, I think
 		outlets.put("main", new Outlet(styles, currentPage, location));
 	}
 

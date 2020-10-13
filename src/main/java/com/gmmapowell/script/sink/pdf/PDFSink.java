@@ -75,6 +75,7 @@ public class PDFSink implements Sink {
 		Map<String, String> current = new TreeMap<>();
 		List<Cursor> sections = new ArrayList<>();
 		PageCompositor page = null;
+		boolean beginSection = false;
 		forever:
 		while (true) {
 			for (Flow f : mainFlows) {
@@ -82,6 +83,7 @@ public class PDFSink implements Sink {
 					Section si = f.sections.get(i);
 					current.put(f.name, si.format);
 					sections.add(new Cursor(f.name, si));
+					beginSection = true;
 				}
 				i++;
 				if (sections.isEmpty())
@@ -89,9 +91,10 @@ public class PDFSink implements Sink {
 				
 				while (!sections.isEmpty()) {
 					if (page == null) {
-						page = stock.getPage(current);
+						page = stock.getPage(current, beginSection);
 						page.begin();
 					}
+					beginSection = false;
 					List<Cursor> active = new ArrayList<>(sections);
 					while (!active.isEmpty()) {
 						List<Cursor> remove = new ArrayList<>();

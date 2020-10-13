@@ -8,6 +8,6 @@ import com.gmmapowell.script.styles.StyleCatalog;
 
 public interface Stock {
 	void newDocument(StyleCatalog styles) throws IOException;
-	PageCompositor getPage(Map<String, String> current) throws IOException;
+	PageCompositor getPage(Map<String, String> current, boolean beginSection) throws IOException;
 	void close(File output) throws IOException;
 }
