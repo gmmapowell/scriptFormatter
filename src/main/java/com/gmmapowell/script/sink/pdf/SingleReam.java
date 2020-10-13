@@ -9,7 +9,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import com.gmmapowell.script.styles.PageStyle;
 
 public class SingleReam extends CommonReam implements Ream {
-	private int cnt = 0;
 	private final float wid;
 	private final float ht;
 	private final PDRectangle size;
@@ -29,7 +28,7 @@ public class SingleReam extends CommonReam implements Ream {
 		doc.addPage(page);
 		stream = new PDPageContentStream(doc, page);
 		SimplePageCompositor ret = new SimplePageCompositor(styles, stream, new PDRectangle(0, 0, wid, ht), right);
-		cnt++;
+		pageNo++;
 		return ret;
 	}
 	

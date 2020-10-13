@@ -12,6 +12,7 @@ import com.gmmapowell.script.styles.StyleCatalog;
 public abstract class CommonReam implements Ream {
 	protected PDDocument doc;
 	protected StyleCatalog styles;
+	protected int pageNo;
 
 	@Override
 	public void newDocument(StyleCatalog styles) throws IOException {
