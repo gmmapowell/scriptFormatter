@@ -14,7 +14,9 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.pdf.BasicStock;
+import com.gmmapowell.script.sink.pdf.DoubleReam;
+import com.gmmapowell.script.sink.pdf.PaperStock;
+import com.gmmapowell.script.styles.page.DefaultPageStyle;
 
 public abstract class ProsePipeline<T extends CurrentState> implements Processor {
 	protected final Sink sink;
@@ -66,7 +68,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		done();
 		// TODO: this needs to be configured
 		// And it particular we want to significantly distinguish between blog stocks and PDF stocks ...
-		sink.render(new BasicStock());
+		sink.render(new PaperStock(new DoubleReam(5.5f*72, 8.5f*72), null, new DefaultPageStyle(), new DefaultPageStyle(), new DefaultPageStyle()));
 		sink.close();
 	}
 

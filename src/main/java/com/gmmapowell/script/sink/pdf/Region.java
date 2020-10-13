@@ -11,17 +11,17 @@ import com.gmmapowell.script.styles.StyleCatalog;
 public class Region {
 	private final StyleCatalog styles;
 	private final PDPageContentStream page;
-	private final int lx;
-	private final int ly;
-	private final int rx;
-	private final int uy;
+	private final float lx;
+	private final float ly;
+	private final float rx;
+	private final float uy;
 
-	private int ytop;
+	private float ytop;
 	private Assembling curr;
 	private StyledToken lastAccepted;
 	private boolean showBorder = false;
 
-	public Region(StyleCatalog styles, PDPageContentStream page, int lx, int ly, int rx, int uy) throws IOException {
+	public Region(StyleCatalog styles, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
 		this.page = page;
 		this.lx = lx;

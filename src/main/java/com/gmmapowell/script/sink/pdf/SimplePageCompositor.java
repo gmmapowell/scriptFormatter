@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
@@ -14,25 +12,20 @@ import com.gmmapowell.script.styles.StyleCatalog;
 
 public class SimplePageCompositor implements PageCompositor {
 	private final StyleCatalog styles;
-	private final PDDocument doc;
-	private final PDRectangle paperSize;
+	private final PDRectangle location;
 	private final Map<String, Outlet> outlets = new TreeMap<>();
 	private PDPageContentStream currentPage;
 
-	public SimplePageCompositor(StyleCatalog styles, PDDocument doc) {
+	public SimplePageCompositor(StyleCatalog styles, PDPageContentStream page, PDRectangle location) {
 		this.styles = styles;
-		this.doc = doc;
-		this.paperSize = new PDRectangle(670, 575);
+		currentPage = page;
+		this.location = location;
 	}
 
 	@Override
 	public void begin() throws IOException {
-		PDPage page = new PDPage(paperSize);
-		doc.addPage(page);
-		currentPage = new PDPageContentStream(doc, page);
-		
 		// unhack this
-		outlets.put("main", new Outlet(styles, currentPage));
+		outlets.put("main", new Outlet(styles, currentPage, location));
 	}
 
 	@Override
@@ -51,11 +44,5 @@ public class SimplePageCompositor implements PageCompositor {
 			ret &= o.nextRegion();
 		}
 		return ret;
-	}
-
-	@Override
-	public void close() throws IOException {
-		currentPage.close();
-		currentPage = null;
 	}
 }

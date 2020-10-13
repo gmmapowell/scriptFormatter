@@ -241,7 +241,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					state.newPara("refComment");
 				else
 					state.newPara("text");
-				System.out.println("starting para " + s);
 			}
 			ProcessingUtils.process(state, s);
 		}
@@ -332,7 +331,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			InlineCommand inline = state.inline;
 			state.inline = null;
 			inline.execute();
-		} else {
+		} else if (state.inPara()) {
 			state.endPara();
 		}
 	}

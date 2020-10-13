@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Break;
@@ -25,7 +22,6 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
-import com.gmmapowell.script.styles.page.DefaultPageStyle;
 import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -37,7 +33,6 @@ public class PDFSink implements Sink {
 	private final String upload;
 	private final boolean debug;
 	private final String sshid;
-	private final PDDocument doc;
 	private final List<Flow> flows = new ArrayList<>();
 	private PDPageContentStream currentPage;
 	private float bottomY;
@@ -60,25 +55,6 @@ public class PDFSink implements Sink {
 			this.output = new File(root, output);
 		this.wantOpen = wantOpen;
 		this.upload = upload;
-		doc = new PDDocument();
-		pageStyle = new DefaultPageStyle();
-		
-		try {
-			loadFonts();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			throw ex;
-		}
-	}
-
-	private void loadFonts() throws IOException {
-		styles.font("monospace", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
-		styles.font("monospace-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceBold.ttf")));
-		styles.font("monospace-oblique", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceOblique.ttf")));
-		styles.font("palatino", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino.ttf")));
-		styles.font("palatino-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold.ttf")));
-		styles.font("palatino-italic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Italic.ttf")));
-		styles.font("palatino-bolditalic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold Italic.ttf")));
 	}
 
 	@Override
@@ -88,7 +64,7 @@ public class PDFSink implements Sink {
 	
 	@Override
 	public void render(Stock stock) throws IOException {
-		stock.newDocument();
+		stock.newDocument(styles);
 		List<Flow> mainFlows = new ArrayList<>();
 		for (Flow f : flows) {
 			if (f.isMain()) {
@@ -111,15 +87,11 @@ public class PDFSink implements Sink {
 				if (sections.isEmpty())
 					break forever;
 				
-				boolean newSection = true;
 				while (!sections.isEmpty()) {
 					if (page == null) {
-						page = stock.getPage(styles, current);
+						page = stock.getPage(current);
 						page.begin();
-						if (newSection)
-							page.nextRegions(); // advance to RHS in double-page mode
 					}
-					newSection = false;
 					List<Cursor> active = new ArrayList<>(sections);
 					while (!active.isEmpty()) {
 						List<Cursor> remove = new ArrayList<>();
@@ -159,14 +131,11 @@ public class PDFSink implements Sink {
 					}
 					boolean advanced = page.nextRegions();
 					if (!advanced) {
-						page.close();
 						page = null;
 					}
 				}
 			}
 		}
-		if (page != null)
-			page.close();
 		stock.close(output);
 	}
 
@@ -426,9 +395,9 @@ public class PDFSink implements Sink {
 
 	private boolean ensurePage() throws IOException {
 		if (currentPage == null) {
-			PDPage page = new PDPage();
-			doc.addPage(page);
-			currentPage = new PDPageContentStream(doc, page);
+//			PDPage page = new PDPage();
+//			doc.addPage(page);
+//			currentPage = new PDPageContentStream(doc, page);
 			if (showBorder) {
 				currentPage.setLineWidth(0.3f);
 				currentPage.moveTo(pageStyle.getLeftMargin(), pageStyle.getBottomMargin());
