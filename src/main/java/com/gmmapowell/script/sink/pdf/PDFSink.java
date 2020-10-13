@@ -18,6 +18,8 @@ import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.SyncAfterFlow;
+import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
@@ -107,6 +109,10 @@ public class PDFSink implements Sink {
 									sections.remove(c);
 									remove.add(c);
 									continue flows;
+								}
+								if (tok.it instanceof YieldToFlow || tok.it instanceof SyncAfterFlow) {
+									System.out.println("handle " + tok.it);
+									continue;
 								}
 								Acceptance a = page.token(tok);
 								if (a == null) {
