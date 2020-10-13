@@ -38,10 +38,11 @@ public class NewLine {
 		Style baseStyle = styles.getOptional(bsname);
 		if (baseStyle == null)
 			throw new RuntimeException("no style found for " + bsname);
-
-		PDFont font = baseStyle.getFont();
-		Float sz = baseStyle.getFontSize();
-		minht = Math.max(minht, baseStyle.getLineSpacing());
+		Style style = baseStyle.apply(token.styles);
+		
+		PDFont font = style.getFont();
+		Float sz = style.getFontSize();
+		minht = Math.max(minht, style.getLineSpacing());
 		BoundingBox bbox = si.bbox(font, sz);
 		if (xpos + bbox.getWidth() > width)
 			return false;

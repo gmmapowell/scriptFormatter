@@ -94,6 +94,10 @@ public class DocState extends CurrentState {
 	public void endPara() {
 		endSpan();
 		currPara = null;
+		
+		// Hack? This is to get us back on track after footnotes, but it might be better to make that more explicit.
+		// I can see it derailing us in other situations.
+		switchToFlow("main");
 	}
 	
 	public void newSpan(List<String> formats) {

@@ -231,6 +231,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				state.newPara("bullet");
 			else
 				state.newPara("bullet" + idx);
+			state.newSpan("bullet-sign");
+			state.text("\u2022");
+			state.endSpan();
 			ProcessingUtils.process(state, s.substring(idx+1).trim());
 		} else {
 			if (!state.inPara()) {
@@ -238,6 +241,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					state.newPara("refComment");
 				else
 					state.newPara("text");
+				System.out.println("starting para " + s);
 			}
 			ProcessingUtils.process(state, s);
 		}
