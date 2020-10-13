@@ -19,6 +19,7 @@ public class Assembling {
 	private float before = 0;
 	private float after;
 	private Style style;
+	private AcceptToken prev = null;
 
 	public Assembling(StyleCatalog styles, float before, float lx, float rx) {
 		this.styles = styles;
@@ -28,27 +29,28 @@ public class Assembling {
 	}
 
 	public void token(StyledToken token) throws IOException {
-		float lm;
-		if (curr == null) { // first token in a new para
-			String bsname = token.styles.get(0);
-			Style baseStyle = styles.getOptional(bsname);
-			if (baseStyle == null)
-				throw new RuntimeException("no style found for " + bsname);
-			this.before = Math.max(baseStyle.getBeforeBlock(), this.before);
-			this.after = baseStyle.getAfterBlock();
-			style = baseStyle.apply(token.styles);
-			Float fm = style.getFirstMargin();
-			if (fm == null)
-				lm = style.getLeftMargin();
-			else
-				lm = fm;
-		} else if (curr.accepts(token))
-			return;
-		else
+		Float lm = null;
+		if (prev == null || !prev.forcedNewLine()) {
+			if (curr == null) { // first token in a new para
+				String bsname = token.styles.get(0);
+				Style baseStyle = styles.getOptional(bsname);
+				if (baseStyle == null)
+					throw new RuntimeException("no style found for " + bsname);
+				this.before = Math.max(baseStyle.getBeforeBlock(), this.before);
+				this.after = baseStyle.getAfterBlock();
+				style = baseStyle.apply(token.styles);
+				lm = style.getFirstMargin();
+			} else if ((prev = curr.accepts(token)) != null)
+				return;
+		} else {
+			lm = prev.getOverflow();
+			this.prev = null;
+		}
+		if (lm == null)
 			lm = style.getLeftMargin();
 		this.curr = new NewLine(styles, lm, width);
 		this.lines.add(curr);
-		if (!curr.accepts(token))
+		if (curr.accepts(token) == null)
 			throw new CantHappenException("new line refused to accept token");
 	}
 

@@ -85,7 +85,7 @@ public class DocStyleCatalog extends FontCatalog {
 
 		catalog.put("grammar",
 				new CompoundStyle(this,
-					create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setLeftMargin(192f).setFirstMargin(0f).build(),
+					create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setLeftMargin(160f).setFirstMargin(0f).build(),
 					defaultStyle
 			));
 

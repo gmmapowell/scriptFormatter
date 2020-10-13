@@ -99,6 +99,11 @@ public class DocState extends CurrentState {
 		// I can see it derailing us in other situations.
 		switchToFlow("main");
 	}
+
+	public void deletePara() {
+		currSection.paras.remove(currPara);
+		endPara();
+	}
 	
 	public void newSpan(List<String> formats) {
 		if (currPara == null) {

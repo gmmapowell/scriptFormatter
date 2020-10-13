@@ -12,11 +12,11 @@ import org.flasck.flas.grammar.SentenceProducer.UseNameForScoping;
 import org.flasck.flas.grammar.TokenDefinition.Matcher;
 import org.zinutils.exceptions.NotImplementedException;
 
-import com.gmmapowell.script.elements.SpanBlock;
+import com.gmmapowell.script.flow.NonBreakingSpace;
 
 public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	private final Production rule;
-	private SpanBlock block;
+	private Object block;
 	private List<String> dontShow = new ArrayList<String>();
 	private boolean justIndented;
 	private DocState state;
@@ -28,6 +28,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void execute() throws IOException {
+		block = "hello";
 		state.newPara("grammar");
 		state.newSpan("grammar-number");
 		state.text("(" + rule.number + ")");
@@ -35,6 +36,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		state.text(rule.name);
 		state.newSpan("grammar-op");
 		state.text("::=");
+		state.newSpan();
 		try {
 			rule.visit(this);
 			state.endPara();
@@ -53,10 +55,16 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	public void choices(OrProduction arg0, Object cxt, List<Definition> defns, List<Integer> probs, int arg3, boolean repeatVarName) {
 		defns.get(0).visit(this);
 		for (int i=1;i<defns.size();i++) {
+			block = "hello";
 			state.newPara("grammar");
 			state.newSpan("grammar-blank");
+			state.op(new NonBreakingSpace());
 			state.newSpan("grammar-op");
 			state.text("|");
+			state.newSpan();
+			defns.get(i).visit(this);
+			if (block == null)
+				state.deletePara();
 			block = null;
 		}
 	}
@@ -76,6 +84,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		state.newPara("grammar");
 		state.newSpan("grammar-op");
 		state.text(">>");
+		state.newSpan();
 		// always return true - this value is part of the SentenceProducer logic
 		return true;
 	}
@@ -94,15 +103,18 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	public void referTo(String prod, boolean resetToken) {
 		if (dontShow.contains(prod))
 			block = null;
-		else if (block != null)
-			state.text(" " + prod);
+		else if (block != null) {
+			state.op(new NonBreakingSpace());
+			state.text(prod);
+		}
 	}
 
 	@Override
 	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3, boolean repeatLast, boolean saveLast, String generator, boolean space) {
 		if (block != null) {
 			state.nestSpan("bold");
-			state.text(" " + token);
+			state.op(new NonBreakingSpace());
+			state.text(token);
 			state.popSpan();
 		}
 	}

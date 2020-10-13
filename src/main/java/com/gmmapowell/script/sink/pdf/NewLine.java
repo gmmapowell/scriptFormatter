@@ -22,19 +22,21 @@ public class NewLine {
 	private float xpos;
 	private List<Item> contents = new ArrayList<>();
 	private float minht = 0;
+	private boolean isNew;
 
 	public NewLine(StyleCatalog styles, float margin, float width) {
 		this.styles = styles;
 		this.xpos = margin;
 		this.width = width;
+		this.isNew = true;
 	}
 
-	public boolean accepts(StyledToken token) throws IOException {
+	public AcceptToken accepts(StyledToken token) throws IOException {
 		SpanItem si = token.it;
 		if (si instanceof ParaBreak)
 			throw new CantHappenException("we should not see this");
-		if (xpos == 0 && si instanceof BreakingSpace) // ignore leading spaces
-			return true;
+		if (isNew && si instanceof BreakingSpace) // ignore leading spaces
+			return new AcceptToken();
 		String bsname = token.styles.get(0);
 		Style baseStyle = styles.getOptional(bsname);
 		if (baseStyle == null)
@@ -46,14 +48,22 @@ public class NewLine {
 		minht = Math.max(minht, style.getLineSpacing());
 		BoundingBox bbox = si.bbox(font, sz);
 		float wid = Math.max(bbox.getWidth(), orZero(style.getWidth()));
-		if (xpos + wid > width)
-			return false;
+		if (xpos + wid > width) {
+			if (isNew)
+				System.out.println("line overflowed with " + token);
+			else
+				return null;
+		}
 		
 		if (si instanceof TextSpanItem)
 			contents.add(new Item(xpos, bbox, font, sz, ((TextSpanItem)si).text));
+		isNew = false;
 		xpos += wid;
 		
-		return true;
+		if (style.getOverflowNewLine() != null && style.getWidth() != null && bbox.getWidth() > style.getWidth())
+			return new AcceptToken(style.getOverflowNewLine());
+		
+		return new AcceptToken();
 	}
 
 	private float orZero(Float x) {
