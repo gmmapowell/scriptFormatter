@@ -29,8 +29,10 @@ public class SimplePageCompositor implements PageCompositor {
 
 	@Override
 	public void begin() throws IOException {
-		// unhack this - it should all come from pageStyle, I think
-		outlets.put("main", new Outlet(styles, currentPage, location));
+		PDRectangle inside = new PDRectangle(
+			location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getLowerLeftY() + pageStyle.getBottomMargin(),
+			location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	location.getHeight() - pageStyle.getBottomMargin() - pageStyle.getTopMargin());
+		outlets.put("main", new Outlet(styles, currentPage, inside));
 	}
 
 	@Override
