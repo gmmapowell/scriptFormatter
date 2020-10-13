@@ -7,25 +7,34 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Assembling {
 	private final StyleCatalog styles;
-	private final int lx;
-	private final int width;
+	private final float lx;
+	private final float width;
 	private final List<NewLine> lines = new ArrayList<NewLine>();
 	private NewLine curr;
+	private float before = 0;
+	private float after;
 
-	public Assembling(StyleCatalog styles, int lx, int rx) {
+	public Assembling(StyleCatalog styles, float before, float lx, float rx) {
 		this.styles = styles;
+		this.before = before;
 		this.lx = lx;
 		this.width = rx - lx;
-		this.curr = new NewLine(styles, width);
-		this.lines.add(curr);
 	}
 
 	public void token(StyledToken token) throws IOException {
-		if (curr.accepts(token))
+		if (curr == null) { // first token in a new para
+			String bsname = token.styles.get(0);
+			Style baseStyle = styles.getOptional(bsname);
+			if (baseStyle == null)
+				throw new RuntimeException("no style found for " + bsname);
+			this.before = Math.max(baseStyle.getBeforeBlock(), this.before);
+			this.after = baseStyle.getAfterBlock();
+		} else if (curr.accepts(token))
 			return;
 		this.curr = new NewLine(styles, width);
 		this.lines.add(curr);
@@ -33,11 +42,8 @@ public class Assembling {
 			throw new CantHappenException("new line refused to accept token");
 	}
 
-	// TODO: needs to deal with space above and below
-	// TODO: needs to know about prev and next paras (if any)
-	// (actually, I think needs to know about prev and leave memo for next)
 	public float height() {
-		float ret = 0;
+		float ret = this.before;
 		for (NewLine l : lines)
 			ret += l.height();
 		return ret;
@@ -45,9 +51,12 @@ public class Assembling {
 
 	public void shove(PDPageContentStream page, float ytop) throws IOException {
 		for (NewLine l : lines) {
-			l.shove(page, lx, ytop - l.height()); // should be baseline from top
+			l.shove(page, lx, ytop - before - l.baseline());
 			ytop -= l.height();
 		}
 	}
 
+	public float after() {
+		return after;
+	}
 }

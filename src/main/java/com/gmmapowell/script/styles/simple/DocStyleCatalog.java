@@ -24,7 +24,7 @@ public class DocStyleCatalog extends FontCatalog {
 			.setBeforeBlock(0)
 			.setJustification(Justification.LEFT)
 			.setLeftMargin(0f)
-			.setLineSpacing(14f)
+			.setLineSpacing(12f)
 			.setRightMargin(0f)
 			.setFont("courier")
 			.setFontSize(10.0f)

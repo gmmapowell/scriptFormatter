@@ -21,6 +21,7 @@ public class NewLine {
 	private final float width;
 	private float xpos;
 	private List<Item> contents = new ArrayList<>();
+	private float minht = 0;
 
 	public NewLine(StyleCatalog styles, float width) {
 		this.styles = styles;
@@ -40,6 +41,7 @@ public class NewLine {
 
 		PDFont font = baseStyle.getFont();
 		Float sz = baseStyle.getFontSize();
+		minht = Math.max(minht, baseStyle.getLineSpacing());
 		BoundingBox bbox = si.bbox(font, sz);
 		if (xpos + bbox.getWidth() > width)
 			return false;
@@ -51,11 +53,15 @@ public class NewLine {
 		return true;
 	}
 
-	public float height() {
+	public float baseline() {
 		float ret = 0;
 		for (Item i : contents)
 			ret = Math.max(ret, i.height());
 		return ret;
+	}
+
+	public float height() {
+		return Math.max(baseline(), minht);
 	}
 
 	public void shove(PDPageContentStream page, float x, float y) throws IOException {

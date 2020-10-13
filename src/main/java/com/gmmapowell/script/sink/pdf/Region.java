@@ -19,7 +19,7 @@ public class Region {
 	private int ytop;
 	private Assembling curr;
 	private StyledToken lastAccepted;
-	private boolean showBorder = true;
+	private boolean showBorder = false;
 
 	public Region(StyleCatalog styles, PDPageContentStream page, int lx, int ly, int rx, int uy) throws IOException {
 		this.styles = styles;
@@ -29,7 +29,7 @@ public class Region {
 		this.rx = rx;
 		this.uy = uy;
 		this.ytop = uy;
-		this.curr = new Assembling(styles, lx, rx);
+		this.curr = new Assembling(styles, 0, lx, rx);
 		if (showBorder) {
 			drawBorder();
 		}
@@ -49,7 +49,7 @@ public class Region {
 			if (ytop - curr.height() > ly) {
 				curr.shove(page, ytop);
 				ytop -= curr.height();
-				curr = new Assembling(styles, lx, rx);
+				curr = new Assembling(styles, curr.after(), lx, rx);
 				lastAccepted = token;
 				System.out.println("    ---- accepted: " + lastAccepted.location());
 				return new Acceptance(Acceptability.PROCESSED, token);
