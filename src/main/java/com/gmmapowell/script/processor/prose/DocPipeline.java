@@ -55,7 +55,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 
 	@Override
 	protected void handleLine(DocState state, String s) throws IOException {
-		if (s.startsWith("@")) {
+		if (s.equals("$$")) {
+			state.blockquote = !state.blockquote;
+		} else if (s.startsWith("@")) {
 			// it's a block starting command
 			commitCurrentCommand();
 			state.cmd = new DocCommand(s.substring(1));
@@ -244,6 +246,8 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			ProcessingUtils.process(state, s);
 		}
+		if (state.blockquote)
+			state.endPara();
 	}
 	
 	@Override

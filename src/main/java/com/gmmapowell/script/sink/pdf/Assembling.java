@@ -36,9 +36,9 @@ public class Assembling {
 				Style baseStyle = styles.getOptional(bsname);
 				if (baseStyle == null)
 					throw new RuntimeException("no style found for " + bsname);
-				this.before = Math.max(baseStyle.getBeforeBlock(), this.before);
-				this.after = baseStyle.getAfterBlock();
 				style = baseStyle.apply(token.styles);
+				this.before = Math.max(style.getBeforeBlock(), this.before);
+				this.after = style.getAfterBlock();
 				lm = style.getFirstMargin();
 			} else if ((prev = curr.accepts(token)) != null)
 				return;

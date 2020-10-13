@@ -30,6 +30,7 @@ public class DocState extends CurrentState {
 	private Para currPara;
 	private HorizSpan currSpan;
 	public boolean wantNumbering;
+	public boolean blockquote;
 
 	public void reset(String file) {
 		this.file = file;
@@ -83,6 +84,8 @@ public class DocState extends CurrentState {
 			throw new CantHappenException("no current section");
 		}
 		currPara = new Para(formats);
+		if (blockquote)
+			currPara.formats.add("blockquote");
 		currSection.paras.add(currPara);
 		currSpan = null;
 	}

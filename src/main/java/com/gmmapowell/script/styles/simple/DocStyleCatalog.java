@@ -77,9 +77,13 @@ public class DocStyleCatalog extends FontCatalog {
 					defaultStyle
 			));
 
+		catalog.put("blockquote",
+			create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setBeforeBlock(0).setAfterBlock(0).build()
+		);
+
 		catalog.put("preformatted",
 				new CompoundStyle(this,
-					create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).build(),
+					create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setBeforeBlock(0).setAfterBlock(0).build(),
 					defaultStyle
 			));
 
