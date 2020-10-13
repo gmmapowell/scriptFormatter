@@ -23,8 +23,9 @@ public class NewLine {
 	private List<Item> contents = new ArrayList<>();
 	private float minht = 0;
 
-	public NewLine(StyleCatalog styles, float width) {
+	public NewLine(StyleCatalog styles, float margin, float width) {
 		this.styles = styles;
+		this.xpos = margin;
 		this.width = width;
 	}
 
@@ -44,14 +45,22 @@ public class NewLine {
 		Float sz = style.getFontSize();
 		minht = Math.max(minht, style.getLineSpacing());
 		BoundingBox bbox = si.bbox(font, sz);
-		if (xpos + bbox.getWidth() > width)
+		float wid = Math.max(bbox.getWidth(), orZero(style.getWidth()));
+		if (xpos + wid > width)
 			return false;
 		
 		if (si instanceof TextSpanItem)
 			contents.add(new Item(xpos, bbox, font, sz, ((TextSpanItem)si).text));
-		xpos += bbox.getWidth();
+		xpos += wid;
 		
 		return true;
+	}
+
+	private float orZero(Float x) {
+		if (x == null)
+			return 0;
+		else
+			return x;
 	}
 
 	public float baseline() {
