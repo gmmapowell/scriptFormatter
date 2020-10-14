@@ -71,4 +71,8 @@ public class Assembling {
 	public float after() {
 		return after;
 	}
+
+	public boolean wantYield() {
+		return false;
+	}
 }

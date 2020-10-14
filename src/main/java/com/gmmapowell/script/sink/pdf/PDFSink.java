@@ -4,12 +4,15 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.script.elements.Block;
 import com.gmmapowell.script.elements.Break;
@@ -17,9 +20,8 @@ import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.ReleaseFlow;
 import com.gmmapowell.script.flow.Section;
-import com.gmmapowell.script.flow.SyncAfterFlow;
-import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
@@ -75,7 +77,7 @@ public class PDFSink implements Sink {
 		}
 		int i=0;
 		Map<String, String> current = new TreeMap<>();
-		List<Cursor> sections = new ArrayList<>();
+		Set<Cursor> sections = new HashSet<>();
 		PageCompositor page = null;
 		boolean beginSection = false;
 		forever:
@@ -92,28 +94,33 @@ public class PDFSink implements Sink {
 			if (sections.isEmpty())
 				break forever;
 				
+			List<Suspension> suspended = new ArrayList<>();
 			while (!sections.isEmpty()) {
 				if (page == null) {
 					page = stock.getPage(current, beginSection);
 					page.begin();
 				}
 				beginSection = false;
-				List<Cursor> active = new ArrayList<>(sections);
+				Set<Cursor> active = new HashSet<>(sections);
+				whileActive:
 				while (!active.isEmpty()) {
-					List<Cursor> remove = new ArrayList<>();
-					flows:
 					for (Cursor c : active) { // try and populate each main section
 						while (true) {
 							StyledToken tok = c.next();
 							System.out.println(tok);
 							if (tok == null) {
 								sections.remove(c);
-								remove.add(c);
-								continue flows;
+								active.remove(c);
+								continue whileActive;
 							}
-							if (tok.it instanceof YieldToFlow || tok.it instanceof SyncAfterFlow) {
-								System.out.println("handle " + tok.it);
-								continue;
+							if (tok.it instanceof ReleaseFlow) {
+								Cursor en = findFlow(suspended, active, ((ReleaseFlow)tok.it).release());
+								if (en == c) {
+									throw new CantHappenException("can't enable the one you're suspending");
+								}
+								active.add(en);
+								sections.add(en);
+								continue whileActive;
 							}
 							Acceptance a = page.token(tok);
 							if (a == null) {
@@ -130,22 +137,46 @@ public class PDFSink implements Sink {
 								continue;
 							case NOROOM: // we are done; the outlet is full
 								c.backTo(a.lastAccepted);
-								remove.add(c);
-								continue flows;
+								active.remove(c);
+								continue whileActive;
 							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
-								break;
+								suspended.add(new Suspension(c, a.lastAccepted));
+								Cursor en = findFlow(suspended, active, a.enable());
+								if (en == c) {
+									throw new CantHappenException("can't enable the one you're suspending");
+								}
+								active.add(en);
+								sections.add(en);
+								active.remove(c);
+								sections.remove(c);
+								continue whileActive;
 							}
 						}
 					}
-					active.removeAll(remove);
 				}
 				boolean advanced = page.nextRegions();
 				if (!advanced) {
 					page = null;
 				}
 			}
+			if (!suspended.isEmpty())
+				throw new CantHappenException("suspended is not empty: " + suspended);
 		}
 		stock.close(output);
+	}
+
+	private Cursor findFlow(List<Suspension> suspended, Set<Cursor> active, String enable) {
+		for (Suspension susp : suspended) {
+			if (susp.isFlow(enable)) {
+				suspended.remove(susp);
+				return susp.cursor;
+			}
+		}
+		for (Cursor c : active) {
+			if (c.isFlow(enable))
+				return c;
+		}
+		throw new CantHappenException("could not enable flow " + enable + " because it did not exist");
 	}
 
 	@Override

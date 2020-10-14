@@ -24,16 +24,17 @@ public class Outlet {
 	}
 	
 	public Acceptance place(StyledToken token) throws IOException {
-		Acceptance ret = null;
 		while (currentRegion < regions.size()) {
-			ret = regions.get(currentRegion).place(token);
+			Acceptance ret = regions.get(currentRegion).place(token);
 			if (ret.status == Acceptability.NOROOM) {
 				if (nextRegion())
 					return new Acceptance(Acceptability.BACKUP, ret.lastAccepted);
 			}
 			return ret;
 		}
-		return ret;
+//		throw new CantHappenException("ran out of regions without returning noroom");
+		// This is wrong ...
+		return new Acceptance(Acceptability.NOROOM, token);
 	}
 
 	public boolean nextRegion() {

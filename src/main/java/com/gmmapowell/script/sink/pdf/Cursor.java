@@ -96,4 +96,12 @@ public class Cursor {
 			this.item.add(new AtomicInteger(item.get(i)));
 	}
 
+	public boolean isFlow(String enable) {
+		return this.flow.equals(enable);
+	}
+
+	@Override
+	public String toString() {
+		return "Cursor[" + flow + "]";
+	}
 }

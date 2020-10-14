@@ -11,6 +11,7 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.NestedSpan;
 import com.gmmapowell.script.flow.Para;
+import com.gmmapowell.script.flow.ReleaseFlow;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
@@ -31,6 +32,7 @@ public class DocState extends CurrentState {
 	private HorizSpan currSpan;
 	public boolean wantNumbering;
 	public boolean blockquote;
+	private Flow currFlow;
 
 	public void reset(String file) {
 		this.file = file;
@@ -56,26 +58,25 @@ public class DocState extends CurrentState {
 	}
 	
 	public void newSection(String flow, String format) {
-		Flow f = flows.get(flow);
-		if (f == null) {
+		currFlow = flows.get(flow);
+		if (currFlow == null) {
 			throw new CantHappenException("there is no flow " + flow);
 		}
 		currSection = new Section(format);
-		f.sections.add(currSection);
+		currFlow.sections.add(currSection);
 		currPara = null;
 		currSpan = null;
 	}
 	
 	public void switchToFlow(String flow) {
-		Flow f = flows.get(flow);
-		if (f == null) {
+		currFlow = flows.get(flow);
+		if (currFlow == null) {
 			throw new CantHappenException("there is no flow " + flow);
 		}
-		if (f.sections.isEmpty()) {
-			currSection = new Section(null);
-			f.sections.add(currSection);
+		if (currFlow.sections.isEmpty()) {
+			throw new CantHappenException("no sections for flow " + flow);
 		} else {
-			currSection = f.sections.get(f.sections.size()-1);
+			currSection = currFlow.sections.get(currFlow.sections.size()-1);
 		}
 	}
 	
@@ -95,12 +96,16 @@ public class DocState extends CurrentState {
 	}
 
 	public void endPara() {
-		endSpan();
-		currPara = null;
-		
 		// Hack? This is to get us back on track after footnotes, but it might be better to make that more explicit.
 		// I can see it derailing us in other situations.
-		switchToFlow("main");
+		if (!currFlow.name.equals("main")) {
+			newSpan();
+			op(new ReleaseFlow("main"));
+			switchToFlow("main");
+		}
+
+		endSpan();
+		currPara = null;
 	}
 
 	public void deletePara() {

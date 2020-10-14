@@ -12,6 +12,10 @@ public class SyncAfterFlow implements SpanItem {
 		this.flow = flow;
 	}
 
+	public String yieldTo() {
+		return flow;
+	}
+
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
 		return null;

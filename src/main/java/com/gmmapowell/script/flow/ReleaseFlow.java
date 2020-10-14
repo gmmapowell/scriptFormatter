@@ -5,14 +5,14 @@ import java.io.IOException;
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
-public class YieldToFlow implements SpanItem {
+public class ReleaseFlow implements SpanItem {
 	private final String flow;
 
-	public YieldToFlow(String flow) {
+	public ReleaseFlow(String flow) {
 		this.flow = flow;
 	}
 	
-	public String yieldTo() {
+	public String release() {
 		return flow;
 	}
 
@@ -23,6 +23,6 @@ public class YieldToFlow implements SpanItem {
 
 	@Override
 	public String toString() {
-		return "YTF[" + flow + "]";
+		return "RF[" + flow + "]";
 	}
 }

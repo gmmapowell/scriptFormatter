@@ -15,7 +15,7 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
-import com.gmmapowell.script.flow.SyncAfterFlow;
+import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Utils;
@@ -111,7 +111,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				state.switchToFlow("footnotes");
 				state.newPara("footnote");
 				state.newSpan("footnote-number");
-				state.op(new SyncAfterFlow("main"));
+				state.op(new YieldToFlow("main"));
 				state.text(Integer.toString(state.nextFootnoteText()) + " ");
 				break;
 			}
@@ -269,6 +269,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				} else {
 					state.wantNumbering = false;
 				}
+				state.newSection("footnotes", style);
 				state.newSection("main", style);
 				toc.chapter(title);
 				state.newPara("chapter-title");

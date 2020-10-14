@@ -10,7 +10,7 @@ import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.flow.BreakingSpace;
-import com.gmmapowell.script.flow.YieldToFlow;
+import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.processor.prose.CurrentState;
 import com.gmmapowell.script.processor.prose.DocState;
 
@@ -231,7 +231,7 @@ public class ProcessingUtils {
 			st.nestSpan("footnote-number");
 			st.text(Integer.toString(st.nextFootnoteMarker()));
 			st.popSpan();
-			st.op(new YieldToFlow("footnotes"));
+			st.op(new SyncAfterFlow("footnotes"));
 			break;
 		default:
 			throw new NotImplementedException("no such command: " + cmd);

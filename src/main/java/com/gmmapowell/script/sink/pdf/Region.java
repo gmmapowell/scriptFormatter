@@ -6,6 +6,8 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.script.flow.ParaBreak;
+import com.gmmapowell.script.flow.SyncAfterFlow;
+import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Region {
@@ -20,6 +22,7 @@ public class Region {
 	private Assembling curr;
 	private StyledToken lastAccepted;
 	private boolean showBorder = false;
+	private String wantYield = null;
 
 	public Region(StyleCatalog styles, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
@@ -50,17 +53,30 @@ public class Region {
 				curr.shove(page, ytop);
 				ytop -= curr.height();
 				curr = new Assembling(styles, curr.after(), lx, rx);
-				lastAccepted = token;
-				System.out.println("    ---- accepted: " + lastAccepted.location());
-				return new Acceptance(Acceptability.PROCESSED, token);
+				if (wantYield != null) {
+					System.out.println("    ---- yielded back to: " + (lastAccepted == null ? "beginning" : lastAccepted.location()));
+					Acceptance ret = new Acceptance(Acceptability.SUSPEND, lastAccepted).enableFlow(wantYield);
+					wantYield = null;
+					return ret;
+				} else {
+					lastAccepted = token;
+					System.out.println("    ---- accepted: " + lastAccepted.location());
+					return new Acceptance(Acceptability.PROCESSED, token);
+				}
 			} else {
 				if (lastAccepted == null)
 					throw new CantHappenException("no tokens were accepted onto the page at all");
 				System.out.println("    ---- last accepted was: " + lastAccepted.location());
 				return new Acceptance(Acceptability.NOROOM, lastAccepted);
 			}
+		} else if (token.it instanceof YieldToFlow) {
+			return new Acceptance(Acceptability.SUSPEND, token).enableFlow(((YieldToFlow)token.it).yieldTo());
 		} else {
-			curr.token(token);
+			if (token.it instanceof SyncAfterFlow) {
+				wantYield = ((SyncAfterFlow)token.it).yieldTo();
+			} else {
+				curr.token(token);
+			}
 			return new Acceptance(Acceptability.PENDING, lastAccepted);
 		}
 	}
