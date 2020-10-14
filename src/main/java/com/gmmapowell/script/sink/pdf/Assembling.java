@@ -57,6 +57,13 @@ public class Assembling {
 			throw new CantHappenException("new line refused to accept token");
 	}
 
+	public float require() {
+		float ret = this.before;
+		for (NewLine l : lines)
+			ret += l.require();
+		return ret;
+	}
+
 	public float height() {
 		float ret = this.before;
 		for (NewLine l : lines)

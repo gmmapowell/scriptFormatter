@@ -26,6 +26,7 @@ public class NewLine {
 	private float minht = 0;
 	private boolean isNew;
 	private PageStyle pageStyle;
+	private float requireBeyond = 0;
 
 	public NewLine(StyleCatalog styles, PageStyle pageStyle, float margin, float width) {
 		this.styles = styles;
@@ -50,6 +51,8 @@ public class NewLine {
 		PDFont font = style.getFont();
 		Float sz = style.getFontSize();
 		minht = Math.max(minht, style.getLineSpacing());
+		if (si instanceof Break)
+			requireBeyond = ((Break) si).require();
 		BoundingBox bbox = si.bbox(font, sz);
 		float wid = Math.max(bbox.getWidth(), orZero(style.getWidth()));
 		if (xpos + wid > width) {
@@ -90,6 +93,10 @@ public class NewLine {
 
 	public float height() {
 		return Math.max(baseline(), minht);
+	}
+
+	public float require() {
+		return Math.max(height(), requireBeyond);
 	}
 
 	public void shove(PDPageContentStream page, float x, float y) throws IOException {

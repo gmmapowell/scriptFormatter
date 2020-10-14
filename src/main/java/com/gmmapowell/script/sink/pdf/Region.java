@@ -52,7 +52,7 @@ public class Region {
 
 	public Acceptance place(StyledToken token) throws IOException {
 		if (token.it instanceof ParaBreak) {
-			if (ytop - curr.height() > ly) {
+			if (ytop - curr.require() > ly) {
 				curr.shove(page, ytop);
 				ytop -= curr.height();
 				curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
