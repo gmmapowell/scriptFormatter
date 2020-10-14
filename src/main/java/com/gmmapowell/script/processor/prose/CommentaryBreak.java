@@ -24,17 +24,17 @@ public class CommentaryBreak implements Break, SpanItem {
 
 	@Override
 	public float top() {
-		return 20;
-	}
-
-	@Override
-	public float textY() {
 		return 40;
 	}
 
 	@Override
+	public float textY() {
+		return 20;
+	}
+
+	@Override
 	public float bottom() {
-		return 52;
+		return 8;
 	}
 
 	@Override
@@ -74,6 +74,6 @@ public class CommentaryBreak implements Break, SpanItem {
 
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
-		return new BoundingBox(0, 0, 200, 200);
+		return new BoundingBox(0, 0, 200, 60);
 	}
 }

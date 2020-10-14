@@ -306,7 +306,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			case "Commentary": {
 				state.endSpan();
-				state.newPara("text");
+				state.newPara("break");
 				state.newSpan();
 				state.op(new CommentaryBreak());
 				state.endPara();

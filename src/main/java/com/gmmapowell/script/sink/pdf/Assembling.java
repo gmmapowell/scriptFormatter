@@ -7,11 +7,13 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Assembling {
 	private final StyleCatalog styles;
+	private PageStyle pageStyle;
 	private final float lx;
 	private final float width;
 	private final List<NewLine> lines = new ArrayList<NewLine>();
@@ -21,8 +23,9 @@ public class Assembling {
 	private Style style;
 	private AcceptToken prev = null;
 
-	public Assembling(StyleCatalog styles, float before, float lx, float rx) {
+	public Assembling(StyleCatalog styles, PageStyle pageStyle, float before, float lx, float rx) {
 		this.styles = styles;
+		this.pageStyle = pageStyle;
 		this.before = before;
 		this.lx = lx;
 		this.width = rx - lx;
@@ -48,7 +51,7 @@ public class Assembling {
 		}
 		if (lm == null)
 			lm = style.getLeftMargin();
-		this.curr = new NewLine(styles, lm, width);
+		this.curr = new NewLine(styles, pageStyle, lm, width);
 		this.lines.add(curr);
 		if (curr.accepts(token) == null)
 			throw new CantHappenException("new line refused to accept token");

@@ -32,7 +32,7 @@ public class SimplePageCompositor implements PageCompositor {
 		PDRectangle inside = new PDRectangle(
 			location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getLowerLeftY() + pageStyle.getBottomMargin(),
 			location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	location.getHeight() - pageStyle.getBottomMargin() - pageStyle.getTopMargin());
-		outlets.put("main", new Outlet(styles, currentPage, inside));
+		outlets.put("main", new Outlet(styles, pageStyle, currentPage, inside));
 		outlets.put("footnotes", outlets.get("main").borrowFrom());
 	}
 

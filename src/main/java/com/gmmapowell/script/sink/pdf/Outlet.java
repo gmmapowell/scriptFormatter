@@ -8,18 +8,19 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Outlet {
 	private final List<Region> regions = new ArrayList<>();
 	private int currentRegion = 0;
 	
-	public Outlet(StyleCatalog styles, PDPageContentStream page, PDRectangle location) throws IOException {
+	public Outlet(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, PDRectangle location) throws IOException {
 		if (page == null)
 			throw new CantHappenException("page must be non-null");
 		// stop hacking this
 		// numbers are in pts
-		regions.add(new Region(styles, page, location.getLowerLeftX(), location.getLowerLeftY(), location.getUpperRightX(), location.getUpperRightY()));
+		regions.add(new Region(styles, pageStyle, page, location.getLowerLeftX(), location.getLowerLeftY(), location.getUpperRightX(), location.getUpperRightY()));
 //		regions.add(new Region(styles, page, 355, 35, 635, 540));
 	}
 	

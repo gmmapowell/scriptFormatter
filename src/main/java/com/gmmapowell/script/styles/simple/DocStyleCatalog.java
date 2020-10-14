@@ -59,6 +59,12 @@ public class DocStyleCatalog extends FontCatalog {
 				defaultStyle
 		));
 
+		catalog.put("break",
+				new CompoundStyle(this,
+					create().setFont("palatino").setFontSize(14f).setBeforeBlock(6).setAfterBlock(6).build(),
+					defaultStyle
+			));
+
 		catalog.put("refComment",
 				new CompoundStyle(this,
 					create().setFont("palatino").setFontSize(9f).setLeftMargin(36).setRightMargin(24).setBeforeBlock(6).setAfterBlock(6).build(),

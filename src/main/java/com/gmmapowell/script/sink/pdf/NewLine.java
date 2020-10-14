@@ -9,10 +9,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
 
@@ -23,9 +25,11 @@ public class NewLine {
 	private List<Item> contents = new ArrayList<>();
 	private float minht = 0;
 	private boolean isNew;
+	private PageStyle pageStyle;
 
-	public NewLine(StyleCatalog styles, float margin, float width) {
+	public NewLine(StyleCatalog styles, PageStyle pageStyle, float margin, float width) {
 		this.styles = styles;
+		this.pageStyle = pageStyle;
 		this.xpos = margin;
 		this.width = width;
 		this.isNew = true;
@@ -59,8 +63,8 @@ public class NewLine {
 			bbox.setLowerLeftY(bbox.getLowerLeftY()+addy);
 		}
 		
-		if (si instanceof TextSpanItem)
-			contents.add(new Item(xpos, bbox, font, sz, ((TextSpanItem)si).text));
+		if (si instanceof TextSpanItem || si instanceof Break)
+			contents.add(new Item(pageStyle, xpos, bbox, font, sz, si));
 		isNew = false;
 		xpos += wid;
 		
