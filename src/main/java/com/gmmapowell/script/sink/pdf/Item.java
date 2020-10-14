@@ -29,7 +29,7 @@ public class Item {
 		page.beginText();
 		try {
 			page.setFont(font, fontsz);
-			page.newLineAtOffset(x+xpos, y);
+			page.newLineAtOffset(x+xpos + bbox.getLowerLeftX(), y + bbox.getLowerLeftY());
 			page.showText(text);
 		} catch (IllegalArgumentException ex) {
 			ex.printStackTrace(System.out);

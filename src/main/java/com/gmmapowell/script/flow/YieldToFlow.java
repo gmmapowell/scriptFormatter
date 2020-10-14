@@ -6,15 +6,19 @@ import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 public class YieldToFlow implements SpanItem {
+	private final String flow;
 
 	public YieldToFlow(String flow) {
-		// TODO Auto-generated constructor stub
+		this.flow = flow;
 	}
 
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return "YTF[" + flow + "]";
+	}
 }

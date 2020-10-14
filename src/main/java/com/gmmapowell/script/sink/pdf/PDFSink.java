@@ -87,61 +87,61 @@ public class PDFSink implements Sink {
 					sections.add(new Cursor(f.name, si));
 					beginSection = true;
 				}
-				i++;
-				if (sections.isEmpty())
-					break forever;
+			}
+			i++;
+			if (sections.isEmpty())
+				break forever;
 				
-				while (!sections.isEmpty()) {
-					if (page == null) {
-						page = stock.getPage(current, beginSection);
-						page.begin();
-					}
-					beginSection = false;
-					List<Cursor> active = new ArrayList<>(sections);
-					while (!active.isEmpty()) {
-						List<Cursor> remove = new ArrayList<>();
-						flows:
-						for (Cursor c : active) { // try and populate each main section
-							while (true) {
-								StyledToken tok = c.next();
-								System.out.println(tok);
-								if (tok == null) {
-									sections.remove(c);
-									remove.add(c);
-									continue flows;
-								}
-								if (tok.it instanceof YieldToFlow || tok.it instanceof SyncAfterFlow) {
-									System.out.println("handle " + tok.it);
-									continue;
-								}
-								Acceptance a = page.token(tok);
-								if (a == null) {
-									System.out.println("---- a == null, for " + tok);
-									continue;
-								}
-								switch (a.status) {
-								case PENDING: // it thinks it may accept it but it may end up having to reject it
-									break;
-								case PROCESSED: // it has taken it and fully processed it
-									break;
-								case BACKUP: // we are being asked to try again, probably new region
-									c.backTo(a.lastAccepted);
-									continue;
-								case NOROOM: // we are done; the outlet is full
-									c.backTo(a.lastAccepted);
-									remove.add(c);
-									continue flows;
-								case SUSPEND: // we cannot proceed until we have seen something from elsewhere
-									break;
-								}
+			while (!sections.isEmpty()) {
+				if (page == null) {
+					page = stock.getPage(current, beginSection);
+					page.begin();
+				}
+				beginSection = false;
+				List<Cursor> active = new ArrayList<>(sections);
+				while (!active.isEmpty()) {
+					List<Cursor> remove = new ArrayList<>();
+					flows:
+					for (Cursor c : active) { // try and populate each main section
+						while (true) {
+							StyledToken tok = c.next();
+							System.out.println(tok);
+							if (tok == null) {
+								sections.remove(c);
+								remove.add(c);
+								continue flows;
+							}
+							if (tok.it instanceof YieldToFlow || tok.it instanceof SyncAfterFlow) {
+								System.out.println("handle " + tok.it);
+								continue;
+							}
+							Acceptance a = page.token(tok);
+							if (a == null) {
+								System.out.println("---- a == null, for " + tok);
+								continue;
+							}
+							switch (a.status) {
+							case PENDING: // it thinks it may accept it but it may end up having to reject it
+								break;
+							case PROCESSED: // it has taken it and fully processed it
+								break;
+							case BACKUP: // we are being asked to try again, probably new region
+								c.backTo(a.lastAccepted);
+								continue;
+							case NOROOM: // we are done; the outlet is full
+								c.backTo(a.lastAccepted);
+								remove.add(c);
+								continue flows;
+							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
+								break;
 							}
 						}
-						active.removeAll(remove);
 					}
-					boolean advanced = page.nextRegions();
-					if (!advanced) {
-						page = null;
-					}
+					active.removeAll(remove);
+				}
+				boolean advanced = page.nextRegions();
+				if (!advanced) {
+					page = null;
 				}
 			}
 		}

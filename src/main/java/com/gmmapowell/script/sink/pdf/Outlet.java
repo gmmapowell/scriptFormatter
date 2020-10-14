@@ -39,4 +39,8 @@ public class Outlet {
 	public boolean nextRegion() {
 		return ++currentRegion < regions.size();
 	}
+
+	public Outlet borrowFrom() {
+		return this;
+	}
 }

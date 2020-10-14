@@ -228,6 +228,9 @@ public class ProcessingUtils {
 		// handle commands that started with &
 		switch (cmd) {
 		case "footnote":
+			st.nestSpan("footnote-number");
+			st.text(Integer.toString(st.nextFootnoteMarker()));
+			st.popSpan();
 			st.op(new YieldToFlow("footnotes"));
 			break;
 		default:

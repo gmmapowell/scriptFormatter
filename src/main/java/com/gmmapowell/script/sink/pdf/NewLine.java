@@ -54,6 +54,10 @@ public class NewLine {
 			else
 				return null;
 		}
+		if (style.getBaselineAdjust() != null) {
+			Float addy = style.getBaselineAdjust();
+			bbox.setLowerLeftY(bbox.getLowerLeftY()+addy);
+		}
 		
 		if (si instanceof TextSpanItem)
 			contents.add(new Item(xpos, bbox, font, sz, ((TextSpanItem)si).text));

@@ -44,7 +44,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		toc = new TableOfContents(tocfile);
 		state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
 		state.flows.put("main", new Flow("main", true));
-		state.flows.put("footnotes", new Flow("footnotes", false));
+		state.flows.put("footnotes", new Flow("footnotes", true));
 		state.flows.put("footer", new Flow("footer", false)); // needs to be a "callback" flow
 	}
 	
