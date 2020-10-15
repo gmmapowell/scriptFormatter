@@ -19,7 +19,7 @@ public class DefaultPageStyle implements PageStyle {
 
 	@Override
 	public Float getTopMargin() {
-		return 72f;
+		return 60f;
 	}
 
 	@Override
@@ -37,6 +37,11 @@ public class DefaultPageStyle implements PageStyle {
 		return 72f;
 	}
 	
+	@Override
+	public boolean wantHeader() {
+		return true;
+	}
+
 	@Override
 	public boolean wantPageNumbers() {
 		return true;

@@ -15,5 +15,6 @@ public interface PageStyle {
 	float pageNumberBaselineY();
 	PDFont getPageNumberFont();
 	float getPageNumberFontSize();
+	boolean wantHeader();
 
 }

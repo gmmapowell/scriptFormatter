@@ -7,13 +7,13 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
-
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Outlet {
 	protected final List<Region> regions = new ArrayList<>();
 	protected int currentRegion = 0;
+	private HFCallback callback;
 	
 	public Outlet(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, PDRectangle location) throws IOException {
 		if (page == null)
@@ -22,6 +22,11 @@ public class Outlet {
 	}
 	
 	protected Outlet() {
+	}
+
+	public Outlet bindCallback(HFCallback callback) {
+		this.callback = callback;
+		return this;
 	}
 	
 	public Acceptance place(StyledToken token) throws IOException {
@@ -37,6 +42,8 @@ public class Outlet {
 	}
 
 	public boolean nextRegion() throws IOException {
+		if (callback != null)
+			callback.populate(regions.get(currentRegion));
 		return ++currentRegion < regions.size();
 	}
 

@@ -46,7 +46,7 @@ public class BifoldReam extends CommonReam implements Ream {
 				stream = streams.get(blksize-mod-1);
 			}
 		} while (pageNo++ % 2 == 1 && left == null);
-		SimplePageCompositor ret = new SimplePageCompositor(styles, stream, new PDRectangle((mod+1)%2*swid, 0, swid, ht), mod%2 == 1 ? left : right);
+		SimplePageCompositor ret = new SimplePageCompositor(this, styles, stream, new PDRectangle((mod+1)%2*swid, 0, swid, ht), mod%2 == 1 ? left : right);
 		return ret;
 	}
 	

@@ -10,6 +10,7 @@ public interface Ream {
 
 	void newDocument(StyleCatalog styles) throws IOException;
 	PageCompositor newPage(PageStyle left, PageStyle right) throws IOException;
+	String currentPageNo();
 	void close(File output) throws IOException;
 
 }

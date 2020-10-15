@@ -27,7 +27,7 @@ public class SingleReam extends CommonReam implements Ream {
 		PDPage page = new PDPage(size);
 		doc.addPage(page);
 		stream = new PDPageContentStream(doc, page);
-		SimplePageCompositor ret = new SimplePageCompositor(styles, stream, new PDRectangle(0, 0, wid, ht), right);
+		SimplePageCompositor ret = new SimplePageCompositor(this, styles, stream, new PDRectangle(0, 0, wid, ht), right);
 		pageNo++;
 		return ret;
 	}

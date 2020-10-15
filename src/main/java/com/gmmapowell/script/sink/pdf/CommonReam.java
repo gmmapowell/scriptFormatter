@@ -21,6 +21,11 @@ public abstract class CommonReam implements Ream {
 		loadFonts();
 	}
 
+	@Override
+	public String currentPageNo() {
+		return Integer.toString(pageNo);
+	}
+	
 	public void loadFonts() throws IOException {
 		styles.font("monospace", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
 		styles.font("monospace-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceBold.ttf")));
