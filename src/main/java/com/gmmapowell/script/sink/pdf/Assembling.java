@@ -22,7 +22,7 @@ public class Assembling {
 	private float after;
 	private Style style;
 	private AcceptToken prev = null;
-	private Float requireAfter;
+	private float requireAfter;
 
 	public Assembling(StyleCatalog styles, PageStyle pageStyle, float before, float lx, float rx) {
 		this.styles = styles;

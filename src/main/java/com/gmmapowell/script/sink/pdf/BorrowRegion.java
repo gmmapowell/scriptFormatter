@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.zinutils.exceptions.CantHappenException;
+
 public class BorrowRegion extends Region {
 	private final Region parent;
 	private final List<Assembling> saved = new ArrayList<>();
@@ -32,7 +34,11 @@ public class BorrowRegion extends Region {
 
 	@Override
 	protected Acceptance checkAcceptedSomething() {
-		return parent.checkAcceptedSomething();
+		if (lastAccepted == null && parent.lastAccepted == null)
+			throw new CantHappenException("no tokens were accepted onto the page at all");
+		System.out.println("    ---- last accepted was: " + (lastAccepted == null ? " none here" : lastAccepted.location()));
+		parent.rejected = true;
+		return new Acceptance(Acceptability.NOROOM, lastAccepted);
 	}
 
 	public void flush() throws IOException {

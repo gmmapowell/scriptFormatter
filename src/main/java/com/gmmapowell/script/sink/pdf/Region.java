@@ -23,9 +23,10 @@ public class Region {
 	protected final boolean showBorder = false;
 
 	protected float ytop;
-	protected Assembling curr;
+	protected Assembling curr, pending;
 	protected StyledToken lastAccepted;
 	protected String wantYield = null;
+	protected boolean rejected;
 
 	public Region(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
@@ -52,16 +53,27 @@ public class Region {
 	}
 
 	public Acceptance place(StyledToken token) throws IOException {
+		if (rejected) {
+			return new Acceptance(Acceptability.NOROOM, lastAccepted);
+		}
+		if (pending != null) {
+			ytop += pending.height();
+			storeCurr();
+			pending = null;
+			curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
+		}
 		if (token.it instanceof ParaBreak) {
 			if (currFits()) {
-				storeCurr();
-				curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 				if (wantYield != null) {
-					System.out.println("    ---- yielded back to: " + (lastAccepted == null ? "beginning" : lastAccepted.location()));
+					pending = curr;
+					ytop -= curr.height(); // claim the space for now ...
+					System.out.println("    ---- yielded back to: " + wantYield + " from " + (lastAccepted == null ? "beginning" : lastAccepted.location()));
 					Acceptance ret = new Acceptance(Acceptability.SUSPEND, lastAccepted).enableFlow(wantYield);
 					wantYield = null;
 					return ret;
 				} else {
+					storeCurr();
+					curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 					lastAccepted = token;
 					System.out.println("    ---- accepted: " + lastAccepted.location());
 					return new Acceptance(Acceptability.PROCESSED, token);
@@ -81,6 +93,12 @@ public class Region {
 		}
 	}
 
+
+	protected void storeCurr() throws IOException {
+		curr.shove(page, ytop);
+		ytop -= curr.height();
+	}
+
 	protected boolean currFits() {
 		return ytop - curr.require() > ly;
 	}
@@ -90,11 +108,6 @@ public class Region {
 			throw new CantHappenException("no tokens were accepted onto the page at all");
 		System.out.println("    ---- last accepted was: " + lastAccepted.location());
 		return new Acceptance(Acceptability.NOROOM, lastAccepted);
-	}
-
-	protected void storeCurr() throws IOException {
-		curr.shove(page, ytop);
-		ytop -= curr.height();
 	}
 
 	public Region borrowFrom() throws IOException {

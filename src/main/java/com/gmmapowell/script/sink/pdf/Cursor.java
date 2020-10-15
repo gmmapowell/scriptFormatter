@@ -1,6 +1,7 @@
 package com.gmmapowell.script.sink.pdf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -85,7 +86,10 @@ public class Cursor implements Comparable<Cursor> {
 	}
 
 	public void backTo(StyledToken lastAccepted) {
-		lastAccepted.resetMe(this);
+		if (lastAccepted == null)
+			resetTo(0, 0, Arrays.asList(0));
+		else
+			lastAccepted.resetMe(this);
 	}
 
 	public void resetTo(int para, int span, List<Integer> item) {
