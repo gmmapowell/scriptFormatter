@@ -22,6 +22,7 @@ public class Assembling {
 	private float after;
 	private Style style;
 	private AcceptToken prev = null;
+	private Float requireAfter;
 
 	public Assembling(StyleCatalog styles, PageStyle pageStyle, float before, float lx, float rx) {
 		this.styles = styles;
@@ -42,6 +43,7 @@ public class Assembling {
 				style = baseStyle.apply(token.styles);
 				this.before = Math.max(style.getBeforeBlock(), this.before);
 				this.after = style.getAfterBlock();
+				this.requireAfter = style.getRequireAfter();
 				lm = style.getFirstMargin();
 			} else if ((prev = curr.accepts(token)) != null)
 				return;
@@ -58,7 +60,7 @@ public class Assembling {
 	}
 
 	public float require() {
-		float ret = this.before;
+		float ret = this.before + this.requireAfter;
 		for (NewLine l : lines)
 			ret += l.require();
 		return ret;
