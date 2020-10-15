@@ -12,19 +12,20 @@ import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Region {
-	private final StyleCatalog styles;
-	private final PageStyle pageStyle;
-	private final PDPageContentStream page;
-	private final float lx;
-	private final float ly;
-	private final float rx;
-	private final float uy;
+	protected final StyleCatalog styles;
+	protected final PageStyle pageStyle;
+	protected final PDPageContentStream page;
+	protected final float lx;
+	protected float ly;
+	protected final float rx;
+	protected final float uy;
 
-	private float ytop;
-	private Assembling curr;
-	private StyledToken lastAccepted;
-	private boolean showBorder = false;
-	private String wantYield = null;
+	protected final boolean showBorder = false;
+
+	protected float ytop;
+	protected Assembling curr;
+	protected StyledToken lastAccepted;
+	protected String wantYield = null;
 
 	public Region(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
@@ -52,9 +53,8 @@ public class Region {
 
 	public Acceptance place(StyledToken token) throws IOException {
 		if (token.it instanceof ParaBreak) {
-			if (ytop - curr.require() > ly) {
-				curr.shove(page, ytop);
-				ytop -= curr.height();
+			if (currFits()) {
+				storeCurr();
 				curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 				if (wantYield != null) {
 					System.out.println("    ---- yielded back to: " + (lastAccepted == null ? "beginning" : lastAccepted.location()));
@@ -67,10 +67,7 @@ public class Region {
 					return new Acceptance(Acceptability.PROCESSED, token);
 				}
 			} else {
-				if (lastAccepted == null)
-					throw new CantHappenException("no tokens were accepted onto the page at all");
-				System.out.println("    ---- last accepted was: " + lastAccepted.location());
-				return new Acceptance(Acceptability.NOROOM, lastAccepted);
+				return checkAcceptedSomething();
 			}
 		} else if (token.it instanceof YieldToFlow) {
 			return new Acceptance(Acceptability.SUSPEND, token).enableFlow(((YieldToFlow)token.it).yieldTo());
@@ -82,6 +79,26 @@ public class Region {
 			}
 			return new Acceptance(Acceptability.PENDING, lastAccepted);
 		}
+	}
+
+	protected boolean currFits() {
+		return ytop - curr.require() > ly;
+	}
+
+	protected Acceptance checkAcceptedSomething() {
+		if (lastAccepted == null)
+			throw new CantHappenException("no tokens were accepted onto the page at all");
+		System.out.println("    ---- last accepted was: " + lastAccepted.location());
+		return new Acceptance(Acceptability.NOROOM, lastAccepted);
+	}
+
+	protected void storeCurr() throws IOException {
+		curr.shove(page, ytop);
+		ytop -= curr.height();
+	}
+
+	public Region borrowFrom() throws IOException {
+		return new BorrowRegion(this);
 	}
 
 }

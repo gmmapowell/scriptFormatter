@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -77,7 +78,7 @@ public class PDFSink implements Sink {
 		}
 		int i=0;
 		Map<String, String> current = new TreeMap<>();
-		Set<Cursor> sections = new HashSet<>();
+		Set<Cursor> sections = new TreeSet<>();
 		PageCompositor page = null;
 		boolean beginSection = false;
 		forever:
@@ -101,7 +102,7 @@ public class PDFSink implements Sink {
 					page.begin();
 				}
 				beginSection = false;
-				Set<Cursor> active = new HashSet<>(sections);
+				Set<Cursor> active = new TreeSet<>(sections);
 				whileActive:
 				while (!active.isEmpty()) {
 					for (Cursor c : active) { // try and populate each main section
@@ -114,7 +115,7 @@ public class PDFSink implements Sink {
 								continue whileActive;
 							}
 							if (tok.it instanceof ReleaseFlow) {
-								Cursor en = findFlow(suspended, active, ((ReleaseFlow)tok.it).release());
+								Cursor en = findFlow(suspended, sections, ((ReleaseFlow)tok.it).release());
 								if (en == c) {
 									throw new CantHappenException("can't enable the one you're suspending");
 								}
@@ -141,7 +142,7 @@ public class PDFSink implements Sink {
 								continue whileActive;
 							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
 								suspended.add(new Suspension(c, a.lastAccepted));
-								Cursor en = findFlow(suspended, active, a.enable());
+								Cursor en = findFlow(suspended, sections, a.enable());
 								if (en == c) {
 									throw new CantHappenException("can't enable the one you're suspending");
 								}
@@ -165,14 +166,14 @@ public class PDFSink implements Sink {
 		stock.close(output);
 	}
 
-	private Cursor findFlow(List<Suspension> suspended, Set<Cursor> active, String enable) {
+	private Cursor findFlow(List<Suspension> suspended, Set<Cursor> sections, String enable) {
 		for (Suspension susp : suspended) {
 			if (susp.isFlow(enable)) {
 				suspended.remove(susp);
 				return susp.cursor;
 			}
 		}
-		for (Cursor c : active) {
+		for (Cursor c : sections) {
 			if (c.isFlow(enable))
 				return c;
 		}

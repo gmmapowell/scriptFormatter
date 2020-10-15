@@ -12,16 +12,16 @@ import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Outlet {
-	private final List<Region> regions = new ArrayList<>();
-	private int currentRegion = 0;
+	protected final List<Region> regions = new ArrayList<>();
+	protected int currentRegion = 0;
 	
 	public Outlet(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, PDRectangle location) throws IOException {
 		if (page == null)
 			throw new CantHappenException("page must be non-null");
-		// stop hacking this
-		// numbers are in pts
 		regions.add(new Region(styles, pageStyle, page, location.getLowerLeftX(), location.getLowerLeftY(), location.getUpperRightX(), location.getUpperRightY()));
-//		regions.add(new Region(styles, page, 355, 35, 635, 540));
+	}
+	
+	protected Outlet() {
 	}
 	
 	public Acceptance place(StyledToken token) throws IOException {
@@ -33,16 +33,14 @@ public class Outlet {
 			}
 			return ret;
 		}
-//		throw new CantHappenException("ran out of regions without returning noroom");
-		// This is wrong ...
-		return new Acceptance(Acceptability.NOROOM, token);
+		throw new CantHappenException("ran out of regions without returning noroom");
 	}
 
-	public boolean nextRegion() {
+	public boolean nextRegion() throws IOException {
 		return ++currentRegion < regions.size();
 	}
 
-	public Outlet borrowFrom() {
-		return this;
+	public Outlet borrowFrom() throws IOException {
+		return new BorrowOutlet(this);
 	}
 }

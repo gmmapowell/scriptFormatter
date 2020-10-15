@@ -11,7 +11,7 @@ import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 
-public class Cursor {
+public class Cursor implements Comparable<Cursor> {
 	private final String flow;
 	private final Section si;
 	private int para;
@@ -98,6 +98,11 @@ public class Cursor {
 
 	public boolean isFlow(String enable) {
 		return this.flow.equals(enable);
+	}
+
+	@Override
+	public int compareTo(Cursor o) {
+		return flow.compareTo(o.flow);
 	}
 
 	@Override

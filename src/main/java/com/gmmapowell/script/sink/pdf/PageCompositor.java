@@ -6,5 +6,5 @@ public interface PageCompositor {
 	void begin() throws IOException;
 
 	Acceptance token(StyledToken next) throws IOException;
-	boolean nextRegions();
+	boolean nextRegions() throws IOException;
 }

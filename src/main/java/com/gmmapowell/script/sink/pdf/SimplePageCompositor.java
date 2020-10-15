@@ -46,7 +46,7 @@ public class SimplePageCompositor implements PageCompositor {
 	}
 
 	@Override
-	public boolean nextRegions() {
+	public boolean nextRegions() throws IOException {
 		boolean ret = true;
 		for (Outlet o : outlets.values()) {
 			ret &= o.nextRegion();

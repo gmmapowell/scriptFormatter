@@ -16,4 +16,9 @@ public class Flow {
 	public boolean isMain() {
 		return main;
 	}
+	
+	@Override
+	public String toString() {
+		return "Flow[" + name + (main?"*":"") + "]";
+	}
 }
