@@ -9,13 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.zinutils.exceptions.InvalidUsageException;
+
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.sink.pdf.BifoldReam;
 import com.gmmapowell.script.sink.pdf.DoubleReam;
 import com.gmmapowell.script.sink.pdf.PaperStock;
+import com.gmmapowell.script.sink.pdf.Ream;
+import com.gmmapowell.script.sink.pdf.SingleReam;
 import com.gmmapowell.script.styles.page.FirstBookPageStyle;
 import com.gmmapowell.script.styles.page.LeftBookPageStyle;
 import com.gmmapowell.script.styles.page.RightBookPageStyle;
@@ -24,11 +29,30 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected final Sink sink;
 	protected final ElementFactory ef;
 	protected final boolean debug;
+	private final String ream;
+	private final float width, height;
+	private final int blksize;
 
 	public ProsePipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		this.ef = ef;
 		this.sink = sink;
 		this.debug = debug;
+		if (options.containsKey("ream")) {
+			this.ream  = options.remove("ream");
+		} else
+			this.ream = "single";
+		if (options.containsKey("width")) {
+			this.width  = dim(options.remove("width"));
+		} else
+			this.width = dim("210mm");
+		if (options.containsKey("height")) {
+			this.height  = dim(options.remove("height"));
+		} else
+			this.height = dim("297mm");
+		if (options.containsKey("blksize")) {
+			this.blksize  = Integer.parseInt(options.remove("blksize"));
+		} else
+			this.blksize = 32;
 	}
 	
 	@Override
@@ -68,8 +92,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			fileDone();
 		}
 		done();
-		// TODO: this needs to be configured
-		sink.render(new PaperStock(new DoubleReam(5.5f*72, 8.5f*72), null, new FirstBookPageStyle(), new LeftBookPageStyle(), new RightBookPageStyle()));
+		sink.render(new PaperStock(makeReam(), null, new FirstBookPageStyle(), new LeftBookPageStyle(), new RightBookPageStyle()));
 		sink.close();
 	}
 
@@ -148,5 +171,37 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected void assertArgsDone(StringBuilder args) {
 		if (args.toString().trim().length() > 0)
 			throw new RuntimeException("command had junk at end: " + args);
+	}
+
+	private float dim(String value) {
+		if (value == null || value.length() < 3)
+			throw new InvalidUsageException("value must have units");
+		String units = value.substring(value.length()-2);
+		float n = Float.parseFloat(value.substring(0, value.length()-2));
+		switch (units) {
+		case "pt":
+			return n;
+		case "in":
+			return n*72;
+		case "mm":
+			return n*72/25.4f;
+		case "cm":
+			return n*72/2.54f;
+		default:
+			throw new InvalidUsageException("do not understand unit " + units + ": try pt, in, mm, cm");
+		}
+	}
+
+	private Ream makeReam() {
+		switch (ream) {
+		case "single":
+			return new SingleReam(width, height);
+		case "double":
+			return new DoubleReam(width, height);
+		case "bifold":
+			return new BifoldReam(blksize, width, height);
+		default:
+			throw new InvalidUsageException("there is no ream " + ream);
+		}
 	}
 }
