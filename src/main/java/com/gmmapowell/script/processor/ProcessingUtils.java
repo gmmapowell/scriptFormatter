@@ -137,7 +137,7 @@ public class ProcessingUtils {
 		st.endSpan();
 	}
 
-	private static void processPart(DocState st, String tx, int i, int to) {
+	public static void processPart(DocState st, String tx, int i, int to) {
 		int from = i;
 		for (;i<to;i++) {
 			int q;
@@ -227,12 +227,17 @@ public class ProcessingUtils {
 	private static void processCommand(DocState st, String cmd) {
 		// handle commands that started with &
 		switch (cmd) {
-		case "footnote":
+		case "footnote": {
 			st.nestSpan("footnote-number");
 			st.text(Integer.toString(st.nextFootnoteMarker()));
 			st.popSpan();
 			st.op(new SyncAfterFlow("footnotes"));
 			break;
+		}
+		case "sp": {
+			st.text(" ");
+			break;
+		}
 		default:
 			throw new NotImplementedException("no such command: " + cmd);
 		}

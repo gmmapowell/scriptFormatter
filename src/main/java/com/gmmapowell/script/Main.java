@@ -17,7 +17,7 @@ public class Main {
 		try {
 			ret = format(cfg);
 		} catch (Throwable t) {
-			t.printStackTrace();
+			t.printStackTrace(System.out);
 		} finally {
 			System.exit(ret);
 		}

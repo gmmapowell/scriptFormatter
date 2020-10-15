@@ -27,6 +27,7 @@ public class Region {
 	protected StyledToken lastAccepted;
 	protected String wantYield = null;
 	protected boolean rejected;
+	private StyledToken pendingAccept;
 
 	public Region(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
@@ -54,20 +55,25 @@ public class Region {
 
 	public Acceptance place(StyledToken token) throws IOException {
 		if (rejected) {
+			System.out.println("already rejected from " + lastAccepted.flow + " " + lastAccepted.location());
 			return new Acceptance(Acceptability.NOROOM, lastAccepted);
 		}
 		if (pending != null) {
+			System.out.println("flushing pending item from before suspension");
 			ytop += pending.height();
 			storeCurr();
+			lastAccepted = pendingAccept;
 			pending = null;
+			pendingAccept = null;
 			curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 		}
 		if (token.it instanceof ParaBreak) {
 			if (currFits()) {
 				if (wantYield != null) {
 					pending = curr;
+					pendingAccept = token;
 					ytop -= curr.height(); // claim the space for now ...
-					System.out.println("    ---- yielded back to: " + wantYield + " from " + (lastAccepted == null ? "beginning" : lastAccepted.location()));
+					System.out.println("    ---- yielded back to: " + wantYield + " from " + (lastAccepted == null ? "beginning" : lastAccepted.flow + " " + lastAccepted.location()));
 					Acceptance ret = new Acceptance(Acceptability.SUSPEND, lastAccepted).enableFlow(wantYield);
 					wantYield = null;
 					return ret;
@@ -75,7 +81,7 @@ public class Region {
 					storeCurr();
 					curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 					lastAccepted = token;
-					System.out.println("    ---- accepted: " + lastAccepted.location());
+					System.out.println("    ---- accepted: " + token.flow + " " + token.location());
 					return new Acceptance(Acceptability.PROCESSED, token);
 				}
 			} else {

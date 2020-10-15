@@ -81,6 +81,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			}
 			switch (cmd) {
 			case "tt": {
+				if (!state.inPara())
+					state.newPara();
+				if (!state.inSpan())
+					state.newSpan();
 				state.nestSpan("preformatted");
 				state.text(args.toString());
 				state.popSpan();
@@ -89,8 +93,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			case "link": {
 				String lk = readString(state, args);
 				String tx = readString(state, args);
+				if (!state.inSpan())
+					state.newSpan();
 				state.nestSpan("link");
-				ProcessingUtils.process(state, tx);
+				ProcessingUtils.processPart(state, tx, 0, tx.length());
 				state.popSpan();
 				// TODO: would something here be better as an operator?
 				state.nestSpan("endlink");

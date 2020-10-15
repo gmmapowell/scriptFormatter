@@ -14,7 +14,7 @@ public class BookPageStyle extends DefaultPageStyle {
 
 	@Override
 	public Float getTopMargin() {
-		return 72f;
+		return 52f;
 	}
 
 	@Override

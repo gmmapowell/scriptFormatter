@@ -37,7 +37,7 @@ public class SimplePageCompositor implements PageCompositor {
 	public void begin() throws IOException {
 		// TODO: pageStyle needs to become more complicated to handle all this properly...
 		PDRectangle header = new PDRectangle(
-			location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getUpperRightY() - 52f,
+			location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getUpperRightY() - 42f,
 			location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	20f
 		);
 		if (pageStyle.wantHeader()) {
