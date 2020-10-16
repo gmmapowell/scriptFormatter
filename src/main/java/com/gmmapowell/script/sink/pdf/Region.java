@@ -2,6 +2,7 @@ package com.gmmapowell.script.sink.pdf;
 
 import java.io.IOException;
 
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
@@ -14,6 +15,7 @@ import com.gmmapowell.script.styles.StyleCatalog;
 public class Region {
 	protected final StyleCatalog styles;
 	protected final PageStyle pageStyle;
+	protected final PDPage meta;
 	protected final PDPageContentStream page;
 	protected final float lx;
 	protected float ly;
@@ -29,9 +31,10 @@ public class Region {
 	protected boolean rejected;
 	private StyledToken pendingAccept;
 
-	public Region(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
+	public Region(StyleCatalog styles, PageStyle pageStyle, PDPage meta, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
 		this.pageStyle = pageStyle;
+		this.meta = meta;
 		this.page = page;
 		this.lx = lx;
 		this.ly = ly;
@@ -55,11 +58,9 @@ public class Region {
 
 	public Acceptance place(StyledToken token) throws IOException {
 		if (rejected) {
-			System.out.println("already rejected from " + lastAccepted.flow + " " + lastAccepted.location());
 			return new Acceptance(Acceptability.NOROOM, lastAccepted);
 		}
 		if (pending != null) {
-			System.out.println("flushing pending item from before suspension");
 			ytop += pending.height();
 			storeCurr();
 			lastAccepted = pendingAccept;
@@ -73,7 +74,7 @@ public class Region {
 					pending = curr;
 					pendingAccept = token;
 					ytop -= curr.height(); // claim the space for now ...
-					System.out.println("    ---- yielded back to: " + wantYield + " from " + (lastAccepted == null ? "beginning" : lastAccepted.flow + " " + lastAccepted.location()));
+//					System.out.println("    ---- yielded back to: " + wantYield + " from " + (lastAccepted == null ? "beginning" : lastAccepted.flow + " " + lastAccepted.location()));
 					Acceptance ret = new Acceptance(Acceptability.SUSPEND, lastAccepted).enableFlow(wantYield);
 					wantYield = null;
 					return ret;
@@ -81,7 +82,7 @@ public class Region {
 					storeCurr();
 					curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 					lastAccepted = token;
-					System.out.println("    ---- accepted: " + token.flow + " " + token.location());
+//					System.out.println("    ---- accepted: " + token.flow + " " + token.location());
 					return new Acceptance(Acceptability.PROCESSED, token);
 				}
 			} else {
@@ -101,7 +102,7 @@ public class Region {
 
 
 	protected void storeCurr() throws IOException {
-		curr.shove(page, ytop);
+		curr.shove(meta, page, ytop);
 		ytop -= curr.height();
 	}
 
@@ -112,7 +113,7 @@ public class Region {
 	protected Acceptance checkAcceptedSomething() {
 		if (lastAccepted == null)
 			throw new CantHappenException("no tokens were accepted onto the page at all");
-		System.out.println("    ---- last accepted was: " + lastAccepted.location());
+//		System.out.println("    ---- last accepted was: " + lastAccepted.location());
 		return new Acceptance(Acceptability.NOROOM, lastAccepted);
 	}
 

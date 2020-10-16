@@ -13,6 +13,7 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
@@ -44,12 +45,12 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	
 	@Override
 	protected DocState begin(Map<String, Flow> flows, String file) {
-		if (flows.isEmpty()) {
+		if (state == null) {
+			this.state = new DocState(flows);
 			state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
 			state.flows.put("main", new Flow("main", true));
 			state.flows.put("footnotes", new Flow("footnotes", true));
 			state.flows.put("footer", new Flow("footer", false)); // needs to be a "callback" flow
-			this.state = new DocState(flows);
 		}
 		state.reset(file);
 		return state;
@@ -96,11 +97,8 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String tx = readString(state, args);
 				if (!state.inSpan())
 					state.newSpan();
-				state.nestSpan("link");
-				ProcessingUtils.processPart(state, tx, 0, tx.length());
-				state.popSpan();
-				// TODO: would something here be better as an operator?
-				state.nestSpan("endlink");
+				state.nestSpan("tt");
+				state.op(new LinkOp(lk, tx));
 				state.popSpan();
 				break;
 			}

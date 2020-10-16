@@ -3,8 +3,6 @@ package com.gmmapowell.script.sink;
 import java.io.IOException;
 import java.util.List;
 
-import com.gmmapowell.script.elements.Block;
-import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.pdf.Stock;
 
@@ -25,19 +23,6 @@ public class MultiSink implements Sink {
 	public void render(Stock stock) throws IOException {
 		for (Sink s : sinks)
 			s.render(stock);
-	}
-
-	@Override
-	public void block(Block block) throws IOException {
-		for (Sink s : sinks)
-			s.block(block);
-	}
-
-	@Override
-	public void brk(Break ad) throws IOException {
-		for (Sink s: sinks) {
-			s.brk(ad);
-		}
 	}
 
 	@Override

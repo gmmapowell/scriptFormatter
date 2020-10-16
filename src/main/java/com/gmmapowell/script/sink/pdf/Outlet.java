@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
@@ -15,10 +16,10 @@ public class Outlet {
 	protected int currentRegion = 0;
 	private HFCallback callback;
 	
-	public Outlet(StyleCatalog styles, PageStyle pageStyle, PDPageContentStream page, PDRectangle location) throws IOException {
+	public Outlet(StyleCatalog styles, PageStyle pageStyle, PDPage meta, PDPageContentStream page, PDRectangle location) throws IOException {
 		if (page == null)
 			throw new CantHappenException("page must be non-null");
-		regions.add(new Region(styles, pageStyle, page, location.getLowerLeftX(), location.getLowerLeftY(), location.getUpperRightX(), location.getUpperRightY()));
+		regions.add(new Region(styles, pageStyle, meta, page, location.getLowerLeftX(), location.getLowerLeftY(), location.getUpperRightX(), location.getUpperRightY()));
 	}
 	
 	protected Outlet() {

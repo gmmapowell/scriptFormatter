@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
@@ -73,9 +74,9 @@ public class Assembling {
 		return ret;
 	}
 
-	public void shove(PDPageContentStream page, float ytop) throws IOException {
+	public void shove(PDPage meta, PDPageContentStream page, float ytop) throws IOException {
 		for (NewLine l : lines) {
-			l.shove(page, lx, ytop - before - l.baseline());
+			l.shove(meta, page, lx, ytop - before - l.baseline());
 			ytop -= l.height();
 		}
 	}

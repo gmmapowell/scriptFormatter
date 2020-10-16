@@ -27,7 +27,6 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 	private final boolean debug;
 	private final BlockDispatcher handler;
 	private final Blocker blocker;
-	private final Sink sink;
 	private final ErrorResult errors = new ErrorResult();
 
 	public PresenterPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
@@ -38,7 +37,6 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 			imagedir = "";
 		else if (!imagedir.endsWith("/"))
 			imagedir += "/";
-		this.sink = sink;
 		handler = new BlockDispatcher(errors, this, imagedir);
 		this.blocker = new Blocker(errors, handler);
 	}
@@ -59,11 +57,6 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 				}
 			}
 			blocker.flush();
-//			try {
-//				sink.fileEnd();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
 		}
 		errors.showTo(new PrintWriter(System.out), 0);
 	}

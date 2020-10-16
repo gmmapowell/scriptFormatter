@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.fontbox.util.BoundingBox;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.zinutils.exceptions.CantHappenException;
@@ -12,6 +13,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
@@ -69,7 +71,7 @@ public class NewLine {
 			bbox.setLowerLeftY(bbox.getLowerLeftY()+addy);
 		}
 		
-		if (si instanceof TextSpanItem || si instanceof Break)
+		if (si instanceof TextSpanItem || si instanceof Break || si instanceof LinkOp)
 			contents.add(new Item(pageStyle, style, xpos, bbox, font, sz, si));
 		isNew = false;
 		xpos += wid;
@@ -102,7 +104,7 @@ public class NewLine {
 		return Math.max(height(), requireBeyond);
 	}
 
-	public void shove(PDPageContentStream page, float x, float y) throws IOException {
+	public void shove(PDPage meta, PDPageContentStream page, float x, float y) throws IOException {
 		switch (just) {
 		case LEFT:
 			break; // the default
@@ -116,7 +118,7 @@ public class NewLine {
 			throw new NotImplementedException();
 		}
 		for (Item i : contents) {
-			i.shove(page, x, y);
+			i.shove(meta, page, x, y);
 		}
 	}
 

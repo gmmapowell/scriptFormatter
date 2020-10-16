@@ -11,7 +11,7 @@ public class BorrowRegion extends Region {
 	private final List<Assembling> saved = new ArrayList<>();
 
 	public BorrowRegion(Region region) throws IOException {
-		super(region.styles, region.pageStyle, region.page, region.lx, region.ly, region.rx, region.uy);
+		super(region.styles, region.pageStyle, region.meta, region.page, region.lx, region.ly, region.rx, region.uy);
 		this.parent = region;
 		this.ytop = ly;
 	}
@@ -36,7 +36,7 @@ public class BorrowRegion extends Region {
 	protected Acceptance checkAcceptedSomething() {
 		if (lastAccepted == null && parent.lastAccepted == null)
 			throw new CantHappenException("no tokens were accepted onto the page at all");
-		System.out.println("    ---- last accepted was: " + (lastAccepted == null ? " none here" : lastAccepted.location()));
+//		System.out.println("    ---- last accepted was: " + (lastAccepted == null ? " none here" : lastAccepted.location()));
 		parent.rejected = true;
 		return new Acceptance(Acceptability.NOROOM, lastAccepted);
 	}
@@ -58,7 +58,7 @@ public class BorrowRegion extends Region {
 
 		ytop -= 7;
 		for (Assembling a : saved) {
-			a.shove(page, ytop);
+			a.shove(meta, page, ytop);
 			ytop -= a.height();
 		}
 	}

@@ -24,10 +24,10 @@ public class SingleReam extends CommonReam implements Ream {
 	public PageCompositor newPage(PageStyle left, PageStyle right) throws IOException {
 		if (stream != null)
 			stream.close();
-		PDPage page = new PDPage(size);
-		doc.addPage(page);
-		stream = new PDPageContentStream(doc, page);
-		SimplePageCompositor ret = new SimplePageCompositor(this, styles, stream, new PDRectangle(0, 0, wid, ht), right);
+		PDPage meta = new PDPage(size);
+		doc.addPage(meta);
+		stream = new PDPageContentStream(doc, meta);
+		SimplePageCompositor ret = new SimplePageCompositor(this, styles, meta, stream, new PDRectangle(0, 0, wid, ht), right);
 		pageNo++;
 		return ret;
 	}

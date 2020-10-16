@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
@@ -18,13 +19,15 @@ import com.gmmapowell.script.styles.StyleCatalog;
 public class SimplePageCompositor implements PageCompositor {
 	private final Ream ream;
 	private final StyleCatalog styles;
+	private final PDPage meta;
 	private final PDPageContentStream currentPage;
 	private final PDRectangle location;
 	private final PageStyle pageStyle;
 	private final Map<String, Outlet> outlets = new TreeMap<>();
 
-	public SimplePageCompositor(Ream ream, StyleCatalog styles, PDPageContentStream page, PDRectangle location, PageStyle style) {
+	public SimplePageCompositor(Ream ream, StyleCatalog styles, PDPage meta, PDPageContentStream page, PDRectangle location, PageStyle style) {
 		this.ream = ream;
+		this.meta = meta;
 		if (page == null)
 			throw new CantHappenException("page must be non-null");
 		this.styles = styles;
@@ -41,7 +44,7 @@ public class SimplePageCompositor implements PageCompositor {
 					location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getUpperRightY() - 42f,
 					location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	20f
 					);
-			outlets.put("header", new Outlet(styles, pageStyle, currentPage, header).bindCallback(new HFCallback() {
+			outlets.put("header", new Outlet(styles, pageStyle, meta, currentPage, header).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
 					r.place(new StyledToken("header", 0, 0, new ArrayList<>(), Arrays.asList("text"), new TextSpanItem("Page " + ream.currentPageNo())));
 					r.place(new StyledToken("header", 0, 0, new ArrayList<>(), Arrays.asList("text"), new ParaBreak()));
@@ -53,7 +56,7 @@ public class SimplePageCompositor implements PageCompositor {
 					location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getLowerLeftY() + 60f,
 					location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	20f
 					);
-			outlets.put("footer", new Outlet(styles, pageStyle, currentPage, footer).bindCallback(new HFCallback() {
+			outlets.put("footer", new Outlet(styles, pageStyle, meta, currentPage, footer).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
 					r.place(new StyledToken("footer", 0, 0, new ArrayList<>(), Arrays.asList("pageno"), new TextSpanItem("Page " + ream.currentPageNo())));
 					r.place(new StyledToken("footer", 0, 0, new ArrayList<>(), Arrays.asList("pageno"), new ParaBreak()));
@@ -65,7 +68,7 @@ public class SimplePageCompositor implements PageCompositor {
 			location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getLowerLeftY() + pageStyle.getBottomMargin(),
 			location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	location.getHeight() - pageStyle.getBottomMargin() - pageStyle.getTopMargin()
 		);
-		outlets.put("main", new Outlet(styles, pageStyle, currentPage, inside));
+		outlets.put("main", new Outlet(styles, pageStyle, meta, currentPage, inside));
 		outlets.put("footnotes", outlets.get("main").borrowFrom());
 	}
 

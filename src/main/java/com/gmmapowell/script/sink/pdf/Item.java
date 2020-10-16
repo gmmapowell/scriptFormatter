@@ -3,10 +3,16 @@ package com.gmmapowell.script.sink.pdf;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
 
 import com.gmmapowell.script.elements.Break;
+import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.styles.PageStyle;
@@ -35,11 +41,13 @@ public class Item {
 		return bbox.getHeight();
 	}
 
-	public void shove(PDPageContentStream page, float x, float y) throws IOException {
+	public void shove(PDPage meta, PDPageContentStream page, float x, float y) throws IOException {
 		if (si instanceof TextSpanItem)
 			showText(page, x, y, (TextSpanItem) si);
 		else if (si instanceof Break)
 			showBreak(page, x, y, (Break) si);
+		else if (si instanceof LinkOp)
+			showLink(meta, page, x, y, (LinkOp) si);
 		else
 			throw new RuntimeException("Cannot handle shoving a " + si.getClass());
 	}
@@ -91,4 +99,32 @@ public class Item {
 		}
 	}
 
+	private void showLink(PDPage meta, PDPageContentStream page, float x, float y, LinkOp lk) throws IOException {
+		page.beginText();
+		try {
+			page.setFont(font, fontsz);
+			page.newLineAtOffset(x+xpos + bbox.getLowerLeftX(), y + bbox.getLowerLeftY());
+			page.showText(lk.tx);
+		} catch (IllegalArgumentException ex) {
+			ex.printStackTrace(System.out);
+		} finally {
+			page.endText();
+		}
+		if (style.getUnderline()) {
+			page.moveTo(x, y-2f);
+			page.lineTo(x+bbox.getWidth(), y-2f);
+			page.stroke();
+		}
+		
+		PDAnnotationLink link = new PDAnnotationLink();
+		link.setRectangle(new PDRectangle(x + xpos + this.bbox.getLowerLeftX(), y + this.bbox.getLowerLeftY() - 2, this.bbox.getWidth(), this.bbox.getHeight()));
+		PDBorderStyleDictionary uline = new PDBorderStyleDictionary();
+		uline.setStyle(PDBorderStyleDictionary.STYLE_UNDERLINE);
+		link.setBorderStyle(uline);
+		PDActionURI action = new PDActionURI();
+		action.setURI(lk.lk);
+		link.setAction(action);
+		
+		meta.getAnnotations().add(link);
+	}
 }

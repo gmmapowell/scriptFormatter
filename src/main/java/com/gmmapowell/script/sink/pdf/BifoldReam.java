@@ -16,6 +16,7 @@ public class BifoldReam extends CommonReam implements Ream {
 	private final float swid;
 	private final float ht;
 	private final PDRectangle size;
+	private final List<PDPage> metas = new ArrayList<>();
 	private final List<PDPageContentStream> streams = new ArrayList<>();
 	
 	public BifoldReam(int blksize, float swid, float ht) {
@@ -29,6 +30,7 @@ public class BifoldReam extends CommonReam implements Ream {
 	
 	@Override
 	public PageCompositor newPage(PageStyle left, PageStyle right) throws IOException {
+		PDPage meta;
 		PDPageContentStream stream;
 		int mod;
 		do {
@@ -38,15 +40,17 @@ public class BifoldReam extends CommonReam implements Ream {
 				streams.clear();
 			}
 			if (mod < blksize/2) { // add new pages
-				PDPage page = new PDPage(size);
-				doc.addPage(page);
-				stream = new PDPageContentStream(doc, page);
+				meta = new PDPage(size);
+				metas.add(meta);
+				doc.addPage(meta);
+				stream = new PDPageContentStream(doc, meta);
 				streams.add(stream);
 			} else {
+				meta = metas.get(blksize-mod-1);
 				stream = streams.get(blksize-mod-1);
 			}
 		} while (pageNo++ % 2 == 1 && left == null);
-		SimplePageCompositor ret = new SimplePageCompositor(this, styles, stream, new PDRectangle((mod+1)%2*swid, 0, swid, ht), mod%2 == 1 ? left : right);
+		SimplePageCompositor ret = new SimplePageCompositor(this, styles, meta, stream, new PDRectangle((mod+1)%2*swid, 0, swid, ht), mod%2 == 1 ? left : right);
 		return ret;
 	}
 	

@@ -14,12 +14,6 @@ import java.util.List;
 
 import org.zinutils.exceptions.NotImplementedException;
 
-import com.gmmapowell.script.elements.Block;
-import com.gmmapowell.script.elements.Break;
-import com.gmmapowell.script.elements.Group;
-import com.gmmapowell.script.elements.Span;
-import com.gmmapowell.script.elements.block.HTMLSpan;
-import com.gmmapowell.script.elements.block.TextBlock;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
@@ -58,7 +52,6 @@ public class BloggerSink implements Sink {
 	private final File postsFile;
 	private final PostIndex index;
 	private PrintWriter writer;
-	private Mode mode = Mode.START;
 	private String blogId;
 	private Posts posts;
 	private StringWriter sw;
@@ -156,104 +149,6 @@ public class BloggerSink implements Sink {
 		return next;
 	}
 
-	@Override
-	public void block(Block block) throws IOException {
-		if (writeBlock(block))
-			writer.println("<br/>");
-	}
-
-	@Override
-	public void brk(Break ad) {
-	}
-
-	private boolean writeBlock(Block block) {
-		if (block instanceof TextBlock)
-			return writeTextBlock((TextBlock) block);
-		else if (block instanceof Group)
-			return writeGroup((Group)block);
-		else
-			throw new RuntimeException("What is " + block.getClass() + "?");
-	}
-
-	private boolean writeTextBlock(TextBlock block) {
-		boolean wantBr = true;
-		switch (block.getStyle()) {
-		case "text": {
-			if (mode == Mode.LIST)
-				writer.println("</ul>");
-			else if (mode == Mode.BLOCKQUOTE) {
-				writer.println("</span>");
-				writer.println("</blockquote>");
-			} else if (mode == Mode.NORMAL)
-				writer.println("<br/>");
-			mode = Mode.NORMAL;
-			break;
-		}
-		case "bullet": {
-			if (mode != Mode.LIST)
-				writer.println("<ul>");
-			mode = Mode.LIST;
-			writer.print("  <li>");
-			break;
-		}
-		case "blockquote": {
-			if (mode == Mode.LIST) {
-				writer.println("</ul>");
-			} else if (mode != Mode.BLOCKQUOTE) {
-				writer.println("<blockquote class='tr_bq'>");
-				writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small;'>");
-				mode = Mode.BLOCKQUOTE;
-			}
-			break;
-		}
-		default: {
-			if (mode == Mode.LIST)
-				writer.println("</ul>");
-			if (block.getStyle().startsWith("h")) {
-				wantBr = false;
-				writer.print("<" + block.getStyle() + ">");
-				mode = Mode.START;
-			} else {
-				System.out.println(block.getStyle());
-				mode = Mode.NORMAL;
-			}
-			break;
-		}
-		}
-		List<String> cf = new ArrayList<>();
-		for (Span s : block) {
-			boolean writeText = true;
-			List<String> styles = s.getStyles();
-			if (styles != null) {
-				drawDownTo(cf, styles.size());
-				for (int i=0;i<styles.size();i++) {
-					String sty = styles.get(i);
-					if (cf.size() > i && cf.get(i).equals(sty))
-						continue;
-					else if (cf.size() > i) {
-						drawDownTo(cf, i);
-					}
-					if ("link".equals(sty) || "endlink".equals(sty))
-						; // don't print these
-					else {
-						writer.print("<" + mapStyle(sty) + ">");
-						cf.add(sty);
-					}
-				}
-			}
-			if (writeText) {
-				if (s instanceof HTMLSpan)
-					writer.print(s.getText());
-				else
-					writer.print(entitify(s.getText()));
-			}
-		}
-		drawDownTo(cf, 0);
-		if (!wantBr)
-			writer.println("</" + block.getStyle() + ">");
-		return wantBr;
-	}
-
 	private String entitify(String text) {
 		StringBuilder sb = new StringBuilder(text);
 		int spaces = 0;
@@ -319,10 +214,6 @@ public class BloggerSink implements Sink {
 		default:
 			return sty;
 		}
-	}
-
-	private boolean writeGroup(Group block) {
-		return false;
 	}
 
 	public void upload(String title, String content) throws IOException {

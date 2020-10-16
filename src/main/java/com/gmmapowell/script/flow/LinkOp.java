@@ -6,7 +6,6 @@ import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 public class LinkOp implements SpanItem {
-
 	public final String lk;
 	public final String tx;
 
@@ -17,8 +16,12 @@ public class LinkOp implements SpanItem {
 
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		float width = 0;
+		try {
+			width = font.getStringWidth(tx)*sz/1000;
+		} catch (IllegalArgumentException ex) {
+		}
+		return new BoundingBox(0, 0, width, sz);
 	}
 
 }
