@@ -1,12 +1,15 @@
 package com.gmmapowell.script.sink.blogger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.zinutils.exceptions.NotImplementedException;
@@ -25,6 +28,7 @@ import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
 import com.gmmapowell.script.sink.pdf.Cursor;
 import com.gmmapowell.script.sink.pdf.Stock;
 import com.gmmapowell.script.sink.pdf.StyledToken;
@@ -41,6 +45,8 @@ import com.google.api.services.blogger.Blogger.Blogs;
 import com.google.api.services.blogger.Blogger.Posts;
 import com.google.api.services.blogger.BloggerScopes;
 import com.google.api.services.blogger.model.Blog;
+import com.google.api.services.blogger.model.Post;
+import com.google.api.services.blogger.model.PostList;
 
 public class BloggerSink implements Sink {
 	public enum Mode {
@@ -50,7 +56,7 @@ public class BloggerSink implements Sink {
 	private final File creds;
 	private final String blogUrl;
 	private final File postsFile;
-//	private final PostIndex index;
+	private final PostIndex index;
 	private PrintWriter writer;
 	private Mode mode = Mode.START;
 	private String blogId;
@@ -62,9 +68,9 @@ public class BloggerSink implements Sink {
 		this.creds = creds;
 		this.blogUrl = blogUrl;
 		this.postsFile = posts;
-//		index = readPosts();
-//		connect();
-//		readFromBlogger();
+		index = readPosts();
+		connect();
+		readFromBlogger();
 	}
 
 	@Override
@@ -73,9 +79,8 @@ public class BloggerSink implements Sink {
 	}
 
 	@Override
-	public void render(Stock stock) {
+	public void render(Stock stock) throws IOException {
 		for (Flow f : flows) {
-			System.out.println("Need to render " + f.name);
 			this.sw = new StringWriter();
 			writer = new PrintWriter(sw);
 			for (Section s : f.sections) {
@@ -84,7 +89,6 @@ public class BloggerSink implements Sink {
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
-					System.out.println(tok);
 					last = transition(cf, last, tok);
 					figureStyles(cf, tok.styles);
 					cf = new ArrayList<>(tok.styles);
@@ -114,8 +118,8 @@ public class BloggerSink implements Sink {
 				}
 				transition(cf, last, "text");
 			}
-			System.out.println("---- will need to upload " + f.name);
-			System.out.println(this.sw);
+			writer.close();
+			upload(f.name, this.sw.toString());
 		}
 	}
 
@@ -152,13 +156,6 @@ public class BloggerSink implements Sink {
 		return next;
 	}
 
-	//	@Override
-//	public void startFile(String file) throws IOException {
-//		this.file = file.replace(".txt", "");
-//		this.sw = new StringWriter();
-//		writer = new PrintWriter(sw);
-//	}
-//
 	@Override
 	public void block(Block block) throws IOException {
 		if (writeBlock(block))
@@ -304,19 +301,6 @@ public class BloggerSink implements Sink {
 					cf.add(sty);
 				}
 			}
-//			if (styles.size() == 1) {
-//				switch(styles.get(0)) {
-//				case "link": {
-//					writer.print("<a href='" + s.getText() + "'>");
-//					writeText = false;
-//					break;
-//				}
-//				case "endlink": {
-//					writer.print("</a>");
-//					break;
-//				}
-//				}
-//			}
 		}
 	}
 	
@@ -341,27 +325,8 @@ public class BloggerSink implements Sink {
 		return false;
 	}
 
-	/*
-	@Override
-	public void fileEnd() throws Exception {
-		switch (mode) {
-		case LIST:
-			writer.println("</ul>");
-			break;
-		case BLOCKQUOTE:
-			writer.println("</span>");
-			writer.println("</blockquote>");
-			break;
-		default:
-			break;
-		}
-		writer.close();
-
-		if (title == null) {
-			System.out.println("Cannot upload without a title");
-			return;
-		}
-		BlogEntry idx = findInPosts();
+	public void upload(String title, String content) throws IOException {
+		BlogEntry idx = findInPosts(title);
 		if (idx != null && idx.isLive)
 			return;
 		Post p = new Post();
@@ -380,31 +345,28 @@ public class BloggerSink implements Sink {
 			posts.update(blogId, idx.key, p).execute();
 		}
 	}
-	*/
 
 	@Override
 	public void showFinal() {
-		// TODO Auto-generated method stub
-
 	}
 	
 	@Override
 	public void upload() throws Exception {
 	}
 
-//	private PostIndex readPosts() throws IOException {
-//		PostIndex index = new PostIndex();
-//		try (FileReader fr = new FileReader(postsFile)) {
-//			index.readFrom(fr);
-//		} catch (FileNotFoundException ex) {
-//			System.out.println(postsFile + " not found; creating");
-//		}
-//		return index;
-//	}
-//
-//	private BlogEntry findInPosts() {
-//		return index.find(title);
-//	}
+	private PostIndex readPosts() throws IOException {
+		PostIndex index = new PostIndex();
+		try (FileReader fr = new FileReader(postsFile)) {
+			index.readFrom(fr);
+		} catch (FileNotFoundException ex) {
+			System.out.println(postsFile + " not found; creating");
+		}
+		return index;
+	}
+
+	private BlogEntry findInPosts(String title) {
+		return index.find(title);
+	}
 
 	private void connect() throws IOException, GeneralSecurityException {
 		Credential c = getCredential();
@@ -417,21 +379,21 @@ public class BloggerSink implements Sink {
 		posts = blogger.posts();
 	}
 	
-//	private void readFromBlogger() throws IOException, GeneralSecurityException {
-//		FileWriter fw = new FileWriter(postsFile, true);
-//		index.appendTo(fw);
-//
-//		String npt = null;
-//		while (true) {
-//			PostList list = posts.list(blogId).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
-//			for (Post e : list.getItems()) {
-//				index.have(e.getId(), e.getStatus(), e.getTitle());
-//			}
-//			npt = list.getNextPageToken();
-//			if (npt == null)
-//				break;
-//		}
-//	}
+	private void readFromBlogger() throws IOException, GeneralSecurityException {
+		FileWriter fw = new FileWriter(postsFile, true);
+		index.appendTo(fw);
+
+		String npt = null;
+		while (true) {
+			PostList list = posts.list(blogId).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
+			for (Post e : list.getItems()) {
+				index.have(e.getId(), e.getStatus(), e.getTitle());
+			}
+			npt = list.getNextPageToken();
+			if (npt == null)
+				break;
+		}
+	}
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));
