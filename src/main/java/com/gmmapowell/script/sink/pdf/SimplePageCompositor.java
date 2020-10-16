@@ -36,15 +36,27 @@ public class SimplePageCompositor implements PageCompositor {
 	@Override
 	public void begin() throws IOException {
 		// TODO: pageStyle needs to become more complicated to handle all this properly...
-		PDRectangle header = new PDRectangle(
-			location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getUpperRightY() - 42f,
-			location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	20f
-		);
 		if (pageStyle.wantHeader()) {
+			PDRectangle header = new PDRectangle(
+					location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getUpperRightY() - 42f,
+					location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	20f
+					);
 			outlets.put("header", new Outlet(styles, pageStyle, currentPage, header).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
 					r.place(new StyledToken("header", 0, 0, new ArrayList<>(), Arrays.asList("text"), new TextSpanItem("Page " + ream.currentPageNo())));
 					r.place(new StyledToken("header", 0, 0, new ArrayList<>(), Arrays.asList("text"), new ParaBreak()));
+				}
+			}));
+		}
+		if (pageStyle.wantFooter()) {
+			PDRectangle footer = new PDRectangle(
+					location.getLowerLeftX() + pageStyle.getLeftMargin(),							location.getLowerLeftY() + 60f,
+					location.getWidth() - pageStyle.getLeftMargin() - pageStyle.getRightMargin(),	20f
+					);
+			outlets.put("footer", new Outlet(styles, pageStyle, currentPage, footer).bindCallback(new HFCallback() {
+				public void populate(Region r) throws IOException {
+					r.place(new StyledToken("footer", 0, 0, new ArrayList<>(), Arrays.asList("pageno"), new TextSpanItem("Page " + ream.currentPageNo())));
+					r.place(new StyledToken("footer", 0, 0, new ArrayList<>(), Arrays.asList("pageno"), new ParaBreak()));
 				}
 			}));
 		}

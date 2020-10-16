@@ -8,12 +8,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.zinutils.exceptions.InvalidUsageException;
 
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.pdf.BifoldReam;
@@ -57,9 +59,9 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	
 	@Override
 	public void process(FilesToProcess files) throws IOException {
+		Map<String, Flow> flows = new TreeMap<>();
 		for (File x : files.included()) {
-			sink.title(x.getName().replace(".txt", ""));
-			T st = begin(x.getName());
+			T st = begin(flows, x.getName());
 			try (LineNumberReader lnr = new LineNumberReader(new FileReader(x))) {
 				String s;
 				while ((s = lnr.readLine()) != null) {
@@ -74,11 +76,10 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						}
 					} catch (Exception ex) {
 						System.out.println("Error encountered processing " + x + " before line " + lnr.getLineNumber());
-//						if (debug)
+						if (debug)
 							ex.printStackTrace(System.out);
-						// else
-//							System.out.println(ex.toString());
-						st.curr = null;
+						 else
+							System.out.println(ex.toString());
 					}
 				}
 			}
@@ -91,13 +92,15 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			}
 			fileDone();
 		}
+		for (Entry<String, Flow> e : flows.entrySet()) {
+			sink.flow(e.getValue());
+		}
 		done();
 		sink.render(new PaperStock(makeReam(), null, new FirstBookPageStyle(), new LeftBookPageStyle(), new RightBookPageStyle()));
-		sink.close();
 	}
 
 	protected abstract void commitCurrentCommand() throws IOException;
-	protected abstract T begin(String file);
+	protected abstract T begin(Map<String, Flow> flows, String file);
 	protected abstract void handleLine(T state, String s) throws IOException;
 	protected void fileDone() {}
 	protected void done() {}

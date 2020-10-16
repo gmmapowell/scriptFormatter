@@ -1,27 +1,33 @@
 package com.gmmapowell.script.sink.blogger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.gmmapowell.script.elements.Break;
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.script.elements.Block;
+import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.elements.Group;
 import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.block.HTMLSpan;
 import com.gmmapowell.script.elements.block.TextBlock;
+import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.ImageOp;
+import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.flow.ParaBreak;
+import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
+import com.gmmapowell.script.sink.pdf.Cursor;
 import com.gmmapowell.script.sink.pdf.Stock;
+import com.gmmapowell.script.sink.pdf.StyledToken;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -35,8 +41,6 @@ import com.google.api.services.blogger.Blogger.Blogs;
 import com.google.api.services.blogger.Blogger.Posts;
 import com.google.api.services.blogger.BloggerScopes;
 import com.google.api.services.blogger.model.Blog;
-import com.google.api.services.blogger.model.Post;
-import com.google.api.services.blogger.model.PostList;
 
 public class BloggerSink implements Sink {
 	public enum Mode {
@@ -46,42 +50,115 @@ public class BloggerSink implements Sink {
 	private final File creds;
 	private final String blogUrl;
 	private final File postsFile;
-	private final PostIndex index;
-	private String title;
+//	private final PostIndex index;
 	private PrintWriter writer;
 	private Mode mode = Mode.START;
 	private String blogId;
 	private Posts posts;
 	private StringWriter sw;
+	private List<Flow> flows = new ArrayList<>();
 
 	public BloggerSink(File root, File creds, String blogUrl, File posts) throws IOException, GeneralSecurityException {
 		this.creds = creds;
 		this.blogUrl = blogUrl;
 		this.postsFile = posts;
-		index = readPosts();
-		connect();
-		readFromBlogger();
+//		index = readPosts();
+//		connect();
+//		readFromBlogger();
 	}
 
 	@Override
 	public void flow(Flow flow) {
-		// TODO Auto-generated method stub
-		
+		flows.add(flow);
 	}
 
 	@Override
 	public void render(Stock stock) {
-		// TODO Auto-generated method stub
-		
+		for (Flow f : flows) {
+			System.out.println("Need to render " + f.name);
+			this.sw = new StringWriter();
+			writer = new PrintWriter(sw);
+			for (Section s : f.sections) {
+				Cursor c = new Cursor(f.name, s);
+				String last = "text";
+				List<String> cf = new ArrayList<>();
+				StyledToken tok;
+				while ((tok = c.next()) != null) {
+					System.out.println(tok);
+					last = transition(cf, last, tok);
+					figureStyles(cf, tok.styles);
+					cf = new ArrayList<>(tok.styles);
+					if (tok.it instanceof TextSpanItem)
+						writer.print(entitify(((TextSpanItem)tok.it).text));
+					else if (tok.it instanceof BreakingSpace)
+						writer.print(" ");
+					else if (tok.it instanceof ParaBreak) {
+						switch (last) {
+						case "bullet":
+							last = "needli";
+							break;
+						case "text":
+							writer.print("<br/>");
+							break;
+						}
+						writer.println();
+					} else if (tok.it instanceof ImageOp) {
+						writer.print("<img border='0' src=\'" + ((ImageOp)tok.it).uri + "' />");
+					} else if (tok.it instanceof LinkOp) {
+						LinkOp l = (LinkOp) tok.it;
+						writer.print("<a href='" + l.lk + "'>");
+						writer.print(l.tx);
+						writer.print("</a>");
+					} else
+						throw new NotImplementedException();
+				}
+				transition(cf, last, "text");
+			}
+			System.out.println("---- will need to upload " + f.name);
+			System.out.println(this.sw);
+		}
 	}
 
-	@Override
-	public void title(String title) throws IOException {
-		this.title = title;
-		this.sw = new StringWriter();
-		writer = new PrintWriter(sw);
+	private String transition(List<String> cf, String last, StyledToken tok) {
+		return transition(cf, last, tok.styles.get(0));
 	}
 
+	private String transition(List<String> cf, String last, String next) {
+		if (next.equals(last))
+			return last;
+
+		if (last.equals("blockquote")) {
+			writer.println("</span>");
+			writer.println("</blockquote>");
+		}
+		if (last.equals("needli") && !next.equals("bullet"))
+			writer.println("</ul>");
+		if (last.startsWith("h")) {
+			writer.println("</" + last + ">");
+		}
+		drawDownTo(cf, 1);
+		if (next.startsWith("h")) {
+			writer.print("<" + next + ">");
+		}
+		if (next.equals("bullet")) {
+			if (!last.equals("needli"))
+				writer.println("<ul>");
+			writer.print("<li>");
+		}
+		if (next.equals("blockquote")) {
+			writer.println("<blockquote class='tr_bq'>");
+			writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small;'>");
+		}
+		return next;
+	}
+
+	//	@Override
+//	public void startFile(String file) throws IOException {
+//		this.file = file.replace(".txt", "");
+//		this.sw = new StringWriter();
+//		writer = new PrintWriter(sw);
+//	}
+//
 	@Override
 	public void block(Block block) throws IOException {
 		if (writeBlock(block))
@@ -166,19 +243,6 @@ public class BloggerSink implements Sink {
 						cf.add(sty);
 					}
 				}
-				if (styles.size() == 1) {
-					switch(styles.get(0)) {
-					case "link": {
-						writer.print("<a href='" + s.getText() + "'>");
-						writeText = false;
-						break;
-					}
-					case "endlink": {
-						writer.print("</a>");
-						break;
-					}
-					}
-				}
 			}
 			if (writeText) {
 				if (s instanceof HTMLSpan)
@@ -223,6 +287,39 @@ public class BloggerSink implements Sink {
 		return sb.toString();
 	}
 
+	private void figureStyles(List<String> cf, List<String> styles) {
+		if (styles != null) {
+			drawDownTo(cf, styles.size());
+			for (int i=1;i<styles.size();i++) {
+				String sty = styles.get(i);
+				if (cf.size() > i && cf.get(i).equals(sty))
+					continue;
+				else if (cf.size() > i) {
+					drawDownTo(cf, i);
+				}
+				if ("link".equals(sty) || "endlink".equals(sty))
+					; // don't print these
+				else {
+					writer.print("<" + mapStyle(sty) + ">");
+					cf.add(sty);
+				}
+			}
+//			if (styles.size() == 1) {
+//				switch(styles.get(0)) {
+//				case "link": {
+//					writer.print("<a href='" + s.getText() + "'>");
+//					writeText = false;
+//					break;
+//				}
+//				case "endlink": {
+//					writer.print("</a>");
+//					break;
+//				}
+//				}
+//			}
+		}
+	}
+	
 	private void drawDownTo(List<String> cf, int to) {
 		while (cf.size() > to) {
 			writer.print("</" + mapStyle(cf.remove(cf.size()-1)) + ">");
@@ -244,6 +341,7 @@ public class BloggerSink implements Sink {
 		return false;
 	}
 
+	/*
 	@Override
 	public void fileEnd() throws Exception {
 		switch (mode) {
@@ -282,11 +380,7 @@ public class BloggerSink implements Sink {
 			posts.update(blogId, idx.key, p).execute();
 		}
 	}
-
-	@Override
-	public void close() throws IOException {
-		index.close();
-	}
+	*/
 
 	@Override
 	public void showFinal() {
@@ -298,19 +392,19 @@ public class BloggerSink implements Sink {
 	public void upload() throws Exception {
 	}
 
-	private PostIndex readPosts() throws IOException {
-		PostIndex index = new PostIndex();
-		try (FileReader fr = new FileReader(postsFile)) {
-			index.readFrom(fr);
-		} catch (FileNotFoundException ex) {
-			System.out.println(postsFile + " not found; creating");
-		}
-		return index;
-	}
-
-	private BlogEntry findInPosts() {
-		return index.find(title);
-	}
+//	private PostIndex readPosts() throws IOException {
+//		PostIndex index = new PostIndex();
+//		try (FileReader fr = new FileReader(postsFile)) {
+//			index.readFrom(fr);
+//		} catch (FileNotFoundException ex) {
+//			System.out.println(postsFile + " not found; creating");
+//		}
+//		return index;
+//	}
+//
+//	private BlogEntry findInPosts() {
+//		return index.find(title);
+//	}
 
 	private void connect() throws IOException, GeneralSecurityException {
 		Credential c = getCredential();
@@ -323,21 +417,21 @@ public class BloggerSink implements Sink {
 		posts = blogger.posts();
 	}
 	
-	private void readFromBlogger() throws IOException, GeneralSecurityException {
-		FileWriter fw = new FileWriter(postsFile, true);
-		index.appendTo(fw);
-
-		String npt = null;
-		while (true) {
-			PostList list = posts.list(blogId).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
-			for (Post e : list.getItems()) {
-				index.have(e.getId(), e.getStatus(), e.getTitle());
-			}
-			npt = list.getNextPageToken();
-			if (npt == null)
-				break;
-		}
-	}
+//	private void readFromBlogger() throws IOException, GeneralSecurityException {
+//		FileWriter fw = new FileWriter(postsFile, true);
+//		index.appendTo(fw);
+//
+//		String npt = null;
+//		while (true) {
+//			PostList list = posts.list(blogId).setStatus(Arrays.asList("draft", "live")).setPageToken(npt).execute();
+//			for (Post e : list.getItems()) {
+//				index.have(e.getId(), e.getStatus(), e.getTitle());
+//			}
+//			npt = list.getNextPageToken();
+//			if (npt == null)
+//				break;
+//		}
+//	}
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));

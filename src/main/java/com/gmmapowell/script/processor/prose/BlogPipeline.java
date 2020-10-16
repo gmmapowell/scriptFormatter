@@ -6,18 +6,27 @@ import java.util.Map;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
+import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.ImageOp;
+import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
 
 public class BlogPipeline extends ProsePipeline<BlogState> {
+	private BlogState state;
+
 	public BlogPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 	}
-
 	
 	@Override
-	protected BlogState begin(String file) {
-		return new BlogState(file);
+	protected BlogState begin(Map<String, Flow> flows, String file) {
+		file = file.replace(".txt", "");
+		state = new BlogState(flows, file);
+		state.flows.put(file, new Flow(file, true));
+		state.newSection(file, "blog");
+		return state;
 	}
 
 	@Override
@@ -25,26 +34,18 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 		if (s.equals("$$")) {
 			state.blockquote = !state.blockquote;
 		} else if (s.startsWith("+")) {
-			if (state.curr != null) {
-				sink.block(state.curr);
-			}
-			state.curr = ef.block(headingLevel(s));
-			ProcessingUtils.addSpans(ef, state, state.curr, s.substring(s.indexOf(" ")+1).trim());
+			state.newPara(headingLevel(s));
+			ProcessingUtils.process(state, s.substring(s.indexOf(" ")+1).trim());
 		} else if (s.startsWith("*")) {
-			if (state.curr != null) {
-				sink.block(state.curr);
-			}
-			state.curr = ef.block("bullet");
-			ProcessingUtils.addSpans(ef, state, state.curr, s.substring(s.indexOf(" ")+1).trim());
+			state.newPara("bullet");
+			ProcessingUtils.process(state, s.substring(s.indexOf(" ")+1).trim());
 		} else {
 			if (state.blockquote) {
-				if (state.curr != null)
-					sink.block(state.curr);
-				state.curr = ef.block("blockquote");
-				state.curr.addSpan(ef.span(null, s));
+				state.newPara("blockquote");
+				ProcessingUtils.process(state, s);
 				return;
-			} else if (state.curr == null) {
-				state.curr = ef.block("text");
+			} else if (!state.inPara()) {
+				state.newPara("text");
 			}
 			if (s.startsWith("&")) {
 				int idx = s.indexOf(" ");
@@ -59,50 +60,55 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				}
 				switch (cmd) {
 				case "bold":
-				case "italic": {
-					if (state.defaultSpans.isEmpty() || !state.defaultSpans.get(0).equals(cmd))
-						state.defaultSpans.add(0, cmd);
-					else
-						state.defaultSpans.remove(0);
+				case "italic":
+				case "tt": {
+					state.newPara("text", cmd);
+					ProcessingUtils.process(state, args.toString());
 					break;
 				}
 				case "link": {
 					String lk = readString(state, args);
 					String tx = readString(state, args);
-					state.curr.addSpan(ef.span("link", lk));
-					ProcessingUtils.addSpans(ef, state, state.curr, tx);
-					state.curr.addSpan(ef.span("endlink", ""));
+					
+					if (!state.inPara())
+						state.newPara("text");
+					if (!state.inSpan())
+						state.newSpan();
+					state.op(new LinkOp(lk, tx));
 					break;
 				}
 				case "sp": {
-					if (state.curr == null)
-						state.curr = ef.block("text");
-					state.curr.addSpan(ef.lspan(state.defaultSpans, " "));
-					ProcessingUtils.addSpans(ef, state, state.curr, args.toString().trim());
+					if (state.inSpan())
+						state.op(new BreakingSpace());
 					break;
 				}
 				case "img": {
+					state.newPara("text");
+					state.newSpan();
 					// Doing this properly may require another API (picker?)
 					// See: https://bloggerdev.narkive.com/SC3HJ3UM/upload-images-using-blogger-api
 					// For now, upload the image by hand and put the URL here
 					//  Obvs you can also use any absolute URL
 					String link = readString(state, args);
-					if (state.curr == null)
-						state.curr = ef.block("text");
-					state.curr.addSpan(ef.html("<img border='0' src=\'" + link + "' />"));
+					state.op(new ImageOp(link));
 					break;
 				}
 				default:
 					throw new RuntimeException(state.location() + " handle inline command: " + cmd);
 				}
 			} else {
-				ProcessingUtils.addSpans(ef, state, state.curr, s);
+				if (!state.inPara())
+					state.newPara("text");
+				ProcessingUtils.process(state, s);
 			}
 		}
 	}
 
 	@Override
 	protected void commitCurrentCommand() throws IOException {
+		if (state.inPara()) {
+			state.endPara();
+		}
 	}
 	
 	private String headingLevel(String s) {
@@ -110,5 +116,10 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 		while (s.length() > level && s.charAt(level) == '+')
 			level++;
 		return "h" + level;
+	}
+	
+	@Override
+	protected void done() {
+//		index.close();
 	}
 }

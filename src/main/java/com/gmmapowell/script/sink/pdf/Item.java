@@ -10,17 +10,20 @@ import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.styles.PageStyle;
+import com.gmmapowell.script.styles.Style;
 
 public class Item {
 	private final PageStyle pageStyle;
+	private final Style style;
 	private final float xpos;
 	private final BoundingBox bbox;
 	private final PDFont font;
 	private final Float fontsz;
 	private final SpanItem si;
 
-	public Item(PageStyle pageStyle, float xpos, BoundingBox bbox, PDFont font, Float fontsz, SpanItem si) {
+	public Item(PageStyle pageStyle, Style style, float xpos, BoundingBox bbox, PDFont font, Float fontsz, SpanItem si) {
 		this.pageStyle = pageStyle;
+		this.style = style;
 		this.xpos = xpos;
 		this.bbox = bbox;
 		this.font = font;
@@ -80,6 +83,11 @@ public class Item {
 			ex.printStackTrace(System.out);
 		} finally {
 			page.endText();
+		}
+		if (style.getUnderline()) {
+			page.moveTo(x, y-2f);
+			page.lineTo(x+bbox.getWidth(), y-2f);
+			page.stroke();
 		}
 	}
 

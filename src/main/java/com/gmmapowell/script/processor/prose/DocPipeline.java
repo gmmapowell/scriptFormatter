@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.Production;
 import org.zinutils.xml.XML;
@@ -21,7 +19,7 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Utils;
 
 public class DocPipeline extends ProsePipeline<DocState> {
-	private final DocState state = new DocState();
+	private DocState state;
 	private final List<File> samples = new ArrayList<>();
 	private final Grammar grammar;
 	private final TableOfContents toc;
@@ -42,14 +40,17 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		} else
 			this.grammar = null;
 		toc = new TableOfContents(tocfile);
-		state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
-		state.flows.put("main", new Flow("main", true));
-		state.flows.put("footnotes", new Flow("footnotes", true));
-		state.flows.put("footer", new Flow("footer", false)); // needs to be a "callback" flow
 	}
 	
 	@Override
-	protected DocState begin(String file) {
+	protected DocState begin(Map<String, Flow> flows, String file) {
+		if (flows.isEmpty()) {
+			state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
+			state.flows.put("main", new Flow("main", true));
+			state.flows.put("footnotes", new Flow("footnotes", true));
+			state.flows.put("footer", new Flow("footer", false)); // needs to be a "callback" flow
+			this.state = new DocState(flows);
+		}
 		state.reset(file);
 		return state;
 	}
@@ -351,9 +352,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	
 	@Override
 	protected void done() {
-		for (Entry<String, Flow> e : state.flows.entrySet()) {
-			sink.flow(e.getValue());
-		}
 		try {
 			toc.write();
 		} catch (Exception ex) {

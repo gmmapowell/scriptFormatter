@@ -39,7 +39,12 @@ public class DefaultPageStyle implements PageStyle {
 	
 	@Override
 	public boolean wantHeader() {
-		return true;
+		return false;
+	}
+
+	@Override
+	public boolean wantFooter() {
+		return false;
 	}
 
 	@Override

@@ -1,12 +1,21 @@
 package com.gmmapowell.script.elements.block;
 
+import java.io.IOException;
+
+import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.elements.Break;
+import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
-public class BoxyAdBreak implements Break {
+public class BoxyAdBreak implements Break, SpanItem {
+
+	@Override
+	public BoundingBox bbox(PDFont font, float sz) throws IOException {
+		return new BoundingBox(0, 0, 0, 60);
+	}
 
 	@Override
 	public String boxText() {
@@ -15,7 +24,7 @@ public class BoxyAdBreak implements Break {
 
 	@Override
 	public float require() {
-		return 0;
+		return 200;
 	}
 
 	@Override

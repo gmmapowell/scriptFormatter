@@ -180,10 +180,6 @@ public class PDFSink implements Sink {
 	}
 
 	@Override
-	public void title(String title) throws IOException {
-	}
-
-	@Override
 	public void block(Block block) throws IOException {
 		List<RenderInfo> ris = new ArrayList<>();
 		collectRI(ris, block);
@@ -399,18 +395,6 @@ public class PDFSink implements Sink {
 		} else {
 			y -= skip;
 		}
-	}
-
-	@Override
-	public void fileEnd() {
-		// no big deal
-	}
-
-	@Override
-	public void close() throws IOException {
-//		closeCurrentPage();
-//		doc.save(output);
-//		doc.close();
 	}
 
 	@Override

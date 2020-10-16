@@ -59,13 +59,12 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 				}
 			}
 			blocker.flush();
-			try {
-				sink.fileEnd();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+//			try {
+//				sink.fileEnd();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 		}
-		sink.close();
 		errors.showTo(new PrintWriter(System.out), 0);
 	}
 

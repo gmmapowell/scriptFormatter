@@ -15,16 +15,10 @@ public class PresenterSink implements Sink {
 
 	@Override
 	public void flow(Flow flow) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
 	public void render(Stock stock) {
-	}
-
-	@Override
-	public void title(String title) throws IOException {
 	}
 
 	@Override
@@ -33,14 +27,6 @@ public class PresenterSink implements Sink {
 
 	@Override
 	public void brk(Break ad) throws IOException {
-	}
-
-	@Override
-	public void fileEnd() throws Exception {
-	}
-
-	@Override
-	public void close() throws IOException {
 	}
 
 	@Override

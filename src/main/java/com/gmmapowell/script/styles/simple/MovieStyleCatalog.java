@@ -53,7 +53,7 @@ public class MovieStyleCatalog extends FontCatalog {
 
 		catalog.put("speaker",
 			new CompoundStyle(this,
-				create().setBeforeBlock(14f).setJustification(Justification.CENTER).build(),
+				create().setBeforeBlock(14f).setRequireAfter(60f).setJustification(Justification.CENTER).build(),
 				defaultStyle
 		));
 
@@ -68,6 +68,12 @@ public class MovieStyleCatalog extends FontCatalog {
 				create().setLeftMargin(72f).setRightMargin(72f).build(),
 				defaultStyle
 		));
+
+		catalog.put("pageno",
+				new CompoundStyle(this,
+					create().setJustification(Justification.CENTER).setFont("courier").build(),
+					defaultStyle
+			));
 
 		catalog.put("italic",
 				create().setItalic(true).build()

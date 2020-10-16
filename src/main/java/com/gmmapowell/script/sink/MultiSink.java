@@ -28,12 +28,6 @@ public class MultiSink implements Sink {
 	}
 
 	@Override
-	public void title(String title) throws IOException {
-		for (Sink s : sinks)
-			s.title(title);
-	}
-
-	@Override
 	public void block(Block block) throws IOException {
 		for (Sink s : sinks)
 			s.block(block);
@@ -44,18 +38,6 @@ public class MultiSink implements Sink {
 		for (Sink s: sinks) {
 			s.brk(ad);
 		}
-	}
-
-	@Override
-	public void fileEnd() throws Exception {
-		for (Sink s : sinks)
-			s.fileEnd();
-	}
-
-	@Override
-	public void close() throws IOException {
-		for (Sink s : sinks)
-			s.close();
 	}
 
 	@Override

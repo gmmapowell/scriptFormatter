@@ -8,12 +8,14 @@ import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.zinutils.exceptions.CantHappenException;
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.Style;
 import com.gmmapowell.script.styles.StyleCatalog;
@@ -27,6 +29,7 @@ public class NewLine {
 	private boolean isNew;
 	private PageStyle pageStyle;
 	private float requireBeyond = 0;
+	private Justification just = Justification.LEFT;
 
 	public NewLine(StyleCatalog styles, PageStyle pageStyle, float margin, float width) {
 		this.styles = styles;
@@ -47,7 +50,7 @@ public class NewLine {
 		if (baseStyle == null)
 			throw new RuntimeException("no style found for " + bsname);
 		Style style = baseStyle.apply(token.styles);
-		
+		just = style.getJustification();
 		PDFont font = style.getFont();
 		Float sz = style.getFontSize();
 		minht = Math.max(minht, style.getLineSpacing());
@@ -67,7 +70,7 @@ public class NewLine {
 		}
 		
 		if (si instanceof TextSpanItem || si instanceof Break)
-			contents.add(new Item(pageStyle, xpos, bbox, font, sz, si));
+			contents.add(new Item(pageStyle, style, xpos, bbox, font, sz, si));
 		isNew = false;
 		xpos += wid;
 		
@@ -100,6 +103,18 @@ public class NewLine {
 	}
 
 	public void shove(PDPageContentStream page, float x, float y) throws IOException {
+		switch (just) {
+		case LEFT:
+			break; // the default
+		case RIGHT:
+			x += width - xpos;
+			break;
+		case CENTER:
+			x += (width - xpos)/2;
+			break;
+		default:
+			throw new NotImplementedException();
+		}
 		for (Item i : contents) {
 			i.shove(page, x, y);
 		}

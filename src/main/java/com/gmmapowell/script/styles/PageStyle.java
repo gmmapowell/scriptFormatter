@@ -16,5 +16,6 @@ public interface PageStyle {
 	PDFont getPageNumberFont();
 	float getPageNumberFontSize();
 	boolean wantHeader();
+	boolean wantFooter();
 
 }

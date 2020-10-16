@@ -21,4 +21,9 @@ public class BookPageStyle extends DefaultPageStyle {
 	public Float getBottomMargin() {
 		return 36f;
 	}
+	
+	@Override
+	public boolean wantHeader() {
+		return true;
+	}
 }

@@ -10,16 +10,10 @@ import com.gmmapowell.script.elements.Block;
 public interface Sink {
 	void flow(Flow flow);
 	void render(Stock stock) throws IOException;
-	void close() throws IOException;
 	void showFinal();
 	void upload() throws Exception;
-	
-	@Deprecated
-	void title(String title) throws IOException;
 	@Deprecated
 	void block(Block block) throws IOException;
 	@Deprecated
 	void brk(Break ad) throws IOException;
-	@Deprecated
-	void fileEnd() throws Exception;
 }
