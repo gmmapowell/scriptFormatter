@@ -16,7 +16,8 @@ public class TextSpanItem implements SpanItem {
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
 		float width = 0;
 		try {
-			width = font.getStringWidth(text)*sz/1000;
+			if (font != null)
+				width = font.getStringWidth(text)*sz/1000;
 		} catch (IllegalArgumentException ex) {
 		}
 		return new BoundingBox(0, 0, width, sz);

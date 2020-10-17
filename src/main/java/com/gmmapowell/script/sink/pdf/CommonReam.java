@@ -33,7 +33,7 @@ public abstract class CommonReam implements Ream {
 		styles.font("palatino", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino.ttf")));
 		styles.font("palatino-bold", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold.ttf")));
 		styles.font("palatino-italic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Italic.ttf")));
-		styles.font("palatino-bolditalic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold Italic.ttf")));
+		styles.font("palatino-bold-italic", (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/Palatino Bold Italic.ttf")));
 	}
 
 	@Override

@@ -82,6 +82,9 @@ public class Item {
 	}
 
 	private void showText(PDPageContentStream page, float x, float y, TextSpanItem si) throws IOException {
+		if (font == null)
+			return;
+		
 		page.beginText();
 		try {
 			page.setFont(font, fontsz);

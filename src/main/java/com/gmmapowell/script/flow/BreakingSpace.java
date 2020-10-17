@@ -8,7 +8,9 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 public class BreakingSpace implements SpanItem {
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
-		float width = font.getStringWidth(" ")*sz/1000;
+		float width = 0;
+		if (font != null)
+			width = font.getStringWidth(" ")*sz/1000;
 		return new BoundingBox(0, 0, width, sz);
 	}
 

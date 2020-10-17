@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.Production;
+import org.zinutils.exceptions.InvalidUsageException;
 import org.zinutils.xml.XML;
 
 import com.gmmapowell.script.config.ConfigException;
@@ -16,6 +18,7 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.prose.DocState.ScanMode;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Utils;
 
@@ -24,6 +27,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	private final List<File> samples = new ArrayList<>();
 	private final Grammar grammar;
 	private final TableOfContents toc;
+	private final ScanMode scanmode;
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
@@ -40,6 +44,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			this.grammar = Grammar.from(XML.fromFile(file));
 		} else
 			this.grammar = null;
+		if (options.containsKey("scanmode")) {
+			this.scanmode = ScanMode.valueOf(options.remove("scanmode").toUpperCase());
+		} else
+			this.scanmode = ScanMode.NONE;
 		toc = new TableOfContents(tocfile);
 	}
 	
@@ -58,6 +66,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 
 	@Override
 	protected void handleLine(DocState state, String s) throws IOException {
+		// Skip everything in the "DETAILS" section
+		if (!"@Conclusion".equals(s) && this.scanmode == ScanMode.OVERVIEW && (state.scanMode == ScanMode.DETAILS))
+			return;
+		
 		if (s.equals("$$")) {
 			state.blockquote = !state.blockquote;
 		} else if (s.startsWith("@")) {
@@ -89,6 +101,17 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					state.newSpan();
 				state.nestSpan("preformatted");
 				state.text(args.toString());
+				state.popSpan();
+				break;
+			}
+			case "bold":
+			case "italic": {
+				if (!state.inPara())
+					state.newPara("text");
+				if (!state.inSpan())
+					state.newSpan();
+				state.nestSpan(cmd);
+				ProcessingUtils.processPart(state, args.toString(), 0, args.length());
 				state.popSpan();
 				break;
 			}
@@ -231,6 +254,16 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			case "outrageousclaim":
 				System.out.println("There is an outrageous claim at " + state.location());
 				break;
+			case "number": {
+				if (!state.activeNumbering())
+					throw new InvalidUsageException("cannot use &number outside @Numbering...@/");
+				state.newPara(state.numberPara());
+				state.newSpan("bullet-sign");
+				state.text(state.currentNumber());
+				state.endSpan();
+				ProcessingUtils.process(state, args.toString().trim());
+				break;
+			}
 			default:
 				throw new RuntimeException(state.location() + " handle inline command: " + s);
 			}
@@ -248,6 +281,8 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			if (!state.inPara()) {
 				if (state.inRefComment)
 					state.newPara("refComment");
+				else if (this.scanmode == ScanMode.DETAILS && (state.scanMode == ScanMode.OVERVIEW || state.scanMode == ScanMode.CONCLUSION))
+					state.newPara("text", "bold");
 				else
 					state.newPara("text");
 			}
@@ -261,6 +296,21 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	protected void commitCurrentCommand() throws IOException {
 		if (state.cmd != null) {
 			switch(state.cmd.name) {
+			case "Overview": {
+				state.scanMode = ScanMode.OVERVIEW;
+				break;
+			}
+			case "Details": {
+				state.scanMode = ScanMode.DETAILS;
+				break;
+			}
+			case "Conclusion": {
+				state.scanMode = ScanMode.CONCLUSION;
+				state.newPara("section-title");
+				ProcessingUtils.process(state, "Conclusions");
+				state.endPara();
+				break;
+			}
 			case "Chapter": {
 				String title = state.cmd.args.get("title");
 				if (title == null)
@@ -270,9 +320,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					style = "chapter";
 				if (state.chapter > 0) {
 					title = Integer.toString(state.chapter) + " " + title;
-					state.wantNumbering = true;
+					state.wantSectionNumbering = true;
 				} else {
-					state.wantNumbering = false;
+					state.wantSectionNumbering = false;
 				}
 				state.newSection("footnotes", style);
 				state.newSection("main", style);
@@ -289,7 +339,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Section without title");
-				if (state.wantNumbering)
+				if (state.wantSectionNumbering)
 					title = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"") + " " + title;
 				toc.section(title);
 				state.newPara("section-title");
@@ -302,9 +352,19 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			case "Subsection": {
 				String title = state.cmd.args.get("title");
 				if (title == null)
-					throw new RuntimeException("Section without title");
+					throw new RuntimeException("Subsection without title");
 				toc.subsection(title);
 				state.newPara("subsection-title");
+				ProcessingUtils.process(state, title);
+				state.endPara();
+				break;
+			}
+			case "Subsubsection": {
+				String title = state.cmd.args.get("title");
+				if (title == null)
+					throw new RuntimeException("Subsubsection without title");
+				toc.subsubsection(title);
+				state.newPara("subsubsection-title");
 				ProcessingUtils.process(state, title);
 				state.endPara();
 				break;
@@ -327,16 +387,27 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				state.inRefComment = true;
 				break;
 			}
+			case "Numbering": {
+				// TODO: probably should allow a numbering format argument & start value
+				state.pushNumbering("arabic", 1);
+				break;
+			}
 			case "/": {
-				state.newPara("endRefComment");
-				state.newSpan("comment-sign");
-				state.text("\u25A1");
-				state.endSpan();
-				state.inRefComment = false;
+				// We probably actually want to have a stack of what to undo ...
+				if (state.inRefComment) {
+					state.newPara("endRefComment");
+					state.newSpan("comment-sign");
+					state.text("\u25A1");
+					state.endSpan();
+					state.inRefComment = false;
+				} else {
+					state.popNumbering();
+				}
 				break;
 			}
 			default:
-				System.out.println("handle " + state.cmd);
+				System.out.println("handle " + state.cmd + " at " + state.inputLocation());
+				break;
 			}
 			state.cmd = null;
 		} else if (state.inline != null) {
@@ -350,6 +421,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	
 	@Override
 	protected void done() {
+		if (state.inRefComment)
+			throw new RuntimeException("Ended in Ref Comment");
+		if (state.activeNumbering())
+			throw new RuntimeException("Still in numbering block");
 		try {
 			toc.write();
 		} catch (Exception ex) {

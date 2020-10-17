@@ -80,6 +80,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 							ex.printStackTrace(System.out);
 						 else
 							System.out.println(ex.toString());
+						return;
 					}
 				}
 			}

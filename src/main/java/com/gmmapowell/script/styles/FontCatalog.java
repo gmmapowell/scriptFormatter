@@ -45,7 +45,7 @@ public abstract class FontCatalog implements StyleCatalog {
 				fn += "-italic";
 			PDFont ret = fonts.get(fn);
 			if (ret == null)
-				throw new RuntimeException("No such font: " + font);
+				throw new RuntimeException("No such font: " + fn);
 			return ret;
 		}
 	}

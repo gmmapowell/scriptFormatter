@@ -53,6 +53,12 @@ public class DocStyleCatalog extends FontCatalog {
 					defaultStyle
 			));
 
+		catalog.put("subsubsection-title",
+				new CompoundStyle(this,
+					create().setFont("palatino").setFontSize(12f).setLineSpacing(16.0f).setBold(true).setBeforeBlock(15).setAfterBlock(12).setRequireAfter(108f).build(),
+					defaultStyle
+			));
+
 		catalog.put("text",
 			new CompoundStyle(this,
 				create().setFont("palatino").setBeforeBlock(6).setAfterBlock(6).build(),
@@ -126,6 +132,12 @@ public class DocStyleCatalog extends FontCatalog {
 					create().setFont("palatino").setBeforeBlock(2).setAfterBlock(2).setFirstMargin(36f).setLeftMargin(50f).build(),
 					defaultStyle
 			));
+
+		catalog.put("number",
+			new CompoundStyle(this,
+				create().setFont("palatino").setBeforeBlock(2).setAfterBlock(2).setFirstMargin(18f).setLeftMargin(32f).build(),
+				defaultStyle
+		));
 
 		catalog.put("footnote",
 				new CompoundStyle(this,

@@ -42,9 +42,16 @@ public class Assembling {
 				if (baseStyle == null)
 					throw new RuntimeException("no style found for " + bsname);
 				style = baseStyle.apply(token.styles);
-				this.before = Math.max(style.getBeforeBlock(), this.before);
-				this.after = style.getAfterBlock();
-				this.requireAfter = style.getRequireAfter();
+				if (style.getBeforeBlock() != null)
+					this.before = Math.max(style.getBeforeBlock(), this.before);
+				if (style.getAfterBlock() == null)
+					this.after = 0;
+				else
+					this.after = style.getAfterBlock();
+				if (style.getRequireAfter() == null)
+					this.requireAfter = 0;
+				else
+					this.requireAfter = style.getRequireAfter();
 				lm = style.getFirstMargin();
 			} else if ((prev = curr.accepts(token)) != null)
 				return;
@@ -54,6 +61,8 @@ public class Assembling {
 		}
 		if (lm == null)
 			lm = style.getLeftMargin();
+		if (lm == null)
+			lm = 0f;
 		this.curr = new NewLine(styles, pageStyle, lm, width);
 		this.lines.add(curr);
 		if (curr.accepts(token) == null)

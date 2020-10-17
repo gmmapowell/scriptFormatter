@@ -55,7 +55,10 @@ public class NewLine {
 		just = style.getJustification();
 		PDFont font = style.getFont();
 		Float sz = style.getFontSize();
-		minht = Math.max(minht, style.getLineSpacing());
+		if (sz == null)
+			sz = 10f;
+		if (style.getLineSpacing() != null)
+			minht = Math.max(minht, style.getLineSpacing());
 		if (si instanceof Break)
 			requireBeyond = ((Break) si).require();
 		BoundingBox bbox = si.bbox(font, sz);
@@ -105,17 +108,19 @@ public class NewLine {
 	}
 
 	public void shove(PDPage meta, PDPageContentStream page, float x, float y) throws IOException {
-		switch (just) {
-		case LEFT:
-			break; // the default
-		case RIGHT:
-			x += width - xpos;
-			break;
-		case CENTER:
-			x += (width - xpos)/2;
-			break;
-		default:
-			throw new NotImplementedException();
+		if (just != null) {
+			switch (just) {
+			case LEFT:
+				break; // the default
+			case RIGHT:
+				x += width - xpos;
+				break;
+			case CENTER:
+				x += (width - xpos)/2;
+				break;
+			default:
+				throw new NotImplementedException();
+			}
 		}
 		for (Item i : contents) {
 			i.shove(meta, page, x, y);

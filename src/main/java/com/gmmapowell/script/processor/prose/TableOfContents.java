@@ -30,6 +30,10 @@ public class TableOfContents {
 		headings.add("    " + title);
 	}
 	
+	public void subsubsection(String title) {
+		headings.add("      " + title);
+	}
+	
 	public void write() throws FileNotFoundException {
 		if (tocfile == null)
 			return;
