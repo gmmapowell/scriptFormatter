@@ -16,10 +16,12 @@ public class ReadConfig {
 			System.out.println("There is no file " + file);
 			return null;
 		}
-		ScriptConfig ret = new ScriptConfig(file.getParentFile());
+		File root = file.getParentFile();
+		ScriptConfig ret = new ScriptConfig(root);
 		Map<String, String> vars = null;
 		boolean debug = false;
-		String index = null, workdir = null, sshid = null;
+		File index = null, workdir = null;
+		String sshid = null;
 		String what = null, type = null;
 		int wline = 0;
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
@@ -41,6 +43,8 @@ public class ReadConfig {
 				String value = s.substring(idx+1).trim();
 				if (!nested) {
 					// if a new block is starting, flush (any) previous block
+					if (workdir == null)
+						workdir = new File(root, "downloads");
 					if (!handleCreation(ret, vars, debug, index, sshid, workdir, what, type, wline))
 						return null;
 					vars = new TreeMap<>();
@@ -51,7 +55,9 @@ public class ReadConfig {
 						break;
 					}
 					case "index": {
-						index = value;
+						index = new File(value);
+						if (!index.isAbsolute())
+							index = new File(root, value);
 						break;
 					}
 					case "sshid": {
@@ -59,7 +65,9 @@ public class ReadConfig {
 						break;
 					}
 					case "workdir": {
-						workdir = value;
+						workdir = new File(value);
+						if (!workdir.isAbsolute())
+							workdir = new File(root, value);
 						break;
 					}
 					default: {
@@ -74,6 +82,8 @@ public class ReadConfig {
 				} else
 					vars.put(key, value);
 			}
+			if (workdir == null)
+				workdir = new File(root, "downloads");
 			if (!handleCreation(ret, vars, debug, index, sshid, workdir, what, type, wline))
 				return null;
 		} catch (IOException ex) {
@@ -89,9 +99,11 @@ public class ReadConfig {
 		return ret;
 	}
 
-	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, String index, String sshid, String workdir, String what, String type, int wline) throws ConfigException, Exception {
+	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, File index, String sshid, File workdir, String what, String type, int wline) throws ConfigException, Exception {
 		if (what == null)
 			return true;
+		ret.setIndex(index);
+		ret.setWorkdir(workdir);
 		switch (what) {
 		case "loader": {
 			if (index == null) {

@@ -16,6 +16,7 @@ import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.DriveLoader;
+import com.gmmapowell.script.loader.drive.Index;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
@@ -32,12 +33,14 @@ public class ScriptConfig implements Config {
 	private ElementFactory elf = new BlockishElementFactory();
 	private Sink sink;
 	private WebEdit webedit;
+	private File index;
 
+	private File workdir;
 	public ScriptConfig(File root) {
 		this.root = root;
 	}
 	
-	public void handleLoader(Map<String, String> vars, String loader, String index, String workdir, boolean debug) throws ConfigException {
+	public void handleLoader(Map<String, String> vars, String loader, File index, File workdir, boolean debug) throws ConfigException {
 		if ("google-drive".equals(loader)) {
 			String creds = vars.remove("credentials");
 			if (creds == null)
@@ -45,8 +48,6 @@ public class ScriptConfig implements Config {
 			String folder = vars.remove("folder");
 			if (folder == null)
 				throw new ConfigException("folder was not defined");
-			if (workdir == null)
-				workdir = "downloads";
 			this.loader = new DriveLoader(root, creds, folder, index, workdir, debug);
 		} else
 			throw new ConfigException("Unrecognized loader type " + loader);
@@ -157,8 +158,10 @@ public class ScriptConfig implements Config {
 
 	@Override
 	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
-		if (loader == null)
-			throw new ConfigException("No loader was specified");
+		if (loader == null) {
+	        Index currentIndex = Index.read(index, workdir);
+			return currentIndex;
+		}
 		if (webedit != null)
 			loader.createWebeditIn(webedit.file, webedit.title);
 		return loader.updateIndex();
@@ -181,5 +184,13 @@ public class ScriptConfig implements Config {
 		if (webedit != null) {
 			webedit.upload();
 		}
+	}
+
+	public void setIndex(File index) {
+		this.index = index;
+	}
+
+	public void setWorkdir(File workdir) {
+		this.workdir = workdir;
 	}
 }

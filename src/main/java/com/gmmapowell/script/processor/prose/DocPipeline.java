@@ -28,6 +28,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	private final Grammar grammar;
 	private final TableOfContents toc;
 	private final ScanMode scanmode;
+	private final boolean joinspace;
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
@@ -48,11 +49,16 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			this.scanmode = ScanMode.valueOf(options.remove("scanmode").toUpperCase());
 		} else
 			this.scanmode = ScanMode.NONE;
+		if (options.containsKey("joinspace"))
+			this.joinspace = Boolean.parseBoolean(options.remove("joinspace"));
+		else
+			this.joinspace = false;
 		toc = new TableOfContents(tocfile);
 	}
 	
 	@Override
 	protected DocState begin(Map<String, Flow> flows, String file) {
+		System.out.println("doc " + file);
 		if (state == null) {
 			this.state = new DocState(flows);
 			state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
@@ -60,7 +66,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			state.flows.put("footnotes", new Flow("footnotes", true));
 			state.flows.put("footer", new Flow("footer", false)); // needs to be a "callback" flow
 		}
-		state.reset(file);
+		state.newfile(file);
 		return state;
 	}
 
@@ -285,6 +291,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					state.newPara("text", "bold");
 				else
 					state.newPara("text");
+			} else if (joinspace) {
+				if (!state.inSpan())
+					state.newSpan();
+				state.op(new BreakingSpace());
 			}
 			ProcessingUtils.process(state, s);
 		}
@@ -318,6 +328,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String style = state.cmd.args.get("style");
 				if (style == null)
 					style = "chapter";
+				state.reset();
 				if (state.chapter > 0) {
 					title = Integer.toString(state.chapter) + " " + title;
 					state.wantSectionNumbering = true;
@@ -421,6 +432,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	
 	@Override
 	protected void done() {
+		if (state == null) {
+			// we did nothing
+			return;
+		}
 		if (state.inRefComment)
 			throw new RuntimeException("Ended in Ref Comment");
 		if (state.activeNumbering())

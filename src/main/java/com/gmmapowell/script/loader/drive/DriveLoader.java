@@ -1,10 +1,8 @@
 package com.gmmapowell.script.loader.drive;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -37,19 +35,11 @@ public class DriveLoader implements Loader {
 	private File webeditFile;
 	private String wetitle;
 
-	public DriveLoader(File root, String creds, String folder, String index, String downloads, boolean debug) throws ConfigException {
+	public DriveLoader(File root, String creds, String folder, File indexFile, File downloads, boolean debug) throws ConfigException {
 		this.creds = new File(Utils.subenvs(creds));
 		this.folder = folder;
-		File i = new File(index);
-		if (i.isAbsolute())
-			this.indexFile = i;
-		else
-			this.indexFile = new File(root, index);
-		File d = new File(downloads);
-		if (d.isAbsolute())
-			this.downloads = d;
-		else
-			this.downloads = new File(root, downloads);
+		this.indexFile = indexFile;
+		this.downloads = downloads;
 		if (!this.downloads.exists()) {
 			if (!this.downloads.mkdir())
 				throw new ConfigException("Could not create " + this.downloads);
@@ -77,9 +67,9 @@ public class DriveLoader implements Loader {
         	System.out.println("Downloading files from Google ...");
         	System.out.println("  + " + item.folder + " (" + item.id + ")");
         }
-        Index currentIndex = readIndex();
+        Index currentIndex = Index.read(indexFile, downloads);
         try {
-//	        downloadFolder(service, currentIndex, downloads, "    ", item);
+	        downloadFolder(service, currentIndex, downloads, "    ", item);
 	        if (webeditFile != null)
 	        	currentIndex.generateWebeditFile(webeditFile, wetitle);
 	        return currentIndex;
@@ -134,19 +124,6 @@ public class DriveLoader implements Loader {
         if (children.getFiles().size() != 1)
         	throw new ConfigException("Could not find nested folder: " + name);
 		return new Item(children.getFiles().get(0).getId(), name);
-	}
-
-	private Index readIndex() throws IOException {
-		Index index = new Index(downloads);
-		try (FileReader fr = new FileReader(indexFile)) {
-			index.readFrom(fr);
-		} catch (FileNotFoundException ex) {
-			System.out.println(indexFile + " not found; creating");
-		}
-		
-		FileWriter fw = new FileWriter(indexFile, true);
-		index.appendTo(fw);
-		return index;
 	}
 
 	private void downloadFolder(Drive service, Index index, File into, String ind, Item item) throws IOException {

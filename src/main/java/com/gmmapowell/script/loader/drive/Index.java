@@ -53,7 +53,20 @@ public class Index implements FilesToProcess {
 	private FileWriter appendTo;
 	private boolean writtenExcluded;
 
-	public Index(File downloads) {
+	public static Index read(File indexFile, File downloads) throws IOException {
+		Index index = new Index(downloads);
+		try (FileReader fr = new FileReader(indexFile)) {
+			index.readFrom(fr);
+		} catch (FileNotFoundException ex) {
+			System.out.println(indexFile + " not found; creating");
+		}
+		
+		FileWriter fw = new FileWriter(indexFile, true);
+		index.appendTo(fw);
+		return index;
+	}
+
+	private Index(File downloads) {
 		this.downloads = downloads;
 	}
 	

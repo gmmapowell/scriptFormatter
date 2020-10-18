@@ -39,16 +39,19 @@ public class DocState extends CurrentState {
 		super(flows);
 	}
 
-	public void reset(String file) {
+	public void newfile(String file) {
 		this.file = file;
+		this.numbering.clear();
+		this.scanMode = ScanMode.NONE;
+	}
+
+	public void reset() {
 		cmd = null;
 		section = 0;
 		commentary = false;
 		nextFnMkr = 1;
 		nextFnText = 1;
 		this.inRefComment = false;
-		this.numbering.clear();
-		this.scanMode = ScanMode.NONE;
 	}
 
 	@Override
