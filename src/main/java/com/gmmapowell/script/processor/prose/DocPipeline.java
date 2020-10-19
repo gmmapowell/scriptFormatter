@@ -21,6 +21,7 @@ import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.LinkFromRef;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.YieldToFlow;
@@ -151,9 +152,11 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				break;
 			}
 			case "sp": {
-				if (state.inPara())
+				if (state.inPara()) {
+					if (!state.inSpan())
+						state.newSpan();
 					state.op(new BreakingSpace());
-				else {
+				} else {
 					state.newPara("text");
 				}
 				ProcessingUtils.process(state, args.toString().trim());
@@ -287,6 +290,32 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				state.text(state.currentNumber());
 				state.endSpan();
 				ProcessingUtils.process(state, args.toString().trim());
+				break;
+			}
+			case "ref": {
+				// TODO: formatting should be customizable
+				if (args == null)
+					throw new RuntimeException("&ref command needs a reference");
+				if (!state.inSpan())
+					state.newSpan();
+				String tx = "unref";
+				String anchor = readString(state, args);
+				if (currentMeta != null) {
+					try {
+						JSONObject anchors = currentMeta.getJSONObject("anchors");
+						if (anchors.has(anchor)) {
+							JSONObject anch = anchors.getJSONObject(anchor);
+							if (!anch.has("number"))
+								throw new InvalidUsageException("the anchor '" + anchor + "' does not have a section number");
+							tx = anch.getString("number");
+						} else {
+							System.out.println("there is no anchor '" + anchor + "'");
+						}
+					} catch (JSONException e) {
+						throw WrappedException.wrap(e);
+					}
+				}
+				state.op(new LinkFromRef(toc, anchor, '§' + tx));
 				break;
 			}
 			default:

@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.zinutils.exceptions.InvalidUsageException;
+import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
@@ -79,7 +80,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						if (debug)
 							ex.printStackTrace(System.out);
 						 else
-							System.out.println(ex.toString());
+							System.out.println(WrappedException.unwrapAny(ex).toString());
 						return;
 					}
 				}
