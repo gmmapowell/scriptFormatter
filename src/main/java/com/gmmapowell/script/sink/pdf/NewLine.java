@@ -13,6 +13,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.SpanItem;
@@ -74,7 +75,7 @@ public class NewLine {
 			bbox.setLowerLeftY(bbox.getLowerLeftY()+addy);
 		}
 		
-		if (si instanceof TextSpanItem || si instanceof Break || si instanceof LinkOp)
+		if (si instanceof TextSpanItem || si instanceof Break || si instanceof LinkOp || si instanceof LinkFromTOC)
 			contents.add(new Item(pageStyle, style, xpos, bbox, font, sz, si));
 		isNew = false;
 		xpos += wid;

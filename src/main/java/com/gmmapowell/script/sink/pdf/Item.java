@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
 
 import com.gmmapowell.script.elements.Break;
+import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
@@ -48,6 +49,8 @@ public class Item {
 			showBreak(page, x, y, (Break) si);
 		else if (si instanceof LinkOp)
 			showLink(meta, page, x, y, (LinkOp) si);
+		else if (si instanceof LinkFromTOC)
+			showTOCLink(meta, page, x, y, (LinkFromTOC) si);
 		else
 			throw new RuntimeException("Cannot handle shoving a " + si.getClass());
 	}
@@ -113,11 +116,11 @@ public class Item {
 		} finally {
 			page.endText();
 		}
-		if (style.getUnderline()) {
-			page.moveTo(x, y-2f);
-			page.lineTo(x+bbox.getWidth(), y-2f);
-			page.stroke();
-		}
+//		if (style.getUnderline()) {
+//			page.moveTo(x, y-2f);
+//			page.lineTo(x+bbox.getWidth(), y-2f);
+//			page.stroke();
+//		}
 		
 		PDAnnotationLink link = new PDAnnotationLink();
 		link.setRectangle(new PDRectangle(x + xpos + this.bbox.getLowerLeftX(), y + this.bbox.getLowerLeftY() - 2, this.bbox.getWidth(), this.bbox.getHeight()));
@@ -127,6 +130,36 @@ public class Item {
 		PDActionURI action = new PDActionURI();
 		action.setURI(lk.lk);
 		link.setAction(action);
+		
+		meta.getAnnotations().add(link);
+	}
+
+	private void showTOCLink(PDPage meta, PDPageContentStream page, float x, float y, LinkFromTOC lk) throws IOException {
+		page.beginText();
+		try {
+			page.setFont(font, fontsz);
+			page.newLineAtOffset(x+xpos + bbox.getLowerLeftX(), y + bbox.getLowerLeftY());
+			page.showText(lk.text);
+		} catch (IllegalArgumentException ex) {
+			ex.printStackTrace(System.out);
+		} finally {
+			page.endText();
+		}
+//		if (style.getUnderline()) {
+//			page.moveTo(x, y-2f);
+//			page.lineTo(x+bbox.getWidth(), y-2f);
+//			page.stroke();
+//		}
+		
+		PDAnnotationLink link = new PDAnnotationLink();
+		link.setRectangle(new PDRectangle(x + xpos + this.bbox.getLowerLeftX(), y + this.bbox.getLowerLeftY() - 2, this.bbox.getWidth(), this.bbox.getHeight()));
+		PDBorderStyleDictionary uline = new PDBorderStyleDictionary();
+		uline.setStyle(PDBorderStyleDictionary.STYLE_UNDERLINE);
+		link.setBorderStyle(uline);
+//		PDActionURI action = new PDActionURI();
+//		action.setURI(lk.lk);
+//		link.setAction(action);
+		lk.pendingTarget(link);
 		
 		meta.getAnnotations().add(link);
 	}

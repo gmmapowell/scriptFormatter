@@ -6,9 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.Production;
 import org.zinutils.exceptions.InvalidUsageException;
+import org.zinutils.exceptions.WrappedException;
+import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 
 import com.gmmapowell.script.config.ConfigException;
@@ -17,6 +22,7 @@ import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.prose.DocState.ScanMode;
@@ -30,6 +36,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	private final TableOfContents toc;
 	private final ScanMode scanmode;
 	private final boolean joinspace;
+	private final JSONObject currentMeta;
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
@@ -57,11 +64,20 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		else
 			this.joinspace = false;
 		toc = new TableOfContents(tocfile, metafile);
+		if (metafile.exists()) {
+			try {
+				currentMeta = new JSONObject(FileUtils.readFile(metafile));
+			} catch (JSONException e) {
+				throw new ConfigException("Failed to read " + metafile + ": " + e);
+			}
+		} else {
+			currentMeta = null;
+		}
 	}
 	
 	@Override
 	protected DocState begin(Map<String, Flow> flows, String file) {
-		System.out.println("doc " + file);
+		System.out.println("processing input file: " + file);
 		if (state == null) {
 			this.state = new DocState(flows);
 			state.flows.put("header", new Flow("header", false)); // needs to be a "callback" flow
@@ -444,6 +460,43 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					state.inRefComment = false;
 				} else {
 					state.popNumbering();
+				}
+				break;
+			}
+			case "TOC": {
+				if (currentMeta == null)
+					break;
+				state.newSection("footnotes", "toc"); // just to keep them in sync
+				state.newSection("main", "toc");
+				List<LinkFromTOC> links = new ArrayList<>();
+				try {
+					JSONArray order = currentMeta.getJSONArray("toc");
+					JSONObject headings = currentMeta.getJSONObject("headings");
+					for (int i=0;i<order.length();i++) {
+						Object e = order.get(i);
+						if (e instanceof String)
+							e = headings.getJSONObject((String)e);
+						JSONObject entry = (JSONObject) e;
+//						String type = entry.getString("type");
+						state.newPara("text"); // "tocline", "toc-" + type
+						if (entry.has("number")) {
+							state.newSpan(); // tocnumber
+							state.text(entry.getString("number"));
+							state.op(new BreakingSpace()); // NBSP?
+						}
+						state.newSpan(); // tocheading
+						state.text(entry.getString("title"));
+						state.newSpan(); // tocdots - how do we set the width of this?
+						state.text("...");
+						state.newSpan(); // tocpage - right justified
+						LinkFromTOC lk = new LinkFromTOC(entry.getString("page"));
+						links.add(lk);
+						state.op(lk);
+						state.endPara();
+					}
+					this.toc.links(links);
+				} catch (JSONException e) {
+					throw WrappedException.wrap(e);
 				}
 				break;
 			}

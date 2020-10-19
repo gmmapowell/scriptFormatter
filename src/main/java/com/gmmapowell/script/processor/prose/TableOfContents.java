@@ -14,6 +14,8 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.zinutils.exceptions.WrappedException;
 
+import com.gmmapowell.script.flow.LinkFromTOC;
+
 public class TableOfContents {
 	private final List<String> headings = new ArrayList<>();
 	private final File tocfile;
@@ -23,6 +25,7 @@ public class TableOfContents {
 	private final JSONObject heads;
 	private final JSONArray toc;
 	private final Map<String, PDPage> pages = new TreeMap<>();
+	private List<LinkFromTOC> links;
 	
 	public TableOfContents(File tocfile, File metafile) {
 		this.tocfile = tocfile;
@@ -81,11 +84,19 @@ public class TableOfContents {
 
 	public void recordPage(JSONObject entry, PDPage page, String name) {
 		try {
+			System.out.println("recording page " + name + " for " + entry);
 			entry.put("page", name);
 			if (entry.has("anchor")) {
 				String anchor = entry.getString("anchor");
 				pages.put(anchor, page);
 				// TODO: notify anybody waiting
+			}
+			if (links != null && !links.isEmpty()) {
+				LinkFromTOC next = links.remove(0);
+				next.sendTo(page);
+				System.out.println("binding " + next + " to " + page + " with " + name);
+			} else {
+				System.out.println("out of links");
 			}
 		} catch (JSONException e) {
 			throw WrappedException.wrap(e);
@@ -99,11 +110,14 @@ public class TableOfContents {
 					pw.println(h);
 			}
 		}
-		System.out.println(pages);
 		if (metafile != null) {
 			try (PrintWriter pw = new PrintWriter(metafile)) {
 				pw.print(meta);
 			}
 		}
+	}
+
+	public void links(List<LinkFromTOC> links) {
+		this.links = new ArrayList<>(links);
 	}
 }

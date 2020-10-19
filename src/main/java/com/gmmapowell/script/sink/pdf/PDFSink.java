@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,6 +79,7 @@ public class PDFSink implements Sink {
 				break forever;
 				
 			List<Suspension> suspended = new ArrayList<>();
+			Set<AnchorOp> records = new HashSet<>();
 			while (!sections.isEmpty()) {
 				if (page == null) {
 					page = stock.getPage(current, beginSection);
@@ -95,8 +97,9 @@ public class PDFSink implements Sink {
 								active.remove(c);
 								continue whileActive;
 							}
+//							System.out.println(tok);
 							if (tok.it instanceof AnchorOp) {
-								((AnchorOp)tok.it).recordPage(page.meta(), page.currentPageName());
+								records.add((AnchorOp)tok.it);
 								continue;
 							}
 							if (tok.it instanceof ReleaseFlow) {
@@ -116,8 +119,13 @@ public class PDFSink implements Sink {
 							switch (a.status) {
 							case PENDING: // it thinks it may accept it but it may end up having to reject it
 								break;
-							case PROCESSED: // it has taken it and fully processed it
+							case PROCESSED: {// it has taken it and fully processed it
+								for (AnchorOp anch : records) {
+									anch.recordPage(page.meta(), page.currentPageName());
+								}
+								records.clear();
 								break;
+							}
 							case BACKUP: // we are being asked to try again, probably new region
 								c.backTo(a.lastAccepted);
 								continue;

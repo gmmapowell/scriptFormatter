@@ -16,5 +16,4 @@ public class JSONTOCEntry implements TOCEntry {
 	public void recordPage(PDPage meta, String name) {
 		toc.recordPage(entry, meta, name);
 	}
-
 }
