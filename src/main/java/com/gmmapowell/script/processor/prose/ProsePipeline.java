@@ -98,13 +98,16 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		}
 		done();
 		sink.render(new PaperStock(makeReam(), null, new FirstBookPageStyle(), new LeftBookPageStyle(), new RightBookPageStyle()));
+		postRender();
 	}
+
 
 	protected abstract void commitCurrentCommand() throws IOException;
 	protected abstract T begin(Map<String, Flow> flows, String file);
 	protected abstract void handleLine(T state, String s) throws IOException;
 	protected void fileDone() {}
 	protected void done() {}
+	protected void postRender() {}
 
 	private String trim(String s) {
 		StringBuilder sb = new StringBuilder(s.trim());

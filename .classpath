@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/api-client/google-api-client/1.30.9/google-api-client-1.30.9.jar" sourcepath="/personal-qb/mvncache/com/google/api-client/google-api-client/1.30.9/google-api-client-1.30.9-sources.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/http-client/google-http-client-jackson2/1.35.0/google-http-client-jackson2-1.35.0.jar" sourcepath="/personal-qb/mvncache/com/google/http-client/google-http-client-jackson2/1.35.0/google-http-client-jackson2-1.35.0-sources.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/http-client/google-http-client/1.35.0/google-http-client-1.35.0.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-core/2.11.0/jackson-core-2.11.0.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/oauth-client/google-oauth-client/1.30.6/google-oauth-client-1.30.6.jar" sourcepath="/personal-qb/mvncache/com/google/oauth-client/google-oauth-client/1.30.6/google-oauth-client-1.30.6-sources.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/apis/google-api-services-drive/v3-rev197-1.25.0/google-api-services-drive-v3-rev197-1.25.0.jar"/>
@@ -31,5 +30,6 @@
 	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/utils/bin/classes"/>
 	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/FLAS2/bin" sourcepath="/Users/gareth/Ziniki/Over/FLAS2/src/main/java"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/jcraft/jsch/0.1.55/jsch-0.1.55.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

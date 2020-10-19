@@ -118,7 +118,8 @@ public class ScriptConfig implements Config {
 		String title = vars.remove("title");
 		if (title == null)
 			throw new ConfigException("title was not defined");
-		this.webedit = new WebEdit(new File(root, file), upload, sshid, title);
+		if (Boolean.parseBoolean(option))
+			this.webedit = new WebEdit(new File(root, file), upload, sshid, title);
 	}
 	
 	

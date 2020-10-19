@@ -12,6 +12,7 @@ import java.util.TreeSet;
 
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ReleaseFlow;
 import com.gmmapowell.script.flow.Section;
@@ -93,6 +94,10 @@ public class PDFSink implements Sink {
 								sections.remove(c);
 								active.remove(c);
 								continue whileActive;
+							}
+							if (tok.it instanceof AnchorOp) {
+								((AnchorOp)tok.it).recordPage(page.meta(), page.currentPageName());
+								continue;
 							}
 							if (tok.it instanceof ReleaseFlow) {
 								Cursor en = findFlow(suspended, sections, ((ReleaseFlow)tok.it).release());

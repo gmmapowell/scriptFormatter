@@ -13,6 +13,7 @@ import org.zinutils.xml.XML;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
+import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkOp;
@@ -32,11 +33,13 @@ public class DocPipeline extends ProsePipeline<DocState> {
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
-		File tocfile = null;
+		File tocfile = null, metafile = null;
 		if (options.containsKey("samples"))
 			this.samples.add(new File(Utils.subenvs(options.remove("samples"))));
 		if (options.containsKey("toc"))
 			tocfile = new File(root, Utils.subenvs(options.remove("toc")));
+		if (options.containsKey("meta"))
+			metafile = new File(root, Utils.subenvs(options.remove("meta")));
 		if (options.containsKey("grammar")) {
 			String grammarName = Utils.subenvs(options.remove("grammar"));
 			File file = new File(grammarName);
@@ -53,7 +56,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			this.joinspace = Boolean.parseBoolean(options.remove("joinspace"));
 		else
 			this.joinspace = false;
-		toc = new TableOfContents(tocfile);
+		toc = new TableOfContents(tocfile, metafile);
 	}
 	
 	@Override
@@ -328,17 +331,25 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String style = state.cmd.args.get("style");
 				if (style == null)
 					style = "chapter";
+				String anchor = state.cmd.args.get("anchor");
 				state.reset();
+				TOCEntry entry;
 				if (state.chapter > 0) {
-					title = Integer.toString(state.chapter) + " " + title;
+					String number = Integer.toString(state.chapter);
+					entry = toc.chapter(anchor, number, title);
+					title = number + " " + title;
 					state.wantSectionNumbering = true;
 				} else {
+					entry = toc.chapter(anchor, null, title);
 					state.wantSectionNumbering = false;
 				}
 				state.newSection("footnotes", style);
 				state.newSection("main", style);
-				toc.chapter(title);
 				state.newPara("chapter-title");
+				if (entry != null) {
+					state.newSpan();
+					state.op(new AnchorOp(entry));
+				}
 				ProcessingUtils.process(state, title);
 				state.endPara();
 				
@@ -350,10 +361,20 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Section without title");
-				if (state.wantSectionNumbering)
-					title = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"") + " " + title;
-				toc.section(title);
+				String anchor = state.cmd.args.get("anchor");
+				TOCEntry entry;
+				if (state.wantSectionNumbering) {
+					String number = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
+					entry = toc.section(anchor, number, title);
+					title = number + " " + title;
+				} else {
+					entry = toc.section(anchor, null, title);
+				}
 				state.newPara("section-title");
+				if (entry != null) {
+					state.newSpan();
+					state.op(new AnchorOp(entry));
+				}
 				ProcessingUtils.process(state, title);
 				state.endPara();
 				
@@ -364,8 +385,13 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Subsection without title");
-				toc.subsection(title);
+				String anchor = state.cmd.args.get("anchor");
+				TOCEntry entry = toc.subsection(anchor, null, title);
 				state.newPara("subsection-title");
+				if (entry != null) {
+					state.newSpan();
+					state.op(new AnchorOp(entry));
+				}
 				ProcessingUtils.process(state, title);
 				state.endPara();
 				break;
@@ -374,8 +400,13 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String title = state.cmd.args.get("title");
 				if (title == null)
 					throw new RuntimeException("Subsubsection without title");
-				toc.subsubsection(title);
+				String anchor = state.cmd.args.get("anchor");
+				TOCEntry entry = toc.subsubsection(anchor, null, title);
 				state.newPara("subsubsection-title");
+				if (entry != null) {
+					state.newSpan();
+					state.op(new AnchorOp(entry));
+				}
 				ProcessingUtils.process(state, title);
 				state.endPara();
 				break;
@@ -440,6 +471,10 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			throw new RuntimeException("Ended in Ref Comment");
 		if (state.activeNumbering())
 			throw new RuntimeException("Still in numbering block");
+	}
+	
+	@Override
+	protected void postRender() {
 		try {
 			toc.write();
 		} catch (Exception ex) {

@@ -5,41 +5,105 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.zinutils.exceptions.WrappedException;
 
 public class TableOfContents {
-	// TODO: this is just to get me started.
-	// Ultimately, I think we need to capture page numbers somehow and store all this as JSON
-	// and then read the JSON and format it at the beginning of the document
-	// Making sure we add links
 	private final List<String> headings = new ArrayList<>();
 	private final File tocfile;
+	private File metafile;
+	private final JSONObject meta = new JSONObject();
+	private final JSONObject anchors;
+	private final JSONObject heads;
+	private final JSONArray toc;
+	private final Map<String, PDPage> pages = new TreeMap<>();
 	
-	public TableOfContents(File tocfile) {
+	public TableOfContents(File tocfile, File metafile) {
 		this.tocfile = tocfile;
+		this.metafile = metafile;
+		try {
+			anchors = new JSONObject();
+			meta.put("anchors", anchors);
+			heads = new JSONObject();
+			meta.put("headings", heads);
+			toc = new JSONArray();
+			meta.put("toc", toc);
+		} catch (JSONException ex) {
+			throw WrappedException.wrap(ex);
+		}
 	}
 
-	public void chapter(String title) {
-		headings.add(title);
+	public TOCEntry chapter(String anchor, String number, String title) {
+		return heading("chapter", anchor, number, title);
 	}
 
-	public void section(String title) {
-		headings.add("  " + title);
+	public TOCEntry section(String anchor, String number, String title) {
+		return heading("section", anchor, number, title);
 	}
 
-	public void subsection(String title) {
-		headings.add("    " + title);
+	public TOCEntry subsection(String anchor, String number, String title) {
+		return heading("subsection", anchor, number, title);
 	}
 	
-	public void subsubsection(String title) {
-		headings.add("      " + title);
+	public TOCEntry subsubsection(String anchor, String number, String title) {
+		return heading("subsubsection", anchor, number, title);
 	}
 	
+	private TOCEntry heading(String type, String anchor, String number, String title) {
+		String header = (number == null ? "": number + " ") + title;
+		headings.add(header);
+		try {
+			JSONObject h = new JSONObject();
+			h.put("type", type);
+			h.put("title", title);
+			if (number != null) {
+				h.put("number", number);
+				heads.put(number, h);
+				toc.put(number);
+			} else {
+				toc.put(h);
+			}
+			if (anchor != null) {
+				h.put("anchor", anchor);
+				anchors.put(anchor, h);
+			}
+			return new JSONTOCEntry(this, h);
+		} catch (JSONException ex) {
+			throw WrappedException.wrap(ex);
+		}
+	}
+
+	public void recordPage(JSONObject entry, PDPage page, String name) {
+		try {
+			entry.put("page", name);
+			if (entry.has("anchor")) {
+				String anchor = entry.getString("anchor");
+				pages.put(anchor, page);
+				// TODO: notify anybody waiting
+			}
+		} catch (JSONException e) {
+			throw WrappedException.wrap(e);
+		}
+	}
+
 	public void write() throws FileNotFoundException {
-		if (tocfile == null)
-			return;
-		try (PrintWriter pw = new PrintWriter(tocfile)) {
-			for (String h : headings)
-				pw.println(h);
+		if (tocfile != null) {
+			try (PrintWriter pw = new PrintWriter(tocfile)) {
+				for (String h : headings)
+					pw.println(h);
+			}
+		}
+		System.out.println(pages);
+		if (metafile != null) {
+			try (PrintWriter pw = new PrintWriter(metafile)) {
+				pw.print(meta);
+			}
 		}
 	}
 }

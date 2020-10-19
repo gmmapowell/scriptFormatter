@@ -21,17 +21,19 @@ public class SimplePageCompositor implements PageCompositor {
 	private final StyleCatalog styles;
 	private final PDPage meta;
 	private final PDPageContentStream currentPage;
+	private final String pageName;
 	private final PDRectangle location;
 	private final PageStyle pageStyle;
 	private final Map<String, Outlet> outlets = new TreeMap<>();
 
-	public SimplePageCompositor(Ream ream, StyleCatalog styles, PDPage meta, PDPageContentStream page, PDRectangle location, PageStyle style) {
+	public SimplePageCompositor(Ream ream, StyleCatalog styles, PDPage meta, PDPageContentStream page, String pageName, PDRectangle location, PageStyle style) {
 		this.ream = ream;
+		this.styles = styles;
 		this.meta = meta;
 		if (page == null)
 			throw new CantHappenException("page must be non-null");
-		this.styles = styles;
 		this.currentPage = page;
+		this.pageName = pageName;
 		this.location = location;
 		this.pageStyle = style;
 	}
@@ -72,6 +74,16 @@ public class SimplePageCompositor implements PageCompositor {
 		outlets.put("footnotes", outlets.get("main").borrowFrom());
 	}
 
+	@Override
+	public String currentPageName() {
+		return pageName;
+	}
+
+	@Override
+	public PDPage meta() {
+		return meta;
+	}
+	
 	@Override
 	public Acceptance token(StyledToken token) throws IOException {
 		Outlet outlet = outlets.get(token.flow);
