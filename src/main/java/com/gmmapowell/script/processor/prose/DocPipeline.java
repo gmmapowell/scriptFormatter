@@ -103,7 +103,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			// it's a block starting command
 			commitCurrentCommand();
 			state.cmd = new DocCommand(s.substring(1));
-//			System.out.println((state.chapter-1) + "." + (state.section-1) + (state.commentary?"c":"") + " @: " + s);
 		} else if (state.cmd != null) {
 			int pos = s.indexOf('=');
 			if (pos == -1)
@@ -395,14 +394,26 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				String style = state.cmd.args.get("style");
 				if (style == null)
 					style = "chapter";
+				if (!style.equals(state.chapterStyle))
+					state.resetNumbering();
+				state.chapterStyle = style;
 				String anchor = state.cmd.args.get("anchor");
 				state.reset();
 				TOCEntry entry;
-				if (state.chapter > 0) {
+				if (state.chapterStyle.equals("chapter")) {
 					String number = Integer.toString(state.chapter);
 					entry = toc.chapter(anchor, number, title);
 					title = number + " " + title;
 					state.wantSectionNumbering = true;
+					state.chapter++;
+					state.section = 1;
+				} else if (state.chapterStyle.equals("appendix")) {
+					String number = new String(new char[] { (char) ('@' + state.chapter) });
+					entry = toc.chapter(anchor, number, title);
+					title = number + " " + title;
+					state.wantSectionNumbering = true;
+					state.chapter++;
+					state.section = 1;
 				} else {
 					entry = toc.chapter(anchor, null, title);
 					state.wantSectionNumbering = false;
@@ -417,8 +428,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				ProcessingUtils.process(state, title);
 				state.endPara();
 				
-				state.chapter++;
-				state.section = 1;
 				break;
 			}
 			case "Section": {
@@ -427,8 +436,12 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					throw new RuntimeException("Section without title");
 				String anchor = state.cmd.args.get("anchor");
 				TOCEntry entry;
-				if (state.wantSectionNumbering) {
+				if (state.chapterStyle.equals("chapter")) {
 					String number = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
+					entry = toc.section(anchor, number, title);
+					title = number + " " + title;
+				} else if (state.chapterStyle.equals("appendix")) {
+					String number = new String(new char[] { (char) ('A' + state.chapter-1) }) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
 					entry = toc.section(anchor, number, title);
 					title = number + " " + title;
 				} else {

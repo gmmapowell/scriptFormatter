@@ -25,7 +25,7 @@ public class DocState extends CurrentState {
 
 	public DocCommand cmd;
 	public InlineCommand inline;
-	public int chapter;
+	public int chapter = 1;
 	public int section;
 	public boolean commentary;
 	public boolean beginComment;
@@ -34,6 +34,7 @@ public class DocState extends CurrentState {
 	public boolean blockquote;
 	private final List<NumberCount> numbering = new ArrayList<>();
 	public ScanMode scanMode = ScanMode.NONE;
+	public String chapterStyle;
 
 	public DocState(Map<String, Flow> flows) {
 		super(flows);
@@ -74,6 +75,12 @@ public class DocState extends CurrentState {
 
 	public void popNumbering() {
 		numbering.remove(numbering.size()-1);
+	}
+
+	public void resetNumbering() {
+		chapter = 1;
+		section = 0;
+		commentary = false;
 	}
 
 	public boolean activeNumbering() {
