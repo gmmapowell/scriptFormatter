@@ -132,6 +132,7 @@ public class PDFSink implements Sink {
 							case NOROOM: // we are done; the outlet is full
 								c.backTo(a.lastAccepted);
 								active.remove(c);
+								records.clear();
 								continue whileActive;
 							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
 								suspended.add(new Suspension(c, a.lastAccepted));

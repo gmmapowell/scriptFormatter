@@ -12,10 +12,12 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 
 public class LinkFromTOC implements SpanItem {
 	public final String text;
+	private final String comment;
 	private PDAnnotationLink pending;
 
-	public LinkFromTOC(String text) {
+	public LinkFromTOC(String text, String comment) {
 		this.text = text;
+		this.comment = comment;
 	}
 
 	@Override
@@ -43,6 +45,6 @@ public class LinkFromTOC implements SpanItem {
 	
 	@Override
 	public String toString() {
-		return "LinkFromTOC[" + text + "]";
+		return "LinkFromTOC[" + text + ":" + comment + "]";
 	}
 }

@@ -42,7 +42,6 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 			handleRule(topRule);
 		else {
 			for (Production r : grammar.productions()) {
-				System.out.println("want " + r.name);
 				if (!dontShow.contains(r.name))
 					handleRule(r);
 			}
@@ -94,12 +93,12 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	@Override
 	public void exdent() {
 		// I think this is only relevant to the sentence producer
-		System.out.println("exdent");
+//		System.out.println("exdent");
 	}
 
 	@Override
 	public void futurePattern(String arg0, String arg1) {
-		System.out.println("futurePattern " + arg0 + " " +arg1);
+//		System.out.println("futurePattern " + arg0 + " " +arg1);
 	}
 
 	@Override
@@ -115,12 +114,12 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void pushPart(String arg0, String arg1, boolean arg2) {
-		System.out.println("ignoring pushPart " + arg0 + " " + arg1 + " " + arg2);
+//		System.out.println("ignoring pushPart " + arg0 + " " + arg1 + " " + arg2);
 	}
 
 	@Override
 	public void referTo(String prod, boolean resetToken) {
-		System.out.println("referring to " + prod);
+//		System.out.println("referring to " + prod);
 		if (dontShow.contains(prod))
 			block = null;
 		else if (block != null) {
@@ -192,19 +191,19 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public boolean complete(OrProduction prod, Object cxt, List<Definition> choices) {
-		System.out.println("complete " + prod.name);
+//		System.out.println("complete " + prod.name);
 		return false;
 	}
 
 	@Override
 	public void exactly(int cnt, Definition child, boolean withEOL) {
-		System.out.println("exactly " + cnt);
+//		System.out.println("exactly " + cnt);
 		
 	}
 
 	@Override
 	public OrProduction isOr(String child) {
-		System.out.println("isor " + child);
+//		System.out.println("isor " + child);
 		return null;
 	}
 
@@ -246,7 +245,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void pushCaseNumber() {
-		System.out.println("push case number");
+//		System.out.println("push case number");
 	}
 
 	private void handleIndentedList(String quant) {

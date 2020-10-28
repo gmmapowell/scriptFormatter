@@ -441,7 +441,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 					entry = toc.section(anchor, number, title);
 					title = number + " " + title;
 				} else if (state.chapterStyle.equals("appendix")) {
-					String number = new String(new char[] { (char) ('A' + state.chapter-1) }) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
+					String number = new String(new char[] { (char) ('@' + state.chapter-1) }) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
 					entry = toc.section(anchor, number, title);
 					title = number + " " + title;
 				} else {
@@ -527,8 +527,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			case "TOC": {
 				if (currentMeta == null)
 					break;
-				state.newSection("footnotes", "toc"); // just to keep them in sync
-				state.newSection("main", "toc");
 				List<LinkFromTOC> links = new ArrayList<>();
 				try {
 					JSONArray order = currentMeta.getJSONArray("toc");
@@ -550,7 +548,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 						state.newSpan(); // tocdots - how do we set the width of this?
 						state.text("...");
 						state.newSpan(); // tocpage - right justified
-						LinkFromTOC lk = new LinkFromTOC(entry.getString("page"));
+						LinkFromTOC lk = new LinkFromTOC(entry.getString("page"), entry.getString("title"));
 						links.add(lk);
 						state.op(lk);
 						state.endPara();
