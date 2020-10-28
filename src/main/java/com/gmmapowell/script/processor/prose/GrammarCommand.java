@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flasck.flas.grammar.Definition;
+import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.OrProduction;
 import org.flasck.flas.grammar.Production;
 import org.flasck.flas.grammar.ProductionVisitor;
@@ -12,33 +13,54 @@ import org.flasck.flas.grammar.SentenceProducer.UseNameForScoping;
 import org.flasck.flas.grammar.TokenDefinition.Matcher;
 import org.zinutils.exceptions.NotImplementedException;
 
+import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 
 public class GrammarCommand implements ProductionVisitor, InlineCommand {
-	private final Production rule;
+	private final Production topRule;
+	private final Grammar grammar;
 	private Object block;
 	private List<String> dontShow = new ArrayList<String>();
 	private boolean justIndented;
 	private DocState state;
 
 	public GrammarCommand(Production rule, DocState state) {
-		this.rule = rule;
+		this.topRule = rule;
+		this.grammar = null;
+		this.state = state;
+	}
+
+	public GrammarCommand(Grammar grammar, DocState state) {
+		this.topRule = null;
+		this.grammar = grammar;
 		this.state = state;
 	}
 
 	@Override
 	public void execute() throws IOException {
+		if (topRule != null)
+			handleRule(topRule);
+		else {
+			for (Production r : grammar.productions()) {
+				System.out.println("want " + r.name);
+				if (!dontShow.contains(r.name))
+					handleRule(r);
+			}
+		}
+	}
+
+	private void handleRule(Production r) {
 		block = "hello";
 		state.newPara("grammar");
 		state.newSpan("grammar-number");
-		state.text("(" + rule.number + ")");
+		state.text("(" + r.number + ")");
 		state.newSpan("grammar-name");
-		state.text(rule.name);
+		state.text(r.name);
 		state.newSpan("grammar-op");
 		state.text("::=");
 		state.newSpan();
 		try {
-			rule.visit(this);
+			r.visit(this);
 			state.endPara();
 		} catch (NotImplementedException ex) {
 			ex.printStackTrace(System.out);
@@ -72,39 +94,41 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	@Override
 	public void exdent() {
 		// I think this is only relevant to the sentence producer
+		System.out.println("exdent");
 	}
 
 	@Override
 	public void futurePattern(String arg0, String arg1) {
+		System.out.println("futurePattern " + arg0 + " " +arg1);
 	}
 
 	@Override
-	public boolean indent() {
+	public boolean indent(boolean force) {
 		this.justIndented = true;
-		state.newPara("grammar");
-		state.newSpan("grammar-op");
-		state.text(">>");
-		state.newSpan();
 		// always return true - this value is part of the SentenceProducer logic
 		return true;
 	}
 
 	@Override
 	public void nestName(int arg0) {
-		System.out.println("this is for the >>! cases");
 	}
 
 	@Override
 	public void pushPart(String arg0, String arg1, boolean arg2) {
-		throw new NotImplementedException();
+		System.out.println("ignoring pushPart " + arg0 + " " + arg1 + " " + arg2);
 	}
 
 	@Override
 	public void referTo(String prod, boolean resetToken) {
+		System.out.println("referring to " + prod);
 		if (dontShow.contains(prod))
 			block = null;
 		else if (block != null) {
-			state.op(new NonBreakingSpace());
+			if (justIndented) {
+				handleIndentedList(">>!");
+			} else {
+				state.op(new BreakingSpace());
+			}
 			state.text(prod);
 		}
 	}
@@ -113,7 +137,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 	public void token(String token, String arg1, UseNameForScoping arg2, List<Matcher> arg3, boolean repeatLast, boolean saveLast, String generator, boolean space) {
 		if (block != null) {
 			state.nestSpan("bold");
-			state.op(new NonBreakingSpace());
+			state.op(new BreakingSpace());
 			state.text(token);
 			state.popSpan();
 		}
@@ -165,28 +189,22 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		}
 		return 0;
 	}
-	
-	@Override
-	public boolean indent(boolean force) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public boolean complete(OrProduction prod, Object cxt, List<Definition> choices) {
-		// TODO Auto-generated method stub
+		System.out.println("complete " + prod.name);
 		return false;
 	}
 
 	@Override
 	public void exactly(int cnt, Definition child, boolean withEOL) {
-		// TODO Auto-generated method stub
+		System.out.println("exactly " + cnt);
 		
 	}
 
 	@Override
 	public OrProduction isOr(String child) {
-		// TODO Auto-generated method stub
+		System.out.println("isor " + child);
 		return null;
 	}
 
@@ -228,8 +246,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 
 	@Override
 	public void pushCaseNumber() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("push case number");
 	}
 
 	private void handleIndentedList(String quant) {
@@ -238,6 +255,7 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		justIndented = false;
 		state.newPara("grammar");
 		state.newSpan("grammar-blank");
+		state.op(new NonBreakingSpace());
 		state.newSpan("grammar-op");
 		state.text(quant);
 	}

@@ -242,17 +242,18 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				commitCurrentCommand();
 				Map<String, String> params = readParams(state, args, "rule");
 				String ruleName = params.get("rule");
-				if (debug)
-					System.out.println("including grammar for production " + ruleName);
-				try {
-					Production rule = grammar.findRule(ruleName);
-					state.inline = new GrammarCommand(rule, state);
-				} catch (RuntimeException ex) {
-					System.out.println(state.inputLocation() + ": " + ex.getMessage());
+				if (ruleName == null) {
+					state.inline = new GrammarCommand(grammar, state);
+				} else {
+					if (debug)
+						System.out.println("including grammar for production " + ruleName);
+					try {
+						Production rule = grammar.findRule(ruleName);
+						state.inline = new GrammarCommand(rule, state);
+					} catch (RuntimeException ex) {
+						System.out.println(state.inputLocation() + ": " + ex.getMessage());
+					}
 				}
-				// TODO: we need the ability to remove rules we don't like
-				// In particular, we need to move the Ziniki extensions into their own rules
-				// and then hide them in the FLAS manual
 				break;
 			}
 			case "removeOption": {

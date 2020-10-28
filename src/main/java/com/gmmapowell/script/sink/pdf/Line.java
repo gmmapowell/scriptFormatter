@@ -69,16 +69,19 @@ public class Line {
 		if (si instanceof Break)
 			requireBeyond = ((Break) si).require();
 		BoundingBox bbox = si.bbox(font, sz);
+		boolean overflow = false;
 		float wid = Math.max(bbox.getWidth(), orZero(style.getWidth()));
 		if (xpos + wid > width) {
-			if (isNew)
+			if (isNew || pending.size() >= contents.size()) {
 				System.out.println("line overflowed with " + token);
-			else {
-				System.out.println("pending=" + pending.size() + " contents = " + contents.size());
-				if (pending.size() >= contents.size()) {
-					System.out.println("overflowed " + width + " with no breaks");
-					return new AcceptToken(style.getOverflowNewLine(), null);
-				}
+				overflow = true;
+			} else {
+//				System.out.println("pending=" + pending.size() + " contents = " + contents.size());
+//				if (pending.size() >= contents.size()) {
+//					System.out.println("overflowed " + width + " with no breaks");
+//					contents.add(new Item(pageStyle, style, adjust(xpos, cellJust, cellWidth, wid), bbox, font, sz, si));
+//					return new AcceptToken(style.getOverflowNewLine(), new ArrayList<>());
+//				}
 				for (int i=0;i<pending.size()-1;i++)
 					contents.remove(contents.size()-1);
 				return new AcceptToken(style.getOverflowNewLine(), pending);
@@ -103,7 +106,7 @@ public class Line {
 			return new AcceptToken(style.getOverflowNewLine(), pending);
 		}
 		
-		if (si instanceof BreakingSpace || si instanceof ParaBreak) {
+		if (overflow || si instanceof BreakingSpace || si instanceof ParaBreak) {
 			pending.clear();
 			return new AcceptToken();
 		} else
