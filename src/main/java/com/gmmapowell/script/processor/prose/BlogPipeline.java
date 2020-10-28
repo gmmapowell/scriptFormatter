@@ -94,7 +94,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					break;
 				}
 				default:
-					throw new RuntimeException(state.location() + " handle inline command: " + cmd);
+					throw new RuntimeException(state.inputLocation() + " handle inline command: " + cmd);
 				}
 			} else {
 				if (!state.inPara())

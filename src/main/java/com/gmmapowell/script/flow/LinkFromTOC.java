@@ -37,7 +37,8 @@ public class LinkFromTOC implements SpanItem {
 		PDPageDestination dest = new PDPageXYZDestination();
 		dest.setPage(page);
 		topage.setDestination(dest);
-		this.pending.setAction(topage);
+		if (this.pending != null)
+			this.pending.setAction(topage);
 	}
 	
 	@Override

@@ -114,11 +114,11 @@ public class ProcessingUtils {
 			break;
 		}
 		case "sp": {
-			st.text(" ");
+			st.op(new BreakingSpace());
 			break;
 		}
 		default:
-			throw new NotImplementedException("no such command: " + cmd);
+			throw new NotImplementedException("no such command: " + cmd + " at " + st.inputLocation());
 		}
 	}
 }

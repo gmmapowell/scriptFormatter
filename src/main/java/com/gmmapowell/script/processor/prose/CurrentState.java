@@ -41,7 +41,7 @@ public abstract class CurrentState implements TextState {
 	}
 
 	public abstract void line(int lineNumber);
-	public abstract String location();
+	public abstract String inputLocation();
 
 	protected boolean trimLine() {
 		return true;

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.flow.BreakingSpace;
@@ -56,6 +57,7 @@ public class BloggerSink implements Sink {
 	private Posts posts;
 	private StringWriter sw;
 	private List<Flow> flows = new ArrayList<>();
+	private boolean haveBreak;
 
 	public BloggerSink(File root, File creds, String blogUrl, File posts) throws IOException, GeneralSecurityException {
 		this.creds = creds;
@@ -82,14 +84,22 @@ public class BloggerSink implements Sink {
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
+//					System.out.println(tok);
 					last = transition(cf, last, tok);
+					boolean hadBreak = haveBreak;
+					haveBreak = false;
 					figureStyles(cf, tok.styles);
 					cf = new ArrayList<>(tok.styles);
 					if (tok.it instanceof TextSpanItem)
 						writer.print(entitify(((TextSpanItem)tok.it).text));
-					else if (tok.it instanceof BreakingSpace)
-						writer.print(" ");
-					else if (tok.it instanceof ParaBreak) {
+					else if (tok.it instanceof BreakingSpace) {
+						if (last.equals("blockquote"))
+							writer.println("&nbsp;");
+						else
+							writer.print(" ");
+					} else if (tok.it instanceof ParaBreak) {
+						if (hadBreak) // ignore multiple consecutive BRKs
+							continue;
 						switch (last) {
 						case "bullet":
 							last = "needli";
@@ -97,8 +107,18 @@ public class BloggerSink implements Sink {
 						case "text":
 							writer.print("<br/>");
 							break;
+						case "blockquote":
+							writer.print("<br/>");
+							break;
+						case "h1":
+						case "h2":
+						case "h3":
+							break; // it happens automatically
+						default:
+							throw new CantHappenException("cannot handle BRKPara in " + last);
 						}
 						writer.println();
+						haveBreak = true;
 					} else if (tok.it instanceof ImageOp) {
 						writer.print("<img border='0' src=\'" + ((ImageOp)tok.it).uri + "' />");
 					} else if (tok.it instanceof LinkOp) {
@@ -114,9 +134,12 @@ public class BloggerSink implements Sink {
 			writer.close();
 			upload(f.name, this.sw.toString());
 		}
+		index.close();
 	}
 
 	private String transition(List<String> cf, String last, StyledToken tok) {
+		if (last.equals("text") && tok.styles.get(0).equals("text") && haveBreak)
+			writer.println("<br/>");
 		return transition(cf, last, tok.styles.get(0));
 	}
 

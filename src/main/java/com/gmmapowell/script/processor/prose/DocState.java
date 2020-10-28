@@ -59,6 +59,7 @@ public class DocState extends CurrentState {
 		this.line = lineNumber;
 	}
 
+	@Override
 	public String inputLocation() {
 		return file + ":" + line;
 	}

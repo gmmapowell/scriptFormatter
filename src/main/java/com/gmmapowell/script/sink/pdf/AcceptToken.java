@@ -1,14 +1,19 @@
 package com.gmmapowell.script.sink.pdf;
 
-public class AcceptToken {
+import java.util.List;
+
+public class AcceptToken implements Outcome {
 	private final Float onl;
+	private final List<StyledToken> left;
 
 	public AcceptToken() {
 		this.onl = null;
+		this.left = null;
 	}
 	
-	public AcceptToken(Float onl) {
+	public AcceptToken(Float onl, List<StyledToken> left) {
 		this.onl = onl;
+		this.left = left;
 	}
 
 	public boolean forcedNewLine() {
@@ -17,5 +22,10 @@ public class AcceptToken {
 
 	public float getOverflow() {
 		return onl;
+	}
+	
+	@Override
+	public List<StyledToken> replay() {
+		return left;
 	}
 }

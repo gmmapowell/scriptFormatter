@@ -90,7 +90,10 @@ public class DocStyleCatalog extends FontCatalog {
 			));
 
 		catalog.put("blockquote",
-			create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setBeforeBlock(0).setAfterBlock(0).build()
+			new CompoundStyle(this,
+				create().setFont("monospace").setFontSize(9f).setLineSpacing(11.5f).setPreformatted(true).setBeforeBlock(0).setAfterBlock(0).build(),
+				defaultStyle
+			)
 		);
 
 		catalog.put("preformatted",
@@ -110,15 +113,15 @@ public class DocStyleCatalog extends FontCatalog {
 		);
 
 		catalog.put("grammar-name",
-				create().setBold(true).setWidth(96.0f).setJustification(Justification.RIGHT).setOverflowNewLine(128.0f).build()
+				create().setBold(true).setWidth(64.0f).setJustification(Justification.RIGHT).setOverflowNewLine(96.0f).build()
 		);
 
 		catalog.put("grammar-blank",
-				create().setBold(true).setWidth(128.0f).setJustification(Justification.RIGHT).build()
+				create().setBold(true).setWidth(96.0f).setJustification(Justification.RIGHT).build()
 		);
 		
 		catalog.put("grammar-op",
-				create().setBold(true).setWidth(32.0f).setJustification(Justification.CENTER).build()
+				create().setBold(true).setWidth(24.0f).setJustification(Justification.CENTER).build()
 		);
 
 		catalog.put("bullet",

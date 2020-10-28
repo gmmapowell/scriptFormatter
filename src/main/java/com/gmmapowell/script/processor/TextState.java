@@ -13,4 +13,5 @@ public interface TextState {
 	void op(SpanItem op);
 
 	int nextFootnoteMarker();
+	String inputLocation();
 }

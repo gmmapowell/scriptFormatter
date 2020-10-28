@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import javax.swing.plaf.nimbus.State;
+
 import org.zinutils.exceptions.InvalidUsageException;
 import org.zinutils.exceptions.WrappedException;
 
@@ -123,14 +125,14 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 
 	protected String readString(T state, StringBuilder args) {
 		if (args == null || args.length() == 0)
-			throw new RuntimeException("cannot read from empty string at " + state.location());
+			throw new RuntimeException("cannot read from empty string at " + state.inputLocation());
 		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
 			args.delete(0, 1);
 		if (args.length() == 0)
-			throw new RuntimeException("cannot read from empty string at " + state.location());
+			throw new RuntimeException("cannot read from empty string at " + state.inputLocation());
 		char c = args.charAt(0);
 		if (c != '\'' && c != '"')
-			throw new RuntimeException("unquoted string at " + state.location());
+			throw new RuntimeException("unquoted string at " + state.inputLocation());
 		args.delete(0, 1);
 		String ret = null;
 		for (int i=0;i<args.length();i++) {
@@ -145,7 +147,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			}
 		}
 		if (ret == null)
-			throw new RuntimeException("unterminated string at " + state.location());
+			throw new RuntimeException("unterminated string at " + state.inputLocation());
 		return ret;
 	}
 
@@ -176,9 +178,9 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		return ret;
 	}
 	
-	protected void assertArgsDone(StringBuilder args) {
+	protected void assertArgsDone(T state, StringBuilder args) {
 		if (args.toString().trim().length() > 0)
-			throw new RuntimeException("command had junk at end: " + args);
+			throw new RuntimeException("command had junk at end: " + args + " at " + state.inputLocation());
 	}
 
 	private float dim(String value) {

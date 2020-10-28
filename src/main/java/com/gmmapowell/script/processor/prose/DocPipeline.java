@@ -23,6 +23,7 @@ import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkFromRef;
 import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
@@ -65,7 +66,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		else
 			this.joinspace = false;
 		toc = new TableOfContents(tocfile, metafile);
-		if (metafile.exists()) {
+		if (metafile != null && metafile.exists()) {
 			try {
 				currentMeta = new JSONObject(FileUtils.readFile(metafile));
 			} catch (JSONException e) {
@@ -266,21 +267,21 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			case "review":
 				if (args == null)
 					throw new RuntimeException("&review command needs something to review");
-				System.out.println("review in " + state.location() + ": " + readString(state, args));
-				assertArgsDone(args);
+				System.out.println("review in " + state.inputLocation() + ": " + readString(state, args));
+				assertArgsDone(state, args);
 				break;
 			case "future":
 				if (args == null)
 					throw new RuntimeException("&future command needs a comment");
-				System.out.println(state.location() + ": in the future, " + readString(state, args));
+				System.out.println(state.inputLocation() + ": in the future, " + readString(state, args));
 				break;
 			case "morework":
 				if (args == null)
 					throw new RuntimeException("&morework command needs a description");
-				System.out.println("more work is required at " + state.location() + ": " + readString(state, args));
+				System.out.println("more work is required at " + state.inputLocation() + ": " + readString(state, args));
 				break;
 			case "outrageousclaim":
-				System.out.println("There is an outrageous claim at " + state.location());
+				System.out.println("There is an outrageous claim at " + state.inputLocation());
 				break;
 			case "number": {
 				if (!state.activeNumbering())
@@ -319,7 +320,7 @@ public class DocPipeline extends ProsePipeline<DocState> {
 				break;
 			}
 			default:
-				throw new RuntimeException(state.location() + " handle inline command: " + s);
+				throw new RuntimeException(state.inputLocation() + " handle inline command: " + s);
 			}
 		} else if (s.startsWith("*")) {
 			int idx = s.indexOf(" ");
@@ -331,9 +332,26 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			state.text("\u2022");
 			state.endSpan();
 			ProcessingUtils.process(state, s.substring(idx+1).trim());
+		} else if (state.blockquote && s.startsWith("|")) {
+			state.newPara("blockquote");
+			state.newSpan();
+			int i=0;
+			for (i=0;i<s.length();i++) {
+				if (s.charAt(i) == '|') {
+					state.op(new NonBreakingSpace());
+					state.op(new NonBreakingSpace());
+				} else
+					break;
+			}
+			while (Character.isWhitespace(s.charAt(i)))
+				i++;
+			if (i < s.length())
+				ProcessingUtils.processPart(state, s, i, s.length());
 		} else {
 			if (!state.inPara()) {
-				if (state.inRefComment)
+				if (state.blockquote)
+					state.newPara("blockquote");
+				else if (state.inRefComment)
 					state.newPara("refComment");
 				else if (this.scanmode == ScanMode.DETAILS && (state.scanMode == ScanMode.OVERVIEW || state.scanMode == ScanMode.CONCLUSION))
 					state.newPara("text", "bold");

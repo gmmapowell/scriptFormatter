@@ -25,7 +25,7 @@ public class BlogState extends CurrentState {
 	}
 
 	@Override
-	public String location() {
+	public String inputLocation() {
 		return file + ":" + line;
 	}
 }
