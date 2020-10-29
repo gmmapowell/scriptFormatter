@@ -23,6 +23,7 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.sink.presenter.PresenterSink;
+import com.gmmapowell.script.styles.ConfigurableStyleCatalog;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class ScriptConfig implements Config {
@@ -67,7 +68,16 @@ public class ScriptConfig implements Config {
 			String styles = vars.remove("styles");
 			if (styles == null)
 				throw new ConfigException("style catalog was not defined");
-			StyleCatalog catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
+			StyleCatalog catalog;
+			try {
+				catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
+			} catch (ClassNotFoundException ex) {
+				try {
+					catalog = new ConfigurableStyleCatalog(new File(root, styles), debug);
+				} catch (Exception e2) {
+					throw new ConfigException(e2.getMessage());
+				}
+			}
 			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug, sshid));
 			break;
 		}

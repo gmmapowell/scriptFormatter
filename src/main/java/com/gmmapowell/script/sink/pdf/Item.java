@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
+import org.zinutils.exceptions.InvalidUsageException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.LinkFromRef;
@@ -30,6 +31,9 @@ public class Item {
 	private final SpanItem si;
 
 	public Item(PageStyle pageStyle, Style style, float xpos, BoundingBox bbox, PDFont font, Float fontsz, SpanItem si) {
+		if (font == null) {
+			throw new InvalidUsageException("null font");
+		}
 		this.pageStyle = pageStyle;
 		this.style = style;
 		this.xpos = xpos;
