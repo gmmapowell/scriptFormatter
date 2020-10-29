@@ -13,7 +13,7 @@ public class MoviePageStyle extends DefaultPageStyle {
 	}
 	
 	@Override
-	public boolean wantFooter() {
+	public Boolean wantFooter() {
 		return true;
 	}
 }

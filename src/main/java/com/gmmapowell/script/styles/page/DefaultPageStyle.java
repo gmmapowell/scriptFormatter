@@ -38,28 +38,28 @@ public class DefaultPageStyle implements PageStyle {
 	}
 	
 	@Override
-	public boolean wantHeader() {
+	public Boolean wantHeader() {
 		return false;
 	}
 
 	@Override
-	public boolean wantFooter() {
+	public Boolean wantFooter() {
 		return false;
 	}
 
 	@Override
-	public boolean wantPageNumbers() {
+	public Boolean wantPageNumbers() {
 		return true;
 	}
 	
 	@Override
-	public float pageNumberCenterX() {
+	public Float pageNumberCenterX() {
 		return 4.25f*72;
 	}
 	
 	@Override
-	public float pageNumberBaselineY() {
-		return 54;
+	public Float pageNumberBaselineY() {
+		return 54f;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class DefaultPageStyle implements PageStyle {
 	}
 
 	@Override
-	public float getPageNumberFontSize() {
+	public Float getPageNumberFontSize() {
 		return 12f;
 	}
 }

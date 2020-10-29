@@ -23,7 +23,7 @@ public class BookPageStyle extends DefaultPageStyle {
 	}
 	
 	@Override
-	public boolean wantHeader() {
+	public Boolean wantHeader() {
 		return true;
 	}
 }

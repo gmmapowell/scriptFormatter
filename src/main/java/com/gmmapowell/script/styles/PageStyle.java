@@ -10,12 +10,12 @@ public interface PageStyle {
 	Float getBottomMargin();
 	Float getLeftMargin();
 	Float getRightMargin();
-	boolean wantPageNumbers();
-	float pageNumberCenterX();
-	float pageNumberBaselineY();
+	Boolean wantPageNumbers();
+	Float pageNumberCenterX();
+	Float pageNumberBaselineY();
 	PDFont getPageNumberFont();
-	float getPageNumberFontSize();
-	boolean wantHeader();
-	boolean wantFooter();
+	Float getPageNumberFontSize();
+	Boolean wantHeader();
+	Boolean wantFooter();
 
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.gmmapowell.script.sink.pdf.Stock;
 import com.gmmapowell.script.styles.FontCatalog;
 import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.Style;
@@ -99,5 +100,10 @@ public class MovieStyleCatalog extends FontCatalog {
 	@Override
 	public Style getOptional(String style) {
 		return catalog.get(style);
+	}
+
+	@Override
+	public Stock getStock(String stockName) {
+		return null;
 	}
 }

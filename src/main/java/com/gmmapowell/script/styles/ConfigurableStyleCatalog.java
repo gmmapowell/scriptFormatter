@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.zinutils.collections.ListMap;
 import org.zinutils.exceptions.InvalidUsageException;
 import org.zinutils.exceptions.NotImplementedException;
@@ -20,6 +21,13 @@ import org.zinutils.reflection.Reflection;
 import org.zinutils.utils.StringUtil;
 
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.sink.pdf.BifoldReam;
+import com.gmmapowell.script.sink.pdf.DoubleReam;
+import com.gmmapowell.script.sink.pdf.PaperStock;
+import com.gmmapowell.script.sink.pdf.Ream;
+import com.gmmapowell.script.sink.pdf.SingleReam;
+import com.gmmapowell.script.sink.pdf.Stock;
+import com.gmmapowell.script.styles.page.ConfigurablePageStyle;
 import com.gmmapowell.script.styles.simple.CompoundStyle;
 import com.gmmapowell.script.styles.simple.SimpleStyle;
 
@@ -27,6 +35,9 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 	private final Map<String, Style> catalog = new TreeMap<>();
 	private final Style defaultStyle;
 	private final Set<String> missed = new TreeSet<>();
+	private final Map<String, String> fontStreams = new TreeMap<>();
+	private final Map<String, Stock> stocks = new TreeMap<>();
+	private final Map<String, PageStyle> pages = new TreeMap<>();
 
 	public ConfigurableStyleCatalog(File file, boolean debug) throws IOException, ConfigException {
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
@@ -81,13 +92,17 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 		String name = curr.get("_name").get(0);
 		if (type.equals("para") || type.equals("text"))
 			buildStyle(debug, type, name, curr);
+		else if (type.equals("pagestyle"))
+			pageStyle(debug, type, name, curr);
+		else if (type.equals("stock"))
+			stock(debug, type, name, curr);
 		else if (type.equals("font"))
-			installFont(debug, type, name, curr);
+			recordFont(debug, type, name, curr);
 		else
 			throw new NotImplementedException("cannot handle " + type);
 	}
 
-	private void buildStyle(boolean debug, String type, String name, ListMap<String, String> curr) {
+	private void buildStyle(boolean debug, String type, String name, ListMap<String, String> curr) throws ConfigException {
 		SimpleStyle overrides = new SimpleStyle(this);
 		if (debug)
 			System.out.println("building new style " + name);
@@ -114,15 +129,51 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 		this.catalog.put(name, s);
 	}
 
-	private void installFont(boolean debug, String type, String name, ListMap<String, String> curr) throws ConfigException {
+	private void recordFont(boolean debug, String type, String name, ListMap<String, String> curr) throws ConfigException {
 		if (curr.contains("stream")) {
 			String stream = curr.get("stream").get(0);
+			fontStreams.put(name, stream);
 //			catalog.font(name, (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
 		} else
 			throw new ConfigException("no stream for font " + name);
 	}
 
-	private void set(SimpleStyle overrides, String prop, List<String> values) {
+	private void pageStyle(boolean debug, String type, String name, ListMap<String, String> curr) throws ConfigException {
+		if (pages.containsKey(name))
+			throw new ConfigException("duplicate page style " + name);
+		ConfigurablePageStyle ps = new ConfigurablePageStyle();
+		pages.put(name, ps);
+		for (String s : curr.keySet()) {
+			if (s.startsWith("_"))
+				continue;
+			set(ps, s, curr.get(s));
+		}
+	}
+
+	private void stock(boolean debug, String type, String name, ListMap<String, String> curr) throws ConfigException {
+		if (stocks.containsKey(name))
+			throw new ConfigException("duplicate stock " + name);
+		ConfigurablePageStyle dps = new ConfigurablePageStyle();
+		if (!curr.contains("pagestyle"))
+			throw new ConfigException("stock must have a default pagestyle");
+		for (String s : curr.get("pagestyle")) {
+			if (!pages.containsKey(s))
+				throw new ConfigException("there is no page style " + s);
+			dps.applyAll(pages.get(s));
+		}
+		ConfigurablePageStyle fl = null, fr = null, left = new ConfigurablePageStyle().applyAll(dps), right = new ConfigurablePageStyle().applyAll(dps);
+		if (curr.contains("left"))
+			left.applyAll(pages.get(curr.get("left").get(0)));
+		if (curr.contains("right"))
+			right.applyAll(pages.get(curr.get("right").get(0)));
+		if (curr.contains("firstLeft"))
+			fl = new ConfigurablePageStyle().applyAll(left).applyAll(pages.get(curr.get("firstLeft").get(0)));
+		if (curr.contains("firstRight"))
+			fr = new ConfigurablePageStyle().applyAll(right).applyAll(pages.get(curr.get("firstRight").get(0)));
+		stocks.put(name, new PaperStock(makeReam(curr), fl, fr, left, right));
+	}
+	
+	private void set(Object overrides, String prop, List<String> values) throws ConfigException {
 		Method m = figureSetMethod(overrides, prop);
 		if (m == null)
 			return;
@@ -130,17 +181,27 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 			try {
 				Class<?>[] args = m.getParameterTypes();
 				if (args.length != 1)
-					throw new NotImplementedException("#args != 1 but " + args.length);
+					throw new NotImplementedException("#args != 1 but " + args.length + " for " + prop + " = " + s);
 				switch (args[0].getSimpleName()) {
 				case "boolean":
 					m.invoke(overrides, Boolean.parseBoolean(s));
 					break;
 				case "float":
 				case "Float":
-					m.invoke(overrides, Float.parseFloat(s));
+					try {
+						m.invoke(overrides, Float.parseFloat(s));
+					} catch (Exception ex) {
+						m.invoke(overrides, dim(s));
+					}
 					break;
 				case "Justification":
 					m.invoke(overrides, Justification.valueOf(s));
+					break;
+				case "PDFont":
+					if (s.equals("courier"))
+						m.invoke(overrides, PDType1Font.COURIER);
+					else
+						throw new ConfigException("Need to handle fonts");
 					break;
 				case "String":
 					m.invoke(overrides, s);
@@ -154,10 +215,9 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 		}
 	}
 
-	private Method figureSetMethod(SimpleStyle overrides, String prop) {
-		List<Method> ms= Reflection.methods(overrides, prop);
-		if (ms.isEmpty())
-			ms = Reflection.methods(overrides, "set" + StringUtil.capitalize(prop));
+	private Method figureSetMethod(Object overrides, String prop) {
+		List<Method> ms = Reflection.methods(overrides, prop);
+		ms.addAll(Reflection.methods(overrides, "set" + StringUtil.capitalize(prop)));
 		if (ms.isEmpty()) {
 			System.out.println("there is no style property " + prop);
 			return null;
@@ -187,4 +247,54 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 	public Style getOptional(String style) {
 		return catalog.get(style);
 	}
+
+	@Override
+	public Stock getStock(String stockName) throws ConfigException {
+		if (!stocks.containsKey(stockName))
+			throw new ConfigException("there is no stock " + stockName + " defined");
+		return stocks.get(stockName);
+	}
+
+	private float dim(String value) {
+		if (value == null || value.length() < 3)
+			throw new InvalidUsageException("value must have units");
+		String units = value.substring(value.length()-2);
+		float n = Float.parseFloat(value.substring(0, value.length()-2));
+		switch (units) {
+		case "pt":
+			return n;
+		case "in":
+			return n*72;
+		case "mm":
+			return n*72/25.4f;
+		case "cm":
+			return n*72/2.54f;
+		default:
+			throw new InvalidUsageException("do not understand unit " + units + ": try pt, in, mm, cm");
+		}
+	}
+
+	private Ream makeReam(ListMap<String, String> curr) {
+		String ream = curr.get("ream").get(0);
+		float w = dim(curr.get("width").get(0));
+		float h = dim(curr.get("height").get(0));
+		int b = 1;
+		if (curr.contains("blksize"))
+			b = Integer.parseInt(curr.get("blksize").get(0));
+		return makeReam(ream, w, h, b);
+	}
+
+	private Ream makeReam(String ream, float width, float height, int blksize) {
+		switch (ream) {
+		case "single":
+			return new SingleReam(width, height);
+		case "double":
+			return new DoubleReam(width, height);
+		case "bifold":
+			return new BifoldReam(blksize, width, height);
+		default:
+			throw new InvalidUsageException("there is no ream " + ream);
+		}
+	}
+
 }

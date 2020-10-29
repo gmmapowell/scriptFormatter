@@ -12,17 +12,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.zinutils.exceptions.CantHappenException;
-import org.zinutils.exceptions.InvalidUsageException;
 
+import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ReleaseFlow;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.styles.StyleCatalog;
-import com.gmmapowell.script.styles.page.FirstBookPageStyle;
-import com.gmmapowell.script.styles.page.LeftBookPageStyle;
-import com.gmmapowell.script.styles.page.RightBookPageStyle;
 import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -35,9 +32,9 @@ public class PDFSink implements Sink {
 	private final boolean debug;
 	private final String sshid;
 	private final List<Flow> flows = new ArrayList<>();
-	private final PaperStock stock;
+	private final Stock stock;
 
-	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException {
+	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
 		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
@@ -48,55 +45,12 @@ public class PDFSink implements Sink {
 			this.output = new File(root, output);
 		this.wantOpen = wantOpen;
 		this.upload = upload;
-		String ream = "single";
-		float width = dim("210mm");
-		float height = dim("297mm");
-		int blksize = 32;
-		if (options.containsKey("ream")) {
-			ream  = options.remove("ream");
+		String stockName = null;
+		if (!options.containsKey("stock")) {
+			throw new ConfigException("must specify a stock to render to");
 		}
-		if (options.containsKey("width")) {
-			width  = dim(options.remove("width"));
-		}
-		if (options.containsKey("height")) {
-			height  = dim(options.remove("height"));
-		}
-		if (options.containsKey("blksize")) {
-			blksize  = Integer.parseInt(options.remove("blksize"));
-		}
-		stock = new PaperStock(makeReam(ream, width, height, blksize), null, new FirstBookPageStyle(), new LeftBookPageStyle(), new RightBookPageStyle());
-	}
-
-	private float dim(String value) {
-		if (value == null || value.length() < 3)
-			throw new InvalidUsageException("value must have units");
-		String units = value.substring(value.length()-2);
-		float n = Float.parseFloat(value.substring(0, value.length()-2));
-		switch (units) {
-		case "pt":
-			return n;
-		case "in":
-			return n*72;
-		case "mm":
-			return n*72/25.4f;
-		case "cm":
-			return n*72/2.54f;
-		default:
-			throw new InvalidUsageException("do not understand unit " + units + ": try pt, in, mm, cm");
-		}
-	}
-
-	private Ream makeReam(String ream, float width, float height, int blksize) {
-		switch (ream) {
-		case "single":
-			return new SingleReam(width, height);
-		case "double":
-			return new DoubleReam(width, height);
-		case "bifold":
-			return new BifoldReam(blksize, width, height);
-		default:
-			throw new InvalidUsageException("there is no ream " + ream);
-		}
+		stockName = options.remove("stock");
+		stock = styles.getStock(stockName);
 	}
 
 	@Override

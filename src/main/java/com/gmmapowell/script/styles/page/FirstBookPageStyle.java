@@ -8,7 +8,7 @@ public class FirstBookPageStyle extends RightBookPageStyle {
 	}
 
 	@Override
-	public boolean wantHeader() {
+	public Boolean wantHeader() {
 		return false;
 	}
 
