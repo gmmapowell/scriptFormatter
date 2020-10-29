@@ -9,10 +9,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.zinutils.collections.ListMap;
 import org.zinutils.exceptions.InvalidUsageException;
@@ -294,6 +298,13 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 			return new BifoldReam(blksize, width, height);
 		default:
 			throw new InvalidUsageException("there is no ream " + ream);
+		}
+	}
+
+	
+	public void loadFonts(PDDocument doc) throws IOException {
+		for (Entry<String, String> e : fontStreams.entrySet()) {
+			super.font(e.getKey(), (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream(e.getValue())));
 		}
 	}
 

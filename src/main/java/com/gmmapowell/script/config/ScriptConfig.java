@@ -25,6 +25,7 @@ import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.sink.presenter.PresenterSink;
 import com.gmmapowell.script.styles.ConfigurableStyleCatalog;
 import com.gmmapowell.script.styles.StyleCatalog;
+import com.gmmapowell.script.utils.Utils;
 
 public class ScriptConfig implements Config {
 	private final File root;
@@ -68,6 +69,7 @@ public class ScriptConfig implements Config {
 			String styles = vars.remove("styles");
 			if (styles == null)
 				throw new ConfigException("style catalog was not defined");
+			styles = Utils.subenvs(styles);
 			StyleCatalog catalog;
 			try {
 				catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();

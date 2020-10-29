@@ -1,9 +1,12 @@
 package com.gmmapowell.script.styles.simple;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 import com.gmmapowell.script.sink.pdf.Stock;
 import com.gmmapowell.script.styles.FontCatalog;
@@ -105,5 +108,11 @@ public class MovieStyleCatalog extends FontCatalog {
 	@Override
 	public Stock getStock(String stockName) {
 		return null;
+	}
+
+	@Override
+	public void loadFonts(PDDocument doc) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 }
