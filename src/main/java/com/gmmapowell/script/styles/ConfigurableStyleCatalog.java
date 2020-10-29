@@ -76,8 +76,18 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 		}
 	}
 
-	private void build(boolean debug, ListMap<String, String> curr) {
+	private void build(boolean debug, ListMap<String, String> curr) throws ConfigException {
+		String type = curr.get("_type").get(0);
 		String name = curr.get("_name").get(0);
+		if (type.equals("para") || type.equals("text"))
+			buildStyle(debug, type, name, curr);
+		else if (type.equals("font"))
+			installFont(debug, type, name, curr);
+		else
+			throw new NotImplementedException("cannot handle " + type);
+	}
+
+	private void buildStyle(boolean debug, String type, String name, ListMap<String, String> curr) {
 		SimpleStyle overrides = new SimpleStyle(this);
 		if (debug)
 			System.out.println("building new style " + name);
@@ -102,6 +112,14 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 			return;
 		}
 		this.catalog.put(name, s);
+	}
+
+	private void installFont(boolean debug, String type, String name, ListMap<String, String> curr) throws ConfigException {
+		if (curr.contains("stream")) {
+			String stream = curr.get("stream").get(0);
+//			catalog.font(name, (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream("/fonts/MonospaceRegular.ttf")));
+		} else
+			throw new ConfigException("no stream for font " + name);
 	}
 
 	private void set(SimpleStyle overrides, String prop, List<String> values) {

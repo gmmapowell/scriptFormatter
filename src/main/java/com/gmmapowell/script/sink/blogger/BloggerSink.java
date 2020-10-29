@@ -25,7 +25,6 @@ import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
 import com.gmmapowell.script.sink.pdf.Cursor;
-import com.gmmapowell.script.sink.pdf.Stock;
 import com.gmmapowell.script.sink.pdf.StyledToken;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -74,7 +73,7 @@ public class BloggerSink implements Sink {
 	}
 
 	@Override
-	public void render(Stock stock) throws IOException {
+	public void render() throws IOException {
 		for (Flow f : flows) {
 			this.sw = new StringWriter();
 			writer = new PrintWriter(sw);

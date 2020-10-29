@@ -78,7 +78,7 @@ public class ScriptConfig implements Config {
 					throw new ConfigException(e2.getMessage());
 				}
 			}
-			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug, sshid));
+			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug, sshid, vars));
 			break;
 		}
 		case "blogger": {

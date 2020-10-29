@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.gmmapowell.script.flow.Flow;
-import com.gmmapowell.script.sink.pdf.Stock;
 
 public class MultiSink implements Sink {
 	private final List<Sink> sinks;
@@ -20,9 +19,9 @@ public class MultiSink implements Sink {
 	}
 
 	@Override
-	public void render(Stock stock) throws IOException {
+	public void render() throws IOException {
 		for (Sink s : sinks)
-			s.render(stock);
+			s.render();
 	}
 
 	@Override

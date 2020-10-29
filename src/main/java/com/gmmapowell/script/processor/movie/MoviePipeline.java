@@ -9,20 +9,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.zinutils.exceptions.InvalidUsageException;
-
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.pdf.BifoldReam;
-import com.gmmapowell.script.sink.pdf.DoubleReam;
-import com.gmmapowell.script.sink.pdf.PaperStock;
-import com.gmmapowell.script.sink.pdf.Ream;
-import com.gmmapowell.script.sink.pdf.SingleReam;
-import com.gmmapowell.script.styles.page.MoviePageStyle;
 
 public class MoviePipeline implements Processor {
 	public enum Mode {
@@ -35,9 +27,6 @@ public class MoviePipeline implements Processor {
 	private final String title;
 	private final boolean debug;
 	private final Formatter formatter;
-	private final String ream;
-	private final float width, height;
-	private final int blksize;
 
 
 	public MoviePipeline(File root, ElementFactory ef, Sink outputTo, Map<String, String> options, boolean debug) throws ConfigException {
@@ -57,22 +46,6 @@ public class MoviePipeline implements Processor {
 		else
 			this.dramatis = new File(root, d);
 		this.sink = outputTo;
-		if (options.containsKey("ream")) {
-			this.ream  = options.remove("ream");
-		} else
-			this.ream = "single";
-		if (options.containsKey("width")) {
-			this.width  = dim(options.remove("width"));
-		} else
-			this.width = dim("210mm");
-		if (options.containsKey("height")) {
-			this.height  = dim(options.remove("height"));
-		} else
-			this.height = dim("297mm");
-		if (options.containsKey("blksize")) {
-			this.blksize  = Integer.parseInt(options.remove("blksize"));
-		} else
-			this.blksize = 32;
 	}
 
 	@Override
@@ -100,7 +73,7 @@ public class MoviePipeline implements Processor {
 		for (Entry<String, Flow> e : state.flows.entrySet()) {
 			sink.flow(e.getValue());
 		}
-		sink.render(new PaperStock(makeReam(), new MoviePageStyle(), new MoviePageStyle(), new MoviePageStyle(), new MoviePageStyle()));
+		sink.render();
 	}
 
 	private void processFile(DramatisPersonae dp, LineNumberReader lnr, String showTitle) throws IOException {
@@ -215,37 +188,5 @@ public class MoviePipeline implements Processor {
 		int idxS = s.indexOf(' ');
 		boolean isSpeech = idxC != -1 && idxC < idxS;
 		return isSpeech;
-	}
-
-	private float dim(String value) {
-		if (value == null || value.length() < 3)
-			throw new InvalidUsageException("value must have units");
-		String units = value.substring(value.length()-2);
-		float n = Float.parseFloat(value.substring(0, value.length()-2));
-		switch (units) {
-		case "pt":
-			return n;
-		case "in":
-			return n*72;
-		case "mm":
-			return n*72/25.4f;
-		case "cm":
-			return n*72/2.54f;
-		default:
-			throw new InvalidUsageException("do not understand unit " + units + ": try pt, in, mm, cm");
-		}
-	}
-
-	private Ream makeReam() {
-		switch (ream) {
-		case "single":
-			return new SingleReam(width, height);
-		case "double":
-			return new DoubleReam(width, height);
-		case "bifold":
-			return new BifoldReam(blksize, width, height);
-		default:
-			throw new InvalidUsageException("there is no ream " + ream);
-		}
 	}
 }

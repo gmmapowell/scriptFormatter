@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.pdf.Stock;
 
 public class PresenterSink implements Sink {
 	public PresenterSink(File root, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
@@ -16,7 +15,7 @@ public class PresenterSink implements Sink {
 	}
 	
 	@Override
-	public void render(Stock stock) {
+	public void render() {
 	}
 
 	@Override
