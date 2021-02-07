@@ -187,13 +187,16 @@ public class EPubSink implements Sink {
 //			if (!suspended.isEmpty())
 //				throw new CantHappenException("suspended is not empty: " + suspended);
 //		}
-//		stock.close(output);
+//		stock.close(output);]
+			String bookId = "bookId";
+			String title = "Ziniki Developer Guide";
+			String identifier = "ziniki-developer-guide";
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));
-			FileUtils.writeToStream(makePackage(), zos);
+			FileUtils.writeToStream(makePackage(bookId, title, identifier), zos);
 			zos.putNextEntry(new ZipEntry("OPS/toc.ncx"));
-			FileUtils.writeToStream(makeTOC(), zos);
-			zos.putNextEntry(new ZipEntry("OPS/intro.xhtml"));
-			FileUtils.writeToStream("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Ziniki Developer Guide</title></head><body><h1>Hello, World</h1></body></html>", zos);
+			FileUtils.writeToStream(makeTOC(title, identifier), zos);
+			zos.putNextEntry(new ZipEntry("OPS/Files/intro.xhtml"));
+			FileUtils.writeToStream("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>" + title + "</title></head><body><h1>Hello, World</h1></body></html>", zos);
 		}
 	}
 
@@ -208,8 +211,7 @@ public class EPubSink implements Sink {
 		return xml.top().serialize();
 	}
 
-	private String makePackage() {
-		String bookId = "book-id"; // This is allegedly OK, but we really should at least pull it from the config
+	private String makePackage(String bookId, String title, String identifier) {
 		XML xml = XML.createNS("1.0", "package", "http://www.idpf.org/2007/opf");
 //		XMLNamespace xns = xml.namespace("xml", "http://www.w3.org/XML/1998/namespace");
 		XMLElement pkg = xml.top();
@@ -223,13 +225,15 @@ public class EPubSink implements Sink {
 		XMLNamespace dc = md.namespace("dc", "http://purl.org/dc/elements/1.1/");
 		
 		XMLElement ident = md.addElement(dc.tag("identifier"));
-		ident.setAttribute("id", "book-id");
-		ident.addText("some isbn or something");
-		XMLElement title = md.addElement(dc.tag("title"));
-		title.setAttribute("id", "title");
-		title.addText("Ziniki Developer Guide");
+		ident.setAttribute("id", bookId);
+		ident.addText(identifier);
+		XMLElement titleElt = md.addElement(dc.tag("title"));
+		titleElt.setAttribute("id", "title");
+		titleElt.addText(title);
 		XMLElement date = md.addElement(dc.tag("date"));
-		date.addText("2021-02-01");
+		DateFormat df = new SimpleDateFormat("YYYY-MM-dd");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		date.addText(df.format(new Date()));
 		XMLElement creator = md.addElement(dc.tag("creator"));
 		creator.addText("Ziniki");
 		XMLElement lang = md.addElement(dc.tag("language"));
@@ -253,7 +257,7 @@ public class EPubSink implements Sink {
 
 		XMLElement item = man.addElement("item");
 		item.setAttribute("id", "intro");
-		item.setAttribute("href", "intro.xhtml");
+		item.setAttribute("href", "Files/intro.xhtml");
 		item.setAttribute("media-type", "application/xhtml+xml");
 		
 		XMLElement ir = spine.addElement("itemref");
@@ -264,18 +268,17 @@ public class EPubSink implements Sink {
 		return pkg.serialize();
 	}
 
-	private String makeTOC() {
+	private String makeTOC(String title, String identifier) {
 		XML xml = XML.createNS("1.0", "ncx", "http://www.daisy.org/z3986/2005/ncx/");
-//		XMLNamespace xns = xml.namespace("xml", "http://www.w3.org/XML/1998/namespace");
 		XMLElement ncx = xml.top();
 		ncx.setAttribute("version", "2005-1");
 		XMLElement head = ncx.addElement("head");
 		XMLElement metaUid = head.addElement("meta");
 		metaUid.setAttribute("name", "dtb:uid");
-		metaUid.setAttribute("content", "some isbn or something");
+		metaUid.setAttribute("content", identifier);
 		XMLElement docTitle = ncx.addElement("docTitle");
 		XMLElement docText = docTitle.addElement("text");
-		docText.addText("Ziniki Developer Guide");
+		docText.addText(title);
 		XMLElement map = ncx.addElement("navMap");
 		XMLElement point = map.addElement("navPoint");
 		point.setAttribute("id", "point1");
@@ -284,9 +287,8 @@ public class EPubSink implements Sink {
 		XMLElement nlt = nl.addElement("text");
 		nlt.addText("Introduction");
 		XMLElement npc = point.addElement("content");
-		npc.setAttribute("src", "intro.xhtml");
+		npc.setAttribute("src", "Files/intro.xhtml");
 		return ncx.serialize();
-//		return "<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\"><head></head><body><h1>Hello, World</h1></body></ncx>";
 	}
 
 	private Cursor findFlow(List<Suspension> suspended, Set<Cursor> sections, String enable) {
