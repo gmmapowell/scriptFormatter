@@ -41,6 +41,10 @@ public class EPubSink implements Sink {
 	private final String sshid;
 	private final List<Flow> flows = new ArrayList<>();
 //	private final Stock stock;
+	private final String bookId;
+	private final String title;
+	private final String identifier;
+	private final String author;
 
 	public EPubSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
 		this.styles = styles;
@@ -54,9 +58,22 @@ public class EPubSink implements Sink {
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 //		String stockName = null;
-//		if (!options.containsKey("stock")) {
-//			throw new ConfigException("must specify a stock to render to");
-//		}
+		if (!options.containsKey("bookid")) {
+			throw new ConfigException("must specify a bookid");
+		}
+		if (!options.containsKey("title")) {
+			throw new ConfigException("must specify a title");
+		}
+		if (!options.containsKey("identifier")) {
+			throw new ConfigException("must specify a book identifier");
+		}
+		if (!options.containsKey("author")) {
+			throw new ConfigException("must specify a book author");
+		}
+		bookId = options.remove("bookid");
+		title = options.remove("title");
+		identifier = options.remove("identifier");
+		author = options.remove("author");
 //		stockName = options.remove("stock");
 //		stock = styles.getStock(stockName);
 	}
@@ -69,16 +86,7 @@ public class EPubSink implements Sink {
 	@Override
 	public void render() throws IOException {
 		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output))) {
-			ZipEntry zem = new ZipEntry("mimetype");
-			String text = "application/epub+zip";
-			zem.setMethod(ZipEntry.STORED);
-			zem.setSize(text.length());
-			zem.setCompressedSize(text.length());
-			CRC32 crc = new CRC32();
-			crc.update(text.getBytes());
-			zem.setCrc(crc.getValue());
-			zos.putNextEntry(zem);
-			FileUtils.writeToStream(text, zos);
+			makeMimetype(zos);
 			zos.putNextEntry(new ZipEntry("META-INF/container.xml"));
 			FileUtils.writeToStream(makeContainer(), zos);
 			// TODO: encryption
@@ -188,16 +196,26 @@ public class EPubSink implements Sink {
 //				throw new CantHappenException("suspended is not empty: " + suspended);
 //		}
 //		stock.close(output);]
-			String bookId = "bookId";
-			String title = "Ziniki Developer Guide";
-			String identifier = "ziniki-developer-guide";
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));
-			FileUtils.writeToStream(makePackage(bookId, title, identifier), zos);
+			FileUtils.writeToStream(makePackage(), zos);
 			zos.putNextEntry(new ZipEntry("OPS/toc.ncx"));
-			FileUtils.writeToStream(makeTOC(title, identifier), zos);
+			FileUtils.writeToStream(makeTOC(), zos);
 			zos.putNextEntry(new ZipEntry("OPS/Files/intro.xhtml"));
 			FileUtils.writeToStream("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>" + title + "</title></head><body><h1>Hello, World</h1></body></html>", zos);
 		}
+	}
+
+	private void makeMimetype(ZipOutputStream zos) throws IOException {
+		ZipEntry zem = new ZipEntry("mimetype");
+		String text = "application/epub+zip";
+		zem.setMethod(ZipEntry.STORED);
+		zem.setSize(text.length());
+		zem.setCompressedSize(text.length());
+		CRC32 crc = new CRC32();
+		crc.update(text.getBytes());
+		zem.setCrc(crc.getValue());
+		zos.putNextEntry(zem);
+		FileUtils.writeToStream(text, zos);
 	}
 
 	private String makeContainer() {
@@ -211,7 +229,7 @@ public class EPubSink implements Sink {
 		return xml.top().serialize();
 	}
 
-	private String makePackage(String bookId, String title, String identifier) {
+	private String makePackage() {
 		XML xml = XML.createNS("1.0", "package", "http://www.idpf.org/2007/opf");
 //		XMLNamespace xns = xml.namespace("xml", "http://www.w3.org/XML/1998/namespace");
 		XMLElement pkg = xml.top();
@@ -235,7 +253,7 @@ public class EPubSink implements Sink {
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		date.addText(df.format(new Date()));
 		XMLElement creator = md.addElement(dc.tag("creator"));
-		creator.addText("Ziniki");
+		creator.addText(author);
 		XMLElement lang = md.addElement(dc.tag("language"));
 		lang.addText("en-US");
 		XMLElement modified = md.addElement(dc.tag("date"));
@@ -268,7 +286,7 @@ public class EPubSink implements Sink {
 		return pkg.serialize();
 	}
 
-	private String makeTOC(String title, String identifier) {
+	private String makeTOC() {
 		XML xml = XML.createNS("1.0", "ncx", "http://www.daisy.org/z3986/2005/ncx/");
 		XMLElement ncx = xml.top();
 		ncx.setAttribute("version", "2005-1");
