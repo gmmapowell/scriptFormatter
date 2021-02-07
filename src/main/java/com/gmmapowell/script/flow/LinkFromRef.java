@@ -12,7 +12,6 @@ public class LinkFromRef implements SpanItem {
 	private TableOfContents toc;
 	public final String anchor;
 	public final String text;
-	private PDAnnotationLink pending;
 
 	public LinkFromRef(TableOfContents toc, String anchor, String text) {
 		this.toc = toc;
