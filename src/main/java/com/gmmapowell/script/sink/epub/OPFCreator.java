@@ -72,14 +72,14 @@ public class OPFCreator {
 		// guide is deprecated, so let's try and avoid it ...
 	}
 
-	public void addFile(String id, String name) {
+	public void addFile(String name) {
 		XMLElement item = man.addElement("item");
-		item.setAttribute("id", id);
+		item.setAttribute("id", name);
 		item.setAttribute("href", "Files/" + name + ".xhtml");
 		item.setAttribute("media-type", "application/xhtml+xml");
 		
 		XMLElement ir = spine.addElement("itemref");
-		ir.setAttribute("idref", id);
+		ir.setAttribute("idref", name);
 	}
 	
 	public String makePackage() {

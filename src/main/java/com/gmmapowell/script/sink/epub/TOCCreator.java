@@ -21,10 +21,10 @@ public class TOCCreator {
 		map = ncx.addElement("navMap");
 	}
 
-	public void addEntry(String title, String file) {
+	public void addEntry(String title, String file, int idx) {
 		XMLElement point = map.addElement("navPoint");
-		point.setAttribute("id", "point1");
-		point.setAttribute("playOrder", "1");
+		point.setAttribute("id", "point" + idx);
+		point.setAttribute("playOrder", Integer.toString(idx));
 		XMLElement nl = point.addElement("navLabel");
 		XMLElement nlt = nl.addElement("text");
 		nlt.addText(title);

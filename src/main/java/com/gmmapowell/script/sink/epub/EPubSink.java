@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -18,9 +20,16 @@ import org.zinutils.xml.XML;
 import org.zinutils.xml.XMLElement;
 
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.NonBreakingSpace;
+import com.gmmapowell.script.flow.ParaBreak;
+import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.pdf.Cursor;
+import com.gmmapowell.script.sink.pdf.StyledToken;
 import com.gmmapowell.script.sink.pdf.Suspension;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Upload;
@@ -40,7 +49,6 @@ public class EPubSink implements Sink {
 	private final String title;
 	private final String identifier;
 	private final String author;
-	private int fileCnt = 1;
 
 	public EPubSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
 		this.styles = styles;
@@ -87,57 +95,86 @@ public class EPubSink implements Sink {
 			FileUtils.writeToStream(makeContainer(), zos);
 			OPFCreator opf = new OPFCreator(bookId, identifier, author, title);
 			TOCCreator toc = new TOCCreator(identifier, title);
+			// TODO: encryption?
 
-			addFile(zos, opf, toc, "intro");
-			FileUtils.writeToStream("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>" + title + "</title></head><body><h1>Hello, World</h1></body></html>", zos);
-			
-			// TODO: encryption
 //		stock.newDocument(styles);
-//		List<Flow> mainFlows = new ArrayList<>();
-//		for (Flow f : flows) {
-//			if (f.isMain()) {
-//				mainFlows.add(f);
-//			}
-//		}
-//		int i=0;
-//		Map<String, String> current = new TreeMap<>();
-//		Set<Cursor> sections = new TreeSet<>();
+		List<Flow> mainFlows = new ArrayList<>();
+		for (Flow f : flows) {
+			if (f.isMain()) {
+				mainFlows.add(f);
+			}
+		}
+		int i=0;
+		Map<String, String> current = new TreeMap<>();
+		Set<Cursor> sections = new TreeSet<>();
 //		PageCompositor page = null;
-//		boolean beginSection = false;
 //		forever:
-//		while (true) {
-//			for (Flow f : mainFlows) {
-//				if (f.sections.size() > i) {
-//					Section si = f.sections.get(i);
-//					current.put(f.name, si.format);
-//					sections.add(new Cursor(f.name, si));
-//					beginSection = true;
-//				}
-//			}
-//			i++;
-//			if (sections.isEmpty())
-//				break forever;
-//				
-//			List<Suspension> suspended = new ArrayList<>();
+		while (true) {
+			for (Flow f : mainFlows) {
+				if (f.sections.size() > i) {
+					Section si = f.sections.get(i);
+					current.put(f.name, si.format);
+					sections.add(new Cursor(f.name, si));
+				}
+			}
+			i++;
+			if (sections.isEmpty())
+				break;
+
+			XHTMLCollector coll = new XHTMLCollector();
+			
+			StringBuilder title = new StringBuilder();
+			
+			List<Cursor> suspended = new ArrayList<>();
 //			Set<AnchorOp> records = new HashSet<>();
-//			while (!sections.isEmpty()) {
-//				if (page == null) {
-//					page = stock.getPage(current, beginSection);
-//					page.begin();
-//				}
-//				beginSection = false;
-//				Set<Cursor> active = new TreeSet<>(sections);
-//				whileActive:
-//				while (!active.isEmpty()) {
-//					for (Cursor c : active) { // try and populate each main section
-//						while (true) {
-//							StyledToken tok = c.next();
-//							if (tok == null) {
-//								sections.remove(c);
-//								active.remove(c);
-//								continue whileActive;
-//							}
-////							System.out.println(tok);
+			while (!sections.isEmpty()) {
+				Set<Cursor> active = new TreeSet<>(sections);
+				whileActive:
+				while (!active.isEmpty()) {
+					for (Cursor c : active) { // try and populate each main section
+						while (true) {
+							StyledToken tok = c.next();
+							if (tok == null) {
+								sections.remove(c);
+								active.remove(c);
+								continue whileActive;
+							}
+//							System.out.println(tok);
+							if (tok.it instanceof YieldToFlow) {
+								suspended.add(c);
+								Cursor en = findFlow(suspended, sections, ((YieldToFlow)tok.it).yieldTo());
+								if (en == c) {
+									throw new CantHappenException("can't enable the one you're suspending");
+								}
+								active.add(en);
+								sections.add(en);
+								active.remove(c);
+								sections.remove(c);
+								continue whileActive;
+							}
+							if (title != null && tok.styles.contains("chapter-title")) {
+								if (tok.it instanceof TextSpanItem) {
+									TextSpanItem tsi = (TextSpanItem) tok.it;
+									title.append(tsi.text);
+								} else if (tok.it instanceof ParaBreak) {
+									coll.title(title.toString());
+//									System.out.println("title: " + title);
+									addFile(zos, opf, toc, i, title.toString());
+									
+									title = null;
+								} else if (tok.it instanceof BreakingSpace || tok.it instanceof NonBreakingSpace) {
+									title.append(" ");
+								}
+							}
+							coll.styles(tok.styles);
+							if (tok.it instanceof TextSpanItem) {
+								coll.text(((TextSpanItem)tok.it).text);
+							} else if (tok.it instanceof NonBreakingSpace)
+								coll.text("&nbsp;");
+							else if (tok.it instanceof BreakingSpace)
+								coll.text(" ");
+							else if (tok.it instanceof ParaBreak)
+								coll.closePara();
 //							if (tok.it instanceof AnchorOp) {
 //								records.add((AnchorOp)tok.it);
 //								continue;
@@ -174,29 +211,18 @@ public class EPubSink implements Sink {
 //								active.remove(c);
 //								records.clear();
 //								continue whileActive;
-//							case SUSPEND: // we cannot proceed until we have seen something from elsewhere
-//								suspended.add(new Suspension(c, a.lastAccepted));
-//								Cursor en = findFlow(suspended, sections, a.enable());
-//								if (en == c) {
-//									throw new CantHappenException("can't enable the one you're suspending");
-//								}
-//								active.add(en);
-//								sections.add(en);
-//								active.remove(c);
-//								sections.remove(c);
-//								continue whileActive;
-//							}
-//						}
-//					}
-//				}
+						}
+					}
+				}
 //				boolean advanced = page.nextRegions();
 //				if (!advanced) {
 //					page = null;
 //				}
-//			}
+				coll.write(zos);
+			}
 //			if (!suspended.isEmpty())
 //				throw new CantHappenException("suspended is not empty: " + suspended);
-//		}
+		}
 //		stock.close(output);]
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));
 			FileUtils.writeToStream(opf.makePackage(), zos);
@@ -229,17 +255,18 @@ public class EPubSink implements Sink {
 		return xml.top().serialize();
 	}
 
-	private void addFile(ZipOutputStream zos, OPFCreator opf, TOCCreator toc, String file) throws IOException {
-		opf.addFile("file" + (fileCnt ++), file);
-		toc.addEntry("Introduction", file);
+	private void addFile(ZipOutputStream zos, OPFCreator opf, TOCCreator toc, int cnt, String title) throws IOException {
+		String file = "file" + cnt;
+		opf.addFile(file);
+		toc.addEntry(title, file, cnt);
 		zos.putNextEntry(new ZipEntry("OPS/Files/" + file + ".xhtml"));
 	}
 
-	private Cursor findFlow(List<Suspension> suspended, Set<Cursor> sections, String enable) {
-		for (Suspension susp : suspended) {
+	private Cursor findFlow(List<Cursor> suspended, Set<Cursor> sections, String enable) {
+		for (Cursor susp : suspended) {
 			if (susp.isFlow(enable)) {
 				suspended.remove(susp);
-				return susp.cursor;
+				return susp;
 			}
 		}
 		for (Cursor c : sections) {
