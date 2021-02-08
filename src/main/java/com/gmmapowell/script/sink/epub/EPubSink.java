@@ -4,14 +4,10 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,7 +16,6 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 import org.zinutils.xml.XMLElement;
-import org.zinutils.xml.XMLNamespace;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.flow.Flow;
@@ -45,6 +40,7 @@ public class EPubSink implements Sink {
 	private final String title;
 	private final String identifier;
 	private final String author;
+	private int fileCnt = 1;
 
 	public EPubSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
 		this.styles = styles;
@@ -89,6 +85,12 @@ public class EPubSink implements Sink {
 			makeMimetype(zos);
 			zos.putNextEntry(new ZipEntry("META-INF/container.xml"));
 			FileUtils.writeToStream(makeContainer(), zos);
+			OPFCreator opf = new OPFCreator(bookId, identifier, author, title);
+			TOCCreator toc = new TOCCreator(identifier, title);
+
+			addFile(zos, opf, toc, "intro");
+			FileUtils.writeToStream("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>" + title + "</title></head><body><h1>Hello, World</h1></body></html>", zos);
+			
 			// TODO: encryption
 //		stock.newDocument(styles);
 //		List<Flow> mainFlows = new ArrayList<>();
@@ -197,11 +199,9 @@ public class EPubSink implements Sink {
 //		}
 //		stock.close(output);]
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));
-			FileUtils.writeToStream(makePackage(), zos);
+			FileUtils.writeToStream(opf.makePackage(), zos);
 			zos.putNextEntry(new ZipEntry("OPS/toc.ncx"));
-			FileUtils.writeToStream(makeTOC(), zos);
-			zos.putNextEntry(new ZipEntry("OPS/Files/intro.xhtml"));
-			FileUtils.writeToStream("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>" + title + "</title></head><body><h1>Hello, World</h1></body></html>", zos);
+			FileUtils.writeToStream(toc.makeTOC(), zos);
 		}
 	}
 
@@ -229,84 +229,10 @@ public class EPubSink implements Sink {
 		return xml.top().serialize();
 	}
 
-	private String makePackage() {
-		XML xml = XML.createNS("1.0", "package", "http://www.idpf.org/2007/opf");
-//		XMLNamespace xns = xml.namespace("xml", "http://www.w3.org/XML/1998/namespace");
-		XMLElement pkg = xml.top();
-		pkg.setAttribute("version", "2.0");
-//		pkg.setAttribute(xns.attr("lang"), "en");
-		pkg.setAttribute("unique-identifier", bookId);
-
-		// metadata
-		XMLElement md = pkg.addElement("metadata");
-		XMLNamespace opf = md.namespace("opf", "http://www.idpf.org/2007/opf");
-		XMLNamespace dc = md.namespace("dc", "http://purl.org/dc/elements/1.1/");
-		
-		XMLElement ident = md.addElement(dc.tag("identifier"));
-		ident.setAttribute("id", bookId);
-		ident.addText(identifier);
-		XMLElement titleElt = md.addElement(dc.tag("title"));
-		titleElt.setAttribute("id", "title");
-		titleElt.addText(title);
-		XMLElement date = md.addElement(dc.tag("date"));
-		DateFormat df = new SimpleDateFormat("YYYY-MM-dd");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-		date.addText(df.format(new Date()));
-		XMLElement creator = md.addElement(dc.tag("creator"));
-		creator.addText(author);
-		XMLElement lang = md.addElement(dc.tag("language"));
-		lang.addText("en-US");
-		XMLElement modified = md.addElement(dc.tag("date"));
-		modified.setAttribute(opf.attr("event"), "modification");
-
-		DateFormat iso = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss'Z'");
-		iso.setTimeZone(TimeZone.getTimeZone("UTC"));
-		modified.addText(iso.format(new Date()));
-		
-		// manifest
-		XMLElement man = pkg.addElement("manifest");
-		XMLElement toc = man.addElement("item");
-		toc.setAttribute("id", "ncx");
-		toc.setAttribute("href", "toc.ncx");
-		toc.setAttribute("media-type", "application/x-dtbncx+xml");
-		// spine
-		XMLElement spine = pkg.addElement("spine");
-		spine.setAttribute("toc", "ncx");
-
-		XMLElement item = man.addElement("item");
-		item.setAttribute("id", "intro");
-		item.setAttribute("href", "Files/intro.xhtml");
-		item.setAttribute("media-type", "application/xhtml+xml");
-		
-		XMLElement ir = spine.addElement("itemref");
-		ir.setAttribute("idref", "intro");
-		
-		// guide is deprecated, so let's try and avoid it ...
-		
-		return pkg.serialize();
-	}
-
-	private String makeTOC() {
-		XML xml = XML.createNS("1.0", "ncx", "http://www.daisy.org/z3986/2005/ncx/");
-		XMLElement ncx = xml.top();
-		ncx.setAttribute("version", "2005-1");
-		XMLElement head = ncx.addElement("head");
-		XMLElement metaUid = head.addElement("meta");
-		metaUid.setAttribute("name", "dtb:uid");
-		metaUid.setAttribute("content", identifier);
-		XMLElement docTitle = ncx.addElement("docTitle");
-		XMLElement docText = docTitle.addElement("text");
-		docText.addText(title);
-		XMLElement map = ncx.addElement("navMap");
-		XMLElement point = map.addElement("navPoint");
-		point.setAttribute("id", "point1");
-		point.setAttribute("playOrder", "1");
-		XMLElement nl = point.addElement("navLabel");
-		XMLElement nlt = nl.addElement("text");
-		nlt.addText("Introduction");
-		XMLElement npc = point.addElement("content");
-		npc.setAttribute("src", "Files/intro.xhtml");
-		return ncx.serialize();
+	private void addFile(ZipOutputStream zos, OPFCreator opf, TOCCreator toc, String file) throws IOException {
+		opf.addFile("file" + (fileCnt ++), file);
+		toc.addEntry("Introduction", file);
+		zos.putNextEntry(new ZipEntry("OPS/Files/" + file + ".xhtml"));
 	}
 
 	private Cursor findFlow(List<Suspension> suspended, Set<Cursor> sections, String enable) {
