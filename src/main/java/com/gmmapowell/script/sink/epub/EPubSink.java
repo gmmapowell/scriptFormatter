@@ -227,7 +227,9 @@ public class EPubSink implements Sink {
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));
 			FileUtils.writeToStream(opf.makePackage(), zos);
 			zos.putNextEntry(new ZipEntry("OPS/toc.ncx"));
-			FileUtils.writeToStream(toc.makeTOC(), zos);
+			FileUtils.writeToStream(toc.makeNCX(), zos);
+			zos.putNextEntry(new ZipEntry("OPS/Files/toc.xhtml"));
+			FileUtils.writeToStream(toc.makeHTML(), zos);
 		}
 	}
 
