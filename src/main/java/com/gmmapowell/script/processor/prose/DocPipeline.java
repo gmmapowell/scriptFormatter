@@ -22,22 +22,19 @@ import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkFromRef;
-import com.gmmapowell.script.flow.LinkOp;
-import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.LinkFromTOC;
+import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.prose.DocState.ScanMode;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Utils;
 
-public class DocPipeline extends ProsePipeline<DocState> {
+public class DocPipeline extends AtPipeline<DocState> {
 	private DocState state;
 	private final List<File> samples = new ArrayList<>();
 	private final Grammar grammar;
 	private final TableOfContents toc;
-	private final ScanMode scanmode;
-	private final boolean joinspace;
 	private final JSONObject currentMeta;
 	
 	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
@@ -57,14 +54,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			this.grammar = Grammar.from(XML.fromFile(file));
 		} else
 			this.grammar = null;
-		if (options.containsKey("scanmode")) {
-			this.scanmode = ScanMode.valueOf(options.remove("scanmode").toUpperCase());
-		} else
-			this.scanmode = ScanMode.NONE;
-		if (options.containsKey("joinspace"))
-			this.joinspace = Boolean.parseBoolean(options.remove("joinspace"));
-		else
-			this.joinspace = false;
 		toc = new TableOfContents(tocfile, metafile);
 		if (metafile != null && metafile.exists()) {
 			try {
@@ -97,18 +86,9 @@ public class DocPipeline extends ProsePipeline<DocState> {
 		if (!"@Conclusion".equals(s) && this.scanmode == ScanMode.OVERVIEW && (state.scanMode == ScanMode.DETAILS))
 			return;
 		
-		if (s.equals("$$")) {
-			state.blockquote = !state.blockquote;
-		} else if (s.startsWith("@")) {
-			// it's a block starting command
-			commitCurrentCommand();
-			state.cmd = new DocCommand(s.substring(1));
-		} else if (state.cmd != null) {
-			int pos = s.indexOf('=');
-			if (pos == -1)
-				throw new RuntimeException("invalid argument to " + state.cmd + ": " + s);
-			state.cmd.arg(s.substring(0, pos).trim(), s.substring(pos+1).trim());
-		} else if (s.startsWith("&")) {
+		if (commonHandleLine(state, s))
+			return;
+		else if (s.startsWith("&")) {
 			int idx = s.indexOf(" ");
 			String cmd;
 			StringBuilder args;
@@ -322,31 +302,6 @@ public class DocPipeline extends ProsePipeline<DocState> {
 			default:
 				throw new RuntimeException(state.inputLocation() + " handle inline command: " + s);
 			}
-		} else if (s.startsWith("*")) {
-			int idx = s.indexOf(" ");
-			if (idx == 1)
-				state.newPara("bullet");
-			else
-				state.newPara("bullet" + idx);
-			state.newSpan("bullet-sign");
-			state.text("\u2022");
-			state.endSpan();
-			ProcessingUtils.process(state, s.substring(idx+1).trim());
-		} else if (state.blockquote && s.startsWith("|")) {
-			state.newPara("blockquote");
-			state.newSpan();
-			int i=0;
-			for (i=0;i<s.length();i++) {
-				if (s.charAt(i) == '|') {
-					state.op(new NonBreakingSpace());
-					state.op(new NonBreakingSpace());
-				} else
-					break;
-			}
-			while (Character.isWhitespace(s.charAt(i)))
-				i++;
-			if (i < s.length())
-				ProcessingUtils.processPart(state, s, i, s.length());
 		} else {
 			if (!state.inPara()) {
 				if (state.blockquote)

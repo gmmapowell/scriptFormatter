@@ -25,6 +25,7 @@ public abstract class CurrentState implements TextState {
 	protected HorizSpan currSpan;
 	protected Flow currFlow;
 
+	public boolean blockquote;
 	protected int nextFnMkr = 1;
 	protected int nextFnText = 1;
 

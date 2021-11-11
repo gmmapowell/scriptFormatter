@@ -4,8 +4,12 @@ import java.util.Map;
 
 import com.gmmapowell.script.flow.Flow;
 
-public class BlogState extends CurrentState {
-	public BlogState(Map<String, Flow> flows, String file) {
+public class ArticleState extends AtState {
+	private final String file;
+	public boolean blockquote;
+	private int line;
+
+	public ArticleState(Map<String, Flow> flows, String file) {
 		super(flows);
 		this.file = file;
 	}

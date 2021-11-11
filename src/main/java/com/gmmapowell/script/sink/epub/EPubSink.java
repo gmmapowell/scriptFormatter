@@ -30,14 +30,13 @@ import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.pdf.Cursor;
 import com.gmmapowell.script.sink.pdf.StyledToken;
-import com.gmmapowell.script.sink.pdf.Suspension;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 public class EPubSink implements Sink {
-	private final StyleCatalog styles;
+//	private final StyleCatalog styles;
 	private final File output;
 	private final boolean wantOpen;
 	private final String upload;
@@ -51,7 +50,7 @@ public class EPubSink implements Sink {
 	private final String author;
 
 	public EPubSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
-		this.styles = styles;
+//		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
 		File f = new File(output);
