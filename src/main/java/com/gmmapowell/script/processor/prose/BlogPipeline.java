@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.zinutils.system.RunProcess;
+
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
@@ -93,6 +95,29 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					state.op(new ImageOp(link));
 					break;
 				}
+				case "git": {
+					String dir = readString(state, args);
+					System.out.println("Want to take git imports from " + dir);
+					state.gitdir(dir);
+					break;
+				}
+				case "import": {
+					try {
+						state.newPara("blockquote");
+						state.newSpan();
+						state.text("this is a test");
+						String branch = readString(state, args);
+						String filespec = readString(state, args);
+						// TODO: this should allow some (optional) range specifier as well, probably substring or regexp
+						state.newPara("blockquote");
+						state.newSpan();
+						state.text("include some part of " + filespec + " from " + branch);
+						gitShow(state, branch, filespec);
+					} catch (Exception ex) {
+						System.err.println(ex.getMessage());
+					}
+					break;
+				}
 				default:
 					throw new RuntimeException(state.inputLocation() + " handle inline command: " + cmd);
 				}
@@ -102,6 +127,21 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				ProcessingUtils.process(state, s);
 			}
 		}
+	}
+
+	private void gitShow(BlogState state, String branch, String filespec) {
+		File dir = state.gitdir();
+		if (dir == null)
+			throw new RuntimeException("Cannot use &import without &git");
+		System.out.println("dir = " + dir);
+		RunProcess gitcmd = new RunProcess("git");
+		gitcmd.arg("show");
+		gitcmd.arg(branch);
+		gitcmd.redirectStderr(System.err);
+		gitcmd.processStdout(new GitShowProcessor(filespec));
+		gitcmd.executeInDir(dir);
+		gitcmd.execute();
+		System.out.println(gitcmd.getExitCode());
 	}
 
 	@Override

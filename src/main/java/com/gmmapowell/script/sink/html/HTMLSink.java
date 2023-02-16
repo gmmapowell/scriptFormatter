@@ -108,8 +108,9 @@ public class HTMLSink implements Sink {
 			writer.close();
 			if (title == null)
 				throw new CantHappenException("title was not defined");
-			FileUtils.writeFile(new File(storeInto, title), sw.toString());
-			FileUtils.cat(new File(storeInto, title));
+			File file = new File(storeInto, title + ".html");
+			FileUtils.writeFile(file, sw.toString());
+			FileUtils.cat(file);
 		}
 	}
 
