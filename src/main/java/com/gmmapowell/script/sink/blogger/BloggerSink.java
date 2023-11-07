@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
+import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
@@ -27,6 +28,7 @@ import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
 import com.gmmapowell.script.sink.pdf.Cursor;
 import com.gmmapowell.script.sink.pdf.StyledToken;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -57,14 +59,26 @@ public class BloggerSink implements Sink {
 	private StringWriter sw;
 	private List<Flow> flows = new ArrayList<>();
 	private boolean haveBreak;
+	private File saveContentAs;
+	private boolean localOnly;
 
-	public BloggerSink(File root, File creds, String blogUrl, File posts) throws IOException, GeneralSecurityException {
+	public BloggerSink(File root, File creds, String blogUrl, File posts, boolean localOnly, File saveContentAs) throws IOException, GeneralSecurityException {
 		this.creds = creds;
 		this.blogUrl = blogUrl;
 		this.postsFile = posts;
+		this.localOnly = localOnly;
+		this.saveContentAs = saveContentAs;
 		index = readPosts();
-		connect();
-		readFromBlogger();
+		if (!localOnly) {
+			try {
+				connect();
+			} catch (TokenResponseException ex) {
+				// clean token store and try again
+				FileUtils.cleanDirectory(tokenStore());
+				connect();
+			}
+			readFromBlogger();
+		}
 	}
 
 	@Override
@@ -93,7 +107,7 @@ public class BloggerSink implements Sink {
 						writer.print(entitify(((TextSpanItem)tok.it).text));
 					else if (tok.it instanceof BreakingSpace) {
 						if (last.equals("blockquote"))
-							writer.println("&nbsp;");
+							writer.print("&nbsp;");
 						else
 							writer.print(" ");
 					} else if (tok.it instanceof ParaBreak) {
@@ -166,7 +180,7 @@ public class BloggerSink implements Sink {
 		}
 		if (next.equals("blockquote")) {
 			writer.println("<blockquote class='tr_bq'>");
-			writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small;'>");
+			writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small; text-wrap: nowrap; overflow-x: scroll;'>");
 		}
 		return next;
 	}
@@ -240,10 +254,15 @@ public class BloggerSink implements Sink {
 
 	public void upload(String title, String content) throws IOException {
 		BlogEntry idx = findInPosts(title);
-		if (idx != null && idx.isLive)
+		if (idx != null && idx.isLive) {
+			System.out.println("Not uploading " + title + " as it is already live");
 			return;
+		}
 		Post p = new Post();
 		p.setTitle(title);
+		if (saveContentAs != null) {
+			FileUtils.writeFile(saveContentAs, sw.toString());
+		}
 		p.setContent(sw.toString());
 		// How do you say you don't want it to publish straight away?
 //		p.setStatus("DRAFT");
@@ -254,8 +273,12 @@ public class BloggerSink implements Sink {
 			posts.revert(blogId, inserted.getId()).execute();
 			index.have(inserted.getId(), "DRAFT", title);
 		} else {
-			System.out.println("Upload " + title + " to " + blogId + ":" + idx);
-			posts.update(blogId, idx.key, p).execute();
+			if (localOnly) {
+				System.out.println("local mode selected - not uploading");
+			} else {
+				System.out.println("Upload " + title + " to " + blogId + ":" + idx);
+				posts.update(blogId, idx.key, p).execute();
+			}
 		}
 	}
 
@@ -281,7 +304,7 @@ public class BloggerSink implements Sink {
 		return index.find(title);
 	}
 
-	private void connect() throws IOException, GeneralSecurityException {
+	private void connect() throws IOException, GeneralSecurityException, TokenResponseException {
 		Credential c = getCredential();
 		Blogger blogger = new Blogger.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), c)
             .setApplicationName("ScriptFormatter")
@@ -309,12 +332,17 @@ public class BloggerSink implements Sink {
 	}
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
+		System.out.println("Getting credential for Blogger");
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, BloggerScopes.all())
-                .setDataStoreFactory(new FileDataStoreFactory(new File(creds.getParentFile(), "google_scriptformatter_blogger_tokens")))
+                .setDataStoreFactory(new FileDataStoreFactory(tokenStore()))
                 .setAccessType("offline")
                 .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8807).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+	}
+
+	private File tokenStore() {
+		return new File(creds.getParentFile(), "google_scriptformatter_blogger_tokens");
 	}
 }

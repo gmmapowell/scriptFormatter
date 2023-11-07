@@ -93,6 +93,14 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		return sb.toString().trim();
 	}
 
+	protected boolean hasMore(T state, StringBuilder args) {
+		if (args == null || args.length() == 0)
+			return false;
+		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
+			args.delete(0, 1);
+		return args.length() > 0;
+	}
+
 	protected String readString(T state, StringBuilder args) {
 		if (args == null || args.length() == 0)
 			throw new RuntimeException("cannot read from empty string at " + state.inputLocation());

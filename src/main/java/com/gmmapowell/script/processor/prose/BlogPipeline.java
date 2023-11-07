@@ -82,6 +82,8 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				case "sp": {
 					if (state.inSpan())
 						state.op(new BreakingSpace());
+					if (args != null)
+						ProcessingUtils.process(state, args.toString());
 					break;
 				}
 				case "img": {
@@ -103,16 +105,16 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				}
 				case "import": {
 					try {
-						state.newPara("blockquote");
-						state.newSpan();
-						state.text("this is a test");
 						String branch = readString(state, args);
 						String filespec = readString(state, args);
-						// TODO: this should allow some (optional) range specifier as well, probably substring or regexp
-						state.newPara("blockquote");
-						state.newSpan();
-						state.text("include some part of " + filespec + " from " + branch);
-						gitShow(state, branch, filespec);
+						String from = null, to = null;
+						if (hasMore(state, args)) {
+							from = readString(state, args);
+						}
+						if (hasMore(state, args)) {
+							to = readString(state, args);
+						}
+						gitShow(state, branch, filespec, from, to);
 					} catch (Exception ex) {
 						System.err.println(ex.getMessage());
 					}
@@ -129,19 +131,18 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 		}
 	}
 
-	private void gitShow(BlogState state, String branch, String filespec) {
+	private void gitShow(BlogState state, String branch, String filespec, String from, String to) {
 		File dir = state.gitdir();
 		if (dir == null)
 			throw new RuntimeException("Cannot use &import without &git");
-		System.out.println("dir = " + dir);
+		System.out.println("git show " + dir + " " + branch + " " + filespec + " " + from + " => " + to);
 		RunProcess gitcmd = new RunProcess("git");
 		gitcmd.arg("show");
 		gitcmd.arg(branch);
 		gitcmd.redirectStderr(System.err);
-		gitcmd.processStdout(new GitShowProcessor(filespec));
+		gitcmd.processStdout(new GitShowProcessor(state, branch, filespec, from, to));
 		gitcmd.executeInDir(dir);
 		gitcmd.execute();
-		System.out.println(gitcmd.getExitCode());
 	}
 
 	@Override

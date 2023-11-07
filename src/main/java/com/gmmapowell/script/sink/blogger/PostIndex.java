@@ -88,6 +88,7 @@ public class PostIndex {
 	}
 
 	public void close() throws IOException {
-		appendTo.close();
+		if (appendTo != null)
+			appendTo.close();
 	}
 }

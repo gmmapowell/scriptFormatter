@@ -148,13 +148,14 @@ public class DriveLoader implements Loader {
 	}
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
+		System.out.println("Getting credential for Drive");
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, DriveScopes.all())
                 .setDataStoreFactory(new FileDataStoreFactory(new File(creds.getParentFile(), "google_scriptformatter_tokens")))
                 .setAccessType("offline")
                 .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("gareth@ziniki.org");
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8803).build();
+        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 	}
 
 }
