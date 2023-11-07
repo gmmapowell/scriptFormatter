@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.zinutils.system.RunProcess;
+
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
@@ -80,6 +82,8 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				case "sp": {
 					if (state.inSpan())
 						state.op(new BreakingSpace());
+					if (args != null)
+						ProcessingUtils.process(state, args.toString());
 					break;
 				}
 				case "img": {
@@ -93,6 +97,29 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					state.op(new ImageOp(link));
 					break;
 				}
+				case "git": {
+					String dir = readString(state, args);
+					System.out.println("Want to take git imports from " + dir);
+					state.gitdir(dir);
+					break;
+				}
+				case "import": {
+					try {
+						String branch = readString(state, args);
+						String filespec = readString(state, args);
+						String from = null, to = null;
+						if (hasMore(state, args)) {
+							from = readString(state, args);
+						}
+						if (hasMore(state, args)) {
+							to = readString(state, args);
+						}
+						gitShow(state, branch, filespec, from, to);
+					} catch (Exception ex) {
+						System.err.println(ex.getMessage());
+					}
+					break;
+				}
 				default:
 					throw new RuntimeException(state.inputLocation() + " handle inline command: " + cmd);
 				}
@@ -102,6 +129,20 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				ProcessingUtils.process(state, s);
 			}
 		}
+	}
+
+	private void gitShow(BlogState state, String branch, String filespec, String from, String to) {
+		File dir = state.gitdir();
+		if (dir == null)
+			throw new RuntimeException("Cannot use &import without &git");
+		System.out.println("git show " + dir + " " + branch + " " + filespec + " " + from + " => " + to);
+		RunProcess gitcmd = new RunProcess("git");
+		gitcmd.arg("show");
+		gitcmd.arg(branch);
+		gitcmd.redirectStderr(System.err);
+		gitcmd.processStdout(new GitShowProcessor(state, branch, filespec, from, to));
+		gitcmd.executeInDir(dir);
+		gitcmd.execute();
 	}
 
 	@Override

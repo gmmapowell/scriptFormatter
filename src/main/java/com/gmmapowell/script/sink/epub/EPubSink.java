@@ -36,7 +36,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 public class EPubSink implements Sink {
-	private final StyleCatalog styles;
+//	private final StyleCatalog styles;
 	private final File output;
 	private final boolean wantOpen;
 	private final String upload;
@@ -50,7 +50,7 @@ public class EPubSink implements Sink {
 	private final String author;
 
 	public EPubSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
-		this.styles = styles;
+//		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
 		File f = new File(output);

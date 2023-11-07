@@ -22,6 +22,7 @@ import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.epub.EPubSink;
+import com.gmmapowell.script.sink.html.HTMLSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.sink.presenter.PresenterSink;
 import com.gmmapowell.script.styles.ConfigurableStyleCatalog;
@@ -120,11 +121,43 @@ public class ScriptConfig implements Config {
 			String posts = vars.remove("posts");
 			if (posts == null)
 				throw new ConfigException("posts was not defined");
+			boolean localOnly = false;
+			String lo = vars.remove("local");
+			if (lo != null && "true".equalsIgnoreCase(lo))
+				localOnly = true;
+			File saveContentAs = null;
+			String sca = vars.remove("saveAs");
+			if (sca != null)
+				saveContentAs = new File(root, sca);
 			File pf = new File(posts);
 			if (!pf.isAbsolute())
 				pf = new File(root, posts);
 			try {
-				sinks.add(new BloggerSink(root, new File(creds), blogUrl, pf));
+				sinks.add(new BloggerSink(root, new File(creds), blogUrl, pf, localOnly, saveContentAs));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
+			}
+			break;
+		}
+		case "html": {
+			String storeInto = vars.remove("store");
+			if (storeInto == null)
+				throw new ConfigException("store directory was not defined");
+//			String creds = vars.remove("credentials");
+//			if (creds == null)
+//				throw new ConfigException("credentials was not defined");
+//			String blogUrl = vars.remove("blogurl");
+//			if (blogUrl == null)
+//				throw new ConfigException("blogurl was not defined");
+//			String posts = vars.remove("posts");
+//			if (posts == null)
+//				throw new ConfigException("posts was not defined");
+//			File pf = new File(posts);
+//			if (!pf.isAbsolute())
+//				pf = new File(root, posts);
+			try {
+				sinks.add(new HTMLSink(root, storeInto));
 			} catch (Exception ex) {
 				throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
 			}

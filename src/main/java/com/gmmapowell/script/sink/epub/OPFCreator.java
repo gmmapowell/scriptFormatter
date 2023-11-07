@@ -39,9 +39,9 @@ public class OPFCreator {
 		pkg.setAttribute("version", "3.0");
 		pkg.setAttribute("unique-identifier", bookId);
 
-		XMLNamespace opf = md.namespace("opf", "http://www.idpf.org/2007/opf");
+		/*XMLNamespace opf = */md.namespace("opf", "http://www.idpf.org/2007/opf");
 		XMLNamespace dc = md.namespace("dc", "http://purl.org/dc/elements/1.1/");
-		XMLNamespace dcterms = md.namespace("dcterms", "http://purl.org/dc/terms/");
+		/*XMLNamespace dcterms = */md.namespace("dcterms", "http://purl.org/dc/terms/");
 		
 		XMLElement ident = md.addElement(dc.tag("identifier"));
 		ident.setAttribute("id", bookId);
