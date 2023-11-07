@@ -35,6 +35,8 @@ public class PDFSink implements Sink {
 	private final Stock stock;
 
 	public PDFSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
+		if (styles == null)
+			throw new ConfigException("must specify a style catalog");
 		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
@@ -51,6 +53,8 @@ public class PDFSink implements Sink {
 		}
 		stockName = options.remove("stock");
 		stock = styles.getStock(stockName);
+		if (stock == null)
+			throw new ConfigException("there was no stock called " + stockName + " specified in the style catalog");
 	}
 
 	@Override

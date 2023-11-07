@@ -1,12 +1,14 @@
 package com.gmmapowell.script.styles;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,8 +44,10 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 	private final Map<String, String> fontStreams = new TreeMap<>();
 	private final Map<String, Stock> stocks = new TreeMap<>();
 	private final Map<String, PageStyle> pages = new TreeMap<>();
+	private final File currdir;
 
 	public ConfigurableStyleCatalog(File file, boolean debug) throws IOException, ConfigException {
+		currdir = new File(System.getProperty("user.dir"));
 		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
 			ListMap<String, String> curr = null; 
 			String s;
@@ -304,7 +308,22 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 	
 	public void loadFonts(PDDocument doc) throws IOException {
 		for (Entry<String, String> e : fontStreams.entrySet()) {
-			super.font(e.getKey(), (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream(e.getValue())));
+			URL url = this.getClass().getResource(e.getValue());
+			File f;
+			if (url != null) 
+				f = new File(url.getPath());
+			else
+				f = new File(currdir, e.getValue());
+			System.out.println("want font from URL " + f);
+			if (f == null || !f.exists()) {
+				System.err.println("there is no font for " + e.getKey() + " in file " + f);
+				continue;
+			}
+			try {
+				super.font(e.getKey(), (PDFont) PDType0Font.load(doc, new FileInputStream(f)));
+			} catch (IOException ex) {
+				System.err.println("cannot load font " + e.getKey() + " from resource " + e.getValue());
+			}
 		}
 	}
 
