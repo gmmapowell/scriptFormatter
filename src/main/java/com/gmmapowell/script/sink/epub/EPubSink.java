@@ -30,7 +30,6 @@ import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.pdf.Cursor;
 import com.gmmapowell.script.sink.pdf.StyledToken;
-import com.gmmapowell.script.sink.pdf.Suspension;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;

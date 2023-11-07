@@ -4,11 +4,6 @@
 	<classpathentry kind="src" output="bin/testclasses" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" output="bin/testclasses" path="src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JDK11">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/api-client/google-api-client/1.30.9/google-api-client-1.30.9.jar" sourcepath="/personal-qb/mvncache/com/google/api-client/google-api-client/1.30.9/google-api-client-1.30.9-sources.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/http-client/google-http-client-jackson2/1.35.0/google-http-client-jackson2-1.35.0.jar" sourcepath="/personal-qb/mvncache/com/google/http-client/google-http-client-jackson2/1.35.0/google-http-client-jackson2-1.35.0-sources.jar"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/http-client/google-http-client/1.35.0/google-http-client-1.35.0.jar"/>
@@ -27,10 +22,18 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/rugbysim/libs/jmock-junit4-2.8.2.jar"/>
 	<classpathentry kind="lib" path="/rugbysim/libs/jmock-2.8.2.jar"/>
-	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/utils/bin/classes" sourcepath="/Users/gareth/Ziniki/Over/Tools/utils/src/main/java"/>
-	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/FLAS2/bin" sourcepath="/Users/gareth/Ziniki/Over/FLAS2/src/main/java"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/com/jcraft/jsch/0.1.55/jsch-0.1.55.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
 	<classpathentry kind="lib" path="/personal-qb/mvncache/org/codehaus/jettison/jettison/1.4.1/jettison-1.4.1.jar"/>
+	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/bin/classes"/>
+	<classpathentry kind="var" path="ZINIKI_ROOT/FLAS2/bin"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-annotations/2.11.3/jackson-annotations-2.11.3.jar"/>
+	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-core/2.11.3/jackson-core-2.11.3.jar"/>
+	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
