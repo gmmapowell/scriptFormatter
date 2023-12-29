@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.script.elements.Span;
 
 public class TextSpan implements Span {
@@ -32,7 +34,7 @@ public class TextSpan implements Span {
 
 	@Override
 	public void addSpan(Span sub) {
-		throw new RuntimeException("Not Implemented");
+		throw new NotImplementedException();
 	}
 	
 	@Override

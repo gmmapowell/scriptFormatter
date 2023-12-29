@@ -2,6 +2,8 @@ package com.gmmapowell.script.elements.block;
 
 import java.util.List;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.script.elements.Span;
 
 public class HTMLSpan implements Span {
@@ -23,6 +25,6 @@ public class HTMLSpan implements Span {
 
 	@Override
 	public void addSpan(Span sub) {
-		throw new RuntimeException("Not Implemented");
+		throw new NotImplementedException();
 	}
 }

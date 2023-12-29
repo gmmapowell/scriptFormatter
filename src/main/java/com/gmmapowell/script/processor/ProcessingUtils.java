@@ -1,6 +1,5 @@
 package com.gmmapowell.script.processor;
 
-import org.zinutils.exceptions.InvalidUsageException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.flow.BreakingSpace;
@@ -29,7 +28,7 @@ public class ProcessingUtils {
 			} else if (q == -2) { // a double character; throw it away
 				st.text(tx.substring(from, i+1));
 				from = ++i + 1;
-			} else if ((q = getCommand(tx, i, to)) >= 0) {
+			} else if ((q = getCommand(st, tx, i, to)) >= 0) {
 				if (i > from)
 					st.text(tx.substring(from, i));
 				processCommand(st, tx.substring(i+1, q));
@@ -84,7 +83,7 @@ public class ProcessingUtils {
 		}
 	}
 
-	private static int getCommand(String tx, int i, int to) {
+	private static int getCommand(TextState state, String tx, int i, int to) {
 		// not a command
 		if (tx.charAt(i) != '&')
 			return -1;
@@ -94,8 +93,8 @@ public class ProcessingUtils {
 		// it's a double ... return the magic value "-2"
 		if (tx.charAt(i) == '&')
 			return -2;
-		if (tx.charAt(i) == ' ')
-			throw new InvalidUsageException("cannot have just &: use && for a single &");
+		if (!Character.isLetterOrDigit(tx.charAt(i)))
+			throw new ParsingException("cannot have just &: use && for a single & at " + state.inputLocation());
 
 		while (i < to && Character.isLetterOrDigit(tx.charAt(i)))
 			i++;
@@ -117,8 +116,9 @@ public class ProcessingUtils {
 			st.op(new BreakingSpace());
 			break;
 		}
-		default:
-			throw new NotImplementedException("no such command: " + cmd + " at " + st.inputLocation());
+		default: {
+			throw new NoSuchCommandException(cmd, st.inputLocation());
+		}
 		}
 	}
 }

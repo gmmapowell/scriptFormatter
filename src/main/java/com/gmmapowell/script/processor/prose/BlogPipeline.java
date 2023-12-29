@@ -12,6 +12,8 @@ import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.processor.NoSuchCommandException;
+import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
 
@@ -33,18 +35,22 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 
 	@Override
 	protected void handleLine(BlogState state, String s) throws IOException {
-		if (s.equals("$$")) {
+		if (s.trim().equals("$$")) {
 			state.blockquote = !state.blockquote;
-		} else if (s.startsWith("+")) {
+		} else if (!state.blockquote && s.startsWith("+")) {
 			state.newPara(headingLevel(s));
 			ProcessingUtils.process(state, s.substring(s.indexOf(" ")+1).trim());
-		} else if (s.startsWith("*")) {
+		} else if (!state.blockquote && s.startsWith("*")) {
 			state.newPara("bullet");
 			ProcessingUtils.process(state, s.substring(s.indexOf(" ")+1).trim());
 		} else {
 			if (state.blockquote) {
 				state.newPara("blockquote");
-				ProcessingUtils.process(state, s);
+				try {
+					ProcessingUtils.process(state, s);
+				} catch (NoSuchCommandException ex) {
+					throw ex.context("blockquote");
+				}
 				return;
 			} else if (!state.inPara()) {
 				state.newPara("text");
@@ -69,14 +75,19 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					break;
 				}
 				case "link": {
-					String lk = readString(state, args);
-					String tx = readString(state, args);
-					
-					if (!state.inPara())
-						state.newPara("text");
-					if (!state.inSpan())
-						state.newSpan();
-					state.op(new LinkOp(lk, tx));
+					try {
+						String lk = readString(state, args);
+						String tx = readString(state, args);
+						
+						if (!state.inPara())
+							state.newPara("text");
+						if (!state.inSpan())
+							state.newSpan();
+						state.op(new LinkOp(lk, tx));
+					} catch (ParsingException ex) {
+						System.out.println(ex.getMessage());
+						System.out.println(" >> " + s);
+					}
 					break;
 				}
 				case "sp": {

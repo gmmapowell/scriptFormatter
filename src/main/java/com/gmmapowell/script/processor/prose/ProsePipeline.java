@@ -16,6 +16,7 @@ import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 
@@ -41,12 +42,15 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 					try {
 						if (st.trimLine())
 							s = trim(s);
-						if (s.length() == 0) {
+						if (!st.blockquote && s.length() == 0) {
 							commitCurrentCommand();
 						} else {
 							st.line(lnr.getLineNumber());
 							handleLine(st, s);
 						}
+					} catch (ParsingException ex) {
+						System.out.println(ex.getMessage());
+						System.out.println(" >> " + s);
 					} catch (Exception ex) {
 						System.out.println("Error encountered processing " + x + " before line " + lnr.getLineNumber());
 						if (debug)
@@ -103,14 +107,14 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 
 	protected String readString(T state, StringBuilder args) {
 		if (args == null || args.length() == 0)
-			throw new RuntimeException("cannot read from empty string at " + state.inputLocation());
+			throw new ParsingException("cannot read from empty string at " + state.inputLocation());
 		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
 			args.delete(0, 1);
 		if (args.length() == 0)
-			throw new RuntimeException("cannot read from empty string at " + state.inputLocation());
+			throw new ParsingException("cannot read from empty string at " + state.inputLocation());
 		char c = args.charAt(0);
 		if (c != '\'' && c != '"')
-			throw new RuntimeException("unquoted string at " + state.inputLocation());
+			throw new ParsingException("unquoted string at " + state.inputLocation());
 		args.delete(0, 1);
 		String ret = null;
 		for (int i=0;i<args.length();i++) {
@@ -125,7 +129,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			}
 		}
 		if (ret == null)
-			throw new RuntimeException("unterminated string at " + state.inputLocation());
+			throw new ParsingException("unterminated string at " + state.inputLocation());
 		return ret;
 	}
 
