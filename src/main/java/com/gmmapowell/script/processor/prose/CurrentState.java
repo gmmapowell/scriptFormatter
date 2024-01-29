@@ -71,6 +71,7 @@ public abstract class CurrentState implements TextState {
 		}
 	}
 	
+	@Override
 	public void newPara(List<String> formats) {
 		if (currSection == null) {
 			throw new CantHappenException("no current section");
@@ -80,10 +81,12 @@ public abstract class CurrentState implements TextState {
 		currSpan = null;
 	}
 
+	@Override
 	public void newPara(String... formats) {
 		newPara(Arrays.asList(formats));
 	}
 
+	@Override
 	public void endPara() {
 		// Hack? This is to get us back on track after footnotes, but it might be better to make that more explicit.
 		// I can see it derailing us in other situations.
@@ -102,6 +105,7 @@ public abstract class CurrentState implements TextState {
 		endPara();
 	}
 	
+	@Override
 	public void newSpan(List<String> formats) {
 		if (currPara == null) {
 			throw new CantHappenException("no current para");
@@ -113,6 +117,7 @@ public abstract class CurrentState implements TextState {
 		currPara.spans.add(currSpan);
 	}
 
+	@Override
 	public void newSpan(String... formats) {
 		newSpan(Arrays.asList(formats));
 	}
@@ -131,6 +136,7 @@ public abstract class CurrentState implements TextState {
 		nestSpan(Arrays.asList(formats));
 	}
 	
+	@Override
 	public void text(String tx) {
 		if (currSpan == null) {
 			throw new CantHappenException("no current span");
@@ -138,6 +144,7 @@ public abstract class CurrentState implements TextState {
 		currSpan.items.add(new TextSpanItem(tx));
 	}
 	
+	@Override
 	public void op(SpanItem op) {
 		if (currSpan == null) {
 			throw new CantHappenException("no current span");
@@ -145,6 +152,7 @@ public abstract class CurrentState implements TextState {
 		currSpan.items.add(op);
 	}
 
+	@Override
 	public void popSpan() {
 		if (currSpan == null)
 			throw new CantHappenException("no current span");

@@ -16,7 +16,7 @@ public class Token {
 	}
 
 	public static Token from(ErrorReporter errors, Tokenizable line) {
-		line.skipWS();
+		line.skipWS(errors);
 		if (!line.hasMore())
 			return null;
 		int mark = line.at();
@@ -97,7 +97,7 @@ public class Token {
 	}
 
 	public static void assertEnd(ErrorReporter errors, Tokenizable line) {
-		line.skipWS();
+		line.skipWS(errors);
 		if (line.hasMore()) {
 			errors.message(line, "end of line expected");
 		}

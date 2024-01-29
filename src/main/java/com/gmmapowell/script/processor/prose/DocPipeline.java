@@ -203,7 +203,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			}
 			case "stop": {
 				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
-					throw new RuntimeException("&select must immediately follow &include");
+					throw new RuntimeException("&stop must immediately follow &include");
 				}
 				Map<String, String> params = readParams(state, args, "at", "elide");
 				((IncludeCommand)state.inline).stopAt(params.get("at"), params.get("elide"));
@@ -211,7 +211,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			}
 			case "indents": {
 				if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
-					throw new RuntimeException("&select must immediately follow &include");
+					throw new RuntimeException("&indents must immediately follow &include");
 				}
 				Map<String, String> params = readParams(state, args, "from", "to");
 				((IncludeCommand)state.inline).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));

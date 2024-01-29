@@ -1,17 +1,19 @@
 package com.gmmapowell.script.processor.prose;
 
+import com.gmmapowell.script.processor.TextState;
+
 // To do this job properly, you should pull in the FLAS TDA parser as we do in the plugin ...
 public class FLASFormatter implements Formatter {
-	private final DocState state;
+	private final TextState state;
 
-	public FLASFormatter(DocState state) {
+	public FLASFormatter(TextState state) {
 		this.state = state;
 	}
 
 	@Override
 	public void format(String text, int exdent) {
 		text = text.replace("\t", "    ");
-		state.newPara("preformatted");
+		state.newPara(state.formatAs());
 		state.newSpan();
 		int i = 0;
 		

@@ -15,6 +15,11 @@ public class ArticleState extends AtState {
 	}
 
 	@Override
+	public String formatAs() {
+		return "preformatted";
+	}
+	
+	@Override
 	public void line(int lineNumber) {
 		this.line = lineNumber;
 	}

@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.gmmapowell.script.flow.Flow;
 
-public class AtState extends CurrentState {
+public abstract class AtState extends CurrentState {
 	public DocCommand cmd;
 	public InlineCommand inline;
 

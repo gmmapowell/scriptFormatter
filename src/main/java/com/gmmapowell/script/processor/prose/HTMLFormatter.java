@@ -1,10 +1,12 @@
 package com.gmmapowell.script.processor.prose;
 
+import com.gmmapowell.script.processor.TextState;
+
 public class HTMLFormatter implements Formatter {
 	private boolean inTag = false;
-	private final DocState state;
+	private final TextState state;
 
-	public HTMLFormatter(DocState state) {
+	public HTMLFormatter(TextState state) {
 		this.state = state;
 	}
 
@@ -13,7 +15,7 @@ public class HTMLFormatter implements Formatter {
 		text = text.replace("\t", "    ");
 		if (exdent > 0)
 			text = text.substring(exdent);
-		state.newPara("preformatted");
+		state.newPara(state.formatAs());
 		state.newSpan();
 		int i = 0;
 		boolean isTag = false;

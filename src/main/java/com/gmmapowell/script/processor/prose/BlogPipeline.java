@@ -114,6 +114,12 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					state.gitdir(dir);
 					break;
 				}
+				case "includeTag": {
+					String tag = readString(state, args);
+					System.out.println("Want to take git includes from tag " + tag);
+					state.gittag(tag);
+					break;
+				}
 				case "import": {
 					try {
 						String branch = readString(state, args);
@@ -129,6 +135,65 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					} catch (Exception ex) {
 						System.err.println(ex.getMessage());
 					}
+					break;
+				}
+				case "include": {
+					commitCurrentCommand();
+					String file = readString(state, args);
+					Map<String, String> params = readParams(state, args, "formatter");
+					File f = null;
+					if (state.gitdir() != null)
+						f = new File(state.gitdir(), file);
+					else
+						f = new File(file);
+					Formatter formatter;
+					if (!params.containsKey("formatter"))
+						 formatter = new BoringFormatter(state);
+					switch (params.get("formatter")) {
+					case "html":
+						formatter = new HTMLFormatter(state);
+						break;
+					case "flas":
+						formatter = new FLASFormatter(state);
+						break;
+					default:
+						formatter = new BoringFormatter(state);
+						break;
+					}
+					state.include = new IncludeCommand(state, f, formatter);
+					break;
+				}
+				case "remove": {
+					if (state.include == null) {
+						throw new RuntimeException("&remove must immediately follow &include");
+					}
+					Map<String, String> params = readParams(state, args, "from", "what");
+//					System.out.println("want to remove from " + state.inline + " with " + params);
+					((IncludeCommand)state.include).butRemove(params.get("from"), params.get("what"));
+					break;
+				}
+				case "select": {
+					if (state.include == null) {
+						throw new RuntimeException("&select must immediately follow &include");
+					}
+					Map<String, String> params = readParams(state, args, "from", "what", "exdent");
+					((IncludeCommand)state.include).selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
+					break;
+				}
+				case "stop": {
+					if (state.include == null) {
+						throw new RuntimeException("&stop must immediately follow &include");
+					}
+					Map<String, String> params = readParams(state, args, "at", "elide");
+					((IncludeCommand)state.include).stopAt(params.get("at"), params.get("elide"));
+					break;
+				}
+				case "indents": {
+					if (state.include == null) {
+						throw new RuntimeException("&indents must immediately follow &include");
+					}
+					Map<String, String> params = readParams(state, args, "from", "to");
+					((IncludeCommand)state.include).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
 					break;
 				}
 				default:
@@ -161,6 +226,11 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 		if (state.inPara()) {
 			state.endPara();
 		}
+		if (state.include != null) {
+			IncludeCommand include = state.include;
+			state.include = null;
+			include.execute();
+		}
 	}
 	
 	private String headingLevel(String s) {
@@ -171,7 +241,8 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 	}
 	
 	@Override
-	protected void done() {
+	protected void done() throws IOException {
+		commitCurrentCommand();
 //		index.close();
 	}
 }

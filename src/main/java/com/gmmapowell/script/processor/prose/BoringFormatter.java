@@ -1,17 +1,18 @@
 package com.gmmapowell.script.processor.prose;
 
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.TextState;
 
 public class BoringFormatter implements Formatter {
-	private final DocState state;
+	private final TextState state;
 
-	public BoringFormatter(DocState state) {
+	public BoringFormatter(TextState state) {
 		this.state = state;
 	}
 
 	@Override
 	public void format(String text, int exdent) {
-		state.newPara("preformatted");
+		state.newPara(state.formatAs());
 		ProcessingUtils.process(state, text.replace("\t", "    "));
 	}
 

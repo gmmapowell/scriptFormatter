@@ -10,6 +10,11 @@ public class MovieState extends CurrentState {
 		super(flows);
 	}
 
+	@Override
+	public String formatAs() {
+		return "preformatted";
+	}
+	
 	public void reset(String file) {
 		this.file = file;
 	}

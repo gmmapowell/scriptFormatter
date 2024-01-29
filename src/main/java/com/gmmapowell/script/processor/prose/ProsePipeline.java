@@ -83,7 +83,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected abstract T begin(Map<String, Flow> flows, String file);
 	protected abstract void handleLine(T state, String s) throws IOException;
 	protected void fileDone() {}
-	protected void done() {}
+	protected void done() throws IOException {}
 	protected void postRender() {}
 
 	private String trim(String s) {

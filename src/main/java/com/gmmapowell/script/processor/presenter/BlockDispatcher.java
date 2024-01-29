@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flasck.flas.blockForm.ContinuedLine;
+import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.blocker.BlockConsumer;
 import org.flasck.flas.errors.ErrorReporter;
 import org.zinutils.exceptions.NotImplementedException;
@@ -32,7 +33,7 @@ public class BlockDispatcher implements BlockConsumer {
 	}
 
 	@Override
-	public void comment(String text) {
+	public void comment(InputPosition pos, String text) {
 		
 	}
 

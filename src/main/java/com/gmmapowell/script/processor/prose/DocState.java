@@ -37,6 +37,11 @@ public class DocState extends AtState {
 		super(flows);
 	}
 
+	@Override
+	public String formatAs() {
+		return "preformatted";
+	}
+	
 	public void newfile(String file) {
 		this.file = file;
 		this.numbering.clear();

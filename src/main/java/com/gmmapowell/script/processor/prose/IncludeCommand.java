@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.gmmapowell.script.processor.TextState;
+
 public class IncludeCommand implements InlineCommand {
 	public class Indents {
 		private final int min;
@@ -35,7 +37,7 @@ public class IncludeCommand implements InlineCommand {
 		}
 	}
 
-	private final DocState state;
+	private final TextState state;
 	private final File file;
 	private final Formatter formatter;
 	private final List<Region> elides = new ArrayList<>();
@@ -44,7 +46,7 @@ public class IncludeCommand implements InlineCommand {
 	private Pattern stopAt;
 	private boolean elideAtEnd;
 
-	public IncludeCommand(DocState state, File file, Formatter formatter) {
+	public IncludeCommand(TextState state, File file, Formatter formatter) {
 		this.state = state;
 		this.file = file;
 		this.formatter = formatter;
@@ -130,7 +132,7 @@ public class IncludeCommand implements InlineCommand {
 	}
 
 	private void elideThis(int il) throws IOException {
-		state.newPara("preformatted");
+		state.newPara(state.formatAs());
 		state.newSpan();
 		state.text(makeElide(il));
 		state.endPara();

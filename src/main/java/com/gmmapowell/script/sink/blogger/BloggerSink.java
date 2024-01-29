@@ -123,6 +123,9 @@ public class BloggerSink implements Sink {
 						case "blockquote":
 							writer.print("<br/>");
 							break;
+						case "preformatted":
+							writer.print("<br/>");
+							break;
 						case "h1":
 						case "h2":
 						case "h3":

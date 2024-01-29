@@ -7,10 +7,16 @@ import com.gmmapowell.script.flow.Flow;
 
 public class BlogState extends CurrentState {
 	private File gitdir;
+	private String gittag;
+	public IncludeCommand include;
 
 	public BlogState(Map<String, Flow> flows, String file) {
 		super(flows);
 		this.file = file;
+	}
+	@Override
+	public String formatAs() {
+		return "blockquote";
 	}
 
 	@Override
@@ -34,5 +40,13 @@ public class BlogState extends CurrentState {
 	
 	public File gitdir() {
 		return this.gitdir;
+	}
+
+	public void gittag(String tag) {
+		this.gittag = tag;
+	}
+	
+	public String gittag() {
+		return this.gittag;
 	}
 }
