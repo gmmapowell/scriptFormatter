@@ -9,8 +9,11 @@ import com.gmmapowell.script.flow.SyncAfterFlow;
 public class ProcessingUtils {
 	public static void process(TextState st, String tx) {
 		st.newSpan();
-		processPart(st, tx, 0, tx.length());
-		st.endSpan();
+		try {
+			processPart(st, tx, 0, tx.length());
+		} finally {
+			st.endSpan();
+		}
 	}
 
 	public static void processPart(TextState st, String tx, int i, int to) {
@@ -21,8 +24,11 @@ public class ProcessingUtils {
 				if (i > from)
 					st.text(tx.substring(from, i));
 				makeSpan(st, tx.charAt(i));
-				processPart(st, tx, i+1, q);
-				st.popSpan();
+				try {
+					processPart(st, tx, i+1, q);
+				} finally {
+					st.popSpan();
+				}
 				i = q;
 				from = i+1;
 			} else if (q == -2) { // a double character; throw it away
