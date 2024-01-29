@@ -141,11 +141,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					commitCurrentCommand();
 					String file = readString(state, args);
 					Map<String, String> params = readParams(state, args, "formatter");
-					File f = null;
-					if (state.gitdir() != null)
-						f = new File(state.gitdir(), file);
-					else
-						f = new File(file);
+					File f = new File(file);
 					Formatter formatter;
 					if (!params.containsKey("formatter"))
 						 formatter = new BoringFormatter(state);

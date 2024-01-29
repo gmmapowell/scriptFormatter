@@ -65,6 +65,7 @@ public class FLASFormatter implements Formatter {
 			case "main":
 			case "method":
 			case "state":
+			case "struct":
 			case "template":
 			case "title":
 				return true;

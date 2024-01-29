@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.gmmapowell.script.flow.Flow;
 
-public class BlogState extends CurrentState {
+public class BlogState extends CurrentState implements GitState {
 	private File gitdir;
 	private String gittag;
 	public IncludeCommand include;
@@ -38,6 +38,7 @@ public class BlogState extends CurrentState {
 		this.gitdir = new File(dir);
 	}
 	
+	@Override
 	public File gitdir() {
 		return this.gitdir;
 	}

@@ -4,11 +4,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.zinutils.system.RunProcess;
 
 import com.gmmapowell.script.processor.TextState;
 
@@ -54,7 +58,7 @@ public class IncludeCommand implements InlineCommand {
 
 	@Override
 	public void execute() throws IOException {
-		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file, Charset.forName("UTF-8")))) {
+		try (LineNumberReader lnr = openSource()) {
 			String line = null;
 			int exdent = 0;
 			int selectionIndent = 0;
@@ -129,6 +133,24 @@ public class IncludeCommand implements InlineCommand {
 			if (lookFor != null)
 				throw new RuntimeException("While processing " + file + ", did not come across " + lookFor.from);
 		}
+	}
+
+	private LineNumberReader openSource() throws IOException {
+		Reader is;
+		if (state instanceof GitState && ((GitState)state).gittag() != null) {
+			GitState gs = (GitState) state;
+			// read it using gitshow
+			RunProcess gitcmd = new RunProcess("git");
+			gitcmd.arg("show");
+			gitcmd.arg(gs.gittag() + ":" + file);
+			gitcmd.captureStdout();
+			gitcmd.redirectStderr(System.err);
+			gitcmd.executeInDir(gs.gitdir());
+			gitcmd.execute();
+			is = new StringReader(gitcmd.getStdout());
+		} else
+			is = new FileReader(file, Charset.forName("UTF-8"));
+		return new LineNumberReader(is);
 	}
 
 	private void elideThis(int il) throws IOException {
