@@ -1,10 +1,8 @@
-package com.gmmapowell.script.sink.pdf;
+package com.gmmapowell.script.flow;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.gmmapowell.script.flow.SpanItem;
 
 public class StyledToken {
 	public final String flow;

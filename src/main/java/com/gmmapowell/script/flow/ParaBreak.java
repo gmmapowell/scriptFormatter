@@ -7,6 +7,10 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 
 public class ParaBreak implements SpanItem {
 
+	public ParaBreak() {
+		System.out.println("BRKPara");
+	}
+	
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
 		return null;

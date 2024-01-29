@@ -18,6 +18,7 @@ import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.SpanItem;
+import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.styles.Justification;
 import com.gmmapowell.script.styles.PageStyle;

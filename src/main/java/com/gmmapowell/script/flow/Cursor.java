@@ -1,16 +1,9 @@
-package com.gmmapowell.script.sink.pdf;
+package com.gmmapowell.script.flow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.gmmapowell.script.flow.HorizSpan;
-import com.gmmapowell.script.flow.NestedSpan;
-import com.gmmapowell.script.flow.Para;
-import com.gmmapowell.script.flow.ParaBreak;
-import com.gmmapowell.script.flow.Section;
-import com.gmmapowell.script.flow.SpanItem;
 
 public class Cursor implements Comparable<Cursor> {
 	private final String flow;

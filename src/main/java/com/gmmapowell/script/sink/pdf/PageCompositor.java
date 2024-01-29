@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDPage;
 
+import com.gmmapowell.script.flow.StyledToken;
+
 public interface PageCompositor {
 	void begin() throws IOException;
 	String currentPageName();

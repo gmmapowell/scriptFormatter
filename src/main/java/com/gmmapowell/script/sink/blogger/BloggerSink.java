@@ -17,16 +17,16 @@ import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.PostIndex.BlogEntry;
-import com.gmmapowell.script.sink.pdf.Cursor;
-import com.gmmapowell.script.sink.pdf.StyledToken;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;

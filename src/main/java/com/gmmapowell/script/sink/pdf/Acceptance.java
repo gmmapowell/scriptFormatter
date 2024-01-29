@@ -1,5 +1,7 @@
 package com.gmmapowell.script.sink.pdf;
 
+import com.gmmapowell.script.flow.StyledToken;
+
 public class Acceptance {
 	public final Acceptability status;
 	public final StyledToken lastAccepted;

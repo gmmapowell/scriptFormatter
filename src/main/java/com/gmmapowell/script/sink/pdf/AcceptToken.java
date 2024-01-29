@@ -2,6 +2,8 @@ package com.gmmapowell.script.sink.pdf;
 
 import java.util.List;
 
+import com.gmmapowell.script.flow.StyledToken;
+
 public class AcceptToken implements Outcome {
 	private final Float onl;
 	private final List<StyledToken> left;

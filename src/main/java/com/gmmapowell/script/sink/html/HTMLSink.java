@@ -13,16 +13,16 @@ import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SectionTitle;
+import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.pdf.Cursor;
-import com.gmmapowell.script.sink.pdf.StyledToken;
 
 public class HTMLSink implements Sink {
 	public enum Mode {

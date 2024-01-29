@@ -1,5 +1,8 @@
 package com.gmmapowell.script.sink.pdf;
 
+import com.gmmapowell.script.flow.Cursor;
+import com.gmmapowell.script.flow.StyledToken;
+
 public class Suspension {
 	public final Cursor cursor;
 	private final StyledToken lastAccepted;

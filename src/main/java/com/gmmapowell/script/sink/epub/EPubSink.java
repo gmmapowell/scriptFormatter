@@ -21,15 +21,15 @@ import org.zinutils.xml.XMLElement;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.pdf.Cursor;
-import com.gmmapowell.script.sink.pdf.StyledToken;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;
