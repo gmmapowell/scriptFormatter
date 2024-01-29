@@ -8,7 +8,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 public class ParaBreak implements SpanItem {
 
 	public ParaBreak() {
-		System.out.println("BRKPara");
 	}
 	
 	@Override

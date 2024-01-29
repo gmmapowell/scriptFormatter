@@ -110,13 +110,13 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				}
 				case "git": {
 					String dir = readString(state, args);
-					System.out.println("Want to take git imports from " + dir);
+//					System.out.println("Want to take git imports from " + dir);
 					state.gitdir(dir);
 					break;
 				}
 				case "includeTag": {
 					String tag = readString(state, args);
-					System.out.println("Want to take git includes from tag " + tag);
+//					System.out.println("Want to take git includes from tag " + tag);
 					state.gittag(tag);
 					break;
 				}

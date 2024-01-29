@@ -37,6 +37,8 @@ public class Cursor implements Comparable<Cursor> {
 			styles.addAll(p.formats);
 			if (span >= p.spans.size()) {
 				this.para++;
+				if (span == 0)
+					continue;
 				this.span = 0;
 				return new StyledToken(flow, para, span, item, styles, new ParaBreak());
 			}

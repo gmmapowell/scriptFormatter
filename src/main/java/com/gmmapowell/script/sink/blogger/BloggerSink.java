@@ -99,7 +99,6 @@ public class BloggerSink implements Sink {
 				while ((tok = c.next()) != null) {
 //					System.out.println(tok);
 					last = transition(cf, last, tok);
-					boolean hadBreak = haveBreak;
 					haveBreak = false;
 					figureStyles(cf, tok.styles);
 					cf = new ArrayList<>(tok.styles);
@@ -111,8 +110,6 @@ public class BloggerSink implements Sink {
 						else
 							writer.print(" ");
 					} else if (tok.it instanceof ParaBreak) {
-						if (hadBreak) // ignore multiple consecutive BRKs
-							continue;
 						switch (last) {
 						case "bullet":
 							last = "needli";
