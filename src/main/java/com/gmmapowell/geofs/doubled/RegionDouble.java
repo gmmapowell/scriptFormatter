@@ -42,6 +42,12 @@ public class RegionDouble implements Region, RegionPlace {
 			throw new CantHappenException("don't provide multiple entries for " + name);
 		entries.put(name, new PlaceString(contents));
 	}
+
+	public void addPlace(String name, byte[] contents) {
+		if (entries.containsKey(name))
+			throw new CantHappenException("don't provide multiple entries for " + name);
+		entries.put(name, new PlaceByteArray(contents));
+	}
 	
 	// TODO: place from file
 	// TODO: regions

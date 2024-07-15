@@ -1,27 +1,27 @@
 package com.gmmapowell.geofs.doubled;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 
 import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.geofs.Place;
 
-public class PlaceString extends PlaceDouble implements RegionPlace, Place {
-	private final String contents;
+public class PlaceByteArray extends PlaceDouble implements RegionPlace, Place {
+	private final byte[] contents;
 
-	public PlaceString(String contents) {
+	public PlaceByteArray(byte[] contents) {
 		this.contents = contents;
 	}
 
 	@Override
 	protected Reader textContents() {
-		return new StringReader(contents);
+		throw new CantHappenException("this is a binary place");
 	}
 
 	@Override
 	protected InputStream binaryContents() {
-		throw new CantHappenException("this is not a binary place");
+		return new ByteArrayInputStream(contents);
 	}
 }

@@ -3,6 +3,7 @@ package com.gmmapowell.geofs;
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
+import com.gmmapowell.geofs.listeners.NumberedLineListener;
 
 /** A <tt>Place</tt> corresponds to the conventional notion of a file in a filesystem, that is, something with a string of bytes.
  * 
@@ -17,10 +18,12 @@ import com.gmmapowell.geofs.listeners.LineListener;
  */
 public interface Place {
 	void lines(LineListener lsnr);
+	void lines(NumberedLineListener lsnr);
 	
 	void binary(BinaryBlockListener lsnr);
 	
 	void chars(CharBlockListener lsnr);
+
 	
 	// TODO: copyMeTo();
 	// TODO: deleteMe();

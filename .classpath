@@ -6,7 +6,7 @@
 	<classpathentry kind="src" output="bin/testclasses" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
-	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/bin/classes"/>
+	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/bin/classes" sourcepath="/ZINIKI_ROOT/Tools/utils/src/main/java"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/FLAS2/bin"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
