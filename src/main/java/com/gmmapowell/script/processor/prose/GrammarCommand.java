@@ -258,4 +258,8 @@ public class GrammarCommand implements ProductionVisitor, InlineCommand {
 		state.newSpan("grammar-op");
 		state.text(quant);
 	}
+	
+	@Override
+	public void generateEOL() {
+	}
 }
