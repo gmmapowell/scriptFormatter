@@ -1,9 +1,12 @@
-package com.gmmapowell.geofs.doubled;
+package com.gmmapowell.geofs.lfs;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.LineNumberReader;
-import java.io.Reader;
+
+import org.zinutils.exceptions.CantHappenException;
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.exceptions.FileStreamingException;
@@ -12,7 +15,14 @@ import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
 
-public abstract class PlaceDouble implements Place {
+public class LFSPlace implements Place {
+	private final File file;
+
+	public LFSPlace(File file) {
+		if (!file.isFile())
+			throw new CantHappenException("there is no directory " + file);
+		this.file = file;
+	}
 
 	@Override
 	public void lines(LineListener lsnr) {
@@ -25,7 +35,7 @@ public abstract class PlaceDouble implements Place {
 	}
 	
 	private void streamLines(LineListener lsnr, NumberedLineListener nlsnr) {
-		try (LineNumberReader lnr = new LineNumberReader(textContents())) {
+		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
 			String s;
 			while ((s = lnr.readLine()) != null) {
 				if (s.endsWith("\r"))
@@ -42,24 +52,11 @@ public abstract class PlaceDouble implements Place {
 
 	@Override
 	public void binary(BinaryBlockListener lsnr) {
-		try (InputStream is = binaryContents()) {
-			byte[] bs = new byte[4096];
-			int cnt;
-			while ((cnt = is.read(bs, 0, 4096)) > 0) {
-				lsnr.block(bs, cnt);
-			}
-		} catch (IOException ex) {
-			throw new FileStreamingException(ex);
-		}
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void chars(CharBlockListener lsnr) {
-		// TODO Auto-generated method stub
-
+		throw new NotImplementedException();
 	}
-
-	protected abstract Reader textContents();
-	protected abstract InputStream binaryContents();
-
 }
