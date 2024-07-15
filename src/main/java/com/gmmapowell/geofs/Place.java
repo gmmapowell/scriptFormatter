@@ -1,0 +1,28 @@
+package com.gmmapowell.geofs;
+
+import com.gmmapowell.geofs.listeners.BinaryBlockListener;
+import com.gmmapowell.geofs.listeners.CharBlockListener;
+import com.gmmapowell.geofs.listeners.LineListener;
+
+/** A <tt>Place</tt> corresponds to the conventional notion of a file in a filesystem, that is, something with a string of bytes.
+ * 
+ * However, because we generally want to be doing things in a TDA fashion (and certainly care about testing), this is a much more
+ * active object than usual.
+ * 
+ * So instead of creating an InputStream from this object, it is your job to ask for the contents to be streamed to you, either
+ * as a binary or text stream.  Alternatively, you can opt to copy it to another <tt>Region</tt>, or delete it.
+ * 
+ * Also, the fact that you have this object says that the corresponding file or object exists (or at least existed when
+ * you obtained it).
+ */
+public interface Place {
+	void lines(LineListener lsnr);
+	
+	void binary(BinaryBlockListener lsnr);
+	
+	void chars(CharBlockListener lsnr);
+	
+	// TODO: copyMeTo();
+	// TODO: deleteMe();
+	
+}
