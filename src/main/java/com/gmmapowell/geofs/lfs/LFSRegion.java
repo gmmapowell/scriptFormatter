@@ -3,7 +3,6 @@ package com.gmmapowell.geofs.lfs;
 import java.io.File;
 
 import org.zinutils.exceptions.CantHappenException;
-import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
@@ -38,7 +37,13 @@ public class LFSRegion implements Region {
 
 	@Override
 	public Region regionPath(String path) {
-		throw new NotImplementedException();
+		File f = new File(path);
+		if (f.isAbsolute())
+			throw new CantHappenException("absolute paths must be used from the world");
+		f = new File(file, path);
+		if (!f.isDirectory())
+			throw new CantHappenException("there is no region " + f);
+		return new LFSRegion(f);
 	}
 
 	@Override
