@@ -26,6 +26,7 @@ public class BasicLFS {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line("hello, world!");
+			oneOf(lsnr).complete();
 		}});
 		
 		File tf = File.createTempFile("lfs", ".txt");

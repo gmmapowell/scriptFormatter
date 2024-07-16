@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.Reader;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.exceptions.FileStreamingException;
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
@@ -14,6 +17,12 @@ import com.gmmapowell.geofs.listeners.NumberedLineListener;
 
 public abstract class PlaceDouble implements Place {
 
+	// I think this is fairly easy to implement - you just pass it to the constructor
+	@Override
+	public Region region() {
+		throw new NotImplementedException();
+	}
+	
 	@Override
 	public void lines(LineListener lsnr) {
 		streamLines(lsnr, null);
@@ -35,6 +44,10 @@ public abstract class PlaceDouble implements Place {
 				else
 					nlsnr.line(lnr.getLineNumber(), s);
 			}
+			if (lsnr != null)
+				lsnr.complete();
+			else
+				nlsnr.complete();
 		} catch (IOException ex) {
 			throw new FileStreamingException(ex);
 		}

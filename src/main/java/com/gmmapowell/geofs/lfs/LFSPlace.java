@@ -9,6 +9,7 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.exceptions.FileStreamingException;
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
@@ -24,6 +25,11 @@ public class LFSPlace implements Place {
 		this.file = file;
 	}
 
+	@Override
+	public Region region() {
+		return new LFSRegion(file.getParentFile());
+	}
+	
 	@Override
 	public void lines(LineListener lsnr) {
 		streamLines(lsnr, null);

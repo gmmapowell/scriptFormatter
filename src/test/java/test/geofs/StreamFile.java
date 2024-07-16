@@ -23,6 +23,7 @@ public class StreamFile {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line("hello, world!");
+			oneOf(lsnr).complete();
 		}});
 		world.root().place("helloworld").lines(lsnr);
 	}
@@ -34,6 +35,7 @@ public class StreamFile {
 		NumberedLineListener lsnr = context.mock(NumberedLineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line(1, "hello, world!");
+			oneOf(lsnr).complete();
 		}});
 		world.root().place("helloworld").lines(lsnr);
 	}
@@ -45,6 +47,7 @@ public class StreamFile {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line("hello, world!");
+			oneOf(lsnr).complete();
 		}});
 		world.root().place("helloworld").lines(lsnr);
 	}
@@ -56,6 +59,7 @@ public class StreamFile {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line(" hello, world! ");
+			oneOf(lsnr).complete();
 		}});
 		world.root().place("helloworld").lines(lsnr);
 	}

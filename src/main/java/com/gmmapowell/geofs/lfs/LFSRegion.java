@@ -16,6 +16,13 @@ public class LFSRegion implements Region {
 			throw new CantHappenException("there is no directory " + file);
 		this.file = file;
 	}
+	
+	@Override
+	public Region parent() {
+		if (file == null || file.getParentFile() == null)
+			throw new CantHappenException("this region does not have a parent");
+		return new LFSRegion(file.getParentFile());
+	}
 
 	@Override
 	public Region subregion(String name) {
