@@ -37,6 +37,7 @@ public interface Region {
 	 */
 	Place placePath(String path);
 	
+	Region parent();
 	// TODO: directory operations
 	// TODO: "create" will need to take a parameter which indicates in an abstract way any configuration parameters, eg. file mode on Linux,
 	// or content type on S3

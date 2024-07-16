@@ -10,4 +10,8 @@ public interface LineListener {
 	 */
 	void line(String line);
 
+	/** When all the lines have been handled, inform the listener
+	 * 
+	 */
+	default void complete() { }
 }

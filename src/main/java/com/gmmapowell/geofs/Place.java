@@ -25,6 +25,8 @@ public interface Place {
 	void chars(CharBlockListener lsnr);
 
 	
+	Region region();
+	
 	// TODO: copyMeTo();
 	// TODO: deleteMe();
 	

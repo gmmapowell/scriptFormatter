@@ -11,4 +11,8 @@ public interface NumberedLineListener {
 	 */
 	void line(int number, String line);
 
+	/** When all the lines have been handled, inform the listener
+	 * 
+	 */
+	default void complete() { }
 }

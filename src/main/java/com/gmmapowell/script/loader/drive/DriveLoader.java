@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.loader.Loader;
@@ -29,13 +31,13 @@ import com.google.api.services.drive.model.FileList;
 public class DriveLoader implements Loader {
 	private final File creds;
 	private final String folder;
-	private final File indexFile;
-	private final File downloads;
+	private final Place indexFile;
+	private final Region downloads;
 	private final boolean debug;
 	private File webeditFile;
 	private String wetitle;
 
-	public DriveLoader(File root, String creds, String folder, File indexFile, File downloads, boolean debug) throws ConfigException {
+	public DriveLoader(Region root, String creds, String folder, Place indexFile, Region downloads, boolean debug) throws ConfigException {
 		this.creds = new File(Utils.subenvs(creds));
 		this.folder = folder;
 		this.indexFile = indexFile;
@@ -61,6 +63,10 @@ public class DriveLoader implements Loader {
 		// Use full path (from this.folder at least) for every file rather than depending on hierarchy
 		// Want a "marker" in the file that says "--excluded--"   
 		// because it has been downloaded but not user "approved" or ordered
+
+		
+		// TODO: This needs to be a "World" that is implemented by GoogleDriveWorld();
+		// World service = connectToGoogleDrive();
 		Drive service = connectToGoogleDrive();
 		Item item = findFolder(service);
         if (debug) {
@@ -126,18 +132,18 @@ public class DriveLoader implements Loader {
 		return new Item(children.getFiles().get(0).getId(), name);
 	}
 
-	private void downloadFolder(Drive service, Index index, File into, String ind, Item item) throws IOException {
+	private void downloadFolder(Drive service, Index index, Region downloads, String ind, Item item) throws IOException {
 		FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();
         List<com.google.api.services.drive.model.File> files = children.getFiles();
         Collections.reverse(files);
         for (com.google.api.services.drive.model.File f : files) {
         	boolean isFolder = f.getMimeType().equals("application/vnd.google-apps.folder");
             if (isFolder) {
-            	File folderInto = new java.io.File(into, f.getName());
+            	Region folderInto = downloads.subregion(f.getName());
 				folderInto.mkdir();
 				downloadFolder(service, index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
             } else {
-            	java.io.File name = new java.io.File(into, f.getName() + ".txt");
+            	Place name = downloads.place(f.getName() + ".txt");
             	Status record = index.record(f.getId(), name);
             	if (debug)
             		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());

@@ -45,6 +45,10 @@ public class LFSPlace implements Place {
 				else
 					nlsnr.line(lnr.getLineNumber(), s);
 			}
+			if (lsnr != null)
+				lsnr.complete();
+			else
+				nlsnr.complete();
 		} catch (IOException ex) {
 			throw new FileStreamingException(ex);
 		}
