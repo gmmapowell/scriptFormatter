@@ -43,6 +43,12 @@ public class LFSRegion implements Region {
 
 	@Override
 	public Place placePath(String path) {
-		throw new NotImplementedException();
+		File f = new File(path);
+		if (f.isAbsolute())
+			throw new CantHappenException("absolute paths must be used from the world");
+		f = new File(file, path);
+		if (!f.isFile())
+			throw new CantHappenException("there is no place " + f);
+		return new LFSPlace(f);
 	}
 }

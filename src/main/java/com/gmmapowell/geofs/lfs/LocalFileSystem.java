@@ -2,6 +2,7 @@ package com.gmmapowell.geofs.lfs;
 
 import java.io.File;
 
+import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
@@ -27,6 +28,12 @@ public class LocalFileSystem implements World {
 
 	@Override
 	public Place placePath(String path) {
-		throw new NotImplementedException();
+		File f = new File(path);
+		if (!f.isAbsolute())
+			throw new CantHappenException("relative paths must be used from a region");
+		if (!f.isFile())
+			throw new CantHappenException("there is no place " + f);
+		return new LFSPlace(f);
+
 	}
 }

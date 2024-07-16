@@ -42,6 +42,38 @@ public class BasicLFS {
 		}
 		Place place = r.place(elts.get(elts.size()-1));
 		place.lines(lsnr);
+		tf.delete();
 	}
 
+	@Test
+	public void testWeCanFindATmpFileWeCreateUsingPlacePath() throws IOException {
+		LineListener lsnr = context.mock(LineListener.class);
+		context.checking(new Expectations() {{
+			oneOf(lsnr).line("hello, world!");
+			oneOf(lsnr).complete();
+		}});
+		
+		File tf = File.createTempFile("lfs", ".txt");
+		FileUtils.writeFile(tf, "hello, world!\n");
+		LocalFileSystem lfs = new LocalFileSystem();
+		Place place = lfs.placePath(tf.getPath());
+		place.lines(lsnr);
+		tf.delete();
+	}
+
+	@Test
+	public void testWeCanFindATmpFileWeCreateFromARegionUsingPlacePath() throws IOException {
+		LineListener lsnr = context.mock(LineListener.class);
+		context.checking(new Expectations() {{
+			oneOf(lsnr).line("hello, world!");
+			oneOf(lsnr).complete();
+		}});
+		
+		File tf = File.createTempFile("lfs", ".txt");
+		FileUtils.writeFile(tf, "hello, world!\n");
+		LocalFileSystem lfs = new LocalFileSystem();
+		Place place = lfs.root().placePath(tf.getPath().substring(1));
+		place.lines(lsnr);
+		tf.delete();
+	}
 }
