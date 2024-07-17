@@ -13,6 +13,7 @@ import org.zinutils.exceptions.UtilException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
@@ -54,7 +55,12 @@ public class ScriptConfig implements Config {
 			String folder = vars.remove("folder");
 			if (folder == null)
 				throw new ConfigException("folder was not defined");
-			this.loader = new DriveLoader(root, creds, folder, index, workdir, debug);
+			
+			GoogleDriveWorld gdw = new GoogleDriveWorld();
+			// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"
+			// the loader wants to take (at least) two Regions/Worlds: one of which is the local disk and the other is the GoogleDriveWorld
+			
+			this.loader = new DriveLoader(gdw, root, workdir, index, creds, folder, debug);
 		} else
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}

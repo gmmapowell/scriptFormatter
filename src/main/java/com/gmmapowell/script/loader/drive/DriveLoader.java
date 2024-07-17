@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.World;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.loader.Loader;
@@ -37,7 +38,7 @@ public class DriveLoader implements Loader {
 	private File webeditFile;
 	private String wetitle;
 
-	public DriveLoader(Region root, String creds, String folder, Place indexFile, Region downloads, boolean debug) throws ConfigException {
+	public DriveLoader(World gdw, Region root, Region downloads, Place indexFile, String creds, String folder, boolean debug) throws ConfigException {
 		this.creds = new File(Utils.subenvs(creds));
 		this.folder = folder;
 		this.indexFile = indexFile;
@@ -103,14 +104,6 @@ public class DriveLoader implements Loader {
 		return ret;
 	}
 
-	private Drive connectToGoogleDrive() throws IOException, GeneralSecurityException {
-		Credential cred = getCredential();
-        Drive service = new Drive.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), cred)
-                .setApplicationName("ScriptFormatter")
-                .build();
-		return service;
-	}
-
 	private Item findTopFolder(Drive service, String f) throws IOException, ConfigException {
 		if (debug) {
 			System.out.println("Loading root folder " + f);
@@ -151,17 +144,6 @@ public class DriveLoader implements Loader {
             		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(new FileOutputStream(name));
             }
         }
-	}
-
-	private Credential getCredential() throws IOException, GeneralSecurityException {
-		System.out.println("Getting credential for Drive");
-		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, DriveScopes.all())
-                .setDataStoreFactory(new FileDataStoreFactory(new File(creds.getParentFile(), "google_scriptformatter_tokens")))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8803).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 	}
 
 }

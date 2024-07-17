@@ -56,4 +56,8 @@ public class LFSRegion implements Region {
 			throw new CantHappenException("there is no place " + f);
 		return new LFSPlace(f);
 	}
+
+	public File getFile() {
+		return file;
+	}
 }

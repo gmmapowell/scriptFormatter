@@ -69,4 +69,8 @@ public class LFSPlace implements Place {
 	public void chars(CharBlockListener lsnr) {
 		throw new NotImplementedException();
 	}
+
+	public File getFile() {
+		return file;
+	}
 }
