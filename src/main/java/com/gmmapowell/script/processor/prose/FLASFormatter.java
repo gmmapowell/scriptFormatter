@@ -69,9 +69,11 @@ public class FLASFormatter implements Formatter {
 			case "template":
 			case "title":
 				return true;
+			case "Boolean":
+			case "Date":
 			case "Number":
 			case "String":
-			case "Date":
+			case "Type":
 				return true;
 			}
 		}

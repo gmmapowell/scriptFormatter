@@ -192,6 +192,11 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					((IncludeCommand)state.include).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
 					break;
 				}
+				case "needbreak": {
+					commitCurrentCommand();
+					state.newPara("break");
+					break;
+				}
 				default:
 					throw new RuntimeException(state.inputLocation() + " handle inline command: " + cmd);
 				}

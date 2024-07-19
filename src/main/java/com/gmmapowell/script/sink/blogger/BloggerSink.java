@@ -115,11 +115,8 @@ public class BloggerSink implements Sink {
 							last = "needli";
 							break;
 						case "text":
-							writer.print("<br/>");
-							break;
+						case "break":
 						case "blockquote":
-							writer.print("<br/>");
-							break;
 						case "preformatted":
 							writer.print("<br/>");
 							break;
@@ -142,7 +139,7 @@ public class BloggerSink implements Sink {
 					} else
 						throw new NotImplementedException();
 				}
-				transition(cf, last, "text");
+				transition(cf, last, "text", false);
 			}
 			writer.close();
 			upload(f.name, this.sw.toString());
@@ -153,11 +150,11 @@ public class BloggerSink implements Sink {
 	private String transition(List<String> cf, String last, StyledToken tok) {
 		if (last.equals("text") && tok.styles.get(0).equals("text") && haveBreak)
 			writer.println("<br/>");
-		return transition(cf, last, tok.styles.get(0));
+		return transition(cf, last, tok.styles.get(0), tok.styles.contains("break"));
 	}
 
-	private String transition(List<String> cf, String last, String next) {
-		if (next.equals(last))
+	private String transition(List<String> cf, String last, String next, boolean butStartAgain) {
+		if (next.equals(last) && !butStartAgain)
 			return last;
 
 		if (last.equals("blockquote")) {

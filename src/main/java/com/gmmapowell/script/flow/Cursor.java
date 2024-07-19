@@ -27,6 +27,7 @@ public class Cursor implements Comparable<Cursor> {
 
 	public StyledToken next() {
 //		System.out.println("next()");
+		boolean startAgain = false;
 		top:
 		while (true) {
 			List<String> styles = new ArrayList<>();
@@ -37,14 +38,21 @@ public class Cursor implements Comparable<Cursor> {
 			styles.addAll(p.formats);
 			if (span >= p.spans.size()) {
 				this.para++;
-				if (span == 0)
+				if (span == 0) {
+					if (p.formats.contains("break"))
+						startAgain = true;
 					continue;
+				}
 				this.span = 0;
 				return new StyledToken(flow, para, span, item, styles, new ParaBreak());
 			}
 //			System.out.println("  span = " + span);
 			HorizSpan hs = p.spans.get(span);
 			styles.addAll(hs.formats);
+			if (startAgain) {
+				styles.add("break");
+				startAgain = false;
+			}
 			int kk = this.item.get(0).get();
 //			System.out.println("  hssz = " + hs.items.size() + "; kk = " + kk);
 			if (kk >= hs.items.size()) {
