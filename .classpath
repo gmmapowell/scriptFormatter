@@ -4,36 +4,20 @@
 	<classpathentry kind="src" output="bin/testclasses" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" output="bin/testclasses" path="src/test/resources"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/api-client/google-api-client/1.30.9/google-api-client-1.30.9.jar" sourcepath="/personal-qb/mvncache/com/google/api-client/google-api-client/1.30.9/google-api-client-1.30.9-sources.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/http-client/google-http-client-jackson2/1.35.0/google-http-client-jackson2-1.35.0.jar" sourcepath="/personal-qb/mvncache/com/google/http-client/google-http-client-jackson2/1.35.0/google-http-client-jackson2-1.35.0-sources.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/http-client/google-http-client/1.35.0/google-http-client-1.35.0.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/oauth-client/google-oauth-client/1.30.6/google-oauth-client-1.30.6.jar" sourcepath="/personal-qb/mvncache/com/google/oauth-client/google-oauth-client/1.30.6/google-oauth-client-1.30.6-sources.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/apis/google-api-services-drive/v3-rev197-1.25.0/google-api-services-drive-v3-rev197-1.25.0.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/oauth-client/google-oauth-client-jetty/1.30.6/google-oauth-client-jetty-1.30.6.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/oauth-client/google-oauth-client-java6/1.30.6/google-oauth-client-java6-1.30.6.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/io/opencensus/opencensus-api/0.26.0/opencensus-api-0.26.0.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/io/opencensus/opencensus-contrib-http-util/0.26.0/opencensus-contrib-http-util-0.26.0.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/io/grpc/grpc-context/1.29.0/grpc-context-1.29.0.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/org/apache/pdfbox/pdfbox/2.0.11/pdfbox-2.0.11.jar" sourcepath="/personal-qb/mvncache/org/apache/pdfbox/pdfbox/2.0.11/pdfbox-2.0.11-sources.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/commons-logging/commons-logging/1.2/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/org/apache/pdfbox/fontbox/2.0.11/fontbox-2.0.11.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/google/apis/google-api-services-blogger/v3-rev82-1.25.0/google-api-services-blogger-v3-rev82-1.25.0.jar" sourcepath="/personal-qb/mvncache/com/google/apis/google-api-services-blogger/v3-rev82-1.25.0/google-api-services-blogger-v3-rev82-1.25.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/rugbysim/libs/jmock-junit4-2.8.2.jar"/>
-	<classpathentry kind="lib" path="/rugbysim/libs/jmock-2.8.2.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/jcraft/jsch/0.1.55/jsch-0.1.55.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/org/codehaus/jettison/jettison/1.4.1/jettison-1.4.1.jar"/>
-	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/bin/classes"/>
+	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/bin/classes" sourcepath="/ZINIKI_ROOT/Tools/utils/src/main/java"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/FLAS2/bin"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-annotations/2.11.3/jackson-annotations-2.11.3.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-core/2.11.3/jackson-core-2.11.3.jar"/>
-	<classpathentry kind="lib" path="/personal-qb/mvncache/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/google-client"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/opencensus"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/pdfbox"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SSH"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Testing"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commonsio"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

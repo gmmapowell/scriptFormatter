@@ -11,6 +11,9 @@ import java.util.Map;
 
 import org.zinutils.exceptions.UtilException;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
@@ -30,21 +33,21 @@ import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Utils;
 
 public class ScriptConfig implements Config {
-	private final File root;
+	private final Region root;
 	private Loader loader;
 	private List<Sink> sinks = new ArrayList<>();
 	private Processor processor;
 	private ElementFactory elf = new BlockishElementFactory();
 	private Sink sink;
 	private WebEdit webedit;
-	private File index;
+	private Place index;
 
-	private File workdir;
-	public ScriptConfig(File root) {
+	private Region workdir;
+	public ScriptConfig(Region root) {
 		this.root = root;
 	}
 	
-	public void handleLoader(Map<String, String> vars, String loader, File index, File workdir, boolean debug) throws ConfigException {
+	public void handleLoader(Map<String, String> vars, String loader, Place index, Region workdir, boolean debug) throws ConfigException {
 		if ("google-drive".equals(loader)) {
 			String creds = vars.remove("credentials");
 			if (creds == null)
@@ -52,7 +55,12 @@ public class ScriptConfig implements Config {
 			String folder = vars.remove("folder");
 			if (folder == null)
 				throw new ConfigException("folder was not defined");
-			this.loader = new DriveLoader(root, creds, folder, index, workdir, debug);
+			
+			GoogleDriveWorld gdw = new GoogleDriveWorld();
+			// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"
+			// the loader wants to take (at least) two Regions/Worlds: one of which is the local disk and the other is the GoogleDriveWorld
+			
+			this.loader = new DriveLoader(gdw, root, workdir, index, creds, folder, debug);
 		} else
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}
@@ -259,11 +267,11 @@ public class ScriptConfig implements Config {
 		}
 	}
 
-	public void setIndex(File index) {
+	public void setIndex(Place index) {
 		this.index = index;
 	}
 
-	public void setWorkdir(File workdir) {
+	public void setWorkdir(Region workdir) {
 		this.workdir = workdir;
 	}
 }

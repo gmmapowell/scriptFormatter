@@ -1,16 +1,18 @@
 package com.gmmapowell.script;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import com.gmmapowell.geofs.World;
+import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.script.config.Config;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ReadConfig;
 
 public class Main {
 	public static void main(String[] args) {
-		Config cfg = gatherConfig(args);
+		LocalFileSystem lfs = new LocalFileSystem();
+		Config cfg = gatherConfig(lfs, args);
 		if (cfg == null)
 			return;
 		int ret = 2;
@@ -23,7 +25,7 @@ public class Main {
 		}
 	}
 
-	private static Config gatherConfig(String[] args) {
+	private static Config gatherConfig(World lfs, String[] args) {
 		String config = null;
 		for (int i=0;i<args.length;i++) {
 			if (args[i].startsWith("-")) {
@@ -39,7 +41,7 @@ public class Main {
 			help();
 			return null;
 		}
-		return new ReadConfig().read(new File(config));
+		return new ReadConfig(lfs).read(config);
 	}
 	
 	private static int format(Config cfg) {
