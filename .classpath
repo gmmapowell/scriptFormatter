@@ -18,5 +18,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/pdfbox"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SSH"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Testing"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commonsio"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
