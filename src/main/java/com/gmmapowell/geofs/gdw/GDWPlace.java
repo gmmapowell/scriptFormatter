@@ -24,6 +24,13 @@ public class GDWPlace implements Place {
 	}
 
 	@Override
+	public String name() {
+		// DO NOT RETURN THE ID
+		// FIND THE ACTUAL NAME!
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public void lines(LineListener lsnr) {
 		try {
 			service.files().export(id, "text/plain").executeMediaAndDownloadTo(LineListenerOutputStream.oslsnr(lsnr));

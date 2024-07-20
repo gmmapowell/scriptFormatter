@@ -31,6 +31,11 @@ public class LFSPlace implements Place {
 	}
 	
 	@Override
+	public String name() {
+		return file.getName();
+	}
+	
+	@Override
 	public void lines(LineListener lsnr) {
 		streamLines(lsnr, null);
 	}

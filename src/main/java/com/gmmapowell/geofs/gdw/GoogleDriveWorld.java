@@ -89,7 +89,7 @@ public class GoogleDriveWorld implements World {
 	}
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
-		System.out.println("Getting credential for Drive");
+		System.out.println("Getting credential for Drive from " + creds);
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), GeoFSUtils.fileReader(creds));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, DriveScopes.all())
                 .setDataStoreFactory(new FileDataStoreFactory(tokensdir()))
@@ -100,6 +100,6 @@ public class GoogleDriveWorld implements World {
 	}
 
 	private File tokensdir() {
-		return new File(GeoFSUtils.file(creds.region()), "google_scriptformatter_tokens");
+		return new File(GeoFSUtils.file(creds.region()), "google_scriptformatter_drive_tokens");
 	}
 }

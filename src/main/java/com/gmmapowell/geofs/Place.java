@@ -27,6 +27,12 @@ public interface Place {
 	
 	Region region();
 	
+	/** Return the name of this place in its Region 
+	 * 
+	 * @return the name of the Place within the Region
+	 */
+	String name();
+	
 	// TODO: copyMeTo();
 	// TODO: deleteMe();
 	

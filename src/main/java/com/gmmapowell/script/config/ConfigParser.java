@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.utils.Utils;
 
 public class ConfigParser implements NumberedLineListener {
@@ -93,7 +94,7 @@ public class ConfigParser implements NumberedLineListener {
 	@Override
 	public void complete() {
 		if (workdir == null)
-			workdir = root.regionPath("downloads");
+			workdir = GeoFSUtils.ensureRegionPath(root, "downloads");
 		if (!handleCreation(config, vars, debug, index, sshid, workdir, what, type, wline)) {
 			config = null;
 		}
@@ -101,7 +102,7 @@ public class ConfigParser implements NumberedLineListener {
 	
 	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, Place index, String sshid, Region workdir, String what, String type, int wline) {
 		try {
-			if (what == null)
+			if (what == null || ret == null)
 				return true;
 			ret.setIndex(index);
 			ret.setWorkdir(workdir);

@@ -56,11 +56,18 @@ public class ScriptConfig implements Config {
 			if (folder == null)
 				throw new ConfigException("folder was not defined");
 			
-			GoogleDriveWorld gdw = new GoogleDriveWorld();
-			// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"
-			// the loader wants to take (at least) two Regions/Worlds: one of which is the local disk and the other is the GoogleDriveWorld
-			
-			this.loader = new DriveLoader(gdw, root, workdir, index, creds, folder, debug);
+			// TODO: I think we need to resolve creds & use placePath
+//			this.creds = new File(Utils.subenvs(creds));
+			Place credsPath = null;
+			try {
+				GoogleDriveWorld gdw = new GoogleDriveWorld("ScriptFormatter", credsPath);
+				// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"
+				// the loader wants to take (at least) two Regions/Worlds: one of which is the local disk and the other is the GoogleDriveWorld
+				
+				this.loader = new DriveLoader(gdw, root, workdir, index, folder, debug);
+			} catch (GeneralSecurityException | IOException ex) {
+				throw new ConfigException(ex.toString());
+			}
 		} else
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}

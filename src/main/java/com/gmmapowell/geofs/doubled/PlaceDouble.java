@@ -24,6 +24,11 @@ public abstract class PlaceDouble implements Place {
 	}
 	
 	@Override
+	public String name() {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public void lines(LineListener lsnr) {
 		streamLines(lsnr, null);
 	}

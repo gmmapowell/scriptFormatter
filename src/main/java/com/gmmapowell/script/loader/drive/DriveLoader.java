@@ -1,8 +1,6 @@
 package com.gmmapowell.script.loader.drive;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -12,42 +10,27 @@ import java.util.List;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.World;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.Index.Status;
-import com.gmmapowell.script.utils.Utils;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 
 public class DriveLoader implements Loader {
-	private final File creds;
 	private final String folder;
 	private final Place indexFile;
 	private final Region downloads;
 	private final boolean debug;
 	private File webeditFile;
 	private String wetitle;
+	private final World gdw;
 
-	public DriveLoader(World gdw, Region root, Region downloads, Place indexFile, String creds, String folder, boolean debug) throws ConfigException {
-		this.creds = new File(Utils.subenvs(creds));
+	public DriveLoader(World gdw, Region root, Region downloads, Place indexFile, String folder, boolean debug) throws ConfigException {
+		this.gdw = gdw;
 		this.folder = folder;
 		this.indexFile = indexFile;
 		this.downloads = downloads;
-		if (!this.downloads.exists()) {
-			if (!this.downloads.mkdir())
-				throw new ConfigException("Could not create " + this.downloads);
-		} else if (!this.downloads.isDirectory())
-			throw new ConfigException(this.downloads + " is not a directory");
 		this.debug = debug;
 	}
 
@@ -66,17 +49,14 @@ public class DriveLoader implements Loader {
 		// because it has been downloaded but not user "approved" or ordered
 
 		
-		// TODO: This needs to be a "World" that is implemented by GoogleDriveWorld();
-		// World service = connectToGoogleDrive();
-		Drive service = connectToGoogleDrive();
-		Item item = findFolder(service);
+		Item item = findFolder();
         if (debug) {
         	System.out.println("Downloading files from Google ...");
         	System.out.println("  + " + item.folder + " (" + item.id + ")");
         }
         Index currentIndex = Index.read(indexFile, downloads);
         try {
-	        downloadFolder(service, currentIndex, downloads, "    ", item);
+	        downloadFolder(currentIndex, downloads, "    ", item);
 	        if (webeditFile != null)
 	        	currentIndex.generateWebeditFile(webeditFile, wetitle);
 	        return currentIndex;
@@ -85,11 +65,11 @@ public class DriveLoader implements Loader {
         }
 	}
 
-	private Item findFolder(Drive service) throws IOException, ConfigException {
+	private Item findFolder() throws IOException, ConfigException {
 		List<String> segments = folderSegments();
-        Item item = findTopFolder(service, segments.remove(0));
+        Item item = findTopFolder(segments.remove(0));
         while (!segments.isEmpty()) {
-        	item = findNestedFolder(service, item, segments.remove(0));
+        	item = findNestedFolder(item, segments.remove(0));
         }
 		return item;
 	}
@@ -104,7 +84,8 @@ public class DriveLoader implements Loader {
 		return ret;
 	}
 
-	private Item findTopFolder(Drive service, String f) throws IOException, ConfigException {
+	// TODO: I think both of these are replaced by "region"
+	private Item findTopFolder(String f) throws IOException, ConfigException {
 		if (debug) {
 			System.out.println("Loading root folder " + f);
 		}
@@ -115,7 +96,7 @@ public class DriveLoader implements Loader {
 		return new Item(id, f);
 	}
 
-	private Item findNestedFolder(Drive service, Item item, String name) throws IOException, ConfigException {
+	private Item findNestedFolder(Item item, String name) throws IOException, ConfigException {
 		if (debug) {
 			System.out.println("Loading nested folder " + name + " in " + item.id);
 		}
@@ -125,39 +106,24 @@ public class DriveLoader implements Loader {
 		return new Item(children.getFiles().get(0).getId(), name);
 	}
 
-	private void downloadFolder(Drive service, Index index, Region downloads, String ind, Item item) throws IOException {
+	private void downloadFolder(Index index, Region downloads, String ind, Item item) throws IOException {
+		// TODO: downloads.list()
 		FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();
         List<com.google.api.services.drive.model.File> files = children.getFiles();
         Collections.reverse(files);
         for (com.google.api.services.drive.model.File f : files) {
         	boolean isFolder = f.getMimeType().equals("application/vnd.google-apps.folder");
             if (isFolder) {
-            	Region folderInto = downloads.subregion(f.getName());
-				folderInto.mkdir();
-				downloadFolder(service, index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
+            	Region folderInto = downloads.ensureSubregion(f.getName());
+				downloadFolder(index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
             } else {
             	Place name = downloads.place(f.getName() + ".txt");
             	Status record = index.record(f.getId(), name);
             	if (debug)
             		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
             	if (record != Status.EXCLUDED)
-            		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(new FileOutputStream(name));
+            		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(name));
             }
         }
 	}
-
-<<<<<<< HEAD
-	private Credential getCredential() throws IOException, GeneralSecurityException {
-		System.out.println("Getting credential for Drive");
-		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, DriveScopes.all())
-                .setDataStoreFactory(new FileDataStoreFactory(new File(creds.getParentFile(), "google_scriptformatter_drive_tokens")))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8803).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-	}
-
-=======
->>>>>>> origin/master
 }

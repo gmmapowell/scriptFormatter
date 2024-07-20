@@ -41,4 +41,13 @@ public interface Region {
 	// TODO: directory operations
 	// TODO: "create" will need to take a parameter which indicates in an abstract way any configuration parameters, eg. file mode on Linux,
 	// or content type on S3
+
+	/** This is basically a nested directory and mkdir() wrapped up in a single operation.
+	 * But it quietly allows the directory to already exist.
+	 * @param name the name of the subregion to access or create
+	 * @return a region object that describes the definitely existing subregion.
+	 */
+	Region ensureSubregion(String name);
+
+	
 }

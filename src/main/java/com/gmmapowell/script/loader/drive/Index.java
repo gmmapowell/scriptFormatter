@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.FilesToProcess;
 
 public class Index implements FilesToProcess {
@@ -91,7 +92,7 @@ public class Index implements FilesToProcess {
 		this.appendTo = fw;
 	}
 
-	public Status record(String id, File name) throws IOException {
+	public Status record(String id, Place place) throws IOException {
 		if (current.containsKey(id)) {
 			return current.get(id).stat;
 		}
@@ -101,7 +102,7 @@ public class Index implements FilesToProcess {
 		}
 		appendTo.append(id);
 		appendTo.append(" ");
-		appendTo.append(name.getPath().replace(downloads.getPath() + "/", ""));
+		appendTo.append(place.name());
 		appendTo.append("\n");
 		return Status.RECORDED;
 	}
