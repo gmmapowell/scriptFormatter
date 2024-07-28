@@ -8,6 +8,8 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.listeners.PlaceListener;
+import com.gmmapowell.geofs.listeners.RegionListener;
 
 public class RegionDouble implements Region, RegionPlace {
 	public Map<String, RegionPlace> entries = new TreeMap<>();
@@ -52,6 +54,26 @@ public class RegionDouble implements Region, RegionPlace {
 		if (entries.containsKey(name))
 			throw new CantHappenException("don't provide multiple entries for " + name);
 		entries.put(name, new PlaceByteArray(contents));
+	}
+
+	@Override
+	public String name() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Region ensureSubregion(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void places(PlaceListener lsnr) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void regions(RegionListener lsnr) {
+		throw new NotImplementedException();
 	}
 	
 	// TODO: place from file

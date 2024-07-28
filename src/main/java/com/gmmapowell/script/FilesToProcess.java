@@ -1,9 +1,9 @@
 package com.gmmapowell.script;
 
-import java.io.File;
+import com.gmmapowell.geofs.Place;
 
 public interface FilesToProcess {
 
-	Iterable<File> included();
+	Iterable<Place> included();
 
 }

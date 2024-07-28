@@ -1,9 +1,7 @@
 package com.gmmapowell.script.processor.prose;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +10,7 @@ import java.util.TreeMap;
 
 import org.zinutils.exceptions.WrappedException;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -32,35 +31,32 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	}
 	
 	@Override
-	public void process(FilesToProcess files) throws IOException {
+	public void process(FilesToProcess places) throws IOException {
 		Map<String, Flow> flows = new TreeMap<>();
-		for (File x : files.included()) {
-			T st = begin(flows, x.getName());
-			try (LineNumberReader lnr = new LineNumberReader(new FileReader(x))) {
-				String s;
-				while ((s = lnr.readLine()) != null) {
-					try {
-						if (st.trimLine())
-							s = trim(s);
-						if (!st.blockquote && s.length() == 0) {
-							commitCurrentCommand();
-						} else {
-							st.line(lnr.getLineNumber());
-							handleLine(st, s);
-						}
-					} catch (ParsingException ex) {
-						System.out.println(ex.getMessage());
-						System.out.println(" >> " + s);
-					} catch (Exception ex) {
-						System.out.println("Error encountered processing " + x + " before line " + lnr.getLineNumber());
-						if (debug)
-							ex.printStackTrace(System.out);
-						 else
-							System.out.println(WrappedException.unwrapAny(ex).toString());
-						return;
+		for (Place x : places.included()) {
+			T st = begin(flows, x.name());
+			x.lines((n, s) -> {
+				try {
+					if (st.trimLine())
+						s = trim(s);
+					if (!st.blockquote && s.length() == 0) {
+						commitCurrentCommand();
+					} else {
+						st.line(n);
+						handleLine(st, s);
 					}
+				} catch (ParsingException ex) {
+					System.out.println(ex.getMessage());
+					System.out.println(" >> " + s);
+				} catch (Exception ex) {
+					System.out.println("Error encountered processing " + x + " before line " + n);
+					if (debug)
+						ex.printStackTrace(System.out);
+					else
+						System.out.println(WrappedException.unwrapAny(ex).toString());
+					return;
 				}
-			}
+			});
 			try {
 				commitCurrentCommand();
 			} catch (Exception ex) {

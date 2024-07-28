@@ -3,9 +3,12 @@ package com.gmmapowell.geofs.lfs;
 import java.io.File;
 
 import org.zinutils.exceptions.CantHappenException;
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.listeners.PlaceListener;
+import com.gmmapowell.geofs.listeners.RegionListener;
 
 public class LFSRegion implements Region {
 	private final File file;
@@ -60,4 +63,26 @@ public class LFSRegion implements Region {
 	public File getFile() {
 		return file;
 	}
+
+	@Override
+	public String name() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Region ensureSubregion(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void places(PlaceListener lsnr) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void regions(RegionListener lsnr) {
+		throw new NotImplementedException();
+	}
+	
+	
 }

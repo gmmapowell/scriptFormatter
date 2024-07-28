@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.io.Writer;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -73,8 +74,12 @@ public abstract class PlaceDouble implements Place {
 
 	@Override
 	public void chars(CharBlockListener lsnr) {
-		// TODO Auto-generated method stub
+		throw new NotImplementedException();
+	}
 
+	@Override
+	public Writer writer() {
+		throw new NotImplementedException();
 	}
 
 	protected abstract Reader textContents();

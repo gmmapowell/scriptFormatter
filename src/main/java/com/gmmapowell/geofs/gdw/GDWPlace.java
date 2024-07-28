@@ -1,6 +1,7 @@
 package com.gmmapowell.geofs.gdw;
 
 import java.io.IOException;
+import java.io.Writer;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -37,6 +38,11 @@ public class GDWPlace implements Place {
 		} catch (IOException ex) {
 			throw new GeoFSException(ex);
 		}
+	}
+
+	@Override
+	public Writer writer() {
+		throw new NotImplementedException();
 	}
 
 	@Override

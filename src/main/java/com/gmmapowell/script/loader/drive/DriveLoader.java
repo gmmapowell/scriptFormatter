@@ -3,9 +3,6 @@ package com.gmmapowell.script.loader.drive;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
@@ -15,7 +12,6 @@ import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.Index.Status;
-import com.google.api.services.drive.model.FileList;
 
 public class DriveLoader implements Loader {
 	private final String folder;
@@ -49,14 +45,14 @@ public class DriveLoader implements Loader {
 		// because it has been downloaded but not user "approved" or ordered
 
 		
-		Item item = findFolder();
+		Region dl = gdw.regionPath(folder);
         if (debug) {
         	System.out.println("Downloading files from Google ...");
-        	System.out.println("  + " + item.folder + " (" + item.id + ")");
+        	System.out.println("  + " + dl /* item.folder + " (" + item.id + ")" */);
         }
         Index currentIndex = Index.read(indexFile, downloads);
         try {
-	        downloadFolder(currentIndex, downloads, "    ", item);
+	        downloadFolder(currentIndex, downloads, "    ", dl);
 	        if (webeditFile != null)
 	        	currentIndex.generateWebeditFile(webeditFile, wetitle);
 	        return currentIndex;
@@ -65,6 +61,7 @@ public class DriveLoader implements Loader {
         }
 	}
 
+	/*
 	private Item findFolder() throws IOException, ConfigException {
 		List<String> segments = folderSegments();
         Item item = findTopFolder(segments.remove(0));
@@ -83,7 +80,9 @@ public class DriveLoader implements Loader {
 		}
 		return ret;
 	}
+	 */
 
+	/*
 	// TODO: I think both of these are replaced by "region"
 	private Item findTopFolder(String f) throws IOException, ConfigException {
 		if (debug) {
@@ -105,25 +104,45 @@ public class DriveLoader implements Loader {
         	throw new ConfigException("Could not find nested folder: " + name);
 		return new Item(children.getFiles().get(0).getId(), name);
 	}
+	*/
 
-	private void downloadFolder(Index index, Region downloads, String ind, Item item) throws IOException {
+	private void downloadFolder(Index index, Region downloads, String ind, Region dlFrom) {
 		// TODO: downloads.list()
-		FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();
-        List<com.google.api.services.drive.model.File> files = children.getFiles();
-        Collections.reverse(files);
-        for (com.google.api.services.drive.model.File f : files) {
-        	boolean isFolder = f.getMimeType().equals("application/vnd.google-apps.folder");
-            if (isFolder) {
-            	Region folderInto = downloads.ensureSubregion(f.getName());
-				downloadFolder(index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
-            } else {
-            	Place name = downloads.place(f.getName() + ".txt");
-            	Status record = index.record(f.getId(), name);
-            	if (debug)
-            		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
-            	if (record != Status.EXCLUDED)
-            		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(name));
-            }
-        }
+		// FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();
+		dlFrom.places(place -> {
+			try {
+	        	Place local = downloads.place(place.name() + ".txt");
+	        	// TODO: we probably want some kind of utility method to get the google ID
+	        	// so that we are not foolishly casting things ...
+	        	Status record = index.record(GeoFSUtils.getGoogleID(local), place);
+	//        	if (debug)
+	//        		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
+	        	if (record != Status.EXCLUDED)
+	        		; // TODO: copy this down easily
+	//        		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(name));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		});
+		dlFrom.regions(region -> {
+        	Region folderInto = downloads.ensureSubregion(region.name());
+			downloadFolder(index, folderInto, ind+ "  ", region);
+		});
+//        List<com.google.api.services.drive.model.File> files = children.getFiles();
+//        Collections.reverse(files);
+//        for (com.google.api.services.drive.model.File f : files) {
+//        	boolean isFolder = f.getMimeType().equals("application/vnd.google-apps.folder");
+//            if (isFolder) {
+//            	Region folderInto = downloads.ensureSubregion(f.getName());
+//				downloadFolder(index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
+//            } else {
+//            	Place name = downloads.place(f.getName() + ".txt");
+//            	Status record = index.record(f.getId(), name);
+//            	if (debug)
+//            		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
+//            	if (record != Status.EXCLUDED)
+//            		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(name));
+//            }
+//        }
 	}
 }

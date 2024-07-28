@@ -92,7 +92,7 @@ public class ScriptConfig implements Config {
 				catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
 			} catch (ClassNotFoundException ex) {
 				try {
-					catalog = new ConfigurableStyleCatalog(new File(root, styles), debug);
+					catalog = new ConfigurableStyleCatalog(root.place(styles), debug);
 				} catch (Exception e2) {
 					throw new ConfigException(e2.getMessage());
 				}
@@ -118,7 +118,7 @@ public class ScriptConfig implements Config {
 				catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
 			} catch (ClassNotFoundException ex) {
 				try {
-					catalog = new ConfigurableStyleCatalog(new File(root, styles), debug);
+					catalog = new ConfigurableStyleCatalog(root.place(styles), debug);
 				} catch (Exception e2) {
 					throw new ConfigException(e2.getMessage());
 				}
@@ -140,13 +140,11 @@ public class ScriptConfig implements Config {
 			String lo = vars.remove("local");
 			if (lo != null && "true".equalsIgnoreCase(lo))
 				localOnly = true;
-			File saveContentAs = null;
+			Place saveContentAs = null;
 			String sca = vars.remove("saveAs");
 			if (sca != null)
-				saveContentAs = new File(root, sca);
-			File pf = new File(posts);
-			if (!pf.isAbsolute())
-				pf = new File(root, posts);
+				saveContentAs = root.place(sca);
+			Place pf = root.placePath(posts);
 			try {
 				sinks.add(new BloggerSink(root, new File(creds), blogUrl, pf, localOnly, saveContentAs));
 			} catch (Exception ex) {
@@ -206,7 +204,7 @@ public class ScriptConfig implements Config {
 		if (title == null)
 			throw new ConfigException("title was not defined");
 		if (Boolean.parseBoolean(option))
-			this.webedit = new WebEdit(new File(root, file), upload, sshid, title);
+			this.webedit = new WebEdit(root.place(file), upload, sshid, title);
 	}
 	
 	

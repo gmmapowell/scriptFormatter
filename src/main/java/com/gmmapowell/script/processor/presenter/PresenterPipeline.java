@@ -1,10 +1,8 @@
 package com.gmmapowell.script.processor.presenter;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
@@ -13,6 +11,7 @@ import org.flasck.flas.blocker.Blocker;
 import org.flasck.flas.errors.ErrorResult;
 import org.zinutils.utils.FileUtils;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -42,20 +41,18 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 	}
 	
 	@Override
-	public void process(FilesToProcess files) throws IOException {
-		for (File f : files.included()) {
-			handler.fileIs(f.getName());
+	public void process(FilesToProcess places) throws IOException {
+		for (Place f : places.included()) {
+			handler.fileIs(f.name());
 			blocker.newFile();
-			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
-				String s;
-				while ((s = lnr.readLine()) != null) {
-					if (!s.startsWith("*")) {
-						if (debug)
-							System.out.println("ignoring " + s);
-					}
-					blocker.present(f.getName(), lnr.getLineNumber(), reapplyTabs(s));
+			f.lines((n, s) -> {
+				if (!s.startsWith("*")) {
+					if (debug)
+						System.out.println("ignoring " + s);
+					// TODO: surely this should then have a "return;"?
 				}
-			}
+				blocker.present(f.name(), n, reapplyTabs(s));
+			});
 			blocker.flush();
 		}
 		errors.showTo(new PrintWriter(System.out), 0);

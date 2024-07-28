@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.Writer;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
@@ -63,6 +64,11 @@ public class LFSPlace implements Place {
 		} catch (IOException ex) {
 			throw new FileStreamingException(ex);
 		}
+	}
+
+	@Override
+	public Writer writer() {
+		throw new NotImplementedException();
 	}
 
 	@Override

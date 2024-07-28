@@ -2,17 +2,16 @@ package com.gmmapowell.script.loader.drive;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.FilesToProcess;
 
 public class Index implements FilesToProcess {
@@ -50,45 +49,39 @@ public class Index implements FilesToProcess {
 	}
 
 	private final Map<String, Known> current = new LinkedHashMap<>();
-	private final File downloads;
-	private FileWriter appendTo;
+	private final Region downloads;
+	private Writer appendTo;
 	private boolean writtenExcluded;
 
-	public static Index read(File indexFile, File downloads) throws IOException {
+	public static Index read(Place indexFile, Region downloads) throws IOException {
 		Index index = new Index(downloads);
-		try (FileReader fr = new FileReader(indexFile)) {
-			index.readFrom(fr);
-		} catch (FileNotFoundException ex) {
-			System.out.println(indexFile + " not found; creating");
-		}
+		index.readFrom(indexFile);
 		
-		FileWriter fw = new FileWriter(indexFile, true);
+		Writer fw = indexFile.writer();
 		index.appendTo(fw);
 		return index;
 	}
 
-	private Index(File downloads) {
+	private Index(Region downloads) {
 		this.downloads = downloads;
 	}
 	
-	public void readFrom(FileReader fr) throws IOException {
-		LineNumberReader lnr = new LineNumberReader(fr);
-		String s;
-		while ((s = lnr.readLine()) != null) {
+	public void readFrom(Place indexFile) throws IOException {
+		indexFile.lines(s -> {
 			s = s.trim();
 			if (s.length() == 0 || s.startsWith("#"))
-				continue;
+				return;
 			if (s.equals("--excluded--")) {
 				writtenExcluded = true;
-				continue;
+				return;
 			}
 			int idx = s.indexOf(" ");
 			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED);
 			current.put(n.id, n);
-		}
+		});
 	}
 
-	public void appendTo(FileWriter fw) {
+	public void appendTo(Writer fw) {
 		this.appendTo = fw;
 	}
 
@@ -108,11 +101,11 @@ public class Index implements FilesToProcess {
 	}
 
 	@Override
-	public Iterable<File> included() {
-		List<File> fs = new ArrayList<>();
+	public Iterable<Place> included() {
+		List<Place> fs = new ArrayList<>();
 		for (Known k : current.values()) {
 			if (k.stat == Status.INCLUDED)
-				fs.add(new File(downloads, k.label));
+				fs.add(downloads.place(k.label));
 		}
 		return fs;
 	}

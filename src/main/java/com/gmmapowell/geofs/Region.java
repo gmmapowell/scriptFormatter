@@ -1,5 +1,8 @@
 package com.gmmapowell.geofs;
 
+import com.gmmapowell.geofs.listeners.PlaceListener;
+import com.gmmapowell.geofs.listeners.RegionListener;
+
 /** A <tt>Region</tt> corresponds to the general notion of a directory, folder or prefix of a filename.
  * 
  * In every situation, this represents a container of multiple items (<tt>Region</tt>s or <tt>Place</tt>s).
@@ -37,7 +40,18 @@ public interface Region {
 	 */
 	Place placePath(String path);
 	
+	/** The parent of this region
+	 * 
+	 * @return the parent of this region (or null if there is no parent)
+	 */
 	Region parent();
+
+	/** The name of this element of the region
+	 * 
+	 * @return the name of this element of the region
+	 */
+	String name();
+
 	// TODO: directory operations
 	// TODO: "create" will need to take a parameter which indicates in an abstract way any configuration parameters, eg. file mode on Linux,
 	// or content type on S3
@@ -48,6 +62,7 @@ public interface Region {
 	 * @return a region object that describes the definitely existing subregion.
 	 */
 	Region ensureSubregion(String name);
-
+	void places(PlaceListener lsnr);
+	void regions(RegionListener lsnr);
 	
 }

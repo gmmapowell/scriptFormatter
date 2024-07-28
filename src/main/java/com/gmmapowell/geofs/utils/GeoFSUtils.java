@@ -51,4 +51,8 @@ public class GeoFSUtils {
 	public static Region ensureRegionPath(Region root, String string) {
 		throw new NotImplementedException();
 	}
+
+	public static String getGoogleID(Place local) {
+		throw new NotImplementedException();
+	}
 }

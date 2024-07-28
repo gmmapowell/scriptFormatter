@@ -1,5 +1,7 @@
 package com.gmmapowell.geofs;
 
+import java.io.Writer;
+
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
@@ -24,6 +26,7 @@ public interface Place {
 	
 	void chars(CharBlockListener lsnr);
 
+	Writer writer();
 	
 	Region region();
 	

@@ -1,14 +1,13 @@
 package com.gmmapowell.script.processor.movie;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -49,7 +48,7 @@ public class MoviePipeline implements Processor {
 	}
 
 	@Override
-	public void process(FilesToProcess files) throws IOException {
+	public void process(FilesToProcess places) throws IOException {
 		DramatisPersonae dp;
 		try {
 			dp = new DramatisPersonae(dramatis);
@@ -58,16 +57,16 @@ public class MoviePipeline implements Processor {
 			return;
 		}
 		String showTitle = title;
-		for (File f : files.included()) {
+		for (Place f : places.included()) {
 			if (debug)
 				System.out.println("included " + f);
-			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
-				processFile(dp, lnr, showTitle);
-			} catch (FileNotFoundException ex) {
-				System.out.println("Could not process " + f);
-			} catch (IOException ex) {
-				System.out.println("Error processing " + f + ": " + ex.getMessage());
-			}
+//			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
+				processFile(dp, f, showTitle);
+//			} catch (FileNotFoundException ex) {
+//				System.out.println("Could not process " + f);
+//			} catch (IOException ex) {
+//				System.out.println("Error processing " + f + ": " + ex.getMessage());
+//			}
 			showTitle = null;
 		}
 		for (Entry<String, Flow> e : state.flows.entrySet()) {
@@ -76,61 +75,64 @@ public class MoviePipeline implements Processor {
 		sink.render();
 	}
 
-	private void processFile(DramatisPersonae dp, LineNumberReader lnr, String showTitle) throws IOException {
+	private void processFile(DramatisPersonae dp, Place f, String showTitle) throws IOException {
 		// We have the ability to insert random notes which we want to skip
 		// The start of the file is automatically in this mode
 		// A new slugline automatically gets you out of it
 		state.newSection("main", "section");
 		if (showTitle != null)
 			formatter.title(showTitle);
-		Mode mode = Mode.COMMENT;
+		AtomicReference<Mode> mode = new AtomicReference<>(Mode.COMMENT);
 		StringBuilder slug = new StringBuilder();
 		StringBuilder para = new StringBuilder();
-		String s;
-		while ((s = lnr.readLine()) != null) {
-			s = s.trim();
-			if (s.startsWith("#"))
-				continue;
-			if (s.length() == 0) {
-				flush(dp, para);
-				continue;
-			}
-			if (isSlugLine(s)) {
-				flush(dp, para);
-				slug.delete(0, slug.length());
-				slug.append(s);
-				slug.append(".  ");
-				mode = Mode.SLUG1;
-				continue;
-			}
-			switch (mode) {
-			case COMMENT:
-				break;
-			case SLUG1: {
-				slug.append(s);
-				slug.append(" - ");
-				mode = Mode.SLUG2;
-				break;
-			}
-			case SLUG2: {
-				slug.append(s);
-				mode = Mode.NORMAL;
-				formatter.slug(slug.toString());
-				break;
-			}
-			case NORMAL: {
-				if (isSpeech(s)) {
+		f.lines(s -> {
+			try {
+				s = s.trim();
+				if (s.startsWith("#"))
+					return;
+				if (s.length() == 0) {
 					flush(dp, para);
+					return;
 				}
-				para.append(s);
-				para.append(' ');
-				break;
+				if (isSlugLine(s)) {
+					flush(dp, para);
+					slug.delete(0, slug.length());
+					slug.append(s);
+					slug.append(".  ");
+					mode.set(Mode.SLUG1);
+					return;
+				}
+				switch (mode.get()) {
+				case COMMENT:
+					break;
+				case SLUG1: {
+					slug.append(s);
+					slug.append(" - ");
+					mode.set(Mode.SLUG2);
+					break;
+				}
+				case SLUG2: {
+					slug.append(s);
+					mode.set(Mode.NORMAL);
+					formatter.slug(slug.toString());
+					break;
+				}
+				case NORMAL: {
+					if (isSpeech(s)) {
+						flush(dp, para);
+					}
+					para.append(s);
+					para.append(' ');
+					break;
+				}
+				default:
+					System.out.println(mode + " ?? - " + s);
+					break;
+				}
+			} catch (Exception ex) {
+				System.out.println("Error processing " + f + ": " + ex.getMessage());
 			}
-			default:
-				System.out.println(mode + " ?? - " + s);
-				break;
-			}
-		}
+		});
 		flush(dp, para);
 		formatter.fileDone();
 	}
