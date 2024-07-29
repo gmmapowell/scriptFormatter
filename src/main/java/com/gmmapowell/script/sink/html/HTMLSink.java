@@ -12,6 +12,9 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.utils.FileUtils;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
@@ -33,10 +36,10 @@ public class HTMLSink implements Sink {
 	private StringWriter sw;
 	private List<Flow> flows = new ArrayList<>();
 	private boolean haveBreak = true;
-	private final File storeInto;
+	private final Region storeInto;
 
-	public HTMLSink(File root, String storeInto) throws IOException, GeneralSecurityException {
-		this.storeInto = new File(root, storeInto);
+	public HTMLSink(Region root, String storeInto) throws IOException, GeneralSecurityException {
+		this.storeInto = root.subregion(storeInto);
 	}
 
 	@Override
@@ -108,9 +111,9 @@ public class HTMLSink implements Sink {
 			writer.close();
 			if (title == null)
 				throw new CantHappenException("title was not defined");
-			File file = new File(storeInto, title + ".html");
-			FileUtils.writeFile(file, sw.toString());
-			FileUtils.cat(file);
+			Place html = storeInto.place(title + ".html");
+			html.store(sw.toString());
+			FileUtils.cat(GeoFSUtils.file(html));
 		}
 	}
 

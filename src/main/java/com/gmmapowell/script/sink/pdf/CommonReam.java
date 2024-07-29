@@ -1,10 +1,11 @@
 package com.gmmapowell.script.sink.pdf;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public abstract class CommonReam implements Ream {
@@ -25,9 +26,9 @@ public abstract class CommonReam implements Ream {
 	}
 
 	@Override
-	public void close(File output) throws IOException {
+	public void close(Place output) throws IOException {
 		closeAllStreams();
-		doc.save(output);
+		doc.save(GeoFSUtils.file(output));
 		doc.close();
 		this.doc = null;
 	}

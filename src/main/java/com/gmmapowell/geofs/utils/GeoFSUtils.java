@@ -38,6 +38,9 @@ public class GeoFSUtils {
 		}
 	}
 
+	public static File file(Place from) {
+		throw new NotImplementedException();
+	}
 
 	public static FileWriter fileAppender(Place postsFile) {
 		throw new NotImplementedException();

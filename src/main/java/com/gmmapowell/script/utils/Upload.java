@@ -7,6 +7,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -14,13 +16,13 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class Upload {
-	private final File from;
+	private final Place from;
 	private final String scpTo;
 	private final String sshid;
 	private final boolean debug;
 
-	public Upload(File from, String scpTo, String sshid, boolean debug) {
-		this.from = from;
+	public Upload(Place output, String scpTo, String sshid, boolean debug) {
+		this.from = output;
 		this.scpTo = scpTo;
 		this.sshid = sshid;
 		this.debug = debug;
@@ -71,7 +73,7 @@ public class Upload {
 					openChannel.mkdir(f.getParent());
 				}
 			}
-			openChannel.put(from.getPath(), to);
+			openChannel.put(GeoFSUtils.file(from).getPath(), to);
 		} finally {
 			if (s != null)
 				s.disconnect();

@@ -1,11 +1,11 @@
 package com.gmmapowell.script.sink.pdf;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
@@ -42,7 +42,7 @@ public class PaperStock implements Stock {
 	}
 	
 	@Override
-	public void close(File output) throws IOException {
+	public void close(Place output) throws IOException {
 		ream.close(output);
 	}
 }

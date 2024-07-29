@@ -19,6 +19,9 @@ import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 import org.zinutils.xml.XMLElement;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Cursor;
@@ -37,7 +40,7 @@ import com.jcraft.jsch.SftpException;
 
 public class EPubSink implements Sink {
 //	private final StyleCatalog styles;
-	private final File output;
+	private final Place output;
 	private final boolean wantOpen;
 	private final String upload;
 	private final boolean debug;
@@ -49,15 +52,11 @@ public class EPubSink implements Sink {
 	private final String identifier;
 	private final String author;
 
-	public EPubSink(File root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
+	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
 //		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
-		File f = new File(output);
-		if (f.isAbsolute())
-			this.output = f;
-		else
-			this.output = new File(root, output);
+		this.output = root.placePath(output);
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 //		String stockName = null;
@@ -88,7 +87,7 @@ public class EPubSink implements Sink {
 	
 	@Override
 	public void render() throws IOException {
-		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output))) {
+		try (ZipOutputStream zos = new ZipOutputStream(GeoFSUtils.saveStreamTo(output))) {
 			makeMimetype(zos);
 			zos.putNextEntry(new ZipEntry("META-INF/container.xml"));
 			FileUtils.writeToStream(makeContainer(), zos);
@@ -284,7 +283,7 @@ public class EPubSink implements Sink {
 		try {
 			if (debug)
 				System.out.println("Opening " + output);
-			Desktop.getDesktop().open(output);
+			Desktop.getDesktop().open(GeoFSUtils.file(output));
 		} catch (Exception e) {
 			System.out.println("Failed to open " + output + " on desktop:\n  " + e.getMessage());
 		}

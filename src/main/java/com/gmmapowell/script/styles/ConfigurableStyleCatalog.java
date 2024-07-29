@@ -2,10 +2,7 @@ package com.gmmapowell.script.styles;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -15,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -26,6 +24,7 @@ import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.reflection.Reflection;
 import org.zinutils.utils.StringUtil;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.sink.pdf.BifoldReam;
 import com.gmmapowell.script.sink.pdf.DoubleReam;
@@ -46,53 +45,52 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 	private final Map<String, PageStyle> pages = new TreeMap<>();
 	private final File currdir;
 
-	public ConfigurableStyleCatalog(File file, boolean debug) throws IOException, ConfigException {
+	public ConfigurableStyleCatalog(Place place, boolean debug) throws IOException, ConfigException {
 		currdir = new File(System.getProperty("user.dir"));
-		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
-			ListMap<String, String> curr = null; 
-			String s;
-			while ((s = lnr.readLine()) != null) {
-				if (s.length() == 0 || s.startsWith("#"))
-					continue;
-				boolean nested = Character.isWhitespace(s.charAt(0));
-				s = s.trim();
-				if (s.length() == 0 || s.startsWith("#"))
-					continue;
-				String key, value;
-				{
-					int idx = s.indexOf(' ');
-					if (idx == -1) {
-						key = s;
-						value = null;
-					} else { 
-						key = s.substring(0, idx);
-						value = s.substring(idx+1).trim();
+		AtomicReference<ListMap<String, String>> curr = new AtomicReference<>();
+		place.lines((n,s) -> {
+			if (s.length() == 0 || s.startsWith("#"))
+				return;
+			boolean nested = Character.isWhitespace(s.charAt(0));
+			s = s.trim();
+			if (s.length() == 0 || s.startsWith("#"))
+				return;
+			String key, value;
+			{
+				int idx = s.indexOf(' ');
+				if (idx == -1) {
+					key = s;
+					value = null;
+				} else { 
+					key = s.substring(0, idx);
+					value = s.substring(idx+1).trim();
+				}
+			}
+			if (value == null)
+				throw new InvalidUsageException("command " + key + " must have a value");
+			if (!nested) {
+				if (curr.get() != null) {
+					// finish off the existing one
+					try {
+						build(debug, curr.get());
+					} catch (Exception ex) {
+						ex.printStackTrace();
 					}
 				}
-				if (value == null)
-					throw new InvalidUsageException("command " + key + " must have a value");
-				if (!nested) {
-					if (curr != null) {
-						// finish off the existing one
-						build(debug, curr);
-					}
-					curr = new ListMap<>();
-					curr.add("_type", key);
-					curr.add("_name", value);
-				} else if (curr == null) {
-					System.out.println(lnr.getLineNumber() + ": must have style to nest inside: " + s);
-				} else
-					curr.add(key, value);
-			}
-			if (curr != null)
-				build(debug, curr);
-			if (catalog.containsKey("default"))
-				defaultStyle = catalog.get("default");
-			else
-				throw new ConfigException("no default style was defined in " + file);
-		} catch (FileNotFoundException ex) {
-			throw new ConfigException("Could not open " + file);
-		}
+				curr.set(new ListMap<>());
+				curr.get().add("_type", key);
+				curr.get().add("_name", value);
+			} else if (curr.get() == null) {
+				System.out.println(n + ": must have style to nest inside: " + s);
+			} else
+				curr.get().add(key, value);
+		});
+		if (curr.get() != null)
+			build(debug, curr.get());
+		if (catalog.containsKey("default"))
+			defaultStyle = catalog.get("default");
+		else
+			throw new ConfigException("no default style was defined in " + place);
 	}
 
 	private void build(boolean debug, ListMap<String, String> curr) throws ConfigException {
