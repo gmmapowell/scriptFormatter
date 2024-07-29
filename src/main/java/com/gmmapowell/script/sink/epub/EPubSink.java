@@ -1,8 +1,6 @@
 package com.gmmapowell.script.sink.epub;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

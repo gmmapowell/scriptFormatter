@@ -1,6 +1,5 @@
 package com.gmmapowell.script.loader.drive;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -110,8 +109,8 @@ public class Index implements FilesToProcess {
 		return fs;
 	}
 	
-	public void generateWebeditFile(File webeditFile, String title) throws FileNotFoundException {
-		try (PrintWriter pw = new PrintWriter(webeditFile)) {
+	public void generateWebeditFile(Place webeditFile, String title) throws FileNotFoundException {
+		try (PrintWriter pw = new PrintWriter(webeditFile.writer())) {
 			pw.println("<html>");
 			pw.println("  <head>");
 			pw.println("    <title>Contents of " + title + "</title>");

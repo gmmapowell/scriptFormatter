@@ -1,19 +1,18 @@
 package com.gmmapowell.script.config;
 
-import java.io.File;
-
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.utils.Upload;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 public class WebEdit {
-	public final File file;
+	public final Place file;
 	public final String upload;
 	private final String sshid;
 	public final String title;
 
-	public WebEdit(File file, String upload, String sshid, String title) {
-		this.file = file;
+	public WebEdit(Place place, String upload, String sshid, String title) {
+		this.file = place;
 		this.upload = upload;
 		this.sshid = sshid;
 		this.title = title;

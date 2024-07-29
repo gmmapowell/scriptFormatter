@@ -1,13 +1,13 @@
 package com.gmmapowell.script.sink.presenter;
 
-import java.io.File;
 import java.io.IOException;
 
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 
 public class PresenterSink implements Sink {
-	public PresenterSink(File root, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
+	public PresenterSink(Region root, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
 	}
 
 	@Override

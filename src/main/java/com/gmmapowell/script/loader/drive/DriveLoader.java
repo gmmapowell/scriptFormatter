@@ -1,6 +1,5 @@
 package com.gmmapowell.script.loader.drive;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -18,7 +17,7 @@ public class DriveLoader implements Loader {
 	private final Place indexFile;
 	private final Region downloads;
 	private final boolean debug;
-	private File webeditFile;
+	private Place webeditFile;
 	private String wetitle;
 	private final World gdw;
 
@@ -31,7 +30,7 @@ public class DriveLoader implements Loader {
 	}
 
 	@Override
-	public void createWebeditIn(File file, String title) {
+	public void createWebeditIn(Place file, String title) {
 		this.webeditFile = file;
 		this.wetitle = title;
 	}
