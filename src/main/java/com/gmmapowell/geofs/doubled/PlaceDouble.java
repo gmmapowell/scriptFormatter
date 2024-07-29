@@ -82,6 +82,11 @@ public abstract class PlaceDouble implements Place {
 		throw new NotImplementedException();
 	}
 
+	@Override
+	public void store(String contents) {
+		throw new NotImplementedException();
+	}
+
 	protected abstract Reader textContents();
 	protected abstract InputStream binaryContents();
 

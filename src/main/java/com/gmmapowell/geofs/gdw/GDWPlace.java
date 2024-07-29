@@ -46,6 +46,11 @@ public class GDWPlace implements Place {
 	}
 
 	@Override
+	public void store(String contents) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public void lines(NumberedLineListener lsnr) {
 		throw new NotImplementedException();
 	}

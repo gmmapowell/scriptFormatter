@@ -27,6 +27,7 @@ public interface Place {
 	void chars(CharBlockListener lsnr);
 
 	Writer writer();
+	void store(String contents);
 	
 	Region region();
 	

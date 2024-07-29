@@ -145,8 +145,9 @@ public class ScriptConfig implements Config {
 			if (sca != null)
 				saveContentAs = root.place(sca);
 			Place pf = root.placePath(posts);
+			Place cp = root.placePath(creds);
 			try {
-				sinks.add(new BloggerSink(root, new File(creds), blogUrl, pf, localOnly, saveContentAs));
+				sinks.add(new BloggerSink(root, cp, blogUrl, pf, localOnly, saveContentAs));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());

@@ -72,6 +72,11 @@ public class LFSPlace implements Place {
 	}
 
 	@Override
+	public void store(String contents) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public void binary(BinaryBlockListener lsnr) {
 		throw new NotImplementedException();
 	}

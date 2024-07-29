@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -35,6 +36,11 @@ public class GeoFSUtils {
 		} else {
 			throw new CantHappenException("can't return file at " + r.getClass());
 		}
+	}
+
+
+	public static FileWriter fileAppender(Place postsFile) {
+		throw new NotImplementedException();
 	}
 
 	public static OutputStream saveStreamTo(Place dest) {

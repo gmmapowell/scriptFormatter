@@ -1,12 +1,13 @@
 package com.gmmapowell.script.sink.blogger;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class PostIndex {
 	public class BlogEntry {
@@ -28,13 +29,11 @@ public class PostIndex {
 	private final Map<String, String> draft = new LinkedHashMap<>();
 	private FileWriter appendTo;
 
-	public void readFrom(FileReader fr) throws IOException {
-		LineNumberReader lnr = new LineNumberReader(fr);
-		String s;
-		while ((s = lnr.readLine()) != null) {
+	public void readFrom(Place postsFile) throws IOException {
+		postsFile.lines((n,s) -> {
 			s = s.trim();
 			if (s.length() == 0 || s.startsWith("#"))
-				continue;
+				return;
 			int idx = s.indexOf(" ");
 			int id2 = s.indexOf(" ", idx+1);
 			String status = s.substring(idx, id2).trim().toLowerCase();
@@ -48,11 +47,11 @@ public class PostIndex {
 			default:
 				throw new RuntimeException("Cannot handle status " + status);
 			}
-		}
+		});
 	}
 
-	public void appendTo(FileWriter fw) {
-		this.appendTo = fw;
+	public void appendTo(Place postsFile) {
+		this.appendTo = GeoFSUtils.fileAppender(postsFile);
 	}
 
 	public void have(String id, String status, String title) throws IOException {

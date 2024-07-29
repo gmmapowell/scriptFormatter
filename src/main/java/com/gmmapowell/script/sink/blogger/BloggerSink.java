@@ -1,9 +1,6 @@
 package com.gmmapowell.script.sink.blogger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -16,6 +13,9 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.utils.FileUtils;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
@@ -49,9 +49,9 @@ public class BloggerSink implements Sink {
 		START, NORMAL, LIST, BLOCKQUOTE
 	}
 
-	private final File creds;
+	private final Place creds;
 	private final String blogUrl;
-	private final File postsFile;
+	private final Place postsFile;
 	private final PostIndex index;
 	private PrintWriter writer;
 	private String blogId;
@@ -59,13 +59,13 @@ public class BloggerSink implements Sink {
 	private StringWriter sw;
 	private List<Flow> flows = new ArrayList<>();
 	private boolean haveBreak;
-	private File saveContentAs;
+	private Place saveContentAs;
 	private boolean localOnly;
 
-	public BloggerSink(File root, File creds, String blogUrl, File posts, boolean localOnly, File saveContentAs) throws IOException, GeneralSecurityException {
-		this.creds = creds;
+	public BloggerSink(Region root, Place cp, String blogUrl, Place pf, boolean localOnly, Place saveContentAs) throws IOException, GeneralSecurityException {
+		this.creds = cp;
 		this.blogUrl = blogUrl;
-		this.postsFile = posts;
+		this.postsFile = pf;
 		this.localOnly = localOnly;
 		this.saveContentAs = saveContentAs;
 		index = readPosts();
@@ -258,7 +258,7 @@ public class BloggerSink implements Sink {
 		Post p = new Post();
 		p.setTitle(title);
 		if (saveContentAs != null) {
-			FileUtils.writeFile(saveContentAs, sw.toString());
+			saveContentAs.store(sw.toString());
 		}
 		p.setContent(sw.toString());
 		// How do you say you don't want it to publish straight away?
@@ -289,11 +289,7 @@ public class BloggerSink implements Sink {
 
 	private PostIndex readPosts() throws IOException {
 		PostIndex index = new PostIndex();
-		try (FileReader fr = new FileReader(postsFile)) {
-			index.readFrom(fr);
-		} catch (FileNotFoundException ex) {
-			System.out.println(postsFile + " not found; creating");
-		}
+		index.readFrom(postsFile);
 		return index;
 	}
 
@@ -313,8 +309,7 @@ public class BloggerSink implements Sink {
 	}
 	
 	private void readFromBlogger() throws IOException, GeneralSecurityException {
-		FileWriter fw = new FileWriter(postsFile, true);
-		index.appendTo(fw);
+		index.appendTo(postsFile);
 
 		String npt = null;
 		while (true) {
@@ -330,7 +325,7 @@ public class BloggerSink implements Sink {
 
 	private Credential getCredential() throws IOException, GeneralSecurityException {
 		System.out.println("Getting credential for Blogger");
-		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new FileReader(creds));
+		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), GeoFSUtils.fileReader(creds));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, BloggerScopes.all())
                 .setDataStoreFactory(new FileDataStoreFactory(tokenStore()))
                 .setAccessType("offline")
@@ -340,6 +335,7 @@ public class BloggerSink implements Sink {
 	}
 
 	private File tokenStore() {
-		return new File(creds.getParentFile(), "google_scriptformatter_blogger_tokens");
+		return new File(GeoFSUtils.file(creds.region()), "google_scriptformatter_blogger_tokens");
+
 	}
 }
