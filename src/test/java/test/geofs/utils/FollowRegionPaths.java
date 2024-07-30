@@ -46,4 +46,35 @@ public class FollowRegionPaths {
 		Region sub = GeoFSUtils.regionPath(world, region, "region/then");
 		assertEquals(ret, sub);
 	}
+
+	@Test
+	public void anAbsoluteOneSegmentPathIsJustASubregion() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		context.checking(new Expectations() {{
+			oneOf(world).root(); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "/from");
+		assertEquals(sr, sub);
+	}
+
+	@Test
+	public void anAbsoluteDoubleSegmentPathCallsSubregionTwice() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		Region ret = context.mock(Region.class, "ret");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root(); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+			oneOf(sr).subregion("region"); will(returnValue(ret));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "/from/region");
+		assertEquals(ret, sub);
+	}
 }

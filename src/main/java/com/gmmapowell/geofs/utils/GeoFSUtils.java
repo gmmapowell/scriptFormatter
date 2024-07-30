@@ -69,17 +69,19 @@ public class GeoFSUtils {
 	public static Region regionPath(World world, Region region, String path) {
 		File f = new File(path);
 		if (f.isAbsolute()) {
-			// start at world
-			return null;
+			return findRelative(world, region, f, true);
 		} else {
 			// start at region
-			return findRelative(region, f);
+			return findRelative(world, region, f, false);
 		}
 	}
 
-	private static Region findRelative(Region region, File f) {
+	private static Region findRelative(World world, Region region, File f, boolean startAtWorld) {
 		if (f.getParentFile() != null) {
-			region = findRelative(region, f.getParentFile());
+			if (f.getParentFile().isAbsolute() && f.getParentFile().getParentFile() == null)
+				region = world.root();
+			else
+				region = findRelative(world, region, f.getParentFile(), startAtWorld);
 		}
 		return region.subregion(f.getName());
 	}
