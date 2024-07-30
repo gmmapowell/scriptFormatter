@@ -34,4 +34,13 @@ public interface World {
 	 * a <tt>Place</tt>.  An error will be thrown if the path cannot be found or resolves to a <tt>Region</tt> instead of a <tt>Place</tt>.
 	 */
 	Place placePath(String path);
+
+	/** In general, we can expect a World to be part of a wider universe - there may be local filesystem worlds, cloud worlds, remote server
+	 * worlds, etc.
+	 * 
+	 * If a world is part of a Universe, then it is possible to obtain a handle to the universe from this world.
+	 * 
+	 * @return the broader Universe of which this World is part
+	 */
+	Universe getUniverse();
 }

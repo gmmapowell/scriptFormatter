@@ -7,9 +7,15 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 
 public class LocalFileSystem implements World {
+	
+	@Override
+	public Universe getUniverse() {
+		throw new NotImplementedException();
+	}
 
 	@Override
 	public Region root() {

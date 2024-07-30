@@ -8,18 +8,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
+import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
 
 public class GeoFSUtils {
+	private static Pattern uriStyle = Pattern.compile("([a-z0-9]+)://(.*)");
 
 	public static Reader fileReader(Place p) throws FileNotFoundException {
 		if (p instanceof LFSPlace) {
@@ -67,10 +72,23 @@ public class GeoFSUtils {
 	}
 
 	public static Region regionPath(World world, Region region, String path) {
+		Matcher isUri = uriStyle.matcher(path);
+		World other = world;
+		if (isUri.matches()) {
+			path = isUri.group(2);
+			Universe u = world.getUniverse();
+			if (u == null) {
+				throw new CantHappenException("the World is not part of a Universe");
+			}
+			other = u.getWorld(isUri.group(1));
+		}
 		File f = new File(path);
 		if (f.isAbsolute()) {
-			return findRelative(world, region, f, true);
+			return findRelative(other, region, f, true);
 		} else {
+			if (other != world) {
+				throw new GeoFSInvalidWorldException();
+			}
 			// start at region
 			return findRelative(world, region, f, false);
 		}
@@ -82,6 +100,14 @@ public class GeoFSUtils {
 				region = world.root();
 			else
 				region = findRelative(world, region, f.getParentFile(), startAtWorld);
+		} else {
+			// absolute paths - return a root
+			if (f.isAbsolute()) {
+				return world.root();
+			} else if (f.getName().endsWith(":")) {
+				return world.root(f.getName());
+			}
+			// else relative paths - fall through
 		}
 		return region.subregion(f.getName());
 	}

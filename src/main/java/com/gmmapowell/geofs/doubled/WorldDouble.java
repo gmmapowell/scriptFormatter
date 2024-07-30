@@ -7,6 +7,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 
 public class WorldDouble implements World {
@@ -21,7 +22,12 @@ public class WorldDouble implements World {
 	public WorldDouble(String... roots) {
 		defaultRoot = new RegionDouble();
 	}
-	
+
+	@Override
+	public Universe getUniverse() {
+		throw new NotImplementedException();
+	}
+
 	@Override
 	public Region root() {
 		if (defaultRoot != null)

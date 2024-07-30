@@ -11,6 +11,7 @@ import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
@@ -53,6 +54,11 @@ public class GoogleDriveWorld implements World {
 			throw new CantHappenException("could not connect to drive");
 		}
 		this.service = s;
+	}
+	
+	@Override
+	public Universe getUniverse() {
+		throw new NotImplementedException();
 	}
 	
 	@Override
