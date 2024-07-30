@@ -96,15 +96,13 @@ public class GeoFSUtils {
 
 	private static Region findRelative(World world, Region region, File f, boolean startAtWorld) {
 		if (f.getParentFile() != null) {
-			if (f.getParentFile().isAbsolute() && f.getParentFile().getParentFile() == null)
-				region = world.root();
-			else
-				region = findRelative(world, region, f.getParentFile(), startAtWorld);
+			region = findRelative(world, region, f.getParentFile(), startAtWorld);
 		} else {
-			// absolute paths - return a root
-			if (f.isAbsolute()) {
+			if (f.isAbsolute()) { // absolute paths - return a root
 				return world.root();
-			} else if (f.getName().endsWith(":")) {
+			} else if (f.getName().endsWith(":")) { // windows drive letters - are absolute, but Java doesn't know it
+				return world.root(f.getName());
+			} else if (f.getName().startsWith("~")) { // ~ represents a home directory - like a root, and thus absolute, but Java doesn't know it
 				return world.root(f.getName());
 			}
 			// else relative paths - fall through
