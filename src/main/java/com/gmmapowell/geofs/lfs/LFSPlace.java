@@ -91,6 +91,11 @@ public class LFSPlace implements Place {
 	public File getFile() {
 		return file;
 	}
+
+	@Override
+	public boolean exists() {
+		throw new NotImplementedException();
+	}
 	
 	@Override
 	public String toString() {

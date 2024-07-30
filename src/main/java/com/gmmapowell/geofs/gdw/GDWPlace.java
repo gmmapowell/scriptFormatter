@@ -69,4 +69,9 @@ public class GDWPlace implements Place {
 	public Region region() {
 		throw new NotImplementedException();
 	}
+
+	@Override
+	public boolean exists() {
+		throw new NotImplementedException();
+	}
 }

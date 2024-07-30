@@ -11,6 +11,8 @@ import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -90,6 +92,9 @@ public class GeoFSUtils {
 				throw new GeoFSInvalidWorldException();
 			}
 			// start at region
+			if (region == null) {
+				throw new GeoFSNoRegionException(path);
+			}
 			return findRelative(world, region, f, false);
 		}
 	}
@@ -113,6 +118,9 @@ public class GeoFSUtils {
 		} else if (f.getParentFile() != null) {
 			return findRelative(world, region, f.getParentFile(), false).place(f.getName());
 		} else {
+			if (region == null) {
+				throw new GeoFSNoRegionException(path);
+			}
 			return region.place(f.getName());
 		}
 	}
@@ -131,5 +139,9 @@ public class GeoFSUtils {
 			// else relative paths - fall through
 		}
 		return region.subregion(f.getName());
+	}
+
+	public static JSONObject readJSON(Place metafile) throws JSONException {
+		throw new NotImplementedException();
 	}
 }

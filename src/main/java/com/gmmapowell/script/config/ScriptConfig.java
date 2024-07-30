@@ -211,6 +211,7 @@ public class ScriptConfig implements Config {
 	@SuppressWarnings("unchecked")
 	public void handleProcessor(Map<String, String> vars, String proc, boolean debug) throws ConfigException {
 		Class<? extends Processor> clz;
+		System.out.println("handling processor " + proc);
 		try {
 			clz = (Class<? extends Processor>) Class.forName(proc);
 		} catch (ClassNotFoundException ex) {
@@ -218,9 +219,11 @@ public class ScriptConfig implements Config {
 		}
 		if (!Processor.class.isAssignableFrom(clz))
 			throw new ConfigException(proc + " is not a Processor");
+		System.out.println("have processor class " + clz);
 		Constructor<? extends Processor> ctor;
 		try {
-			ctor = clz.getConstructor(File.class, ElementFactory.class, Sink.class, Map.class, boolean.class);
+			ctor = clz.getConstructor(Region.class, ElementFactory.class, Sink.class, Map.class, boolean.class);
+			System.out.println("have processor ctor " + ctor);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new ConfigException(proc + " does not have a suitable constructor");
 		}

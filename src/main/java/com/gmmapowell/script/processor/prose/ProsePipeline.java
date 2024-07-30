@@ -1,6 +1,5 @@
 package com.gmmapowell.script.processor.prose;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +10,7 @@ import java.util.TreeMap;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -24,7 +24,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected final ElementFactory ef;
 	protected final boolean debug;
 
-	public ProsePipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+	public ProsePipeline(Region root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		this.ef = ef;
 		this.sink = sink;
 		this.debug = debug;

@@ -16,6 +16,9 @@ import org.zinutils.exceptions.WrappedException;
 import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.AnchorOp;
@@ -37,15 +40,16 @@ public class DocPipeline extends AtPipeline<DocState> {
 	private final TableOfContents toc;
 	private final JSONObject currentMeta;
 	
-	public DocPipeline(File root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+	public DocPipeline(Region root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
-		File tocfile = null, metafile = null;
+		Place tocfile = null;
+		Place metafile = null;
 		if (options.containsKey("samples"))
 			this.samples.add(new File(Utils.subenvs(options.remove("samples"))));
 		if (options.containsKey("toc"))
-			tocfile = new File(root, Utils.subenvs(options.remove("toc")));
+			tocfile = root.place(options.remove("toc"));
 		if (options.containsKey("meta"))
-			metafile = new File(root, Utils.subenvs(options.remove("meta")));
+			metafile = root.place(options.remove("meta"));
 		if (options.containsKey("grammar")) {
 			String grammarName = Utils.subenvs(options.remove("grammar"));
 			File file = new File(grammarName);
@@ -57,7 +61,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 		toc = new TableOfContents(tocfile, metafile);
 		if (metafile != null && metafile.exists()) {
 			try {
-				currentMeta = new JSONObject(FileUtils.readFile(metafile));
+				currentMeta = GeoFSUtils.readJSON(metafile);
 			} catch (JSONException e) {
 				throw new ConfigException("Failed to read " + metafile + ": " + e);
 			}

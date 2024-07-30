@@ -11,6 +11,7 @@ import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
+import com.gmmapowell.geofs.utils.GeoFSNoRegionException;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 /** Paths are a hack in my view, but a necessary one.
@@ -32,6 +33,12 @@ public class FollowRegionPaths {
 		}});
 		Region sub = GeoFSUtils.regionPath(world, region, "region");
 		assertEquals(sr, sub);
+	}
+
+	@Test(expected=GeoFSNoRegionException.class)
+	public void cannotFindARelativePathFromAWorld() {
+		World world = context.mock(World.class);
+		GeoFSUtils.regionPath(world, null, "region");
 	}
 
 	@Test

@@ -20,13 +20,14 @@ import org.zinutils.collections.ListMap;
 import org.zinutils.exceptions.InvalidUsageException;
 import org.zinutils.exceptions.WrappedException;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.flow.LinkFromTOC;
 
 public class TableOfContents {
 	private List<LinkFromTOC> links;
 	private final List<String> headings = new ArrayList<>();
-	private final File tocfile;
-	private File metafile;
+	private final Place tocfile;
+	private Place metafile;
 	private final JSONObject meta = new JSONObject();
 	private final JSONObject anchors;
 	private final JSONObject heads;
@@ -34,7 +35,7 @@ public class TableOfContents {
 	private final Map<String, PDPage> anchorPages = new TreeMap<>();
 	private ListMap<String, PDAnnotationLink> anchorWaiting = new ListMap<>();
 	
-	public TableOfContents(File tocfile, File metafile) {
+	public TableOfContents(Place tocfile, Place metafile) {
 		this.tocfile = tocfile;
 		this.metafile = metafile;
 		try {
@@ -150,13 +151,13 @@ public class TableOfContents {
 
 	public void write() throws FileNotFoundException {
 		if (tocfile != null) {
-			try (PrintWriter pw = new PrintWriter(tocfile)) {
+			try (PrintWriter pw = new PrintWriter(tocfile.writer())) {
 				for (String h : headings)
 					pw.println(h);
 			}
 		}
 		if (metafile != null) {
-			try (PrintWriter pw = new PrintWriter(metafile)) {
+			try (PrintWriter pw = new PrintWriter(metafile.writer())) {
 				pw.print(meta);
 			}
 		}

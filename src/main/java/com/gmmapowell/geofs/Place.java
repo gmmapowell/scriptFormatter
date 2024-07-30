@@ -37,6 +37,13 @@ public interface Place {
 	 */
 	String name();
 	
+	// TODO: more generally, we need to consider how we want to handle the difference between:
+	// a) places that already exist
+	// b) places that don't exist yet, but we want to create
+	// c) places that may or may not exist and we want to be able to tell
+	// It seems to me that subclasses may be an option - not sure
+	boolean exists();
+	
 	// TODO: copyMeTo();
 	// TODO: deleteMe();
 	

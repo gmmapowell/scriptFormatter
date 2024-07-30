@@ -78,7 +78,7 @@ public class GoogleDriveWorld implements World {
 
 	@Override
 	public Region regionPath(String path) {
-		throw new NotImplementedException();
+		return GeoFSUtils.regionPath(this, null, path);
 	}
 
 	@Override
