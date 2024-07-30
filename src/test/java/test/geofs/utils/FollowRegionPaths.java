@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -75,6 +76,96 @@ public class FollowRegionPaths {
 			oneOf(sr).subregion("region"); will(returnValue(ret));
 		}});
 		Region sub = GeoFSUtils.regionPath(world, region, "/from/region");
+		assertEquals(ret, sub);
+	}
+
+	@Test
+	@Ignore
+	public void windowsHasDriveLetters() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		Region ret = context.mock(Region.class, "ret");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+			oneOf(sr).subregion("region"); will(returnValue(ret));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "C:/from/region");
+		assertEquals(ret, sub);
+	}
+
+	@Test
+	@Ignore
+	public void weCanHandleURITypeRelativePaths() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		Region ret = context.mock(Region.class, "ret");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+			oneOf(sr).subregion("region"); will(returnValue(ret));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "file://from/region");
+		assertEquals(ret, sub);
+	}
+
+	@Test
+	@Ignore
+	public void weCanHandleURITypeAbsolutePaths() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		Region ret = context.mock(Region.class, "ret");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+			oneOf(sr).subregion("region"); will(returnValue(ret));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "file:///from/region");
+		assertEquals(ret, sub);
+	}
+
+	@Test
+	@Ignore
+	public void weCanHandleURITypePathsWithWindowsDriveLetters() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		Region ret = context.mock(Region.class, "ret");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+			oneOf(sr).subregion("region"); will(returnValue(ret));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "file://C:/from/region");
+		assertEquals(ret, sub);
+	}
+
+	@Test
+	@Ignore
+	public void weCanHandleURITypePathsOnGoogleWorld() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		Region ret = context.mock(Region.class, "ret");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+			oneOf(sr).subregion("region"); will(returnValue(ret));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "google://from/region");
 		assertEquals(ret, sub);
 	}
 }

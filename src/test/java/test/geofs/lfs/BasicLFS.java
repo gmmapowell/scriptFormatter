@@ -23,7 +23,6 @@ import com.google.common.io.Files;
 // I have tried to write it in a way that works on all Linux systems.
 // Obviously it would be possible to put more effort in to analyze what we have and what exists and adjust.
 
-@Ignore
 public class BasicLFS {
 	@Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 
@@ -68,6 +67,7 @@ public class BasicLFS {
 	}
 
 	@Test
+	@Ignore
 	public void testWeCanFindATmpFileWeCreateFromARegionUsingPlacePath() throws IOException {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{

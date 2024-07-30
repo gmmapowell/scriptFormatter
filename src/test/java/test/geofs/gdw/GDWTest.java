@@ -23,7 +23,7 @@ public class GDWTest {
 		}});
 
 		LocalFileSystem lfs = new LocalFileSystem();
-		GoogleDriveWorld world = new GoogleDriveWorld("ScriptFormatter", lfs.placePath("/home/gareth/.ssh/google_scriptformatter_creds.json"));
+		GoogleDriveWorld world = new GoogleDriveWorld("ScriptFormatter", lfs.placePath("~/.ssh/google_scriptformatter_creds.json"));
 		world.root().place("hw").lines(lsnr);
 	}
 
