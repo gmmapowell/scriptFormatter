@@ -11,10 +11,17 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 
 public class LocalFileSystem implements World {
-	
+	private Universe universe;
+
+	public LocalFileSystem(Universe universe) {
+		this.universe = universe;
+		if (universe != null)
+			universe.register("lfs", this);
+	}
+
 	@Override
 	public Universe getUniverse() {
-		throw new NotImplementedException();
+		return universe;
 	}
 
 	@Override

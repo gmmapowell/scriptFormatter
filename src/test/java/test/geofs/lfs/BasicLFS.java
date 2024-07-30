@@ -37,7 +37,7 @@ public class BasicLFS {
 		File tf = File.createTempFile("lfs", ".txt");
 		FileUtils.writeFile(tf, "hello, world!\n");
 		List<String> elts = FileUtils.pathElements(tf);
-		LocalFileSystem lfs = new LocalFileSystem();
+		LocalFileSystem lfs = new LocalFileSystem(null);
 		Region r = lfs.root();
 		for (int i=0;i<elts.size()-1;i++) {
 			String s = elts.get(i);
@@ -60,7 +60,7 @@ public class BasicLFS {
 		
 		File tf = File.createTempFile("lfs", ".txt");
 		FileUtils.writeFile(tf, "hello, world!\n");
-		LocalFileSystem lfs = new LocalFileSystem();
+		LocalFileSystem lfs = new LocalFileSystem(null);
 		Place place = lfs.placePath(tf.getPath());
 		place.lines(lsnr);
 		tf.delete();
@@ -77,7 +77,7 @@ public class BasicLFS {
 		
 		File tf = File.createTempFile("lfs", ".txt");
 		FileUtils.writeFile(tf, "hello, world!\n");
-		LocalFileSystem lfs = new LocalFileSystem();
+		LocalFileSystem lfs = new LocalFileSystem(null);
 		Place place = lfs.root().placePath(tf.getPath().substring(1));
 		place.lines(lsnr);
 		tf.delete();
@@ -86,7 +86,7 @@ public class BasicLFS {
 	@Test
 	public void testWeCanFindATmpDirWeCreateUsingRegionPath() throws IOException {
 		File tf = Files.createTempDir();
-		LocalFileSystem lfs = new LocalFileSystem();
+		LocalFileSystem lfs = new LocalFileSystem(null);
 		Region region = lfs.regionPath(tf.getPath());
 		assertNotNull(region);
 		tf.delete();
@@ -95,7 +95,7 @@ public class BasicLFS {
 	@Test
 	public void testWeCanFindATmpDirWeCreateFromARegionUsingRegionPath() throws IOException {
 		File tf = Files.createTempDir();
-		LocalFileSystem lfs = new LocalFileSystem();
+		LocalFileSystem lfs = new LocalFileSystem(null);
 		Region region = lfs.root().regionPath(tf.getPath().substring(1));
 		assertNotNull(region);
 		tf.delete();

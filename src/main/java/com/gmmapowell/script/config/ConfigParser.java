@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.utils.Utils;
@@ -21,9 +22,9 @@ public class ConfigParser implements NumberedLineListener {
 	private Region root;
 	private Exception capture;
 
-	public ConfigParser(Region root) {
+	public ConfigParser(Universe universe, Region root) {
 		this.root = root;
-		config = new ScriptConfig(root);
+		config = new ScriptConfig(universe, root);
 	}
 	
 	@Override

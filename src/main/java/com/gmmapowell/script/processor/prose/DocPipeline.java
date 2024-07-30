@@ -13,7 +13,6 @@ import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.Production;
 import org.zinutils.exceptions.InvalidUsageException;
 import org.zinutils.exceptions.WrappedException;
-import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 
 import com.gmmapowell.geofs.Place;

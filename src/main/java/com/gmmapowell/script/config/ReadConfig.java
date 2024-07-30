@@ -22,7 +22,7 @@ public class ReadConfig {
 //			return null;
 //		}
 		Region root = place.region();
-		ConfigParser parser = new ConfigParser(root);
+		ConfigParser parser = new ConfigParser(world.getUniverse(), root);
 		place.lines(parser);
 		try {
 			return parser.config();

@@ -3,15 +3,18 @@ package com.gmmapowell.script;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
+import com.gmmapowell.geofs.simple.SimpleUniverse;
 import com.gmmapowell.script.config.Config;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ReadConfig;
 
 public class Main {
 	public static void main(String[] args) {
-		LocalFileSystem lfs = new LocalFileSystem();
+		Universe uv = new SimpleUniverse();
+		LocalFileSystem lfs = new LocalFileSystem(uv);
 		Config cfg = gatherConfig(lfs, args);
 		if (cfg == null)
 			return;

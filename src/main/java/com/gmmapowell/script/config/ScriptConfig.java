@@ -1,6 +1,5 @@
 package com.gmmapowell.script.config;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +12,7 @@ import org.zinutils.exceptions.UtilException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -41,9 +41,11 @@ public class ScriptConfig implements Config {
 	private Sink sink;
 	private WebEdit webedit;
 	private Place index;
-
 	private Region workdir;
-	public ScriptConfig(Region root) {
+	private Universe universe;
+	
+	public ScriptConfig(Universe universe, Region root) {
+		this.universe = universe;
 		this.root = root;
 	}
 	
@@ -59,7 +61,7 @@ public class ScriptConfig implements Config {
 			// TODO: I think we need to resolve creds & use placePath
 			Place credsPath = root.placePath(creds);
 			try {
-				GoogleDriveWorld gdw = new GoogleDriveWorld("ScriptFormatter", credsPath);
+				GoogleDriveWorld gdw = new GoogleDriveWorld(universe, "ScriptFormatter", credsPath);
 				// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"
 				// the loader wants to take (at least) two Regions/Worlds: one of which is the local disk and the other is the GoogleDriveWorld
 				

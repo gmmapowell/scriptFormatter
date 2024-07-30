@@ -29,11 +29,14 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.DriveList;
 
 public class GoogleDriveWorld implements World {
+	private final Universe universe;
 	private final String appName;
 	private final Place creds;
 	private final Drive service;
 
-	public GoogleDriveWorld(String appName, Place creds) throws IOException, GeneralSecurityException {
+	public GoogleDriveWorld(Universe universe, String appName, Place creds) throws IOException, GeneralSecurityException {
+		this.universe = universe;
+		universe.register("google", this);
 		this.appName = appName;
 		this.creds = creds;
 		int i=0;
@@ -58,7 +61,7 @@ public class GoogleDriveWorld implements World {
 	
 	@Override
 	public Universe getUniverse() {
-		throw new NotImplementedException();
+		return universe;
 	}
 	
 	@Override

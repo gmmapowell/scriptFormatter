@@ -6,9 +6,11 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.geofs.listeners.LineListener;
+import com.gmmapowell.geofs.simple.SimpleUniverse;
 
 @Ignore
 public class GDWTest {
@@ -22,8 +24,9 @@ public class GDWTest {
 			oneOf(lsnr).complete();
 		}});
 
-		LocalFileSystem lfs = new LocalFileSystem();
-		GoogleDriveWorld world = new GoogleDriveWorld("ScriptFormatter", lfs.placePath("~/.ssh/google_scriptformatter_creds.json"));
+		Universe uv = new SimpleUniverse();
+		LocalFileSystem lfs = new LocalFileSystem(uv);
+		GoogleDriveWorld world = new GoogleDriveWorld(uv, "ScriptFormatter", lfs.placePath("~/.ssh/google_scriptformatter_creds.json"));
 		world.root().place("hw").lines(lsnr);
 	}
 
