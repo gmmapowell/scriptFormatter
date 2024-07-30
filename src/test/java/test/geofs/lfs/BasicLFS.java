@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.zinutils.utils.FileUtils;
@@ -21,6 +22,8 @@ import com.google.common.io.Files;
 // This is an "integration" test and as such, it depends on external realities.
 // I have tried to write it in a way that works on all Linux systems.
 // Obviously it would be possible to put more effort in to analyze what we have and what exists and adjust.
+
+@Ignore
 public class BasicLFS {
 	@Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 

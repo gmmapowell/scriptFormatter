@@ -14,6 +14,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
@@ -62,6 +63,31 @@ public class GeoFSUtils {
 	}
 
 	public static String getGoogleID(Place local) {
+		throw new NotImplementedException();
+	}
+
+	public static Region regionPath(World world, Region region, String path) {
+		File f = new File(path);
+		if (f.isAbsolute()) {
+			// start at world
+			return null;
+		} else {
+			// start at region
+			return findRelative(region, f);
+		}
+	}
+
+	private static Region findRelative(Region region, File f) {
+		if (f.getParentFile() != null) {
+			region = findRelative(region, f.getParentFile());
+		}
+		return region.subregion(f.getName());
+	}
+
+	public static Place placePath(World world, Region lfsRegion, String path) {
+		File f = new File(path);
+		if (f.isAbsolute())
+			;
 		throw new NotImplementedException();
 	}
 }

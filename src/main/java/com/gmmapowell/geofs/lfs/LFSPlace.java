@@ -18,9 +18,11 @@ import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
 
 public class LFSPlace implements Place {
+	private final LocalFileSystem world;
 	private final File file;
 
-	public LFSPlace(File file) {
+	public LFSPlace(LocalFileSystem world, File file) {
+		this.world = world;
 		if (!file.isFile())
 			throw new CantHappenException("there is no directory " + file);
 		this.file = file;
@@ -28,7 +30,7 @@ public class LFSPlace implements Place {
 
 	@Override
 	public Region region() {
-		return new LFSRegion(file.getParentFile());
+		return new LFSRegion(world, file.getParentFile());
 	}
 	
 	@Override
@@ -88,5 +90,10 @@ public class LFSPlace implements Place {
 
 	public File getFile() {
 		return file;
+	}
+	
+	@Override
+	public String toString() {
+		return file.toString();
 	}
 }

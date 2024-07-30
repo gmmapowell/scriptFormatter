@@ -57,8 +57,7 @@ public class ScriptConfig implements Config {
 				throw new ConfigException("folder was not defined");
 			
 			// TODO: I think we need to resolve creds & use placePath
-//			this.creds = new File(Utils.subenvs(creds));
-			Place credsPath = null;
+			Place credsPath = root.placePath(creds);
 			try {
 				GoogleDriveWorld gdw = new GoogleDriveWorld("ScriptFormatter", credsPath);
 				// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"

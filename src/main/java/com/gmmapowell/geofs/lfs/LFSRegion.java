@@ -9,11 +9,14 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class LFSRegion implements Region {
+	private final LocalFileSystem world;
 	private final File file;
 
-	public LFSRegion(File file) {
+	public LFSRegion(LocalFileSystem world, File file) {
+		this.world = world;
 		if (!file.isDirectory())
 			throw new CantHappenException("there is no directory " + file);
 		this.file = file;
@@ -23,41 +26,29 @@ public class LFSRegion implements Region {
 	public Region parent() {
 		if (file == null || file.getParentFile() == null)
 			throw new CantHappenException("this region does not have a parent");
-		return new LFSRegion(file.getParentFile());
+		return new LFSRegion(world, file.getParentFile());
 	}
 
 	@Override
 	public Region subregion(String name) {
 		File f = new File(file, name);
-		return new LFSRegion(f);
+		return new LFSRegion(world, f);
 	}
 
 	@Override
 	public Place place(String name) {
 		File f = new File(file, name);
-		return new LFSPlace(f);
+		return new LFSPlace(world, f);
 	}
 
 	@Override
 	public Region regionPath(String path) {
-		File f = new File(path);
-		if (f.isAbsolute())
-			throw new CantHappenException("absolute paths must be used from the world");
-		f = new File(file, path);
-		if (!f.isDirectory())
-			throw new CantHappenException("there is no region " + f);
-		return new LFSRegion(f);
+		return GeoFSUtils.regionPath(world, this, path);
 	}
 
 	@Override
 	public Place placePath(String path) {
-		File f = new File(path);
-		if (f.isAbsolute())
-			throw new CantHappenException("absolute paths must be used from the world");
-		f = new File(file, path);
-		if (!f.isFile())
-			throw new CantHappenException("there is no place " + f);
-		return new LFSPlace(f);
+		return GeoFSUtils.placePath(world, this, path);
 	}
 
 	public File getFile() {
@@ -83,6 +74,4 @@ public class LFSRegion implements Region {
 	public void regions(RegionListener lsnr) {
 		throw new NotImplementedException();
 	}
-	
-	
 }

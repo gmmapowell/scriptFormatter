@@ -13,7 +13,7 @@ public class LocalFileSystem implements World {
 
 	@Override
 	public Region root() {
-		return new LFSRegion(new File("/"));
+		return new LFSRegion(this, new File("/"));
 	}
 
 	@Override
@@ -25,10 +25,10 @@ public class LocalFileSystem implements World {
 	public Region regionPath(String path) {
 		File f = new File(path);
 		if (!f.isAbsolute())
-			throw new CantHappenException("relative paths must be used from a region");
+			throw new CantHappenException("relative paths cannot be used from the root");
 		if (!f.isDirectory())
 			throw new CantHappenException("there is no region " + f);
-		return new LFSRegion(f);
+		return new LFSRegion(this, f);
 	}
 
 	@Override
@@ -38,6 +38,6 @@ public class LocalFileSystem implements World {
 			throw new CantHappenException("relative paths must be used from a region");
 		if (!f.isFile())
 			throw new CantHappenException("there is no place " + f);
-		return new LFSPlace(f);
+		return new LFSPlace(this, f);
 	}
 }
