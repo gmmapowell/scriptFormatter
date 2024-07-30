@@ -94,6 +94,29 @@ public class GeoFSUtils {
 		}
 	}
 
+	public static Place placePath(World world, Region region, String path) {
+		Matcher isUri = uriStyle.matcher(path);
+		World other = world;
+		if (isUri.matches()) {
+			path = isUri.group(2);
+			Universe u = world.getUniverse();
+			if (u == null) {
+				throw new CantHappenException("the World is not part of a Universe");
+			}
+			other = u.getWorld(isUri.group(1));
+		}
+		File f = new File(path);
+		if (f.isAbsolute()) { 
+			return findRelative(other, region, f.getParentFile(), true).place(f.getName());
+		} else if (other != world) {
+			throw new GeoFSInvalidWorldException();
+		} else if (f.getParentFile() != null) {
+			return findRelative(world, region, f.getParentFile(), false).place(f.getName());
+		} else {
+			return region.place(f.getName());
+		}
+	}
+	
 	private static Region findRelative(World world, Region region, File f, boolean startAtWorld) {
 		if (f.getParentFile() != null) {
 			region = findRelative(world, region, f.getParentFile(), startAtWorld);
@@ -108,12 +131,5 @@ public class GeoFSUtils {
 			// else relative paths - fall through
 		}
 		return region.subregion(f.getName());
-	}
-
-	public static Place placePath(World world, Region lfsRegion, String path) {
-		File f = new File(path);
-		if (f.isAbsolute())
-			;
-		throw new NotImplementedException();
 	}
 }
