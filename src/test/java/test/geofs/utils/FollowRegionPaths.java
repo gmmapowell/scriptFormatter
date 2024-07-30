@@ -80,6 +80,20 @@ public class FollowRegionPaths {
 	}
 
 	@Test
+	public void tildeRepresentsTheHomeDirectory() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "/");
+		Region region = context.mock(Region.class, "unused");
+		Region sr = context.mock(Region.class, "sr");
+		context.checking(new Expectations() {{
+			oneOf(world).root(); will(returnValue(root));
+			oneOf(root).subregion("from"); will(returnValue(sr));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "~/from");
+		assertEquals(sr, sub);
+	}
+
+	@Test
 	@Ignore
 	public void windowsHasDriveLetters() {
 		World world = context.mock(World.class);
