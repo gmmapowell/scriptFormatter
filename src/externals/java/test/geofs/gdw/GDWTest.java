@@ -2,7 +2,6 @@ package test.geofs.gdw;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -12,7 +11,6 @@ import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.simple.SimpleUniverse;
 
-@Ignore
 public class GDWTest {
 	@Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 

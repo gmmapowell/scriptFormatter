@@ -1,5 +1,6 @@
 package test.geofs.lfs;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.geofs.listeners.LineListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.google.common.io.Files;
 
 // This is an "integration" test and as such, it depends on external realities.
@@ -99,5 +101,14 @@ public class BasicLFS {
 		Region region = lfs.root().regionPath(tf.getPath().substring(1));
 		assertNotNull(region);
 		tf.delete();
+	}
+	
+	@Test
+	public void tildeIsUserHome() throws IOException {
+		LocalFileSystem lfs = new LocalFileSystem(null);
+		String userDir = System.getProperty("user.home");
+		System.out.println(userDir);
+		Region r = lfs.root("~");
+		assertEquals(userDir, GeoFSUtils.file(r).getPath());
 	}
 }
