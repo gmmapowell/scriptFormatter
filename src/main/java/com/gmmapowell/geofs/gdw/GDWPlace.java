@@ -18,18 +18,20 @@ import com.google.api.services.drive.Drive;
 
 public class GDWPlace implements Place {
 	private final Drive service;
+	private final String name;
 	private final String id;
+	private final GDWRegion region;
 
-	public GDWPlace(Drive service, String id) {
+	public GDWPlace(Drive service, String id, String name, GDWRegion region) {
 		this.service = service;
+		this.name = name;
 		this.id = id;
+		this.region = region;
 	}
 
 	@Override
 	public String name() {
-		// DO NOT RETURN THE ID
-		// FIND THE ACTUAL NAME!
-		throw new NotImplementedException();
+		return name;
 	}
 	
 	@Override
@@ -76,5 +78,14 @@ public class GDWPlace implements Place {
 	@Override
 	public boolean exists() {
 		throw new NotImplementedException();
+	}
+
+	public String googleID() {
+		return id;
+	}
+	
+	@Override
+	public String toString() {
+		return region.toString() + "/" + name;
 	}
 }

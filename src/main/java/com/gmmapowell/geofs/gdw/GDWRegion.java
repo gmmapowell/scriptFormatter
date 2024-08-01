@@ -1,6 +1,8 @@
 package com.gmmapowell.geofs.gdw;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -44,7 +46,7 @@ public class GDWRegion implements Region {
 	        if (result.getFiles().size() != 1)
 	        	throw new GeoFSException("Could not find root folder: " + name);
 	        String id = result.getFiles().get(0).getId();
-			return new GDWPlace(service, id);
+			return new GDWPlace(service, id, name, this);
 		} catch (Exception ex) {
 			throw new GeoFSException(ex);
 		}
@@ -62,12 +64,30 @@ public class GDWRegion implements Region {
 
 	@Override
 	public void places(PlaceListener lsnr) {
-		throw new NotImplementedException();
+		try {
+			FileList children = service.files().list().setQ("'" + regionId + "' in parents AND mimeType != 'application/vnd.google-apps.folder'").setFields("files(id, name, mimeType)").execute();
+	        List<com.google.api.services.drive.model.File> files = children.getFiles();
+	        Collections.reverse(files);
+	        for (com.google.api.services.drive.model.File f : files) {
+	        	lsnr.place(new GDWPlace(service, f.getId(), f.getName(), this));
+	        }			
+		} catch (IOException ex) {
+			throw new GeoFSException(ex);
+		}
 	}
 
 	@Override
 	public void regions(RegionListener lsnr) {
-		throw new NotImplementedException();
+		try {
+			FileList children = service.files().list().setQ("'" + regionId + "' in parents AND mimeType = 'application/vnd.google-apps.folder'").setFields("files(id, name, mimeType)").execute();
+	        List<com.google.api.services.drive.model.File> files = children.getFiles();
+	        Collections.reverse(files);
+	        for (com.google.api.services.drive.model.File f : files) {
+	        	lsnr.region(new GDWRegion(service, f.getId(), f.getName(), this));
+	        }			
+		} catch (IOException ex) {
+			throw new GeoFSException(ex);
+		}
 	}
 
 	@Override
@@ -83,5 +103,13 @@ public class GDWRegion implements Region {
 	@Override
 	public Region parent() {
 		return parent;
+	}
+	
+	@Override
+	public String toString() {
+		if (parent == null) {
+			return "google://";
+		} else
+			return parent.toString() + "/" + name;
 	}
 }

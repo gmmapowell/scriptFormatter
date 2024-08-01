@@ -87,9 +87,7 @@ public class DriveLoader implements Loader {
 		dlFrom.places(place -> {
 			try {
 	        	Place local = downloads.place(place.name() + ".txt");
-	        	// TODO: we probably want some kind of utility method to get the google ID
-	        	// so that we are not foolishly casting things ...
-	        	Status record = index.record(GeoFSUtils.getGoogleID(local), place);
+	        	Status record = index.record(GeoFSUtils.getGoogleID(place), local);
 	//        	if (debug)
 	//        		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
 	        	if (record != Status.EXCLUDED)

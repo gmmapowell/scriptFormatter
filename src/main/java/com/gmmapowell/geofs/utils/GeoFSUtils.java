@@ -22,6 +22,7 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
+import com.gmmapowell.geofs.gdw.GDWPlace;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
 
@@ -47,7 +48,10 @@ public class GeoFSUtils {
 	}
 
 	public static File file(Place from) {
-		throw new NotImplementedException();
+		if (from instanceof LFSPlace) {
+			return ((LFSPlace)from).getFile();
+		} else
+			throw new NotImplementedException("file(" + from.getClass() + ")");
 	}
 
 	public static FileWriter fileAppender(Place postsFile) {
@@ -70,7 +74,10 @@ public class GeoFSUtils {
 	}
 
 	public static String getGoogleID(Place local) {
-		throw new NotImplementedException();
+		if (local instanceof GDWPlace)
+			return ((GDWPlace)local).googleID();
+		else
+			throw new NotImplementedException();
 	}
 
 	public static Region regionPath(World world, Region region, String path) {

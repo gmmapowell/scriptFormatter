@@ -2,6 +2,7 @@ package com.gmmapowell.geofs.lfs;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Writer;
@@ -12,6 +13,7 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.exceptions.FileStreamingException;
+import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
@@ -70,7 +72,11 @@ public class LFSPlace implements Place {
 
 	@Override
 	public Writer writer() {
-		throw new NotImplementedException();
+		try {
+			return new FileWriter(file);
+		} catch (Exception ex) {
+			throw new GeoFSException(ex);
+		}
 	}
 
 	@Override

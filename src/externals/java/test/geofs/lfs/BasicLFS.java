@@ -5,11 +5,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.zinutils.utils.FileUtils;
@@ -69,7 +69,6 @@ public class BasicLFS {
 	}
 
 	@Test
-	@Ignore
 	public void testWeCanFindATmpFileWeCreateFromARegionUsingPlacePath() throws IOException {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
@@ -91,6 +90,30 @@ public class BasicLFS {
 		LocalFileSystem lfs = new LocalFileSystem(null);
 		Region region = lfs.regionPath(tf.getPath());
 		assertNotNull(region);
+		tf.delete();
+	}
+
+	@Test
+	public void testWeCanWriteAFile() throws IOException {
+		File tf = File.createTempFile("lfsw", ",txt");
+		LocalFileSystem lfs = new LocalFileSystem(null);
+		Place place = lfs.placePath(tf.getPath());
+		assertNotNull(place);
+		Writer pw = place.writer();
+		pw.write("hello world\n");
+		pw.close();
+		assertEquals("hello world\n", FileUtils.readFile(tf));
+		tf.delete();
+	}
+
+	@Test
+	public void testWeCanObtainAFileFromAnLFSPlace() throws IOException {
+		File tf = File.createTempFile("lfsf", ",txt");
+		LocalFileSystem lfs = new LocalFileSystem(null);
+		Place place = lfs.placePath(tf.getPath());
+		assertNotNull(place);
+		File pf = GeoFSUtils.file(place);
+		assertEquals(tf, pf);
 		tf.delete();
 	}
 
