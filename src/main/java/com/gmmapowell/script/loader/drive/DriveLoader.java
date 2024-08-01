@@ -43,7 +43,6 @@ public class DriveLoader implements Loader {
 		// Want a "marker" in the file that says "--excluded--"   
 		// because it has been downloaded but not user "approved" or ordered
 
-		
 		Region dl = gdw.regionPath(folder);
         if (debug) {
         	System.out.println("Downloading files from Google ...");
@@ -60,30 +59,7 @@ public class DriveLoader implements Loader {
         }
 	}
 
-	/*
-	private Item findFolder() throws IOException, ConfigException {
-		List<String> segments = folderSegments();
-        Item item = findTopFolder(segments.remove(0));
-        while (!segments.isEmpty()) {
-        	item = findNestedFolder(item, segments.remove(0));
-        }
-		return item;
-	}
-	
-	private List<String> folderSegments() {
-		File f = new File(folder);
-		List<String> ret = new ArrayList<>();
-		while (f != null) {
-			ret.add(0, f.getName());
-			f = f.getParentFile();
-		}
-		return ret;
-	}
-	 */
-
 	private void downloadFolder(Index index, Region downloads, String ind, Region dlFrom) {
-		// TODO: downloads.list()
-		// FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();
 		dlFrom.places(place -> {
 			try {
 	        	Place local = downloads.place(place.name() + ".txt");

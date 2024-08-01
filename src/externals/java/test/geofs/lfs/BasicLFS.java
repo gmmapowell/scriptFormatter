@@ -107,6 +107,20 @@ public class BasicLFS {
 	}
 
 	@Test
+	public void testWeCanAppendToAFile() throws IOException {
+		File tf = File.createTempFile("lfsa", ",txt");
+		FileUtils.writeFile(tf, "this is the first line\n");
+		LocalFileSystem lfs = new LocalFileSystem(null);
+		Place place = lfs.placePath(tf.getPath());
+		assertNotNull(place);
+		Writer pw = place.appender();
+		pw.write("second line\n");
+		pw.close();
+		assertEquals("this is the first line\nsecond line\n", FileUtils.readFile(tf));
+		tf.delete();
+	}
+
+	@Test
 	public void testWeCanObtainAFileFromAnLFSPlace() throws IOException {
 		File tf = File.createTempFile("lfsf", ",txt");
 		LocalFileSystem lfs = new LocalFileSystem(null);

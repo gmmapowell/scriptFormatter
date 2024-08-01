@@ -56,7 +56,7 @@ public class Index implements FilesToProcess {
 		Index index = new Index(downloads);
 		index.readFrom(indexFile);
 		
-		Writer fw = indexFile.writer();
+		Writer fw = indexFile.appender();
 		index.appendTo(fw);
 		return index;
 	}

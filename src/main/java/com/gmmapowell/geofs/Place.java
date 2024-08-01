@@ -26,7 +26,22 @@ public interface Place {
 	
 	void chars(CharBlockListener lsnr);
 
+	/** Open the place for writing, deleting any existing contents
+	 * 
+	 * @return a Writer to write to the file
+	 */
 	Writer writer();
+	
+	/** Open the place for writing, appending after any existing contents
+	 * 
+	 * @return a Writer to append to the file
+	 */
+	Writer appender();
+
+	/** Store a given string in the place
+	 * 
+	 * @param contents - the contents to store
+	 */
 	void store(String contents);
 	
 	Region region();

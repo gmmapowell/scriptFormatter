@@ -52,6 +52,11 @@ public class GDWPlace implements Place {
 	}
 
 	@Override
+	public Writer appender() {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public void store(String contents) {
 		throw new NotImplementedException();
 	}

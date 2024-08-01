@@ -80,6 +80,15 @@ public class LFSPlace implements Place {
 	}
 
 	@Override
+	public Writer appender() {
+		try {
+			return new FileWriter(file, true);
+		} catch (Exception ex) {
+			throw new GeoFSException(ex);
+		}
+	}
+
+	@Override
 	public void store(String contents) {
 		throw new NotImplementedException();
 	}
