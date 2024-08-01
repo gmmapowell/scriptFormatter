@@ -13,6 +13,7 @@ import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.geofs.utils.LineListenerOutputStream;
 import com.google.api.services.drive.Drive;
 
@@ -78,6 +79,15 @@ public class GDWPlace implements Place {
 	@Override
 	public boolean exists() {
 		throw new NotImplementedException();
+	}
+	
+	@Override
+	public void copyTo(Place to) {
+		try {
+			service.files().export(id, "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(to));
+		} catch (IOException ex) {
+			throw new GeoFSException(ex);
+		}
 	}
 
 	public String googleID() {

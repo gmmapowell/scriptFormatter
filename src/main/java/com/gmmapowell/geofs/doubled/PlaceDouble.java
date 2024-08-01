@@ -86,6 +86,11 @@ public abstract class PlaceDouble implements Place {
 	public void store(String contents) {
 		throw new NotImplementedException();
 	}
+	
+	@Override
+	public void copyTo(Place to) {
+		throw new NotImplementedException();
+	}
 
 	@Override
 	public boolean exists() {

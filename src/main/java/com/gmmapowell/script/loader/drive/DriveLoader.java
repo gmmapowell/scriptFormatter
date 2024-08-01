@@ -87,12 +87,12 @@ public class DriveLoader implements Loader {
 		dlFrom.places(place -> {
 			try {
 	        	Place local = downloads.place(place.name() + ".txt");
-	        	Status record = index.record(GeoFSUtils.getGoogleID(place), local);
-	//        	if (debug)
-	//        		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
+	        	String id = GeoFSUtils.getGoogleID(place);
+				Status record = index.record(id, local);
+	        	if (debug)
+	        		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), "", place.name(), id);
 	        	if (record != Status.EXCLUDED)
-	        		; // TODO: copy this down easily
-	//        		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(name));
+	        		place.copyTo(local);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -101,21 +101,5 @@ public class DriveLoader implements Loader {
         	Region folderInto = downloads.ensureSubregion(region.name());
 			downloadFolder(index, folderInto, ind+ "  ", region);
 		});
-//        List<com.google.api.services.drive.model.File> files = children.getFiles();
-//        Collections.reverse(files);
-//        for (com.google.api.services.drive.model.File f : files) {
-//        	boolean isFolder = f.getMimeType().equals("application/vnd.google-apps.folder");
-//            if (isFolder) {
-//            	Region folderInto = downloads.ensureSubregion(f.getName());
-//				downloadFolder(index, folderInto, ind+ "  ", new Item(f.getId(), f.getName()));
-//            } else {
-//            	Place name = downloads.place(f.getName() + ".txt");
-//            	Status record = index.record(f.getId(), name);
-//            	if (debug)
-//            		System.out.printf("%s%s %s%s (%s)\n", ind, record.flag(), isFolder?"+ ":"", f.getName(), f.getId());
-//            	if (record != Status.EXCLUDED)
-//            		service.files().export(f.getId(), "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(name));
-//            }
-//        }
 	}
 }

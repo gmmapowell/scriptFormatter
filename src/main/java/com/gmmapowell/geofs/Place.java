@@ -44,7 +44,12 @@ public interface Place {
 	// It seems to me that subclasses may be an option - not sure
 	boolean exists();
 	
-	// TODO: copyMeTo();
+	/** Copy the contents of this place to another place
+	 * 
+	 * @param to the place to copy to
+	 */
+	void copyTo(Place to);
+	
 	// TODO: deleteMe();
 	
 }

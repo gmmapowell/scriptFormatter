@@ -3,6 +3,7 @@ package test.geofs.gdw;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -11,11 +12,13 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.gdw.GDWPlace;
 import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
+import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.PlaceListener;
@@ -107,4 +110,13 @@ public class GDWTest {
 
 		world.root().subregion("testregions").regions(lsnr);
 	}	
+	
+	@Test
+	public void weCanDownloadADriveFile() throws Exception {
+		File tf = File.createTempFile("download", ",txt");
+		LFSPlace local = new LFSPlace(null, tf);
+		world.root().place("hw").copyTo(local);
+		assertEquals("\uFEFFhello, world!", FileUtils.readFile(tf));
+		tf.delete();
+	}
 }
