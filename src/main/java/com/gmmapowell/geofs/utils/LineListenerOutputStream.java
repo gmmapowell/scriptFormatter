@@ -42,12 +42,12 @@ public class LineListenerOutputStream extends Writer {
 		Segment sg = new Segment(cbuf, off, len);
 		int from = 0;
 		for (int i=0;i<sg.length();i++) {
-//			System.out.println("char " + i + " of " + sg + " => " + sg.charAt(i));
+//			System.out.println("char " + i + " of " + sg + " => " + Character.codePointAt(sg, i));
 			if (sg.charAt(i) == '\n') {
 				int to = i;
 				if (to > 0 && sg.charAt(to-1) == '\r')
 					to--;
-//				System.out.println("have " + sg.subSequence(from, to));
+//				System.out.println("have |" + sg.subSequence(from, to) + "|");
 				if (buffer.length() > 0) {
 					buffer.append(sg.subSequence(from, to));
 					line(buffer.toString());

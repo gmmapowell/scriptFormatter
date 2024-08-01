@@ -107,7 +107,6 @@ public class BasicLFS {
 	public void tildeIsUserHome() throws IOException {
 		LocalFileSystem lfs = new LocalFileSystem(null);
 		String userDir = System.getProperty("user.home");
-		System.out.println(userDir);
 		Region r = lfs.root("~");
 		assertEquals(userDir, GeoFSUtils.file(r).getPath());
 	}

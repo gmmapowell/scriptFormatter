@@ -18,7 +18,7 @@ public class GDWTest {
 	public void testWeCanStreamADriveFile() throws Exception {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).line("hello, world!");
+			oneOf(lsnr).line("\uFEFFhello, world!");
 			oneOf(lsnr).complete();
 		}});
 

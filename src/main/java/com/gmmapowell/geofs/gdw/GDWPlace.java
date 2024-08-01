@@ -1,6 +1,7 @@
 package com.gmmapowell.geofs.gdw;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Writer;
 
 import org.zinutils.exceptions.NotImplementedException;
@@ -34,7 +35,9 @@ public class GDWPlace implements Place {
 	@Override
 	public void lines(LineListener lsnr) {
 		try {
-			service.files().export(id, "text/plain").executeMediaAndDownloadTo(LineListenerOutputStream.oslsnr(lsnr));
+			OutputStream os = LineListenerOutputStream.oslsnr(lsnr);
+			service.files().export(id, "text/plain").executeMediaAndDownloadTo(os);
+			os.close();
 		} catch (IOException ex) {
 			throw new GeoFSException(ex);
 		}
