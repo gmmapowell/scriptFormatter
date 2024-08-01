@@ -8,7 +8,7 @@ import com.google.api.services.drive.model.File;
 public class GDWRootRegion extends GDWRegion {
 
 	public GDWRootRegion(Drive service) throws IOException {
-		super(service, findRootId(service));
+		super(service, findRootId(service), null, null);
 	}
 
 	private static String findRootId(Drive service) throws IOException {

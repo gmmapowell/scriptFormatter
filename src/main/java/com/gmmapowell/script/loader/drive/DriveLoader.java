@@ -81,30 +81,6 @@ public class DriveLoader implements Loader {
 	}
 	 */
 
-	/*
-	// TODO: I think both of these are replaced by "region"
-	private Item findTopFolder(String f) throws IOException, ConfigException {
-		if (debug) {
-			System.out.println("Loading root folder " + f);
-		}
-		FileList result = service.files().list().setQ("name='" + f + "'").execute();
-        if (result.getFiles().size() != 1)
-        	throw new ConfigException("Could not find root folder: " + f);
-        String id = result.getFiles().get(0).getId();
-		return new Item(id, f);
-	}
-
-	private Item findNestedFolder(Item item, String name) throws IOException, ConfigException {
-		if (debug) {
-			System.out.println("Loading nested folder " + name + " in " + item.id);
-		}
-		FileList children = service.files().list().setQ("'" + item.id + "' in parents and name='" + name + "'").execute();
-        if (children.getFiles().size() != 1)
-        	throw new ConfigException("Could not find nested folder: " + name);
-		return new Item(children.getFiles().get(0).getId(), name);
-	}
-	*/
-
 	private void downloadFolder(Index index, Region downloads, String ind, Region dlFrom) {
 		// TODO: downloads.list()
 		// FileList children = service.files().list().setQ("'" + item.id + "' in parents").setFields("files(id, name, mimeType)").execute();

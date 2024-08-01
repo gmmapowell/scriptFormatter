@@ -1,5 +1,7 @@
 package com.gmmapowell.geofs.gdw;
 
+import java.io.IOException;
+
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
@@ -13,15 +15,26 @@ import com.google.api.services.drive.model.FileList;
 public class GDWRegion implements Region {
 	protected final Drive service;
 	protected final String regionId;
+	private final String name;
+	private final Region parent;
 
-	public GDWRegion(Drive service, String regionId) {
+	public GDWRegion(Drive service, String regionId, String name, Region parent) {
 		this.service = service;
 		this.regionId = regionId;
+		this.name = name;
+		this.parent = parent;
 	}
 
 	@Override
 	public Region subregion(String name) {
-		throw new NotImplementedException();
+		try {
+			FileList children = service.files().list().setQ("'" + regionId + "' in parents and name='" + name + "'").execute();
+	        if (children.getFiles().size() != 1)
+	        	throw new GeoFSException("could not find region: " + name);
+			return new GDWRegion(service, children.getFiles().get(0).getId(), name, this);
+		} catch (IOException ex) {
+			throw new GeoFSException(ex);
+		}
 	}
 
 	@Override
@@ -39,7 +52,7 @@ public class GDWRegion implements Region {
 
 	@Override
 	public String name() {
-		throw new NotImplementedException();
+		return name;
 	}
 
 	@Override
@@ -69,6 +82,6 @@ public class GDWRegion implements Region {
 
 	@Override
 	public Region parent() {
-		throw new NotImplementedException();
+		return parent;
 	}
 }
