@@ -39,11 +39,13 @@ public class Index implements FilesToProcess {
 		String id;
 		String label;
 		Status stat;
+		boolean alreadyDownloaded;
 		
-		public Known(String id, String label, Status stat) {
+		public Known(String id, String label, Status stat, boolean alreadyDownloaded) {
 			this.id = id;
 			this.label = label;
 			this.stat = stat;
+			this.alreadyDownloaded = alreadyDownloaded;
 		}
 	}
 
@@ -51,6 +53,7 @@ public class Index implements FilesToProcess {
 	private final Region downloads;
 	private Writer appendTo;
 	private boolean writtenExcluded;
+	private boolean alreadyDownloaded;
 
 	public static Index read(Place indexFile, Region downloads) throws IOException {
 		Index index = new Index(downloads);
@@ -74,8 +77,13 @@ public class Index implements FilesToProcess {
 				writtenExcluded = true;
 				return;
 			}
+			if (s.equals("--downloaded--")) {
+				alreadyDownloaded = true;
+				return;
+			}
+
 			int idx = s.indexOf(" ");
-			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED);
+			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED, alreadyDownloaded);
 			current.put(n.id, n);
 		});
 	}
@@ -84,9 +92,9 @@ public class Index implements FilesToProcess {
 		this.appendTo = fw;
 	}
 
-	public Status record(String id, Place place) throws IOException {
+	public boolean record(String id, Place place) throws IOException {
 		if (current.containsKey(id)) {
-			return current.get(id).stat;
+			return !current.get(id).alreadyDownloaded;
 		}
 		if (!writtenExcluded) {
 			appendTo.append("--excluded--\n");
@@ -96,7 +104,7 @@ public class Index implements FilesToProcess {
 		appendTo.append(" ");
 		appendTo.append(place.name());
 		appendTo.append("\n");
-		return Status.RECORDED;
+		return !alreadyDownloaded;
 	}
 
 	@Override
