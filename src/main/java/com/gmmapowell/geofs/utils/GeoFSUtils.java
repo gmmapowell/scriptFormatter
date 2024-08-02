@@ -167,7 +167,7 @@ public class GeoFSUtils {
 		return region.subregion(f.getName());
 	}
 
-	public static JSONObject readJSON(Place metafile) throws JSONException {
-		throw new NotImplementedException();
+	public static JSONObject readJSON(Place p) throws JSONException {
+		return new JSONObject(p.read());
 	}
 }

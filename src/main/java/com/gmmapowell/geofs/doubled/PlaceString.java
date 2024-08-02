@@ -16,6 +16,11 @@ public class PlaceString extends PlaceDouble implements RegionPlace, Place {
 	}
 
 	@Override
+	public String read() {
+		return contents;
+	}
+	
+	@Override
 	protected Reader textContents() {
 		return new StringReader(contents);
 	}

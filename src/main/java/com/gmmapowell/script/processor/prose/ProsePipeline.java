@@ -34,7 +34,6 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	public void process(FilesToProcess places) throws IOException {
 		Map<String, Flow> flows = new TreeMap<>();
 		for (Place x : places.included()) {
-			System.out.println("have place " + x);
 			T st = begin(flows, x.name());
 			x.lines((n, s) -> {
 				try {

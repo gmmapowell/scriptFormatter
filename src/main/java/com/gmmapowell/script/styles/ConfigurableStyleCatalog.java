@@ -37,6 +37,7 @@ import com.gmmapowell.script.styles.simple.CompoundStyle;
 import com.gmmapowell.script.styles.simple.SimpleStyle;
 
 public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalog {
+	private final boolean debug;
 	private final Map<String, Style> catalog = new TreeMap<>();
 	private final Style defaultStyle;
 	private final Set<String> missed = new TreeSet<>();
@@ -46,6 +47,7 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 	private final File currdir;
 
 	public ConfigurableStyleCatalog(Place place, boolean debug) throws IOException, ConfigException {
+		this.debug = debug;
 		currdir = new File(System.getProperty("user.dir"));
 		AtomicReference<ListMap<String, String>> curr = new AtomicReference<>();
 		place.lines((n,s) -> {
@@ -312,7 +314,8 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 				f = new File(url.getPath());
 			else
 				f = new File(currdir, e.getValue());
-			System.out.println("want font from URL " + f);
+			if (debug)
+				System.out.println("want font from URL " + f);
 			if (f == null || !f.exists()) {
 				System.err.println("there is no font for " + e.getKey() + " in file " + f);
 				continue;
