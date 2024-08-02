@@ -36,6 +36,11 @@ public class GDWPlace implements Place {
 	}
 	
 	@Override
+	public String read() {
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public void lines(LineListener lsnr) {
 		try {
 			OutputStream os = LineListenerOutputStream.oslsnr(lsnr);

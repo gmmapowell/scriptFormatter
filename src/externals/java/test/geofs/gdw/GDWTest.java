@@ -2,9 +2,11 @@ package test.geofs.gdw;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assume.assumeNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 
 import org.jmock.Expectations;
@@ -38,21 +40,29 @@ public class GDWTest {
 
 	@BeforeClass
 	public static void connectToGoogle() throws IOException, GeneralSecurityException {
-		world = new GoogleDriveWorld(uv, "ScriptFormatter", lfs.placePath("~/.ssh/google_scriptformatter_creds.json"));
+		try {
+			world = new GoogleDriveWorld(uv, "ScriptFormatter", lfs.placePath("~/.ssh/google_scriptformatter_creds.json"));
+		} catch (UnknownHostException ex) {
+			world = null;
+		}
 	}
 
 	@Test
 	public void theRootHasNoName() throws Exception {
+		assumeNotNull(world);
+
 		assertNull(world.root().name());
 	}
 	
 	@Test
 	public void theRootHasNoParent() throws Exception {
+		assumeNotNull(world);
 		assertNull(world.root().parent());
 	}
 	
 	@Test
 	public void testWeCanStreamADriveFile() throws Exception {
+		assumeNotNull(world);
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line("\uFEFFhello, world!");
@@ -64,6 +74,7 @@ public class GDWTest {
 
 	@Test
 	public void testWeCanFindASubregion() throws Exception {
+		assumeNotNull(world);
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).line("\uFEFFhello, world!");
@@ -75,23 +86,27 @@ public class GDWTest {
 
 	@Test
 	public void theSubregionKnowsItsName() throws Exception {
+		assumeNotNull(world);
 		assertEquals("testregions", world.root().subregion("testregions").name());
 	}
 
 	@Test
 	public void theSubregionKnowsItsParent() throws Exception {
+		assumeNotNull(world);
 		Region root = world.root();
 		assertEquals(root, root.subregion("testregions").parent());
 	}
 	
 	@Test
 	public void weCanObtainAGoogleIDFromAPlaceUsingUtils() throws Exception {
+		assumeNotNull(world);
 		GDWPlace p = new GDWPlace(null, "xx-yy-zz", null, null);
 		assertEquals("xx-yy-zz", GeoFSUtils.getGoogleID(p));
 	}	
 
 	@Test
 	public void weCanFindThePlacesInARegion() throws Exception {
+		assumeNotNull(world);
 		PlaceListener lsnr = context.mock(PlaceListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).place(with(PlaceMatcher.called("hwtest")));
@@ -103,6 +118,7 @@ public class GDWTest {
 
 	@Test
 	public void weCanFindTheRegionsInARegion() throws Exception {
+		assumeNotNull(world);
 		RegionListener lsnr = context.mock(RegionListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).region(with(RegionMatcher.called("nested")));
@@ -113,6 +129,7 @@ public class GDWTest {
 	
 	@Test
 	public void weCanDownloadADriveFile() throws Exception {
+		assumeNotNull(world);
 		File tf = File.createTempFile("download", ",txt");
 		LFSPlace local = new LFSPlace(null, tf);
 		world.root().place("hw").copyTo(local);

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,7 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
+import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.gdw.GDWPlace;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
@@ -107,6 +109,21 @@ public class GeoFSUtils {
 	}
 
 	public static Place placePath(World world, Region region, String path) {
+		BiFunction<Region, String, Place> resolve = (r,n) -> r.place(n);
+		return findPlace(world, region, path, resolve);
+	}
+	
+	public static Place newPlacePath(World world, Region region, String path) {
+		BiFunction<Region, String, Place> resolve = (r,n) -> r.newPlace(n);
+		return findPlace(world, region, path, resolve);
+	}
+
+	public static Place ensurePlacePath(World world, Region region, String path) {
+		BiFunction<Region, String, Place> resolve = (r,n) -> r.ensurePlace(n);
+		return findPlace(world, region, path, resolve);
+	}
+
+	public static Place findPlace(World world, Region region, String path, BiFunction<Region, String, Place> resolve) {
 		Matcher isUri = uriStyle.matcher(path);
 		World other = world;
 		if (isUri.matches()) {
@@ -118,20 +135,22 @@ public class GeoFSUtils {
 			other = u.getWorld(isUri.group(1));
 		}
 		File f = new File(path);
+		Region r;
 		if (f.isAbsolute()) { 
-			return findRelative(other, region, f.getParentFile(), true).place(f.getName());
+			r = findRelative(other, region, f.getParentFile(), true);
 		} else if (other != world) {
 			throw new GeoFSInvalidWorldException();
 		} else if (f.getParentFile() != null) {
-			return findRelative(world, region, f.getParentFile(), false).place(f.getName());
+			r = findRelative(world, region, f.getParentFile(), false);
 		} else {
 			if (region == null) {
 				throw new GeoFSNoRegionException(path);
 			}
-			return region.place(f.getName());
+			r = region;
 		}
+		return resolve.apply(r, f.getName());
 	}
-	
+
 	private static Region findRelative(World world, Region region, File f, boolean startAtWorld) {
 		if (f.getParentFile() != null) {
 			region = findRelative(world, region, f.getParentFile(), startAtWorld);

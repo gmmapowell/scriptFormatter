@@ -48,7 +48,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 		if (options.containsKey("toc"))
 			tocfile = root.place(options.remove("toc"));
 		if (options.containsKey("meta"))
-			metafile = root.place(options.remove("meta"));
+			metafile = root.ensurePlace(options.remove("meta"));
 		if (options.containsKey("grammar")) {
 			String grammarName = Utils.subenvs(options.remove("grammar"));
 			File file = new File(grammarName);

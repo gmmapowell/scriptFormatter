@@ -23,6 +23,7 @@ public interface Region {
 	 * @return the nested <tt>Region</tt>
 	 */
 	Region subregion(String name);
+
 	/** Find a <tt>Place</tt> within this <tt>Region</tt>.
 	 * 
 	 * @param name the name of the <tt>Place</tt>
@@ -30,6 +31,28 @@ public interface Region {
 	 */
 	Place place(String name);
 	
+	/** Create a new <tt>Place</tt> within this <tt>Region</tt>.
+	 * 
+	 * Errors will result from trying to read from this place.
+	 * 
+	 * @param name the name of the <tt>Place</tt>
+	 * @return the nested <tt>Place</tt>
+	 */
+	// TODO: this needs to take a parameter which indicates in an abstract way any configuration parameters, eg. file mode on Linux,
+	// or content type on S3
+	Place newPlace(String name);
+
+	/** Either find or create a new <tt>Place</tt> within this <tt>Region</tt>.
+	 * 
+	 * If the place does not exist, it will be an error to try and read it.
+	 * 
+	 * @param name the name of the <tt>Place</tt>
+	 * @return the nested <tt>Place</tt>
+	 */
+	// TODO: this needs to take a parameter which indicates in an abstract way any configuration parameters, eg. file mode on Linux,
+	// or content type on S3
+	Place ensurePlace(String name);
+
 	/** For compatibility with the usual mechanism of whole paths, this method allows the user to provide an entire path which resolves to
 	 * a <tt>Region</tt>.  An error will be thrown if the path cannot be found or resolves to a <tt>Place</tt> instead of a <tt>Region</tt>.
 	 */
@@ -58,8 +81,6 @@ public interface Region {
 	String name();
 
 	// TODO: directory operations
-	// TODO: "create" will need to take a parameter which indicates in an abstract way any configuration parameters, eg. file mode on Linux,
-	// or content type on S3
 
 	/** This is basically a nested directory and mkdir() wrapped up in a single operation.
 	 * But it quietly allows the directory to already exist.

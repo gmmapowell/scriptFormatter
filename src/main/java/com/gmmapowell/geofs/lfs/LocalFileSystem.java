@@ -46,4 +46,14 @@ public class LocalFileSystem implements World {
 	public Place placePath(String path) {
 		return GeoFSUtils.placePath(this, null, path);
 	}
+
+	@Override
+	public Place newPlacePath(String path) {
+		return GeoFSUtils.newPlacePath(this, null, path);
+	}
+
+	@Override
+	public Place ensurePlacePath(String path) {
+		return GeoFSUtils.ensurePlacePath(this, null, path);
+	}
 }

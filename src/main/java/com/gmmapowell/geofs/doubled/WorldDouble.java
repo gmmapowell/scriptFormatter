@@ -9,6 +9,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class WorldDouble implements World {
 	private Region defaultRoot;
@@ -47,7 +48,16 @@ public class WorldDouble implements World {
 
 	@Override
 	public Place placePath(String path) {
-		throw new NotImplementedException();
+		return GeoFSUtils.placePath(this, null, path);
 	}
-	
+
+	@Override
+	public Place newPlacePath(String path) {
+		return GeoFSUtils.newPlacePath(this, null, path);
+	}
+
+	@Override
+	public Place ensurePlacePath(String path) {
+		return GeoFSUtils.ensurePlacePath(this, null, path);
+	}
 }

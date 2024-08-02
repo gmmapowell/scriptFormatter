@@ -35,6 +35,16 @@ public interface World {
 	 */
 	Place placePath(String path);
 
+	/** For compatibility with the usual mechanism of whole paths, this method allows the user to provide an entire path which resolves to
+	 * a <tt>Place</tt>.  An error will be thrown if the path to the place exists.
+	 */
+	Place newPlacePath(String path);
+
+	/** For compatibility with the usual mechanism of whole paths, this method allows the user to provide an entire path which resolves to
+	 * a <tt>Place</tt>.  The place may or may not exist.  If it does not exist, errors will be thrown if the user attempts to read it.
+	 */
+	Place ensurePlacePath(String path);
+
 	/** In general, we can expect a World to be part of a wider universe - there may be local filesystem worlds, cloud worlds, remote server
 	 * worlds, etc.
 	 * 
@@ -43,4 +53,5 @@ public interface World {
 	 * @return the broader Universe of which this World is part
 	 */
 	Universe getUniverse();
+
 }

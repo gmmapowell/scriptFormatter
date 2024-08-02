@@ -19,11 +19,34 @@ import com.gmmapowell.geofs.listeners.NumberedLineListener;
  * you obtained it).
  */
 public interface Place {
+	/** Read the entirety of the file as a String.
+	 * 
+	 * @return the String contents of the place
+	 */
+	String read();
+	
+	/** Read the file one line at a time, providing each line in turn to a listener
+	 * 
+	 * @param lsnr a listener expecting a String line of input
+	 */
 	void lines(LineListener lsnr);
+	
+	/** Read the file one line at a time, providing each line in turn to a listener along with the line number.
+	 * 
+	 * @param lsnr a listener expecting a line number and a String line of input
+	 */
 	void lines(NumberedLineListener lsnr);
 	
+	/** Read a binary file in blocks, providing block in turn to a listener.
+	 * 
+	 * @param lsnr a listener expecting a byte block
+	 */
 	void binary(BinaryBlockListener lsnr);
 	
+	/** Read a text file in blocks, providing block in turn to a listener.
+	 * 
+	 * @param lsnr a listener expecting a char[] block
+	 */
 	void chars(CharBlockListener lsnr);
 
 	/** Open the place for writing, deleting any existing contents

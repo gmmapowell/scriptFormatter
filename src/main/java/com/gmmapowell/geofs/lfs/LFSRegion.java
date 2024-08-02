@@ -42,6 +42,21 @@ public class LFSRegion implements Region {
 	}
 
 	@Override
+	public Place newPlace(String name) {
+		File f = new File(file, name);
+		return new LFSPendingPlace(world, f);
+	}
+
+	@Override
+	public Place ensurePlace(String name) {
+		File f = new File(file, name);
+		if (f.isFile())
+			return new LFSPlace(world, f);
+		else
+			return new LFSPendingPlace(world, f);
+	}
+
+	@Override
 	public Region regionPath(String path) {
 		return GeoFSUtils.regionPath(world, this, path);
 	}

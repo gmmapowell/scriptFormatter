@@ -86,9 +86,19 @@ public class GoogleDriveWorld implements World {
 
 	@Override
 	public Place placePath(String path) {
-		throw new NotImplementedException();
+		return GeoFSUtils.placePath(this, null, path);
 	}
 	
+	@Override
+	public Place newPlacePath(String path) {
+		return GeoFSUtils.newPlacePath(this, null, path);
+	}
+
+	@Override
+	public Place ensurePlacePath(String path) {
+		return GeoFSUtils.ensurePlacePath(this, null, path);
+	}
+
 	private Drive connectToGoogleDrive() throws IOException, GeneralSecurityException {
 		Credential cred = getCredential();
         Drive service = new Drive.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), cred)
