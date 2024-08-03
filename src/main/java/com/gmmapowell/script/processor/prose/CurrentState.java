@@ -90,6 +90,9 @@ public abstract class CurrentState implements TextState {
 	public void endPara() {
 		// Hack? This is to get us back on track after footnotes, but it might be better to make that more explicit.
 		// I can see it derailing us in other situations.
+		
+		// TODO: the inline footnote should be &footnote; the actual text should be @Footnote ... @/
+		// That also provides for options such as type=page|chapter and flow=nowidow
 		if (currFlow.name.equals("footnotes") && flows.containsKey("main")) {
 			newSpan();
 			op(new ReleaseFlow("main"));
