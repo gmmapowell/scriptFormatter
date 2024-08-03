@@ -518,7 +518,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 				break;
 			}
 			default:
-				System.out.println("handle " + state.cmd + " at " + state.inputLocation());
+				System.out.println("cannot commit " + state.cmd + " at " + state.inputLocation());
 				break;
 			}
 			state.cmd = null;
