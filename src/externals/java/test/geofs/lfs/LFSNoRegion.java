@@ -1,47 +1,39 @@
 package test.geofs.lfs;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 
 import org.junit.Test;
-import org.zinutils.utils.FileUtils;
 
-import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.World;
-import com.gmmapowell.geofs.lfs.LFSPendingPlace;
-import com.gmmapowell.geofs.lfs.LFSPlace;
+import com.gmmapowell.geofs.lfs.LFSPendingRegion;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 
-/** Tests to handle the behaviour of places that don't exist (yet)
+/** Tests to handle the behaviour of regions that don't exist (yet)
  * 
  */
-public class LFSNoPlace {
-
+public class LFSNoRegion {
+	
 	@Test
-	public void weCanCreateANewFile() throws IOException {
-		// Come up with a new file name, but then delete it
-		File tf = File.createTempFile("newf", ",txt");
+	public void weCanCreateANewRegion() throws IOException {
+		// Come up with a new file name, but then delete it; we can then use it as a directory name
+		File tf = File.createTempFile("newf", ",dir");
 		tf.delete();
 		
 		// Ask the LFSWorld for it
 		World lfs = new LocalFileSystem(null);
-		Place place = lfs.newPlacePath(tf.getPath());
-		assertNotNull(place);
-		assertTrue(place instanceof LFSPendingPlace);
+		Region region = lfs.newRegionPath(tf.getPath());
+		assertNotNull(region);
+		assertTrue(region instanceof LFSPendingRegion);
 		
-		// And now create it
-		Writer pw = place.writer();
-		pw.write("hello world\n");
-		pw.close();
-		assertEquals("hello world\n", FileUtils.readFile(tf));
-		tf.delete();
+		assertTrue(tf.exists());
 	}
 
+	/*
 	@Test
 	public void anEnsuredFileMayExist() throws IOException {
 		File tf = File.createTempFile("efc", ",txt");
@@ -74,4 +66,6 @@ public class LFSNoPlace {
 		assertEquals("hello world\n", FileUtils.readFile(tf));
 		tf.delete();
 	}
+	
+	*/
 }

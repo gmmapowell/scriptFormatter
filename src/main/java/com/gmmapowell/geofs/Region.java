@@ -24,6 +24,13 @@ public interface Region {
 	 */
 	Region subregion(String name);
 
+	/** Create a nested <tt>Region</tt> within this <tt>Region</tt>.
+	 * 
+	 * @param name the name of the <tt>Region</tt>
+	 * @return the nested <tt>Region</tt>
+	 */
+	Region newSubregion(String name);
+
 	/** Find a <tt>Place</tt> within this <tt>Region</tt>.
 	 * 
 	 * @param name the name of the <tt>Place</tt>
@@ -67,6 +74,8 @@ public interface Region {
 	//			this.creds = new File(Utils.subenvs(creds));
 
 	Place placePath(String path);
+	
+	Place ensurePlacePath(String path);
 	
 	/** The parent of this region
 	 * 

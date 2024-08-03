@@ -85,6 +85,11 @@ public class GoogleDriveWorld implements World {
 	}
 
 	@Override
+	public Region newRegionPath(String path) {
+		return GeoFSUtils.newRegionPath(this, null, path);
+	}
+
+	@Override
 	public Place placePath(String path) {
 		return GeoFSUtils.placePath(this, null, path);
 	}

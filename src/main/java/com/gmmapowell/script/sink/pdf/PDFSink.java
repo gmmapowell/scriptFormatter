@@ -44,7 +44,7 @@ public class PDFSink implements Sink {
 		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
-		this.output = root.placePath(output);
+		this.output = root.ensurePlacePath(output);
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 		String stockName = null;

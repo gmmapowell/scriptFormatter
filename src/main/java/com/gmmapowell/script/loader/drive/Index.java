@@ -69,6 +69,8 @@ public class Index implements FilesToProcess {
 	}
 	
 	public void readFrom(Place indexFile) throws IOException {
+		if (!indexFile.exists())
+			return;
 		indexFile.lines(s -> {
 			s = s.trim();
 			if (s.length() == 0 || s.startsWith("#"))

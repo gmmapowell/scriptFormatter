@@ -33,7 +33,9 @@ import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Utils;
 
 public class ScriptConfig implements Config {
+	private final Universe universe;
 	private final Region root;
+	private boolean debug;
 	private Loader loader;
 	private List<Sink> sinks = new ArrayList<>();
 	private Processor processor;
@@ -42,7 +44,6 @@ public class ScriptConfig implements Config {
 	private WebEdit webedit;
 	private Place index;
 	private Region workdir;
-	private Universe universe;
 	
 	public ScriptConfig(Universe universe, Region root) {
 		this.universe = universe;
@@ -50,6 +51,7 @@ public class ScriptConfig implements Config {
 	}
 	
 	public void handleLoader(Map<String, String> vars, String loader, Place index, Region workdir, boolean debug) throws ConfigException {
+		this.debug = debug;
 		if ("google-drive".equals(loader)) {
 			String creds = vars.remove("credentials");
 			if (creds == null)
@@ -263,6 +265,12 @@ public class ScriptConfig implements Config {
 
 	@Override
 	public void generate(FilesToProcess files) throws IOException {
+		if (processor == null) {
+			if (debug) {
+				System.out.println("no processor has been defined");
+			}
+			return;
+		}
 		processor.process(files);
 	}
 

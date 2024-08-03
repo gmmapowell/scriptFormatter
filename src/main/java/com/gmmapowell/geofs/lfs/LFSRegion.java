@@ -7,13 +7,14 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class LFSRegion implements Region {
 	private final LocalFileSystem world;
-	private final File file;
+	protected final File file;
 
 	public LFSRegion(LocalFileSystem world, File file) {
 		this.world = world;
@@ -22,6 +23,15 @@ public class LFSRegion implements Region {
 		this.file = file;
 	}
 	
+	public LFSRegion(LocalFileSystem world, File file, boolean notExists) {
+		this.world = world;
+		if (!notExists)
+			throw new CantHappenException("this constructor must be called with notExists = true");
+		if (file.exists())
+			throw new CantHappenException("the region exists (may be file): " + file);
+		this.file = file;
+	}
+
 	@Override
 	public Region parent() {
 		if (file == null || file.getParentFile() == null)
@@ -33,6 +43,13 @@ public class LFSRegion implements Region {
 	public Region subregion(String name) {
 		File f = new File(file, name);
 		return new LFSRegion(world, f);
+	}
+
+	@Override
+	public Region newSubregion(String name) {
+		LFSPendingRegion ret = new LFSPendingRegion(world, new File(file, name));
+		ret.create();
+		return ret;
 	}
 
 	@Override
@@ -57,6 +74,17 @@ public class LFSRegion implements Region {
 	}
 
 	@Override
+	public Region ensureSubregion(String name) {
+		File f = new File(file, name);
+		if (f.isDirectory())
+			return new LFSRegion(world, f);
+		else if (f.isFile())
+			throw new GeoFSNoRegionException(f.getPath());
+		else
+			return new LFSPendingRegion(world, f);
+	}
+
+	@Override
 	public Region regionPath(String path) {
 		return GeoFSUtils.regionPath(world, this, path);
 	}
@@ -66,17 +94,17 @@ public class LFSRegion implements Region {
 		return GeoFSUtils.placePath(world, this, path);
 	}
 
+	@Override
+	public Place ensurePlacePath(String path) {
+		return GeoFSUtils.ensurePlacePath(world, this, path);
+	}
+
 	public File getFile() {
 		return file;
 	}
 
 	@Override
 	public String name() {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public Region ensureSubregion(String name) {
 		throw new NotImplementedException();
 	}
 

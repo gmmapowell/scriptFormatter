@@ -20,6 +20,11 @@ public class RegionDouble implements Region, RegionPlace {
 	}
 
 	@Override
+	public Region newSubregion(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public Region parent() {
 		throw new NotImplementedException();
 	}
@@ -44,6 +49,11 @@ public class RegionDouble implements Region, RegionPlace {
 
 	@Override
 	public Region regionPath(String path) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Place ensurePlacePath(String path) {
 		throw new NotImplementedException();
 	}
 

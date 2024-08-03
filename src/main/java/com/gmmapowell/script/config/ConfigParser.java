@@ -49,7 +49,7 @@ public class ConfigParser implements NumberedLineListener {
 		if (!nested) {
 			// if a new block is starting, flush (any) previous block
 			if (workdir == null)
-				workdir = root.subregion("downloads");
+				workdir = root.ensureSubregion("downloads");
 			if (!handleCreation(config, vars, debug, index, sshid, workdir, what, type, wline)) {
 				config = null;
 				return;
@@ -62,7 +62,7 @@ public class ConfigParser implements NumberedLineListener {
 				break;
 			}
 			case "index": {
-				index = root.placePath(value);
+				index = root.ensurePlace(value);
 //				index = new File(value);
 //				if (!index.isAbsolute())
 //					index = new File(root, value);

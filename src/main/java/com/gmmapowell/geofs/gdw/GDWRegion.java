@@ -40,6 +40,11 @@ public class GDWRegion implements Region {
 	}
 
 	@Override
+	public Region newSubregion(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public Place place(String name) {
 		try {
 			FileList result = service.files().list().setQ("name='" + name + "' and '" + regionId + "' in parents and mimeType != 'application/vnd.google-apps.folder'").execute();
@@ -107,6 +112,11 @@ public class GDWRegion implements Region {
 
 	@Override
 	public Place placePath(String path) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Place ensurePlacePath(String path) {
 		throw new NotImplementedException();
 	}
 

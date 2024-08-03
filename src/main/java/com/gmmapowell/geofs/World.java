@@ -29,6 +29,11 @@ public interface World {
 	 * a <tt>Region</tt>.  An error will be thrown if the path cannot be found or resolves to a <tt>Place</tt> instead of a <tt>Region</tt>.
 	 */
 	Region regionPath(String path);
+
+	/** For compatibility with the usual mechanism of whole paths, this method allows the user to provide an entire path which resolves to
+	 * a <tt>Region</tt>.  An error will be thrown if the path already exists.
+	 */
+	Region newRegionPath(String path);
 	
 	/** For compatibility with the usual mechanism of whole paths, this method allows the user to provide an entire path which resolves to
 	 * a <tt>Place</tt>.  An error will be thrown if the path cannot be found or resolves to a <tt>Region</tt> instead of a <tt>Place</tt>.

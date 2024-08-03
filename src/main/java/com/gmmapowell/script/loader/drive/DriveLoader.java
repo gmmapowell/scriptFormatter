@@ -63,7 +63,7 @@ public class DriveLoader implements Loader {
 	private void downloadFolder(Index index, Region downloads, String ind, Region dlFrom) {
 		dlFrom.places(place -> {
 			try {
-				Place local = downloads.place(place.name() + ".txt");
+				Place local = downloads.ensurePlace(place.name() + ".txt");
 				String id = GeoFSUtils.getGoogleID(place);
 				boolean download = index.record(id, local);
 				if (debug)

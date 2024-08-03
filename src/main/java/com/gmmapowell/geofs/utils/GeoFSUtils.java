@@ -30,6 +30,16 @@ import com.gmmapowell.geofs.lfs.LFSRegion;
 
 public class GeoFSUtils {
 	private static Pattern uriStyle = Pattern.compile("([a-z0-9]+)://(.*)");
+	
+	static class RegionName {
+		Region r;
+		String n;
+		
+		public RegionName(Region r, String n) {
+			this.r = r;
+			this.n = n;
+		}
+	}
 
 	public static Reader fileReader(Place p) throws FileNotFoundException {
 		if (p instanceof LFSPlace) {
@@ -71,10 +81,6 @@ public class GeoFSUtils {
 		}
 	}
 
-	public static Region ensureRegionPath(Region root, String string) {
-		throw new NotImplementedException();
-	}
-
 	public static String getGoogleID(Place local) {
 		if (local instanceof GDWPlace)
 			return ((GDWPlace)local).googleID();
@@ -83,6 +89,20 @@ public class GeoFSUtils {
 	}
 
 	public static Region regionPath(World world, Region region, String path) {
+		RegionName rn = obtainParentRegion(world, region, path);
+		return rn.r.subregion(rn.n);
+	}
+
+	public static Region newRegionPath(World world, Region region, String path) {
+		RegionName rn = obtainParentRegion(world, region, path);
+		return rn.r.newSubregion(rn.n);
+	}
+
+	public static Region ensureRegionPath(Region root, String string) {
+		throw new NotImplementedException();
+	}
+
+	private static RegionName obtainParentRegion(World world, Region region, String path) {
 		Matcher isUri = uriStyle.matcher(path);
 		World other = world;
 		if (isUri.matches()) {
@@ -94,8 +114,16 @@ public class GeoFSUtils {
 			other = u.getWorld(isUri.group(1));
 		}
 		File f = new File(path);
-		if (f.isAbsolute()) {
-			return findRelative(other, region, f, true);
+		String name = f.getName();
+		f = f.getParentFile();
+		Region r;
+		if (f == null) {
+			if (region == null) {
+				throw new GeoFSNoRegionException(path);
+			}
+			r = region;
+		} else if (f.isAbsolute()) {
+			r = findRelative(other, region, f, true);
 		} else {
 			if (other != world) {
 				throw new GeoFSInvalidWorldException();
@@ -104,8 +132,9 @@ public class GeoFSUtils {
 			if (region == null) {
 				throw new GeoFSNoRegionException(path);
 			}
-			return findRelative(world, region, f, false);
+			r = findRelative(world, region, f, false);
 		}
+		return new RegionName(r, name);
 	}
 
 	public static Place placePath(World world, Region region, String path) {
