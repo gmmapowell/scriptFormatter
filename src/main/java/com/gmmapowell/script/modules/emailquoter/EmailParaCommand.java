@@ -1,6 +1,7 @@
 package com.gmmapowell.script.modules.emailquoter;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.processor.ProcessingUtils;
@@ -24,13 +25,26 @@ public class EmailParaCommand implements LineCommand {
 	
 	@Override
 	public void execute() throws IOException {
-		state.newPara("emailquote");
-		state.newSpan();
+		AtomicBoolean inPara = new AtomicBoolean(false);
 		cfg.mailPara.quoteEmail(citation, s -> {
-			ProcessingUtils.noCommands(state, s);
-			state.newSpan();
-			state.op(new BreakingSpace());
+			if (s.trim().length() == 0) {
+				if (inPara.get()) {
+					state.endPara();
+					inPara.set(false);
+				}
+			} else {
+				if (!inPara.get()) {
+					state.newPara("emailquote");
+					state.newSpan();
+					inPara.set(true);
+				} else {
+					state.newSpan();
+					state.op(new BreakingSpace());
+				}
+				ProcessingUtils.noCommands(state, s);
+			}
 		});
-		state.endPara();
+		if (inPara.get())
+			state.endPara();
 	}
 }

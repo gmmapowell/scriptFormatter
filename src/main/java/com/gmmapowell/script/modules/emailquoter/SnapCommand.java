@@ -31,20 +31,39 @@ public class SnapCommand implements LineCommand {
 	public void execute() throws IOException {
 		AtomicBoolean inPara = new AtomicBoolean(false);
 		cfg.mailPara.showSnaps(snapFiles, s -> {
-			if (s.trim().length() == 0) {
+			if (s instanceof SnapPara) {
 				// para break
 				if (inPara.get()) {
 					state.endPara();
 					inPara.set(false);
 				}
 			} else {
-				if (!inPara.get()) {
-					state.newPara("emailquote");
-					inPara.set(true);
+				if (s instanceof SnapRef) {
+					if (inPara.get()) {
+						state.endPara();
+						inPara.set(false);
+					}
+					state.newPara("emailquote", "italic");
+					ProcessingUtils.noCommands(state, ((SnapRef)s).ref);
+					state.endPara();
+				} else if (s instanceof SnapUser) {
+					if (inPara.get()) {
+						state.endPara();
+						inPara.set(false);
+					}
+					state.newPara("emailquote", "bold");
+					ProcessingUtils.noCommands(state, ((SnapUser)s).snapper);
+					state.endPara();
+				} else {
+					if (!inPara.get()) {
+						state.newPara("emailquote");
+						inPara.set(true);
+					} else {
+						state.newSpan();
+						state.op(new BreakingSpace());
+					}
+					ProcessingUtils.noCommands(state, ((SnapText)s).text);
 				}
-				ProcessingUtils.noCommands(state, s);
-				state.newSpan();
-				state.op(new BreakingSpace());
 			}
 		});
 		state.endPara();

@@ -1,0 +1,7 @@
+1. We need to include all the final emails
+2. Snaps should have a blank line before the snapper
+4. There is a bug with pages overflowing, which we should just bypass
+  -- but we should test it
+  -- but this goes away with proper formatting
+5. It would be good to be able to make the quotes more selective
+7. We need to make the whole of SF more testable.

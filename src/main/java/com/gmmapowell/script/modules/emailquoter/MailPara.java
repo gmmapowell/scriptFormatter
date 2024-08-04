@@ -14,7 +14,7 @@ import com.gmmapowell.geofs.Region;
 
 public class MailPara {
 	private final Region root;
-	private final Map<String, List<String>> snapsInfo = new TreeMap<>();
+	private final Map<String, List<SnapLine>> snapsInfo = new TreeMap<>();
 	
 	public MailPara(Region root, Place snapsTxt) throws FileNotFoundException, IOException {
 		this.root = root;
@@ -22,21 +22,24 @@ public class MailPara {
 	}
 
 	private void parseSnaps(Place snapsTxt) throws FileNotFoundException, IOException {
-		AtomicReference<List<String>> curr = new AtomicReference<>(null);
+		AtomicReference<List<SnapLine>> curr = new AtomicReference<>(null);
 		snapsTxt.lines(s -> {
+			s = s.trim();
 			if (s.length() > 2 && s.charAt(0) == '[') {
 				String tag = s.substring(1, s.length()-1);
 				int idx = tag.indexOf(' ');
 				if (idx != -1)
 					tag = tag.substring(0, idx);
-				ArrayList<String> nl = new ArrayList<>();
+				ArrayList<SnapLine> nl = new ArrayList<>();
 				curr.set(nl);
 				snapsInfo.put(tag, nl);
 			} else {
-				if (s.length() == 1) 
-					curr.get().add(snapper(s));
+				if (s.length() == 0)
+					curr.get().add(new SnapPara());
+				else if (s.length() == 1) 
+					curr.get().add(new SnapUser(snapper(s)));
 				else
-					curr.get().add(s);
+					curr.get().add(new SnapText(s));
 			}
 		});
 	}
@@ -60,12 +63,12 @@ public class MailPara {
 		showLines(region, c.first, c.last, lsnr);
 	}
 
-	public void showSnaps(SnapList snaps, Consumer<String> lsnr) {
+	public void showSnaps(SnapList snaps, Consumer<SnapLine> lsnr) {
 		for (String k : snaps.list) {
-			List<String> text = snapsInfo.get(k);
+			List<SnapLine> text = snapsInfo.get(k);
 			if (text == null)
 				throw new RuntimeException("there is no snap entry for key " + k);
-			showSnap(lsnr, text);
+			showSnap(lsnr, k, text);
 		}
 	}
 
@@ -88,6 +91,8 @@ public class MailPara {
 
 	private void showLines(Region region, int first, int last, Consumer<String> lsnr) throws FileNotFoundException, IOException {
 		Place place = region.place("text");
+		lsnr.accept("[" + asDate(region.name()) + "]");
+		lsnr.accept("");
 		place.lines((n,l) -> {
 			if (n < first || n > last)
 				return;
@@ -95,8 +100,14 @@ public class MailPara {
 		});
 	}
 
-	private void showSnap(Consumer<String> lsnr, List<String> text) {
-		for (String s : text) {
+	private String asDate(String name) {
+		String ret = name.replace("msg-", "").substring(0, 12);
+		return ret.substring(0, 4) + "-" + ret.substring(4,6) + "-" + ret.substring(6,8) + "_" + ret.substring(8,10) + ":" + ret.substring(10,12);
+	}
+
+	private void showSnap(Consumer<SnapLine> lsnr, String ref, List<SnapLine> text) {
+		lsnr.accept(new SnapRef(ref));
+		for (SnapLine s : text) {
 			lsnr.accept(s);
 		}
 	}
