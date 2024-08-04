@@ -88,10 +88,10 @@ public class Region {
 				}
 			} else {
 				// HACK!!! // This represents a page overflow for a single para
-//				if (lastAccepted == null) {
-//					storeCurr();
-//					return new Acceptance(Acceptability.PROCESSED, token);
-//				}
+				if (lastAccepted == null) {
+					storeCurr();
+					return new Acceptance(Acceptability.PROCESSED, token);
+				}
 
 				// -- HACK!!!
 				return checkAcceptedSomething();
@@ -107,7 +107,6 @@ public class Region {
 			return new Acceptance(Acceptability.PENDING, lastAccepted);
 		}
 	}
-
 
 	protected void storeCurr() throws IOException {
 		curr.shove(meta, page, ytop);

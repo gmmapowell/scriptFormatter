@@ -101,7 +101,10 @@ public class Item {
 			page.newLineAtOffset(x+xpos + bbox.getLowerLeftX(), y + bbox.getLowerLeftY());
 			page.showText(si.text);
 		} catch (IllegalArgumentException ex) {
-			ex.printStackTrace(System.out);
+			if (ex.getMessage().startsWith("No glyph for "))
+				System.out.println(ex.getMessage());
+			else
+				ex.printStackTrace(System.out);
 		} finally {
 			page.endText();
 		}

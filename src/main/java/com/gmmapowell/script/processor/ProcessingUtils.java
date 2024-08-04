@@ -8,7 +8,6 @@ import com.gmmapowell.script.flow.SyncAfterFlow;
 // This should be unit tested
 public class ProcessingUtils {
 	public static void noCommands(TextState st, String tx) {
-		System.out.println("tx: " + tx);
 		st.newSpan();
 		try {
 			int from = 0;

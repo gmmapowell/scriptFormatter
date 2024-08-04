@@ -159,7 +159,7 @@ public class CompoundStyle implements Style {
 		Boolean bold = override.getBold();
 		Boolean pb = parent.getBold();
 		if (bold == null) {
-			return pb;
+			return pb != null ? pb : false;
 		}
 		return bold ^ pb; // XOR to toggle them
 	}
@@ -169,7 +169,7 @@ public class CompoundStyle implements Style {
 		Boolean italic = override.getItalic();
 		Boolean pi = parent.getItalic();
 		if (italic == null) {
-			return pi;
+			return pi != null ? pi : false;
 		}
 		return italic ^ pi; // XOR to toggle them
 	}
