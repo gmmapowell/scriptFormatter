@@ -31,6 +31,13 @@ public interface Region {
 	 */
 	Region newSubregion(String name);
 
+	/** Does the <tt>Place</tt> exist within this <tt>Region</tt>.
+	 * 
+	 * @param name the name of the <tt>Place</tt>
+	 * @return true if the Region contains the <tt>Place</tt>
+	 */
+	boolean hasPlace(String string);
+
 	/** Find a <tt>Place</tt> within this <tt>Region</tt>.
 	 * 
 	 * @param name the name of the <tt>Place</tt>

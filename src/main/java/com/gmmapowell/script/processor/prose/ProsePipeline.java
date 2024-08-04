@@ -26,6 +26,41 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 
 public abstract class ProsePipeline<T extends CurrentState> implements Processor, ProcessorConfig {
+	public class SBLineArgsParser implements LineArgsParser {
+		private final T state;
+		private final StringBuilder args;
+
+		public SBLineArgsParser(T state, StringBuilder args) {
+			this.state = state;
+			this.args = args;
+		}
+		
+		@Override
+		public boolean hasMore() {
+			return ProsePipeline.this.hasMore(state, args);
+		}
+		
+		@Override
+		public String readString() {
+			return ProsePipeline.this.readString(state, args);
+		}
+		
+		@Override
+		public String readArg() {
+			return ProsePipeline.this.readArg(state, args);
+		}
+
+		@Override
+		public void argsDone() {
+			assertArgsDone(state, args);
+		}
+		
+		@Override
+		public String toString() {
+			return args.toString();
+		}
+	}
+
 	public class ConfigProc {
 		private final Class<? extends LineCommand> procclz;
 		private final Object cfg;
@@ -142,8 +177,8 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 			ConfigProc cp = lineProcessors.get(cmd);
 			if (cp == null)
 				return false;
-			Constructor<? extends LineCommand> ctor = cp.procclz.getDeclaredConstructor(cp.cfg.getClass(), state.getClass(), StringBuilder.class);
-			LineCommand proc = ctor.newInstance(cp.cfg, state, args);
+			Constructor<? extends LineCommand> ctor = cp.procclz.getDeclaredConstructor(cp.cfg.getClass(), state.getClass(), LineArgsParser.class);
+			LineCommand proc = ctor.newInstance(cp.cfg, state, new SBLineArgsParser(state, args));
 			proc.execute();
 			return true;
 		} catch (Exception ex) {
@@ -199,6 +234,28 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		return ret;
 	}
 
+	protected String readArg(T state, StringBuilder args) {
+		if (args == null || args.length() == 0)
+			throw new ParsingException("cannot read from empty string at " + state.inputLocation());
+		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
+			args.delete(0, 1);
+		if (args.length() == 0)
+			throw new ParsingException("cannot read from empty string at " + state.inputLocation());
+		char c = args.charAt(0);
+		if (c == '\'' || c == '"')
+			return readString(state, args);
+		for (int i=0;i<args.length();i++) {
+			if (Character.isWhitespace(args.charAt(i))) {
+				String ret = args.substring(0, i);
+				args.delete(0, i);
+				return ret;
+			}
+		}
+		String ret = args.toString();
+		args.delete(0, args.length());
+		return ret;
+	}
+
 	protected Map<String, String> readParams(T state, StringBuilder args, String... allowedStrings) {
 		Map<String, String> ret = new TreeMap<>();
 		if (args == null)
@@ -227,7 +284,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	}
 	
 	protected void assertArgsDone(T state, StringBuilder args) {
-		if (args.toString().trim().length() > 0)
+		if (hasMore(state, args))
 			throw new RuntimeException("command had junk at end: " + args + " at " + state.inputLocation());
 	}
 }

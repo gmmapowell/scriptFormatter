@@ -53,6 +53,11 @@ public class LFSRegion implements Region {
 	}
 
 	@Override
+	public boolean hasPlace(String name) {
+		return new File(file, name).isFile();
+	}
+	
+	@Override
 	public Place place(String name) {
 		File f = new File(file, name);
 		return new LFSPlace(world, f);
@@ -105,7 +110,7 @@ public class LFSRegion implements Region {
 
 	@Override
 	public String name() {
-		throw new NotImplementedException();
+		return file.getName();
 	}
 
 	@Override
@@ -115,7 +120,11 @@ public class LFSRegion implements Region {
 
 	@Override
 	public void regions(RegionListener lsnr) {
-		throw new NotImplementedException();
+		for (File f : file.listFiles()) {
+			if (f.isDirectory()) {
+				lsnr.region(subregion(f.getName()));
+			}
+		}
 	}
 	
 	@Override

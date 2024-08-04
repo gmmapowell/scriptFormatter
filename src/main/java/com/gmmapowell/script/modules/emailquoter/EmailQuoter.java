@@ -13,9 +13,15 @@ public class EmailQuoter implements ModuleActivator {
 		Region threadRegion = root.subregion(threads);
 		String snaps = params.remove("snaps");
 		Place snapsPlace = root.place(snaps);
-		EmailConfig cfg = new EmailConfig(threadRegion, snapsPlace);
-		proc.installCommand("emailpara", EmailParaCommand.class, cfg);
-		proc.installCommand("emailthreads", EmailThreadsCommand.class, cfg);
-		proc.installCommand("snap", SnapCommand.class, cfg);
+		try {
+			EmailConfig cfg = new EmailConfig(threadRegion, snapsPlace);
+			proc.installCommand("emailpara", EmailParaCommand.class, cfg);
+			proc.installCommand("emailthreads", EmailThreadsCommand.class, cfg);
+			proc.installCommand("snap", SnapCommand.class, cfg);
+		} catch (ConfigException ex) {
+			throw ex;
+		} catch (Exception ex) {
+			throw new ConfigException("error configuring EmailQuoter: " + ex);
+		}
 	}
 }

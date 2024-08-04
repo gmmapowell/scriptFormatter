@@ -87,6 +87,13 @@ public class Region {
 					return new Acceptance(Acceptability.PROCESSED, token);
 				}
 			} else {
+				// HACK!!! // This represents a page overflow for a single para
+				if (lastAccepted == null) {
+					storeCurr();
+					return new Acceptance(Acceptability.PROCESSED, token);
+				}
+
+				// -- HACK!!!
 				return checkAcceptedSomething();
 			}
 		} else if (token.it instanceof YieldToFlow) {
@@ -108,6 +115,7 @@ public class Region {
 	}
 
 	protected boolean currFits() {
+//		System.out.println("ytop = " + ytop + " - " + curr.require() + " > " + ly);
 		return ytop - curr.require() > ly;
 	}
 

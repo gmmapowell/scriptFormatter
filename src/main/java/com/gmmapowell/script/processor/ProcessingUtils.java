@@ -7,6 +7,28 @@ import com.gmmapowell.script.flow.SyncAfterFlow;
 
 // This should be unit tested
 public class ProcessingUtils {
+	public static void noCommands(TextState st, String tx) {
+		System.out.println("tx: " + tx);
+		st.newSpan();
+		try {
+			int from = 0;
+			for (int i=0;i<tx.length();i++) {
+				if (Character.isWhitespace(tx.charAt(i))) {
+					if (from < i) {
+						st.text(tx.substring(from, i));
+						st.op(new BreakingSpace());
+					}
+					from = i+1;
+				}
+			}
+			if (from < tx.length()) {
+				st.text(tx.substring(from));
+			}
+		} finally {
+			st.endSpan();
+		}
+	}
+
 	public static void process(TextState st, String tx) {
 		st.newSpan();
 		try {

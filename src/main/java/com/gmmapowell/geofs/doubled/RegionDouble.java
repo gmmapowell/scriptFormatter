@@ -30,6 +30,11 @@ public class RegionDouble implements Region, RegionPlace {
 	}
 
 	@Override
+	public boolean hasPlace(String string) {
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public Place place(String name) {
 		RegionPlace entry = entries.get(name);
 		if (!(entry instanceof Place))

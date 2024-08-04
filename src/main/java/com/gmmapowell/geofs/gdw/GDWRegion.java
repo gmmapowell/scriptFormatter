@@ -45,6 +45,11 @@ public class GDWRegion implements Region {
 	}
 
 	@Override
+	public boolean hasPlace(String string) {
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public Place place(String name) {
 		try {
 			FileList result = service.files().list().setQ("name='" + name + "' and '" + regionId + "' in parents and mimeType != 'application/vnd.google-apps.folder'").execute();
