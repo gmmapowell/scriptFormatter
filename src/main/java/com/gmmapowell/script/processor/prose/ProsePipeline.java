@@ -1,6 +1,7 @@
 package com.gmmapowell.script.processor.prose;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -14,8 +15,8 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
-import com.gmmapowell.script.config.InlineProcessor;
 import com.gmmapowell.script.config.ModuleActivator;
+import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.VarValue;
 import com.gmmapowell.script.elements.ElementFactory;
@@ -24,11 +25,21 @@ import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 
-public abstract class ProsePipeline<T extends CurrentState> implements Processor {
+public abstract class ProsePipeline<T extends CurrentState> implements Processor, ProcessorConfig {
+	public class ConfigProc {
+		private final Class<? extends LineCommand> procclz;
+		private final Object cfg;
+
+		public ConfigProc(Class<? extends LineCommand> proc, Object cfg) {
+			this.procclz = proc;
+			this.cfg = cfg;
+		}
+	}
+
 	protected final Sink sink;
 	protected final ElementFactory ef;
 	protected final boolean debug;
-	protected final Map<String, InlineProcessor> inlineProcessors = new TreeMap<>();
+	protected final Map<String, ConfigProc> lineProcessors = new TreeMap<>();
 
 	public ProsePipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		this.ef = ef;
@@ -38,10 +49,12 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		boolean err = false;
 		if (options.containsKey("module")) {
 			Iterable<VarValue> modules = options.values("module");
-			System.out.println("modules = " + modules);
+			if (debug)
+				System.out.println("modules = " + modules);
 			for (VarValue vv : modules) {
 				String s = vv.unique();
-				System.out.println("have module " + s);
+				if (debug)
+					System.out.println("have module " + s);
 				try {
 					@SuppressWarnings("unchecked")
 					Class<? extends ModuleActivator> mclz = (Class<? extends ModuleActivator>) Class.forName(s);
@@ -49,8 +62,8 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						System.out.println(s + " was not a module activator");
 						err = true;
 					}
-					Method ctor = mclz.getDeclaredMethod("activate", VarMap.class);
-					ctor.invoke(null, options);
+					Method ctor = mclz.getDeclaredMethod("activate", ProcessorConfig.class, VarMap.class);
+					ctor.invoke(null, this, options);
 				} catch (Exception e) {
 					System.out.println("could not load module activator class " + s + ": " + e);
 					err = true;
@@ -63,6 +76,14 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 		}
 	}
 	
+	@Override
+	public void installCommand(String cmd, Class<? extends LineCommand> proc, Object cfg) throws ConfigException {
+		if (lineProcessors.containsKey(cmd)) {
+			throw new ConfigException("cannot install multiple commands for " + cmd);
+		}
+		lineProcessors.put(cmd, new ConfigProc(proc, cfg));
+	}
+
 	@Override
 	public void process(FilesToProcess places) throws IOException {
 		Map<String, Flow> flows = new TreeMap<>();
@@ -114,6 +135,22 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected void fileDone() {}
 	protected void done() throws IOException {}
 	protected void postRender() {}
+
+	
+	protected boolean handleConfiguredSingleLineCommand(T state, String cmd, StringBuilder args) {
+		try {
+			ConfigProc cp = lineProcessors.get(cmd);
+			if (cp == null)
+				return false;
+			Constructor<? extends LineCommand> ctor = cp.procclz.getDeclaredConstructor(cp.cfg.getClass(), state.getClass(), StringBuilder.class);
+			LineCommand proc = ctor.newInstance(cp.cfg, state, args);
+			proc.execute();
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return true;
+		}
+	}
 
 	private String trim(String s) {
 		StringBuilder sb = new StringBuilder(s.trim());

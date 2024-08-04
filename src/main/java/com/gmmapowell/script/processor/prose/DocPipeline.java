@@ -93,7 +93,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 		if (commonHandleLine(state, s))
 			return;
 		else if (s.startsWith("&")) {
-			handleInlineCommand(state, s);
+			handleSingleLineCommand(state, s);
 		} else {
 			handleTextLine(state, s);
 		}
@@ -119,7 +119,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 		ProcessingUtils.process(state, s);
 	}
 
-	private void handleInlineCommand(DocState state, String s) throws IOException {
+	private void handleSingleLineCommand(DocState state, String s) throws IOException {
 		int idx = s.indexOf(" ");
 		String cmd;
 		StringBuilder args;
@@ -330,12 +330,15 @@ public class DocPipeline extends AtPipeline<DocState> {
 			state.op(new LinkFromRef(toc, anchor, '§' + tx));
 			break;
 		}
-		default:
-			System.out.println("cannot handle " + s + " at " + state.inputLocation());
+		default: {
+			if (!handleConfiguredSingleLineCommand(state, cmd, args)) {
+				System.out.println("cannot handle " + s + " at " + state.inputLocation());
+			}
 			break;
 		}
+		}
 	}
-	
+
 	@Override
 	protected void commitCurrentCommand() throws IOException {
 		if (state.cmd != null) {
@@ -533,7 +536,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			}
 			state.cmd = null;
 		} else if (state.inline != null) {
-			InlineCommand inline = state.inline;
+			LineCommand inline = state.inline;
 			state.inline = null;
 			inline.execute();
 		} else if (state.inPara()) {

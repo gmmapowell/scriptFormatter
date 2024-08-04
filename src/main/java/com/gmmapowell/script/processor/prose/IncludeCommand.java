@@ -16,7 +16,7 @@ import org.zinutils.system.RunProcess;
 
 import com.gmmapowell.script.processor.TextState;
 
-public class IncludeCommand implements InlineCommand {
+public class IncludeCommand implements LineCommand {
 	public class Indents {
 		private final int min;
 		private final int max;

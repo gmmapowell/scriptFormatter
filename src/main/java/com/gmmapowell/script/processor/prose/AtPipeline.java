@@ -1,7 +1,6 @@
 package com.gmmapowell.script.processor.prose;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;

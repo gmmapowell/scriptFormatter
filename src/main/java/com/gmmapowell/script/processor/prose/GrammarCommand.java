@@ -16,7 +16,7 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 
-public class GrammarCommand implements ProductionVisitor, InlineCommand {
+public class GrammarCommand implements ProductionVisitor, LineCommand {
 	private final Production topRule;
 	private final Grammar grammar;
 	private Object block;
