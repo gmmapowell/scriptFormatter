@@ -1,6 +1,7 @@
 package com.gmmapowell.script.processor.prose;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,10 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.InlineProcessor;
+import com.gmmapowell.script.config.ModuleActivator;
+import com.gmmapowell.script.config.VarMap;
+import com.gmmapowell.script.config.VarValue;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.processor.ParsingException;
@@ -23,11 +28,39 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected final Sink sink;
 	protected final ElementFactory ef;
 	protected final boolean debug;
+	protected final Map<String, InlineProcessor> inlineProcessors = new TreeMap<>();
 
-	public ProsePipeline(Region root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+	public ProsePipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		this.ef = ef;
 		this.sink = sink;
 		this.debug = debug;
+		
+		boolean err = false;
+		if (options.containsKey("module")) {
+			Iterable<VarValue> modules = options.values("module");
+			System.out.println("modules = " + modules);
+			for (VarValue vv : modules) {
+				String s = vv.unique();
+				System.out.println("have module " + s);
+				try {
+					@SuppressWarnings("unchecked")
+					Class<? extends ModuleActivator> mclz = (Class<? extends ModuleActivator>) Class.forName(s);
+					if (!(ModuleActivator.class.isAssignableFrom(mclz))) {
+						System.out.println(s + " was not a module activator");
+						err = true;
+					}
+					Method ctor = mclz.getDeclaredMethod("activate", VarMap.class);
+					ctor.invoke(null, options);
+				} catch (Exception e) {
+					System.out.println("could not load module activator class " + s + ": " + e);
+					err = true;
+				}
+			}
+			options.delete("module");
+		}
+		if (err) {
+			throw new ConfigException("Could not activate modules");
+		}
 	}
 	
 	@Override

@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.zinutils.exceptions.UtilException;
 
@@ -50,7 +49,7 @@ public class ScriptConfig implements Config {
 		this.root = root;
 	}
 	
-	public void handleLoader(Map<String, String> vars, String loader, Place index, Region workdir, boolean debug) throws ConfigException {
+	public void handleLoader(VarMap vars, String loader, Place index, Region workdir, boolean debug) throws ConfigException {
 		this.debug = debug;
 		if ("google-drive".equals(loader)) {
 			String creds = vars.remove("credentials");
@@ -75,7 +74,7 @@ public class ScriptConfig implements Config {
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}
 
-	public void handleOutput(Map<String, String> vars, String output, boolean debug, String sshid) throws ConfigException, Exception {
+	public void handleOutput(VarMap vars, String output, boolean debug, String sshid) throws ConfigException, Exception {
 		switch (output) {
 		case "epub": {
 			String file = vars.remove("file");
@@ -197,7 +196,7 @@ public class ScriptConfig implements Config {
 		}
 	}
 
-	public void handleWebedit(Map<String, String> vars, String option, boolean debug, String sshid) throws ConfigException {
+	public void handleWebedit(VarMap vars, String option, boolean debug, String sshid) throws ConfigException {
 		String file = vars.remove("file");
 		if (file == null)
 			throw new ConfigException("webedit output file was not defined");
@@ -213,7 +212,7 @@ public class ScriptConfig implements Config {
 	
 	
 	@SuppressWarnings("unchecked")
-	public void handleProcessor(Map<String, String> vars, String proc, boolean debug) throws ConfigException {
+	public void handleProcessor(VarMap vars, String proc, boolean debug) throws ConfigException {
 		Class<? extends Processor> clz;
 		if (debug)
 			System.out.println("handling processor " + proc);
@@ -228,7 +227,7 @@ public class ScriptConfig implements Config {
 			System.out.println("have processor class " + clz);
 		Constructor<? extends Processor> ctor;
 		try {
-			ctor = clz.getConstructor(Region.class, ElementFactory.class, Sink.class, Map.class, boolean.class);
+			ctor = clz.getConstructor(Region.class, ElementFactory.class, Sink.class, VarMap.class, boolean.class);
 			if (debug)
 				System.out.println("have processor ctor " + ctor);
 		} catch (NoSuchMethodException | SecurityException e) {

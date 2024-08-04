@@ -21,6 +21,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
@@ -50,7 +51,7 @@ public class EPubSink implements Sink {
 	private final String identifier;
 	private final String author;
 
-	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
+	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
 //		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
@@ -58,22 +59,22 @@ public class EPubSink implements Sink {
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 //		String stockName = null;
-		if (!options.containsKey("bookid")) {
+		if (!vars.containsKey("bookid")) {
 			throw new ConfigException("must specify a bookid");
 		}
-		if (!options.containsKey("title")) {
+		if (!vars.containsKey("title")) {
 			throw new ConfigException("must specify a title");
 		}
-		if (!options.containsKey("identifier")) {
+		if (!vars.containsKey("identifier")) {
 			throw new ConfigException("must specify a book identifier");
 		}
-		if (!options.containsKey("author")) {
+		if (!vars.containsKey("author")) {
 			throw new ConfigException("must specify a book author");
 		}
-		bookId = options.remove("bookid");
-		title = options.remove("title");
-		identifier = options.remove("identifier");
-		author = options.remove("author");
+		bookId = vars.remove("bookid");
+		title = vars.remove("title");
+		identifier = vars.remove("identifier");
+		author = vars.remove("author");
 //		stockName = options.remove("stock");
 //		stock = styles.getStock(stockName);
 	}

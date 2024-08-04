@@ -1,8 +1,5 @@
 package com.gmmapowell.script.config;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
@@ -12,7 +9,7 @@ import com.gmmapowell.script.utils.Utils;
 
 public class ConfigParser implements NumberedLineListener {
 	private ScriptConfig config;
-	Map<String, String> vars = null;
+	VarMap vars = null;
 	boolean debug = false;
 	Place index = null;
 	Region workdir = null;
@@ -33,7 +30,9 @@ public class ConfigParser implements NumberedLineListener {
 			return;
 		if (s.length() == 0 || s.startsWith("#"))
 			return;
-		boolean nested = Character.isWhitespace(s.charAt(0));
+		int nesting = 0;
+		while (nesting < s.length() && Character.isWhitespace(s.charAt(nesting)))
+			nesting++;
 		s = s.trim();
 		if (s.length() == 0 || s.startsWith("#"))
 			return;
@@ -46,15 +45,15 @@ public class ConfigParser implements NumberedLineListener {
 		}
 		String key = s.substring(0, idx);
 		String value = s.substring(idx+1).trim();
-		if (!nested) {
+		if (nesting == 0) {
 			// if a new block is starting, flush (any) previous block
 			if (workdir == null)
 				workdir = root.ensureSubregion("downloads");
-			if (!handleCreation(config, vars, debug, index, sshid, workdir, what, type, wline)) {
+			if (!handleCreation()) {
 				config = null;
 				return;
 			}
-			vars = new TreeMap<>();
+			vars = new VarMap();
 			what = null;
 			switch (key) {
 			case "debug": {
@@ -88,44 +87,45 @@ public class ConfigParser implements NumberedLineListener {
 			}
 		} else if (what == null) {
 			System.out.println(lno + ": must have outer block to nest inside: " + s);
-		} else
-			vars.put(key, value);
+		} else {
+			vars.put(nesting, key, value);
+		}
 	}
 	
 	@Override
 	public void complete() {
 		if (workdir == null)
 			workdir = GeoFSUtils.ensureRegionPath(root, "downloads");
-		if (!handleCreation(config, vars, debug, index, sshid, workdir, what, type, wline)) {
+		if (!handleCreation()) {
 			config = null;
 		}
 	}
 	
-	private boolean handleCreation(ScriptConfig ret, Map<String, String> vars, boolean debug, Place index, String sshid, Region workdir, String what, String type, int wline) {
+	private boolean handleCreation() {
 		try {
-			if (what == null || ret == null)
+			if (what == null || config == null)
 				return true;
-			ret.setIndex(index);
-			ret.setWorkdir(workdir);
+			config.setIndex(index);
+			config.setWorkdir(workdir);
 			switch (what) {
 			case "loader": {
 				if (index == null) {
 					System.out.println(wline + ": must specify index before loader");
 					return false;
 				}
-				ret.handleLoader(vars, type, index, workdir, debug);
+				config.handleLoader(vars, type, index, workdir, debug);
 				break;
 			}
 			case "processor": {
-				ret.handleProcessor(vars, type, debug);
+				config.handleProcessor(vars, type, debug);
 				break;
 			}
 			case "output": {
-				ret.handleOutput(vars, type, debug, sshid);
+				config.handleOutput(vars, type, debug, sshid);
 				break;
 			}
 			case "webedit": {
-				ret.handleWebedit(vars, type, debug, sshid);
+				config.handleWebedit(vars, type, debug, sshid);
 				break;
 			}
 			default: {

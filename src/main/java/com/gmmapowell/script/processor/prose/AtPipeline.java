@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.processor.ProcessingUtils;
@@ -15,7 +16,7 @@ public abstract class AtPipeline<T extends AtState> extends ProsePipeline<T> {
 	protected final ScanMode scanmode;
 	protected final boolean joinspace;
 
-	public AtPipeline(Region root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+	public AtPipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 		if (options.containsKey("scanmode")) {
 			this.scanmode = ScanMode.valueOf(options.remove("scanmode").toUpperCase());

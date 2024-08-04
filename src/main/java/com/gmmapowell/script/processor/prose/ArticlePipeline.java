@@ -8,6 +8,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
@@ -20,7 +21,7 @@ import com.gmmapowell.script.sink.Sink;
 public class ArticlePipeline extends AtPipeline<ArticleState> {
 	private ArticleState state;
 
-	public ArticlePipeline(Region root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+	public ArticlePipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 	}
 

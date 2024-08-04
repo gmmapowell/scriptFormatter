@@ -8,6 +8,7 @@ import org.zinutils.system.RunProcess;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
@@ -21,7 +22,7 @@ import com.gmmapowell.script.sink.Sink;
 public class BlogPipeline extends ProsePipeline<BlogState> {
 	private BlogState state;
 
-	public BlogPipeline(Region root, ElementFactory ef, Sink sink, Map<String, String> options, boolean debug) throws ConfigException {
+	public BlogPipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 	}
 	

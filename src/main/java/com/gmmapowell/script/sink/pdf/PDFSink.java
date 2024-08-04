@@ -16,6 +16,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
@@ -38,7 +39,7 @@ public class PDFSink implements Sink {
 	private final List<Flow> flows = new ArrayList<>();
 	private final Stock stock;
 
-	public PDFSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, Map<String, String> options) throws IOException, ConfigException {
+	public PDFSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
 		if (styles == null)
 			throw new ConfigException("must specify a style catalog");
 		this.styles = styles;
@@ -48,10 +49,10 @@ public class PDFSink implements Sink {
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 		String stockName = null;
-		if (!options.containsKey("stock")) {
+		if (!vars.containsKey("stock")) {
 			throw new ConfigException("must specify a stock to render to");
 		}
-		stockName = options.remove("stock");
+		stockName = vars.remove("stock");
 		stock = styles.getStock(stockName);
 		if (stock == null)
 			throw new ConfigException("there was no stock called " + stockName + " specified in the style catalog");
