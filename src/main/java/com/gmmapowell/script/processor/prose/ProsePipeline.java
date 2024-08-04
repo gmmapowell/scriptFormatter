@@ -62,8 +62,8 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 						System.out.println(s + " was not a module activator");
 						err = true;
 					}
-					Method ctor = mclz.getDeclaredMethod("activate", ProcessorConfig.class, VarMap.class);
-					ctor.invoke(null, this, options);
+					Method ctor = mclz.getDeclaredMethod("activate", ProcessorConfig.class, Region.class, VarMap.class);
+					ctor.invoke(null, this, root, vv.map());
 				} catch (Exception e) {
 					System.out.println("could not load module activator class " + s + ": " + e);
 					err = true;

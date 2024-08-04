@@ -117,4 +117,9 @@ public class LFSRegion implements Region {
 	public void regions(RegionListener lsnr) {
 		throw new NotImplementedException();
 	}
+	
+	@Override
+	public String toString() {
+		return file.getPath();
+	}
 }
