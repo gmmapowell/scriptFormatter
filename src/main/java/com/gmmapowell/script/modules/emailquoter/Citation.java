@@ -16,6 +16,18 @@ public class Citation {
 		return c;
 	}
 	
+	public String getFile() {
+		return file;
+	}
+
+	public int getFirst() {
+		return first;
+	}
+
+	public int getLast() {
+		return last;
+	}
+
 	@Override
 	public String toString() {
 		return file + ":" + first + (last > first ? "-" + last : "");

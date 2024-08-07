@@ -122,13 +122,12 @@ public class DocPipeline extends AtPipeline<DocState> {
 	private void handleSingleLineCommand(DocState state, String s) throws IOException {
 		int idx = s.indexOf(" ");
 		String cmd;
-		StringBuilder args;
+		LineArgsParser p = null;
 		if (idx == -1) {
 			cmd = s.substring(1);
-			args = null;
 		} else {
 			cmd = s.substring(1, idx);
-			args = new StringBuilder(s.substring(idx+1));
+			p = new SBLineArgsParser<DocState>(state, s.substring(idx+1));
 		}
 		switch (cmd) {
 		case "tt": {
@@ -137,7 +136,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (!state.inSpan())
 				state.newSpan();
 			state.nestSpan("preformatted");
-			state.text(args.toString());
+			state.text(p.asString());
 			state.popSpan();
 			break;
 		}
@@ -148,13 +147,13 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (!state.inSpan())
 				state.newSpan();
 			state.nestSpan(cmd);
-			ProcessingUtils.processPart(state, args.toString(), 0, args.length());
+			ProcessingUtils.processPart(state, p.asString(), 0, p.asString().length());
 			state.popSpan();
 			break;
 		}
 		case "link": {
-			String lk = readString(state, args);
-			String tx = readString(state, args);
+			String lk = p.readString();
+			String tx = p.readString();
 			if (!state.inSpan())
 				state.newSpan();
 			state.nestSpan("tt");
@@ -170,7 +169,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			} else {
 				state.newPara("text");
 			}
-			ProcessingUtils.process(state, args.toString().trim());
+			ProcessingUtils.process(state, p.asString().trim());
 			break;
 		}
 		case "footnote": {
@@ -184,8 +183,8 @@ public class DocPipeline extends AtPipeline<DocState> {
 		}
 		case "include": {
 			commitCurrentCommand();
-			String file = readString(state, args);
-			Map<String, String> params = readParams(state, args, "formatter");
+			String file = p.readString();
+			Map<String, String> params = p.readParams("formatter");
 //				System.out.println("want to include " + file + " with " + params);
 			File f = null;
 			for (File r : samples) {
@@ -219,7 +218,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
 				throw new RuntimeException("&remove must immediately follow &include");
 			}
-			Map<String, String> params = readParams(state, args, "from", "what");
+			Map<String, String> params = p.readParams("from", "what");
 //				System.out.println("want to remove from " + state.inline + " with " + params);
 			((IncludeCommand)state.inline).butRemove(params.get("from"), params.get("what"));
 			break;
@@ -228,7 +227,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
 				throw new RuntimeException("&select must immediately follow &include");
 			}
-			Map<String, String> params = readParams(state, args, "from", "what", "exdent");
+			Map<String, String> params = p.readParams("from", "what", "exdent");
 			((IncludeCommand)state.inline).selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
 			break;
 		}
@@ -236,7 +235,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
 				throw new RuntimeException("&stop must immediately follow &include");
 			}
-			Map<String, String> params = readParams(state, args, "at", "elide");
+			Map<String, String> params = p.readParams("at", "elide");
 			((IncludeCommand)state.inline).stopAt(params.get("at"), params.get("elide"));
 			break;
 		}
@@ -244,13 +243,13 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
 				throw new RuntimeException("&indents must immediately follow &include");
 			}
-			Map<String, String> params = readParams(state, args, "from", "to");
+			Map<String, String> params = p.readParams("from", "to");
 			((IncludeCommand)state.inline).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
 			break;
 		}
 		case "grammar": {
 			commitCurrentCommand();
-			Map<String, String> params = readParams(state, args, "rule");
+			Map<String, String> params = p.readParams("rule");
 			String ruleName = params.get("rule");
 			if (ruleName == null) {
 				state.inline = new GrammarCommand(grammar, state);
@@ -270,26 +269,26 @@ public class DocPipeline extends AtPipeline<DocState> {
 			if (state.inline == null || !(state.inline instanceof GrammarCommand)) {
 				throw new RuntimeException("&removeOption must immediately follow &grammar");
 			}
-			Map<String, String> params = readParams(state, args, "prod");
+			Map<String, String> params = p.readParams("prod");
 //				System.out.println("want to remove from " + state.inline + " with " + params);
 			((GrammarCommand)state.inline).removeProd(params.get("prod"));
 			break;
 		}
 		case "review":
-			if (args == null)
+			if (p == null)
 				throw new RuntimeException("&review command needs something to review");
-			System.out.println("review in " + state.inputLocation() + ": " + readString(state, args));
-			assertArgsDone(state, args);
+			System.out.println("review in " + state.inputLocation() + ": " + p.readString());
+			p.argsDone();
 			break;
 		case "future":
-			if (args == null)
+			if (p == null)
 				throw new RuntimeException("&future command needs a comment");
-			System.out.println(state.inputLocation() + ": in the future, " + readString(state, args));
+			System.out.println(state.inputLocation() + ": in the future, " + p.readString());
 			break;
 		case "morework":
-			if (args == null)
+			if (p == null)
 				throw new RuntimeException("&morework command needs a description");
-			System.out.println("more work is required at " + state.inputLocation() + ": " + readString(state, args));
+			System.out.println("more work is required at " + state.inputLocation() + ": " + p.readString());
 			break;
 		case "outrageousclaim":
 			System.out.println("There is an outrageous claim at " + state.inputLocation());
@@ -301,17 +300,17 @@ public class DocPipeline extends AtPipeline<DocState> {
 			state.newSpan("bullet-sign");
 			state.text(state.currentNumber());
 			state.endSpan();
-			ProcessingUtils.process(state, args.toString().trim());
+			ProcessingUtils.process(state, p.asString().trim());
 			break;
 		}
 		case "ref": {
 			// TODO: formatting should be customizable
-			if (args == null)
+			if (p == null)
 				throw new RuntimeException("&ref command needs a reference");
 			if (!state.inSpan())
 				state.newSpan();
 			String tx = "unref";
-			String anchor = readString(state, args);
+			String anchor = p.readString();
 			if (currentMeta != null) {
 				try {
 					JSONObject anchors = currentMeta.getJSONObject("anchors");
@@ -331,7 +330,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 			break;
 		}
 		default: {
-			if (!handleConfiguredSingleLineCommand(state, cmd, args)) {
+			if (!handleConfiguredSingleLineCommand(state, cmd, p)) {
 				System.out.println("cannot handle " + s + " at " + state.inputLocation());
 			}
 			break;

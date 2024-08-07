@@ -22,7 +22,7 @@ public class EmailAt implements Comparable<EmailAt>{
 
 	public void text(LineListener lsnr) {
 		if (!mr.hasPlace("text")) {
-			System.out.println("only html");
+			System.out.println("only html: " + mr);
 			lsnr.line("only html");
 			lsnr.complete();
 		} else {

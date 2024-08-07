@@ -60,26 +60,25 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 			if (s.startsWith("&")) {
 				int idx = s.indexOf(" ");
 				String cmd;
-				StringBuilder args;
+				LineArgsParser p = null;
 				if (idx == -1) {
 					cmd = s.substring(1);
-					args = null;
 				} else {
 					cmd = s.substring(1, idx);
-					args = new StringBuilder(s.substring(idx+1));
+					p = new SBLineArgsParser<BlogState>(state, s.substring(idx+1));
 				}
 				switch (cmd) {
 				case "bold":
 				case "italic":
 				case "tt": {
 					state.newPara("text", cmd);
-					ProcessingUtils.process(state, args.toString());
+					ProcessingUtils.process(state, p.asString());
 					break;
 				}
 				case "link": {
 					try {
-						String lk = readString(state, args);
-						String tx = readString(state, args);
+						String lk = p.readString();
+						String tx = p.readString();
 						
 						if (!state.inPara())
 							state.newPara("text");
@@ -95,8 +94,8 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				case "sp": {
 					if (state.inSpan())
 						state.op(new BreakingSpace());
-					if (args != null)
-						ProcessingUtils.process(state, args.toString());
+					if (p != null)
+						ProcessingUtils.process(state, p.asString());
 					break;
 				}
 				case "img": {
@@ -106,32 +105,32 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					// See: https://bloggerdev.narkive.com/SC3HJ3UM/upload-images-using-blogger-api
 					// For now, upload the image by hand and put the URL here
 					//  Obvs you can also use any absolute URL
-					String link = readString(state, args);
+					String link = p.readString();
 					state.op(new ImageOp(link));
 					break;
 				}
 				case "git": {
-					String dir = readString(state, args);
+					String dir = p.readString();
 //					System.out.println("Want to take git imports from " + dir);
 					state.gitdir(dir);
 					break;
 				}
 				case "includeTag": {
-					String tag = readString(state, args);
+					String tag = p.readString();
 //					System.out.println("Want to take git includes from tag " + tag);
 					state.gittag(tag);
 					break;
 				}
 				case "import": {
 					try {
-						String branch = readString(state, args);
-						String filespec = readString(state, args);
+						String branch = p.readString();
+						String filespec = p.readString();
 						String from = null, to = null;
-						if (hasMore(state, args)) {
-							from = readString(state, args);
+						if (p.hasMore()) {
+							from = p.readString();
 						}
-						if (hasMore(state, args)) {
-							to = readString(state, args);
+						if (p.hasMore()) {
+							to = p.readString();
 						}
 						gitShow(state, branch, filespec, from, to);
 					} catch (Exception ex) {
@@ -141,8 +140,8 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 				}
 				case "include": {
 					commitCurrentCommand();
-					String file = readString(state, args);
-					Map<String, String> params = readParams(state, args, "formatter");
+					String file = p.readString();
+					Map<String, String> params = p.readParams("formatter");
 					File f = new File(file);
 					Formatter formatter;
 					if (!params.containsKey("formatter"))
@@ -165,7 +164,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					if (state.include == null) {
 						throw new RuntimeException("&remove must immediately follow &include");
 					}
-					Map<String, String> params = readParams(state, args, "from", "what");
+					Map<String, String> params = p.readParams("from", "what");
 //					System.out.println("want to remove from " + state.inline + " with " + params);
 					((IncludeCommand)state.include).butRemove(params.get("from"), params.get("what"));
 					break;
@@ -174,7 +173,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					if (state.include == null) {
 						throw new RuntimeException("&select must immediately follow &include");
 					}
-					Map<String, String> params = readParams(state, args, "from", "what", "exdent");
+					Map<String, String> params = p.readParams("from", "what", "exdent");
 					((IncludeCommand)state.include).selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
 					break;
 				}
@@ -182,7 +181,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					if (state.include == null) {
 						throw new RuntimeException("&stop must immediately follow &include");
 					}
-					Map<String, String> params = readParams(state, args, "at", "elide");
+					Map<String, String> params = p.readParams("at", "elide");
 					((IncludeCommand)state.include).stopAt(params.get("at"), params.get("elide"));
 					break;
 				}
@@ -190,7 +189,7 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 					if (state.include == null) {
 						throw new RuntimeException("&indents must immediately follow &include");
 					}
-					Map<String, String> params = readParams(state, args, "from", "to");
+					Map<String, String> params = p.readParams("from", "to");
 					((IncludeCommand)state.include).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
 					break;
 				}
