@@ -34,7 +34,7 @@ public class EmailParaCommand implements LineCommand {
 					if (idx != -1)
 						s = s.substring(idx);
 					else
-						System.out.println("Could not find text '" + citation.getFromPhrase() + "' at line " + n);
+						System.out.println("Could not find text '" + citation.getFromPhrase() + "' at line " + n + " of " + citation.file);
 				}
 			}
 			if (n == citation.last) {
@@ -43,7 +43,7 @@ public class EmailParaCommand implements LineCommand {
 					if (idx != -1)
 						s = s.substring(0, idx + citation.getToPhrase().length());
 					else
-						System.out.println("Could not find text '" + citation.getToPhrase() + "' at line " + n);
+						System.out.println("Could not find text '" + citation.getToPhrase() + "' at line " + n + " of " + citation.file);
 				}
 			}
 			if (s.length() == 0) {
