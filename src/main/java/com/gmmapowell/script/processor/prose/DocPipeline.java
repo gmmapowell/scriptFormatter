@@ -125,6 +125,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 		LineArgsParser p = null;
 		if (idx == -1) {
 			cmd = s.substring(1);
+			p = new SBLineArgsParser<DocState>(state, "");
 		} else {
 			cmd = s.substring(1, idx);
 			p = new SBLineArgsParser<DocState>(state, s.substring(idx+1));

@@ -26,8 +26,27 @@ public class EmailParaCommand implements LineCommand {
 	@Override
 	public void execute() throws IOException {
 		AtomicBoolean inPara = new AtomicBoolean(false);
-		cfg.mailPara.quoteEmail(citation, s -> {
-			if (s.trim().length() == 0) {
+		cfg.mailPara.quoteEmail(citation, (n, s) -> {
+			s = s.trim();
+			if (n == citation.first) {
+				if (citation.getFromPhrase() != null) {
+					int idx = s.indexOf(citation.getFromPhrase());
+					if (idx != -1)
+						s = s.substring(idx);
+					else
+						System.out.println("Could not find text '" + citation.getFromPhrase() + "' at line " + n);
+				}
+			}
+			if (n == citation.last) {
+				if (citation.getToPhrase() != null) {
+					int idx = s.lastIndexOf(citation.getToPhrase());
+					if (idx != -1)
+						s = s.substring(0, idx + citation.getToPhrase().length());
+					else
+						System.out.println("Could not find text '" + citation.getToPhrase() + "' at line " + n);
+				}
+			}
+			if (s.length() == 0) {
 				if (inPara.get()) {
 					state.endPara();
 					inPara.set(false);

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.gmmapowell.geofs.Place;
@@ -55,7 +56,7 @@ public class MailPara {
 		}
 	}
 	
-	public void quoteEmail(Citation c, Consumer<String> lsnr) throws IOException {
+	public void quoteEmail(Citation c, BiConsumer<Integer, String> lsnr) throws IOException {
 		Region region = findTextFileFor(root, c.file);
 		if (region == null) 
 			throw new RuntimeException("did not find message " + c.file);
@@ -89,14 +90,14 @@ public class MailPara {
 		return found.get();
 	}
 
-	private void showLines(Region region, int first, int last, Consumer<String> lsnr) throws FileNotFoundException, IOException {
+	private void showLines(Region region, int first, int last, BiConsumer<Integer, String> lsnr) throws FileNotFoundException, IOException {
 		Place place = region.place("text");
-		lsnr.accept("[" + asDate(region.name()) + "]");
-		lsnr.accept("");
+		lsnr.accept(-1, "[" + asDate(region.name()) + "]");
+		lsnr.accept(-1, "");
 		place.lines((n,l) -> {
 			if (n < first || n > last)
 				return;
-			lsnr.accept(l);
+			lsnr.accept(n, l);
 		});
 	}
 
