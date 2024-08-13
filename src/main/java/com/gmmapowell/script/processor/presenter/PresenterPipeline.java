@@ -12,9 +12,9 @@ import org.flasck.flas.errors.ErrorResult;
 import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.geofs.Place;
-import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
+import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.kNodes.Galaxy;
 import com.gmmapowell.script.presenter.nodes.Presentation;
 import com.gmmapowell.script.presenter.nodes.Slide;

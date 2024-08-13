@@ -7,8 +7,8 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
-import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Loader;
 
 public class DriveLoader implements Loader {

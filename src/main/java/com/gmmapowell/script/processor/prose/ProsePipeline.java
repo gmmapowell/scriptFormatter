@@ -11,7 +11,6 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ModuleActivator;
 import com.gmmapowell.script.config.ProcessorConfig;
@@ -19,6 +18,7 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.VarValue;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;

@@ -1,5 +1,6 @@
 package com.gmmapowell.script.flow;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
@@ -9,6 +10,7 @@ import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.zinutils.exceptions.NotImplementedException;
 
 public class LinkFromTOC implements SpanItem {
 	public final String text;
@@ -48,5 +50,10 @@ public class LinkFromTOC implements SpanItem {
 	@Override
 	public String toString() {
 		return "LinkFromTOC[" + text + ":" + comment + "]";
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		throw new NotImplementedException();
 	}
 }

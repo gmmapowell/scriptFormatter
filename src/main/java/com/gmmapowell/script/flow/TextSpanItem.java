@@ -1,5 +1,6 @@
 package com.gmmapowell.script.flow;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
@@ -21,6 +22,12 @@ public class TextSpanItem implements SpanItem {
 		} catch (IllegalArgumentException ex) {
 		}
 		return new BoundingBox(0, 0, width, sz);
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		os.writeShort(FlowStandard.TEXT);
+		os.writeUTF(text);
 	}
 
 	@Override

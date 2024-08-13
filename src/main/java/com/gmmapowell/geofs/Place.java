@@ -1,5 +1,7 @@
 package com.gmmapowell.geofs;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
@@ -49,7 +51,19 @@ public interface Place {
 	 */
 	void chars(CharBlockListener lsnr);
 
-	/** Open the place for writing, deleting any existing contents
+	/** For compatibility, offer an input stream from the place
+	 * 
+	 * @return an InputStream of the contents of this place
+	 */
+	InputStream input();
+
+	/** Open the place for writing binary data, deleting any existing contents
+	 * 
+	 * @return an OutputStream to write to the file
+	 */
+	OutputStream stream();
+
+	/** Open the place for writing text, deleting any existing contents
 	 * 
 	 * @return a Writer to write to the file
 	 */

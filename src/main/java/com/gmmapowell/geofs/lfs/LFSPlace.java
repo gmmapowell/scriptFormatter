@@ -1,10 +1,14 @@
 package com.gmmapowell.geofs.lfs;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
+import java.io.OutputStream;
 import java.io.Writer;
 
 import org.zinutils.exceptions.CantHappenException;
@@ -85,6 +89,27 @@ public class LFSPlace implements Place {
 				nlsnr.complete();
 		} catch (IOException ex) {
 			throw new FileStreamingException(ex);
+		}
+	}
+
+	@Override
+	public InputStream input() {
+		try {
+			return new FileInputStream(file);
+		} catch (Exception ex) {
+			throw new GeoFSException(ex);
+		}
+	}
+
+	@Override
+	public OutputStream stream() {
+		if (!file.exists()) {
+			createFile();
+		}
+		try {
+			return new FileOutputStream(file);
+		} catch (Exception ex) {
+			throw new GeoFSException(ex);
 		}
 	}
 

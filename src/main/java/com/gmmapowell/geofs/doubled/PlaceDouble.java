@@ -3,6 +3,7 @@ package com.gmmapowell.geofs.doubled;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
@@ -79,6 +80,16 @@ public abstract class PlaceDouble implements Place {
 
 	@Override
 	public void chars(CharBlockListener lsnr) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public InputStream input() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public OutputStream stream() {
 		throw new NotImplementedException();
 	}
 

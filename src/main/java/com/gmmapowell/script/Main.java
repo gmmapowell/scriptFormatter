@@ -10,6 +10,7 @@ import com.gmmapowell.geofs.simple.SimpleUniverse;
 import com.gmmapowell.script.config.Config;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ReadConfig;
+import com.gmmapowell.script.intf.FilesToProcess;
 
 public class Main {
 	public static void main(String[] args) {

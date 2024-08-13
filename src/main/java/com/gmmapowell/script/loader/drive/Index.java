@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.script.FilesToProcess;
+import com.gmmapowell.script.intf.FilesToProcess;
 
 public class Index implements FilesToProcess {
 	public enum Status {

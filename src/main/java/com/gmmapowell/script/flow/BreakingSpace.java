@@ -1,5 +1,6 @@
 package com.gmmapowell.script.flow;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
@@ -12,6 +13,11 @@ public class BreakingSpace implements SpanItem {
 		if (font != null)
 			width = font.getStringWidth(" ")*sz/1000;
 		return new BoundingBox(0, 0, width, sz);
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		os.writeShort(FlowStandard.BREAKING_SPACE);
 	}
 
 	@Override

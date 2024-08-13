@@ -1,10 +1,12 @@
 package com.gmmapowell.script.flow;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.processor.prose.TableOfContents;
 
@@ -36,5 +38,10 @@ public class LinkFromRef implements SpanItem {
 	@Override
 	public String toString() {
 		return "LinkFromRef[" + anchor + ":" + text + "]";
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		throw new NotImplementedException();
 	}
 }

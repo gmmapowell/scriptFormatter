@@ -3,7 +3,7 @@ package com.gmmapowell.script.config;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import com.gmmapowell.script.FilesToProcess;
+import com.gmmapowell.script.intf.FilesToProcess;
 
 public interface Config {
 	FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException;

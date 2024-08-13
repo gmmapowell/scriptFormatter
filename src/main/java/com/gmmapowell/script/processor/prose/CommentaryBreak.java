@@ -1,9 +1,11 @@
 package com.gmmapowell.script.processor.prose;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.SpanItem;
@@ -75,5 +77,10 @@ public class CommentaryBreak implements Break, SpanItem {
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
 		return new BoundingBox(0, 0, 200, 60);
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		throw new NotImplementedException();
 	}
 }

@@ -1,6 +1,7 @@
 package com.gmmapowell.geofs.gdw;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 
@@ -49,6 +50,16 @@ public class GDWPlace implements Place {
 		} catch (IOException ex) {
 			throw new GeoFSException(ex);
 		}
+	}
+
+	@Override
+	public InputStream input() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public OutputStream stream() {
+		throw new NotImplementedException();
 	}
 
 	@Override

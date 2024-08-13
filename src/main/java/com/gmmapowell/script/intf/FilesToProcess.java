@@ -1,4 +1,4 @@
-package com.gmmapowell.script;
+package com.gmmapowell.script.intf;
 
 import com.gmmapowell.geofs.Place;
 

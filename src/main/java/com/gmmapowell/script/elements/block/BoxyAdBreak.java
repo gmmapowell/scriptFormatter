@@ -1,9 +1,11 @@
 package com.gmmapowell.script.elements.block;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.SpanItem;
@@ -70,5 +72,10 @@ public class BoxyAdBreak implements Break, SpanItem {
 	@Override
 	public float total() {
 		return 0;
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		throw new NotImplementedException();
 	}
 }

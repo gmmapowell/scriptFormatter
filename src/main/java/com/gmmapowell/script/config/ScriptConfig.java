@@ -13,9 +13,9 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
-import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
+import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.DriveLoader;
 import com.gmmapowell.script.loader.drive.Index;
@@ -23,6 +23,7 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.blogger.BloggerSink;
+import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 import com.gmmapowell.script.sink.epub.EPubSink;
 import com.gmmapowell.script.sink.html.HTMLSink;
 import com.gmmapowell.script.sink.pdf.PDFSink;
@@ -238,6 +239,9 @@ public class ScriptConfig implements Config {
 				this.sink = sinks.get(0);
 			else
 				this.sink = new MultiSink(sinks);
+			// TODO: should be configured
+			// TODO: we also want to change the responsibilities here, so this will be very different later
+			this.sink = new CaptureSinkInFile(root, sink);
 			processor = ctor.newInstance(root, elf, sink, vars, debug);
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof ConfigException)

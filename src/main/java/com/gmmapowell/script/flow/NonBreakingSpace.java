@@ -1,9 +1,11 @@
 package com.gmmapowell.script.flow;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.zinutils.exceptions.NotImplementedException;
 
 public class NonBreakingSpace implements SpanItem {
 	@Override
@@ -15,5 +17,10 @@ public class NonBreakingSpace implements SpanItem {
 	@Override
 	public String toString() {
 		return "NBSPC";
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		throw new NotImplementedException();
 	}
 }

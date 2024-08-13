@@ -8,10 +8,10 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.gmmapowell.geofs.Place;
-import com.gmmapowell.script.FilesToProcess;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 
