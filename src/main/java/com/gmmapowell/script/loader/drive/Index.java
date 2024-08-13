@@ -85,7 +85,7 @@ public class Index implements FilesToProcess {
 			}
 
 			int idx = s.indexOf(" ");
-			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED, alreadyDownloaded);
+			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED, writtenExcluded || alreadyDownloaded);
 			current.put(n.id, n);
 		});
 	}
@@ -106,7 +106,7 @@ public class Index implements FilesToProcess {
 		appendTo.append(" ");
 		appendTo.append(place.name());
 		appendTo.append("\n");
-		return !alreadyDownloaded;
+		return !alreadyDownloaded && !writtenExcluded;
 	}
 
 	@Override

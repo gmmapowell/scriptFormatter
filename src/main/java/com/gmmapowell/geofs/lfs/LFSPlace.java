@@ -114,7 +114,7 @@ public class LFSPlace implements Place {
 
 	@Override
 	public void store(String contents) {
-		throw new NotImplementedException();
+		FileUtils.writeFile(file, contents);
 	}
 	
 	@Override

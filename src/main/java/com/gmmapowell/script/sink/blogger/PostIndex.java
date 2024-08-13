@@ -1,7 +1,7 @@
 package com.gmmapowell.script.sink.blogger;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,7 +27,7 @@ public class PostIndex {
 
 	private final Map<String, String> live = new LinkedHashMap<>();
 	private final Map<String, String> draft = new LinkedHashMap<>();
-	private FileWriter appendTo;
+	private Writer appendTo;
 
 	public void readFrom(Place postsFile) throws IOException {
 		postsFile.lines((n,s) -> {

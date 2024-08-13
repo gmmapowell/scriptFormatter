@@ -276,18 +276,18 @@ public class DocPipeline extends AtPipeline<DocState> {
 			break;
 		}
 		case "review":
-			if (p == null)
+			if (!p.hasMore())
 				throw new RuntimeException("&review command needs something to review");
 			System.out.println("review in " + state.inputLocation() + ": " + p.readString());
 			p.argsDone();
 			break;
 		case "future":
-			if (p == null)
+			if (!p.hasMore())
 				throw new RuntimeException("&future command needs a comment");
 			System.out.println(state.inputLocation() + ": in the future, " + p.readString());
 			break;
 		case "morework":
-			if (p == null)
+			if (!p.hasMore())
 				throw new RuntimeException("&morework command needs a description");
 			System.out.println("more work is required at " + state.inputLocation() + ": " + p.readString());
 			break;
@@ -306,7 +306,7 @@ public class DocPipeline extends AtPipeline<DocState> {
 		}
 		case "ref": {
 			// TODO: formatting should be customizable
-			if (p == null)
+			if (!p.hasMore())
 				throw new RuntimeException("&ref command needs a reference");
 			if (!state.inSpan())
 				state.newSpan();

@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,8 +66,11 @@ public class GeoFSUtils {
 			throw new NotImplementedException("file(" + from.getClass() + ")");
 	}
 
-	public static FileWriter fileAppender(Place postsFile) {
-		throw new NotImplementedException();
+	public static Writer fileAppender(Place file) {
+		if (file instanceof LFSPlace)
+			return ((LFSPlace)file).appender();
+		else
+			throw new NotImplementedException("no appender for " + file.getClass());
 	}
 
 	public static OutputStream saveStreamTo(Place dest) {

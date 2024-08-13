@@ -123,6 +123,7 @@ public class BloggerSink implements Sink {
 						case "h1":
 						case "h2":
 						case "h3":
+						case "h4":
 							break; // it happens automatically
 						default:
 							throw new CantHappenException("cannot handle BRKPara in " + last);
