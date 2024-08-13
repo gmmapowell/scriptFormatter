@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
+import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.utils.Hollerith;
 import org.zinutils.utils.HollerithFormat;
 import org.zinutils.utils.Justification;
@@ -13,8 +14,9 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.script.flow.FlowStandard;
+import com.gmmapowell.script.modules.doc.DocModule;
 
-public class DecodeDumpFile {
+public class DecodeDumpFile implements DumpDecoder {
 
 	public static void main(String[] args) throws IOException {
 		new DecodeDumpFile(args[0]).dump();
@@ -113,12 +115,22 @@ public class DecodeDumpFile {
 		if (module == 0) {
 			decodeBuiltin(si);
 		} else {
-			decodeModule();
+			decodeModule(si, module);
 		}
 	}
 
-	private void decodeModule() {
+	private void decodeModule(int si, byte module) throws IOException {
+		// TODO: it should go without saying that ultimately this needs to be configurable :-)
 		
+		switch (module) {
+		case DocModule.ID: {
+			DocModule.decode(this, dis, si);
+			break;
+		}
+		default: {
+			throw new NotImplementedException();
+		}
+		}
 	}
 
 	private void decodeBuiltin(int si) throws IOException {
@@ -154,7 +166,7 @@ public class DecodeDumpFile {
 		}
 	}
 
-	private void showText(String msg) {
+	public void showText(String msg) {
 		Hollerith h = new Hollerith(fmt);
 		h.set("lineNo", StringUtil.digits(lineNo, 6));
 		h.set("offset", StringUtil.hex(bytebuf.offset() & 0xffffff, 6));

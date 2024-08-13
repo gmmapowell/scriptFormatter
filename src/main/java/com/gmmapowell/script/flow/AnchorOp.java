@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.zinutils.exceptions.NotImplementedException;
 
+import com.gmmapowell.script.modules.doc.DocModule;
 import com.gmmapowell.script.processor.prose.TOCEntry;
 
 public class AnchorOp implements SpanItem {
@@ -27,12 +27,14 @@ public class AnchorOp implements SpanItem {
 	}
 
 	@Override
-	public String toString() {
-		return "Anchor";
+	public void intForm(DataOutputStream os) throws IOException {
+		os.write(DocModule.ID);
+		os.write(DocModule.ANCHOR_OP);
+		entry.intForm(os);
 	}
 
 	@Override
-	public void intForm(DataOutputStream os) throws IOException {
-		throw new NotImplementedException();
+	public String toString() {
+		return "Anchor";
 	}
 }

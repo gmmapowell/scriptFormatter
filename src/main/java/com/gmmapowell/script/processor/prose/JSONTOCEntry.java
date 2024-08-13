@@ -1,5 +1,7 @@
 package com.gmmapowell.script.processor.prose;
 
+import java.io.DataOutputStream;
+
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -15,5 +17,10 @@ public class JSONTOCEntry implements TOCEntry {
 	@Override
 	public void recordPage(PDPage meta, String name) {
 		toc.recordPage(entry, meta, name);
+	}
+
+	@Override
+	public void intForm(DataOutputStream os) {
+		System.out.println("not quite sure what to write here");
 	}
 }

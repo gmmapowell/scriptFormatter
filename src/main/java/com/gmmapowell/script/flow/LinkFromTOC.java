@@ -10,7 +10,8 @@ import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
-import org.zinutils.exceptions.NotImplementedException;
+
+import com.gmmapowell.script.modules.doc.DocModule;
 
 public class LinkFromTOC implements SpanItem {
 	public final String text;
@@ -48,12 +49,14 @@ public class LinkFromTOC implements SpanItem {
 	}
 	
 	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		os.write(DocModule.ID);
+		os.write(DocModule.LINK_FROM_TOC);
+		// not quite sure what to write here
+	}
+	
+	@Override
 	public String toString() {
 		return "LinkFromTOC[" + text + ":" + comment + "]";
-	}
-
-	@Override
-	public void intForm(DataOutputStream os) throws IOException {
-		throw new NotImplementedException();
 	}
 }
