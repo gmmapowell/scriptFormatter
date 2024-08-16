@@ -53,9 +53,9 @@ public class Galaxy<T extends KNodeItem> {
 		return n;
 	}
 
-	public void asJson(Writer w) throws IOException {
+	public void asJson(Writer writer) throws IOException {
 		JsonFactory jf = new JsonFactory();
-		JsonGenerator gen = jf.createGenerator(w);
+		JsonGenerator gen = jf.createGenerator(writer);
 		gen.writeStartObject();
 		gen.writeFieldName("slides");
 		gen.writeStartArray();
@@ -69,6 +69,20 @@ public class Galaxy<T extends KNodeItem> {
 			kn.tunnels(gen);
 		}
 		gen.writeEndArray();
+		gen.writeEndObject();
+		gen.flush();
+	}
+
+	public void writeMeta(Writer writer) throws IOException {
+		JsonFactory jf = new JsonFactory();
+		JsonGenerator gen = jf.createGenerator(writer);
+		gen.writeStartObject();
+		gen.writeFieldName("slides");
+		gen.writeStartObject();
+		for (KNode<T> kn : sparse) {
+			kn.meta(gen);
+		}
+		gen.writeEndObject();
 		gen.writeEndObject();
 		gen.flush();
 	}

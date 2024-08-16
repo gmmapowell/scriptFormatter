@@ -137,6 +137,15 @@ public class KNode<T extends KNodeItem> {
 		gen.writeEndObject();
 	}
 
+	public void meta(JsonGenerator gen) throws IOException {
+		gen.writeFieldName(item.name());
+		gen.writeStartObject();
+		gen.writeNumberField("x", xpos);
+		gen.writeNumberField("y", ypos);
+		gen.writeNumberField("z", zpos);
+		gen.writeEndObject();
+	}
+
 	public void tunnels(JsonGenerator gen) throws IOException {
 		if (!links.isEmpty()) {
 			for (Link<T> l : links) {

@@ -69,8 +69,10 @@ public class PresenterPipeline implements Processor, PresentationMapper {
 	public void present(Presentation presentation) {
 		Galaxy<Slide> g = new Galaxy<Slide>(presentation.slides());
 		Place f = root.ensurePlace(FileUtils.ensureExtension(presentation.name, ".json"));
+		Place m = root.ensurePlace(FileUtils.ensureExtension(presentation.name, ".meta"));
 		try {
 			g.asJson(f.writer());
+			g.writeMeta(m.writer());
 		} catch (Exception ex) {
 			ex.printStackTrace(System.out);
 		}

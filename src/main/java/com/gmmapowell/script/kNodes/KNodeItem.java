@@ -9,4 +9,5 @@ public interface KNodeItem {
 	String image();
 	String overlayImage();
 	void asJson(JsonGenerator gen) throws IOException;
+	void meta(JsonGenerator gen) throws IOException;
 }
