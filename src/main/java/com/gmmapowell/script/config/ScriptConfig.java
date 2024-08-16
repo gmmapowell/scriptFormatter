@@ -252,7 +252,7 @@ public class ScriptConfig implements Config {
 			Throwable t = UtilException.unwrap(e);
 			t.printStackTrace(System.out);
 			throw new ConfigException("could not create " + proc);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | IOException e) {
 			UtilException.unwrap(e).printStackTrace(System.out);
 			throw new ConfigException("could not create " + proc);
 		}

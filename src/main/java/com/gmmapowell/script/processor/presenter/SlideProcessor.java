@@ -5,17 +5,21 @@ import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.presenter.nodes.Slide;
 import com.gmmapowell.script.presenter.nodes.SlideStep;
 import com.gmmapowell.script.processor.presenter.slideformats.BoringSlideFormatter;
 import com.gmmapowell.script.processor.presenter.slideformats.TitleSlideFormatter;
+import com.gmmapowell.script.sink.Sink;
 
 public class SlideProcessor implements LineProcessor {
 	private final ErrorReporter errors;
 	private final Slide slide;
 	private final String imagedir;
+	private final Sink sink;
 
-	public SlideProcessor(ErrorReporter errors, Slide slide, String imagedir) {
+	public SlideProcessor(Sink sink, ErrorReporter errors, Slide slide, String imagedir) {
+		this.sink = sink;
 		this.errors = errors;
 		this.slide = slide;
 		this.imagedir = imagedir;
@@ -138,8 +142,8 @@ public class SlideProcessor implements LineProcessor {
 
 	@Override
 	public void flush() {
-		// TODO Auto-generated method stub
-
+		Flow flow = new Flow(slide.name(), false);
+		sink.flow(flow);
 	}
 
 }

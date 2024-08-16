@@ -47,7 +47,8 @@ public class DecodeDumpFile implements DumpDecoder {
 
 	private void dump() throws IOException {
 		loadModules();
-		showFlows();
+		while (showFlow())
+			;
 	}
 
 	private void loadModules() throws IOException {
@@ -55,14 +56,14 @@ public class DecodeDumpFile implements DumpDecoder {
 		showText("#modules: " + nmod);
 	}
 	
-	private void showFlows() throws IOException {
+	private boolean showFlow() throws IOException {
 		try {
 			boolean b = dis.readBoolean();
 			String name = dis.readUTF();
 			showText("flow '" + name + "'" + (b ? " is main":""));
 		} catch (EOFException ex) {
 			// no more flows ...
-			return;
+			return false;
 		}
 		
 		short ns = dis.readShort();
@@ -70,6 +71,7 @@ public class DecodeDumpFile implements DumpDecoder {
 		for (int i=0;i<ns;i++) {
 			showSection(i);
 		}
+		return true;
 	}
 
 	private void showSection(int sno) throws IOException {

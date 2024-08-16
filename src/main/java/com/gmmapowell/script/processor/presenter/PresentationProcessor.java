@@ -4,20 +4,18 @@ import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
-import com.gmmapowell.script.presenter.nodes.Presentation;
 import com.gmmapowell.script.presenter.nodes.Slide;
+import com.gmmapowell.script.sink.Sink;
 
 public class PresentationProcessor implements LineProcessor {
+	private final Sink sink;
 	private final ErrorReporter errors;
-	private final PresentationMapper mapper;
-	private final Presentation presentation;
 	private final String imagedir;
 
-	public PresentationProcessor(ErrorReporter errors, PresentationMapper mapper, String imagedir, String name) {
+	public PresentationProcessor(Sink sink, ErrorReporter errors, String imagedir) {
+		this.sink = sink;
 		this.errors = errors;
-		this.mapper = mapper;
 		this.imagedir = imagedir;
-		this.presentation = new Presentation(name);
 	}
 
 	@Override
@@ -42,8 +40,7 @@ public class PresentationProcessor implements LineProcessor {
 					return new IgnoreNestingProcessor();
 				}
 				Slide slide = new Slide(((NameToken)nt).name);
-				presentation.add(slide);
-				return new SlideProcessor(errors, slide, imagedir);
+				return new SlideProcessor(sink, errors, slide, imagedir);
 			}
 			default:
 				errors.message(tx, "invalid keyword: " + kw);
@@ -57,6 +54,5 @@ public class PresentationProcessor implements LineProcessor {
 
 	@Override
 	public void flush() {
-		mapper.present(presentation);
 	}
 }

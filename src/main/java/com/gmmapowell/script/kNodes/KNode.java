@@ -5,16 +5,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public class KNode<T extends KNodeItem> {
 	private final T item;
+	private final JSONObject mi;
 	private final int x, y, z;
 	private float xpos, ypos, zpos;
 	private final List<Link<T>> links = new ArrayList<>();
+	private final int which;
 
-	public KNode(T item, int which, int ncells) {
+	public KNode(T item, int which, int ncells, JSONObject mi) {
 		this.item = item;
+		this.which = which;
+		this.mi = mi;
 		this.x = which % ncells;
 		this.y = (which/ncells) % ncells;
 		this.z = which/ncells/ncells;
@@ -26,25 +33,38 @@ public class KNode<T extends KNodeItem> {
 	}
 
 	public void locate(int ncells, KNode<T>[] occupation, Random r) {
-		float cx = (x-ncells/2f + 0.5f)*Galaxy.CellSize;
-		float cy = (y-ncells/2f + 0.5f)*Galaxy.CellSize;
-		float cz = (z-ncells/2f + 0.5f)*Galaxy.CellSize;
-		this.xpos = cx + (r.nextFloat()-0.5f)*Galaxy.CellSize;
-		this.ypos = cy + (r.nextFloat()-0.5f)*Galaxy.CellSize;
-		this.zpos = cz + (r.nextFloat()-0.5f)*Galaxy.CellSize;
-//		System.out.println("X: " + x + " => " + cx + " => " + xpos);
-//		System.out.println("Y: " + y + " => " + cy + " => " + ypos);
-//		System.out.println("Z: " + z + " => " + cz + " => " + zpos);
-		for (int nx=-1;nx<=0;nx++) {
-			if (this.x == 0 && nx == -1) continue;
-			for (int ny=-1;ny<=0;ny++) {
-				if (this.y == 0 && ny == -1) continue;
-				for (int nz=-1;nz<=0;nz++) {
-					if (this.z == 0 && nz == -1) continue;
-					if (nx+ny+nz == 0) continue;
-					int other = (x+nx) + ncells*(y+ny) + ncells*ncells*(z+nz);
-//					System.out.println("Nudge " + x + ","+y+"," + z + " compared to " + nx + ", " + ny + ", "+nz + " = " + other);
-					nudge(occupation[other], nx, ny, nz);
+		boolean done = false;
+		if (mi != null) {
+			try {
+				this.xpos = (float) mi.getDouble("x");
+				this.ypos = (float) mi.getDouble("y");
+				this.zpos = (float) mi.getDouble("z");
+				done = true;
+			} catch (JSONException ex) {
+				//
+			}
+		}
+		if (!done) {
+			float cx = (x-ncells/2f + 0.5f)*Galaxy.CellSize;
+			float cy = (y-ncells/2f + 0.5f)*Galaxy.CellSize;
+			float cz = (z-ncells/2f + 0.5f)*Galaxy.CellSize;
+			this.xpos = cx + (r.nextFloat()-0.5f)*Galaxy.CellSize;
+			this.ypos = cy + (r.nextFloat()-0.5f)*Galaxy.CellSize;
+			this.zpos = cz + (r.nextFloat()-0.5f)*Galaxy.CellSize;
+	//		System.out.println("X: " + x + " => " + cx + " => " + xpos);
+	//		System.out.println("Y: " + y + " => " + cy + " => " + ypos);
+	//		System.out.println("Z: " + z + " => " + cz + " => " + zpos);
+			for (int nx=-1;nx<=0;nx++) {
+				if (this.x == 0 && nx == -1) continue;
+				for (int ny=-1;ny<=0;ny++) {
+					if (this.y == 0 && ny == -1) continue;
+					for (int nz=-1;nz<=0;nz++) {
+						if (this.z == 0 && nz == -1) continue;
+						if (nx+ny+nz == 0) continue;
+						int other = (x+nx) + ncells*(y+ny) + ncells*ncells*(z+nz);
+	//					System.out.println("Nudge " + x + ","+y+"," + z + " compared to " + nx + ", " + ny + ", "+nz + " = " + other);
+						nudge(occupation[other], nx, ny, nz);
+					}
 				}
 			}
 		}
@@ -140,6 +160,7 @@ public class KNode<T extends KNodeItem> {
 	public void meta(JsonGenerator gen) throws IOException {
 		gen.writeFieldName(item.name());
 		gen.writeStartObject();
+		gen.writeNumberField("which", which);
 		gen.writeNumberField("x", xpos);
 		gen.writeNumberField("y", ypos);
 		gen.writeNumberField("z", zpos);

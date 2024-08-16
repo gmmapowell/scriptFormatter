@@ -51,4 +51,8 @@ public class FlowDumper {
 			s.intForm(this.os);
 		}
 	}
+
+	public void close() throws IOException {
+		this.os.close();
+	}
 }

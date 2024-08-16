@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -14,16 +17,39 @@ public class Galaxy<T extends KNodeItem> {
 	public static final float PlanetSize = 1.0f;
 	public static final float MinDist = 10.0f;
 	private final List<KNode<T>> sparse;
+	private int ncells;
 
-	public Galaxy(List<T> items) {
+	public Galaxy(JSONObject meta, List<T> items) {
 		this.sparse = new ArrayList<KNode<T>>();
 		Random r = new Random();
-		int ncells = figureCount(items.size());
+		ncells = figureCount(items.size());
+		JSONObject slides = null;
+		try {
+			if (meta != null) {
+				if (meta.getInt("ncells") != ncells) { // if there are too many cells, we cannot continue with the current placement
+					meta = null;
+				} else if (meta.has("slides")) {
+					slides = meta.getJSONObject("slides");
+				}
+			}
+		} catch (JSONException ex) {
+			meta = null;
+		}
 		@SuppressWarnings("unchecked")
 		KNode<T>[] occupation = new KNode[ncells*ncells*ncells];
 		int idx = 0;
-		for (T item : items)
-			place(idx++, ncells, occupation, r, item);
+		for (T item : items) {
+			String name = item.name();
+			JSONObject mi = null;
+			if (slides != null && slides.has(name)) {
+				try {
+					mi = slides.getJSONObject(name);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			place(idx++, ncells, occupation, r, item, mi);
+		}
 		for (int i=0;i<occupation.length;i++) {
 			if (occupation[i] == null)
 				continue;
@@ -34,14 +60,21 @@ public class Galaxy<T extends KNodeItem> {
 		}
 	}
 
-	private void place(int idx, int ncells, KNode<T>[] occupation, Random r, T item) {
-		int which;
-		while (true) {
-			which = r.nextInt(ncells*ncells*ncells);
-			if (occupation[which] == null)
-				break;
+	private void place(int idx, int ncells, KNode<T>[] occupation, Random r, T item, JSONObject mi) {
+		int which = -1;
+		try {
+			if (mi != null && mi.has("which")) {
+				which = mi.getInt("which");
+			}
+		} catch (JSONException ex) {
+			//
 		}
-		KNode<T> kn = new KNode<T>(item, which, ncells);
+		while (which == -1) {
+			int w = r.nextInt(ncells*ncells*ncells);
+			if (occupation[w] == null)
+				which = w;
+		}
+		KNode<T> kn = new KNode<T>(item, which, ncells, mi);
 		occupation[which] = kn;
 		sparse.add(kn);
 	}
@@ -77,6 +110,7 @@ public class Galaxy<T extends KNodeItem> {
 		JsonFactory jf = new JsonFactory();
 		JsonGenerator gen = jf.createGenerator(writer);
 		gen.writeStartObject();
+		gen.writeNumberField("ncells", ncells);
 		gen.writeFieldName("slides");
 		gen.writeStartObject();
 		for (KNode<T> kn : sparse) {

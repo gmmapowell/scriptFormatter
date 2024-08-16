@@ -9,27 +9,32 @@ import org.flasck.flas.blocker.BlockConsumer;
 import org.flasck.flas.errors.ErrorReporter;
 import org.zinutils.exceptions.NotImplementedException;
 
-public class BlockDispatcher implements BlockConsumer {
-	private List<LineProcessor> stack;
-	private final ErrorReporter errors;
-	private final PresentationMapper mapper;
-	private final String imagedir;
-	private String nextName;
+import com.gmmapowell.script.sink.Sink;
 
-	public BlockDispatcher(ErrorReporter errors, PresentationMapper mapper, String imagedir) {
+public class BlockDispatcher implements BlockConsumer {
+	private final Sink sink;
+	private final List<LineProcessor> stack = new ArrayList<>();
+	private final ErrorReporter errors;
+	private final String imagedir;
+
+	public BlockDispatcher(Sink sink, ErrorReporter errors, String imagedir) {
+		this.sink = sink;
 		this.errors = errors;
-		this.mapper = mapper;
 		this.imagedir = imagedir;
 	}
 
 	public void fileIs(String name) {
-		this.nextName = name;
 	}
 	
 	@Override
 	public void newFile() {
-		stack = new ArrayList<>();
-		this.stack.add(new PresentationProcessor(errors, mapper, imagedir, nextName));
+		this.flush();
+		stack.clear();
+		
+		// TODO: this is either wrong or just inconsistent with everything else we do
+		// All the source files should be gathered together, and then one image shown
+		// in the "sink"
+		this.stack.add(new PresentationProcessor(sink, errors, imagedir));
 	}
 
 	@Override

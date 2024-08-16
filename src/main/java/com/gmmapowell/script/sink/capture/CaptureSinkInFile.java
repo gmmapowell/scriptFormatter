@@ -7,17 +7,17 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 
 public class CaptureSinkInFile implements Sink {
-	private final Region region;
 	private final Sink sink;
+	private final FlowDumper dumper;
 
-	public CaptureSinkInFile(Region region, Sink sink) {
-		this.region = region;
+	public CaptureSinkInFile(Region region, Sink sink) throws IOException {
 		this.sink = sink;
+		dumper = new FlowDumper(region.ensurePlace("fred.flow"));
 	}
 
 	public void flow(Flow flow) {
 		try {
-			new FlowDumper(region.ensurePlace("fred.flow")).dump(flow);
+			dumper.dump(flow);
 		} catch (IOException ex) {
 			System.out.println("could not capture flow " + flow.name + ": " + ex);
 		}
@@ -25,6 +25,7 @@ public class CaptureSinkInFile implements Sink {
 	}
 
 	public void render() throws IOException {
+		dumper.close();
 		sink.render();
 	}
 
