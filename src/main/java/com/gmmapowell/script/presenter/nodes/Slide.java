@@ -103,4 +103,33 @@ public class Slide implements KNodeItem {
 		gen.writeEndArray();
 		gen.writeEndObject();
 	}
+	
+	@Override
+	public void meta(JsonGenerator gen) throws IOException {
+		gen.writeStartObject();
+		gen.writeStringField("name", name);
+		if (xt != null) {
+			gen.writeFieldName("aspect");
+			gen.writeStartArray();
+			gen.writeNumber(xt);
+			gen.writeNumber(yt);
+			gen.writeEndArray();
+		}
+		if (this.backgroundColor != null) {
+			gen.writeStringField("background", this.backgroundColor);
+		}
+		gen.writeFieldName("steps");
+		gen.writeStartArray();
+		gen.writeStartObject();
+		if (sf != null)
+			sf.asJson(gen);
+		gen.writeEndObject();
+		for (SlideStep s : steps) {
+			gen.writeStartObject();
+			sf.stepJson(gen, s);
+			gen.writeEndObject();
+		}
+		gen.writeEndArray();
+		gen.writeEndObject();
+	}
 }

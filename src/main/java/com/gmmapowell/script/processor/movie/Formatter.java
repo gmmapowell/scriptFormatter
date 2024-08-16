@@ -2,7 +2,7 @@ package com.gmmapowell.script.processor.movie;
 
 import java.io.IOException;
 
-import com.gmmapowell.script.elements.block.BoxyAdBreak;
+import com.gmmapowell.script.modules.movie.BoxyAdBreak;
 import com.gmmapowell.script.processor.ProcessingUtils;
 
 public class Formatter {

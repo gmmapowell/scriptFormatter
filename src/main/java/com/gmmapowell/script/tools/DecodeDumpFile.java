@@ -14,7 +14,10 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.script.flow.FlowStandard;
+import com.gmmapowell.script.modules.article.ArticleModule;
 import com.gmmapowell.script.modules.doc.DocModule;
+import com.gmmapowell.script.modules.manual.ManualModule;
+import com.gmmapowell.script.modules.movie.MovieModule;
 
 public class DecodeDumpFile implements DumpDecoder {
 
@@ -119,20 +122,6 @@ public class DecodeDumpFile implements DumpDecoder {
 		}
 	}
 
-	private void decodeModule(int si, byte module) throws IOException {
-		// TODO: it should go without saying that ultimately this needs to be configurable :-)
-		
-		switch (module) {
-		case DocModule.ID: {
-			DocModule.decode(this, dis, si);
-			break;
-		}
-		default: {
-			throw new NotImplementedException();
-		}
-		}
-	}
-
 	private void decodeBuiltin(int si) throws IOException {
 		byte op = dis.readByte();
 		switch (op) {
@@ -155,13 +144,66 @@ public class DecodeDumpFile implements DumpDecoder {
 			break;
 		}
 		
+		case FlowStandard.YIELD: {
+			showText("item " + si + " yields");
+			String ytf = dis.readUTF();
+			showText("  to flow: '" + ytf + "'");
+			break;
+		}
+
+		case FlowStandard.RELEASE: {
+			showText("item " + si + " releases");
+			String rf = dis.readUTF();
+			showText("  flow: '" + rf + "'");
+			break;
+		}
+		
+		case FlowStandard.SYNC_AFTER: {
+			showText("item " + si + " syncs");
+			String af = dis.readUTF();
+			showText("  after flow: '" + af + "'");
+			break;
+		}
+		
+		case FlowStandard.IMAGE_OP: {
+			String uri = dis.readUTF();
+			showText("item " + si + " is an image: '" + uri + "'");
+			break;
+		}
+		
 		case FlowStandard.NESTED: {
 			showSpan(0);
 			break;
 		}
 		default: {
-			showText("item " + si + " is built in but INVALID");
+			showText("item " + si + " is built in but INVALID (" + op + ")");
 			break;
+		}
+		}
+	}
+
+	private void decodeModule(int si, byte module) throws IOException {
+		// TODO: it should go without saying that ultimately this needs to be configurable :-)
+		
+		switch (module) {
+		case DocModule.ID: {
+			DocModule.decode(this, dis, si);
+			break;
+		}
+		case MovieModule.ID: {
+			ManualModule.decode(this, dis, si);
+			break;
+		}
+		case ArticleModule.ID: {
+			ManualModule.decode(this, dis, si);
+			break;
+		}
+		case ManualModule.ID: {
+			ManualModule.decode(this, dis, si);
+			break;
+		}
+		default: {
+			throw new NotImplementedException("module id " + module);
 		}
 		}
 	}

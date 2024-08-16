@@ -12,11 +12,13 @@ import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class LocalFileSystem implements World {
 	private Universe universe;
+	private Region cwd;
 
 	public LocalFileSystem(Universe universe) {
 		this.universe = universe;
 		if (universe != null)
 			universe.register("lfs", this);
+		cwd = new LFSRegion(this, new File(System.getProperty("user.dir")));
 	}
 
 	@Override
@@ -39,26 +41,26 @@ public class LocalFileSystem implements World {
 
 	@Override
 	public Region regionPath(String path) {
-		return GeoFSUtils.regionPath(this, null, path);
+		return GeoFSUtils.regionPath(this, cwd, path);
 	}
 
 	@Override
 	public Region newRegionPath(String path) {
-		return GeoFSUtils.newRegionPath(this, null, path);
+		return GeoFSUtils.newRegionPath(this, cwd, path);
 	}
 
 	@Override
 	public Place placePath(String path) {
-		return GeoFSUtils.placePath(this, null, path);
+		return GeoFSUtils.placePath(this, cwd, path);
 	}
 
 	@Override
 	public Place newPlacePath(String path) {
-		return GeoFSUtils.newPlacePath(this, null, path);
+		return GeoFSUtils.newPlacePath(this, cwd, path);
 	}
 
 	@Override
 	public Place ensurePlacePath(String path) {
-		return GeoFSUtils.ensurePlacePath(this, null, path);
+		return GeoFSUtils.ensurePlacePath(this, cwd, path);
 	}
 }

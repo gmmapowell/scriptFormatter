@@ -17,8 +17,10 @@ public class Main {
 		Universe uv = new SimpleUniverse();
 		LocalFileSystem lfs = new LocalFileSystem(uv);
 		Config cfg = gatherConfig(lfs, args);
-		if (cfg == null)
+		if (cfg == null) {
+			System.exit(5);
 			return;
+		}
 		int ret = 2;
 		try {
 			ret = format(cfg);

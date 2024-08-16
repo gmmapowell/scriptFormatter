@@ -86,7 +86,8 @@ public class Index implements FilesToProcess {
 
 			int idx = s.indexOf(" ");
 			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED, writtenExcluded || alreadyDownloaded);
-			current.put(n.id, n);
+			if (!current.containsKey(n.id))
+				current.put(n.id, n);
 		});
 	}
 

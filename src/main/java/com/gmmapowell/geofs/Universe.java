@@ -6,4 +6,6 @@ public interface Universe {
 
 	void register(String name, World world);
 
+	Region regionPath(String uri);
+
 }

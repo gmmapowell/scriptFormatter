@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.zinutils.exceptions.NotImplementedException;
 
 public class ImageOp implements SpanItem {
 	public final String uri;
@@ -22,6 +21,7 @@ public class ImageOp implements SpanItem {
 
 	@Override
 	public void intForm(DataOutputStream os) throws IOException {
-		throw new NotImplementedException();
+		os.writeShort(FlowStandard.IMAGE_OP);
+		os.writeUTF(uri);
 	}
 }

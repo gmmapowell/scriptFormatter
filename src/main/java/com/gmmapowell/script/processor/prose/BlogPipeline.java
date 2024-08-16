@@ -244,7 +244,8 @@ public class BlogPipeline extends ProsePipeline<BlogState> {
 	
 	@Override
 	protected void done() throws IOException {
-		commitCurrentCommand();
+		if (state != null)
+			commitCurrentCommand();
 //		index.close();
 	}
 }

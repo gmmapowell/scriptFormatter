@@ -310,9 +310,15 @@ public class ConfigurableStyleCatalog extends FontCatalog implements StyleCatalo
 		for (Entry<String, String> e : fontStreams.entrySet()) {
 			URL url = this.getClass().getResource(e.getValue());
 			File f;
-			if (url != null) 
-				f = new File(url.getPath());
-			else
+			if (url != null) {
+				String path = url.getPath();
+				if (path.contains("!/")) {
+					System.out.println("want font from jar " + path.substring(path.indexOf("!/")));
+					super.font(e.getKey(), (PDFont) PDType0Font.load(doc, this.getClass().getResourceAsStream(e.getValue())));
+					continue;
+				}
+				f = new File(path);
+			} else
 				f = new File(currdir, e.getValue());
 			if (debug)
 				System.out.println("want font from URL " + f);

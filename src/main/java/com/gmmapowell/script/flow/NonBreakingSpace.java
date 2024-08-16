@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.zinutils.exceptions.NotImplementedException;
 
 public class NonBreakingSpace implements SpanItem {
 	@Override
@@ -13,14 +12,14 @@ public class NonBreakingSpace implements SpanItem {
 		float width = font.getStringWidth(" ")*sz/1000;
 		return new BoundingBox(0, 0, width, sz);
 	}
+	
+	@Override
+	public void intForm(DataOutputStream os) throws IOException {
+		os.writeShort(FlowStandard.NON_BREAKING_SPACE);
+	}
 
 	@Override
 	public String toString() {
 		return "NBSPC";
-	}
-
-	@Override
-	public void intForm(DataOutputStream os) throws IOException {
-		throw new NotImplementedException();
 	}
 }

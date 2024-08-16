@@ -5,10 +5,10 @@ import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.elements.Break;
 import com.gmmapowell.script.flow.SpanItem;
+import com.gmmapowell.script.modules.manual.ManualModule;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
@@ -68,11 +68,6 @@ public class CommentaryBreak implements Break, SpanItem {
 	public float total() {
 		return 60;
 	}
-	
-	@Override
-	public String toString() {
-		return "COMMENTARY";
-	}
 
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
@@ -81,6 +76,12 @@ public class CommentaryBreak implements Break, SpanItem {
 
 	@Override
 	public void intForm(DataOutputStream os) throws IOException {
-		throw new NotImplementedException();
+		os.write(ManualModule.ID);
+		os.write(ManualModule.COMMENTARY_BREAK);
+	}
+	
+	@Override
+	public String toString() {
+		return "COMMENTARY";
 	}
 }

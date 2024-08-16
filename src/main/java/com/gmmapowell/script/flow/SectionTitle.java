@@ -5,7 +5,8 @@ import java.io.IOException;
 
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.zinutils.exceptions.NotImplementedException;
+
+import com.gmmapowell.script.modules.article.ArticleModule;
 
 public class SectionTitle implements SpanItem {
 	private final String title;
@@ -24,12 +25,13 @@ public class SectionTitle implements SpanItem {
 	}
 
 	@Override
-	public String toString() {
-		return "Section[" + title + "]";
+	public void intForm(DataOutputStream os) throws IOException {
+		os.write(ArticleModule.ID);
+		os.write(ArticleModule.SECTION_TITLE);
 	}
 
 	@Override
-	public void intForm(DataOutputStream os) throws IOException {
-		throw new NotImplementedException();
+	public String toString() {
+		return "Section[" + title + "]";
 	}
 }

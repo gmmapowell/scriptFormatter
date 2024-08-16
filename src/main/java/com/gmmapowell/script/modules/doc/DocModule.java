@@ -8,10 +8,10 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.script.tools.DumpDecoder;
 
 public class DocModule {
-
 	public static final byte ID = 1;
 	public static final byte ANCHOR_OP = 0x01;
 	public static final byte LINK_FROM_TOC = 0x02;
+	public static final byte LINK_FROM_REF = 0x03;
 	
 	public static void decode(DumpDecoder decoder, DataInputStream dis, int si) throws IOException {
 		byte c = dis.readByte();
@@ -22,6 +22,10 @@ public class DocModule {
 		}
 		case LINK_FROM_TOC: {
 			decoder.showText("link from toc");
+			break;
+		}
+		case LINK_FROM_REF: {
+			decoder.showText("link from ref");
 			break;
 		}
 		default: {

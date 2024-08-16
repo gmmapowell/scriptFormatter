@@ -33,6 +33,8 @@ import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Utils;
 
 public class ScriptConfig implements Config {
+	private final boolean ALLOW_UPLOADS = false;
+	
 	private final Universe universe;
 	private final Region root;
 	private boolean debug;
@@ -60,17 +62,15 @@ public class ScriptConfig implements Config {
 			if (folder == null)
 				throw new ConfigException("folder was not defined");
 			
-			// TODO: I think we need to resolve creds & use placePath
-			Place credsPath = root.placePath(creds);
 			try {
-				GoogleDriveWorld gdw = new GoogleDriveWorld(universe, "ScriptFormatter", credsPath);
-				// TODO: split this into two things: there should be a "Google Drive World" and then there is a "loader"
-				// the loader wants to take (at least) two Regions/Worlds: one of which is the local disk and the other is the GoogleDriveWorld
-				
-				this.loader = new DriveLoader(gdw, root, workdir, index, folder, debug);
+				// TODO: I feel that this should be elsewhere
+				Place credsPath = root.placePath(creds);
+				new GoogleDriveWorld(universe, "ScriptFormatter", credsPath);
 			} catch (GeneralSecurityException | IOException ex) {
 				throw new ConfigException(ex.toString());
 			}
+			// TODO: this should not depend on Google Drive 
+			this.loader = new DriveLoader(universe, root, workdir, index, folder, debug);
 		} else
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}
@@ -184,12 +184,15 @@ public class ScriptConfig implements Config {
 			String file = vars.remove("file");
 			if (file == null)
 				throw new ConfigException("output file was not defined");
+			String meta = vars.remove("meta");
+			if (meta == null)
+				throw new ConfigException("meta file was not defined");
 			String show = vars.remove("show");
 			boolean wantShow = false;
 			if ("true".equals(show))
 				wantShow = true;
 			String upload = vars.remove("upload");
-			sinks.add(new PresenterSink(root, file, wantShow, upload, debug));
+			sinks.add(new PresenterSink(root, file, meta, wantShow, upload, debug));
 			break;
 		}
 		default:
@@ -284,10 +287,12 @@ public class ScriptConfig implements Config {
 	}
 
 	public void upload() throws Exception {
-		if (sink != null)
-			sink.upload();
-		if (webedit != null) {
-			webedit.upload();
+		if (ALLOW_UPLOADS) {
+			if (sink != null)
+				sink.upload();
+			if (webedit != null) {
+				webedit.upload();
+			}
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.security.GeneralSecurityException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.geofs.World;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.intf.FilesToProcess;
@@ -18,11 +18,11 @@ public class DriveLoader implements Loader {
 	private final boolean debug;
 	private Place webeditFile;
 	private String wetitle;
-	private final World gdw;
+	private final Universe u;
 
-	public DriveLoader(World gdw, Region root, Region downloads, Place indexFile, String folder, boolean debug)
+	public DriveLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean debug)
 			throws ConfigException {
-		this.gdw = gdw;
+		this.u = u;
 		this.folder = folder;
 		this.indexFile = indexFile;
 		this.downloads = downloads;
@@ -44,7 +44,7 @@ public class DriveLoader implements Loader {
 		// Want a "marker" in the file that says "--excluded--"
 		// because it has been downloaded but not user "approved" or ordered
 
-		Region dl = gdw.regionPath(folder);
+		Region dl = u.regionPath(folder);
 		if (debug) {
 			System.out.println("Downloading files from Google ...");
 			System.out.println("  + " + dl /* item.folder + " (" + item.id + ")" */);

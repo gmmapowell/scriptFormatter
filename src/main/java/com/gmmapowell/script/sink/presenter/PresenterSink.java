@@ -7,7 +7,7 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 
 public class PresenterSink implements Sink {
-	public PresenterSink(Region root, String output, boolean wantOpen, String upload, boolean debug) throws IOException {
+	public PresenterSink(Region root, String output, String meta, boolean wantOpen, String upload, boolean debug) throws IOException {
 	}
 
 	@Override

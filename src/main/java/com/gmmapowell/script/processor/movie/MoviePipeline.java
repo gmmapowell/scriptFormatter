@@ -1,14 +1,14 @@
 package com.gmmapowell.script.processor.movie;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.intf.FilesToProcess;
@@ -20,15 +20,14 @@ public class MoviePipeline implements Processor {
 		COMMENT, SLUG1, SLUG2, NORMAL;
 	}
 
-	private final File dramatis;
+	private final Place dramatis;
 	private final MovieState state;
 	private final Sink sink;
 	private final String title;
 	private final boolean debug;
 	private final Formatter formatter;
 
-
-	public MoviePipeline(File root, ElementFactory ef, Sink outputTo, Map<String, String> options, boolean debug) throws ConfigException {
+	public MoviePipeline(Region root, ElementFactory ef, Sink outputTo, VarMap options, boolean debug) throws ConfigException {
 		this.debug = debug;
 		this.state = new MovieState(new TreeMap<String, Flow>());
 		this.state.flows.put("main", new Flow("main", true));
@@ -39,11 +38,7 @@ public class MoviePipeline implements Processor {
 		String d = options.remove("dramatis");
 		if (d == null)
 			throw new ConfigException("There is no definition of dramatis");
-		File df = new File(d);
-		if (df.isAbsolute())
-			this.dramatis = df;
-		else
-			this.dramatis = new File(root, d);
+		this.dramatis = root.place(d);
 		this.sink = outputTo;
 	}
 
@@ -60,13 +55,7 @@ public class MoviePipeline implements Processor {
 		for (Place f : places.included()) {
 			if (debug)
 				System.out.println("included " + f);
-//			try (LineNumberReader lnr = new LineNumberReader(new FileReader(f))) {
-				processFile(dp, f, showTitle);
-//			} catch (FileNotFoundException ex) {
-//				System.out.println("Could not process " + f);
-//			} catch (IOException ex) {
-//				System.out.println("Error processing " + f + ": " + ex.getMessage());
-//			}
+			processFile(dp, f, showTitle);
 			showTitle = null;
 		}
 		for (Entry<String, Flow> e : state.flows.entrySet()) {
