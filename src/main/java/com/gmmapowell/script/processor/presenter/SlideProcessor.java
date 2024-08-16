@@ -16,7 +16,7 @@ import com.gmmapowell.script.modules.presenter.BgImageOp;
 import com.gmmapowell.script.modules.presenter.FormatOp;
 import com.gmmapowell.script.sink.Sink;
 
-public class SlideProcessor implements LineProcessor {
+public class SlideProcessor implements LineProcessor, SlideCollector {
 	private final Sink sink;
 	private final ErrorReporter errors;
 	private final String imagedir;
@@ -94,8 +94,9 @@ public class SlideProcessor implements LineProcessor {
 //					if (sf == null)
 //						return new IgnoreNestingProcessor();
 //					slide.setFormat(sf);
-					metaOp(new FormatOp(format));
-					return new FormatFieldProcessor(errors, imagedir);
+					FormatOp fmt = new FormatOp(format);
+					metaOp(fmt);
+					return new FormatFieldProcessor(this, errors, imagedir);
 				} else {
 					errors.message(name.location(), "format must be a name");
 					return new IgnoreNestingProcessor();
@@ -140,7 +141,8 @@ public class SlideProcessor implements LineProcessor {
 		}
 	}
 
-	private void metaOp(SpanItem op) {
+	@Override
+	public void metaOp(SpanItem op) {
 		Para p = new Para(null);
 		HorizSpan span = new HorizSpan(null, null);
 		p.spans.add(span);
@@ -148,7 +150,8 @@ public class SlideProcessor implements LineProcessor {
 		meta.paras.add(p);
 	}
 
-	private void text(Section s, String tx) {
+	@Override
+	public void text(Section s, String tx) {
 		Para p = new Para(null);
 		HorizSpan span = new HorizSpan(null, null);
 		p.spans.add(span);
@@ -156,7 +159,8 @@ public class SlideProcessor implements LineProcessor {
 		s.paras.add(p);
 	}
 
-	private HorizSpan span(Section s) {
+	@Override
+	public HorizSpan span(Section s) {
 		Para p = new Para(null);
 		HorizSpan span = new HorizSpan(null, null);
 		p.spans.add(span);

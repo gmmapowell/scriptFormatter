@@ -8,11 +8,15 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.flow.SpanItem;
 
-public class BgImageOp implements SpanItem {
-	public final String url;
+public class FieldOptionOp implements SpanItem {
+	public final String field;
+	public final String name;
+	public final String sval;
 
-	public BgImageOp(String url) {
-		this.url = url;
+	public FieldOptionOp(String field, String name, String sval) {
+		this.field = field;
+		this.name = name;
+		this.sval = sval;
 	}
 
 	@Override
@@ -24,8 +28,9 @@ public class BgImageOp implements SpanItem {
 	@Override
 	public void intForm(DataOutputStream os) throws IOException {
 		os.write(PresenterModule.ID);
-		os.write(PresenterModule.BG_IMAGE_OP);
-		os.writeUTF(url);
+		os.write(PresenterModule.FIELD_OPTION_INNER_OP);
+		os.writeUTF(name);
+		os.writeUTF(sval);
 	}
 
 }

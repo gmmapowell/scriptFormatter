@@ -14,6 +14,8 @@ public class PresenterModule {
 	public static final byte ASPECT_OP = 0x02;
 	public static final byte BG_IMAGE_OP = 0x03;
 	public static final byte BG_COLOR_OP = 0x04;
+	public static final byte FIELD_OPTION_OP = 0x11;
+	public static final byte FIELD_OPTION_INNER_OP = 0x12;
 	
 	public static void decode(DumpDecoder decoder, DataInputStream dis, int si) throws IOException {
 		byte c = dis.readByte();
@@ -41,6 +43,22 @@ public class PresenterModule {
 			decoder.showText("background color");
 			String col = dis.readUTF();
 			decoder.showText("  use color: '" + col + "'");
+			break;
+		}
+		case FIELD_OPTION_OP: {
+			decoder.showText("field option");
+			String opt = dis.readUTF();
+			decoder.showText("  option is: '" + opt + "'");
+			String val = dis.readUTF();
+			decoder.showText("     <- '" + val + "'");
+			break;
+		}
+		case FIELD_OPTION_INNER_OP: {
+			decoder.showText("field inner option");
+			String opt = dis.readUTF();
+			decoder.showText("  option is: '" + opt + "'");
+			String val = dis.readUTF();
+			decoder.showText("     <- '" + val + "'");
 			break;
 		}
 		default: {

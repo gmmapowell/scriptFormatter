@@ -2,14 +2,12 @@ package com.gmmapowell.script.processor.presenter.slideformats;
 
 import java.io.IOException;
 
-import org.flasck.flas.errors.ErrorReporter;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.gmmapowell.script.presenter.nodes.Slide;
 
 public class TitleSlideFormatter extends CommonSlideFormatter {
-	public TitleSlideFormatter(ErrorReporter errors, Slide slide) {
-		super(errors, slide);
+	public TitleSlideFormatter(Slide slide) {
+		super(slide);
 	}
 
 	protected void jsonFields(JsonGenerator gen, float ax, float ay) throws IOException {

@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.flasck.flas.blockForm.InputPosition;
-import org.flasck.flas.errors.ErrorReporter;
+import org.zinutils.exceptions.CantHappenException;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.gmmapowell.script.presenter.nodes.Slide;
@@ -24,24 +23,22 @@ public abstract class CommonSlideFormatter implements SlideFormatter {
 		}
 	}
 
-	protected final ErrorReporter errors;
 	protected final Slide slide;
 	protected final Map<String, Field> fields = new HashMap<>();
 
-	public CommonSlideFormatter(ErrorReporter errors, Slide slide) {
-		this.errors = errors;
+	public CommonSlideFormatter(Slide slide) {
 		this.slide = slide;
 	}
 
 	@Override
-	public void field(InputPosition loc, String name, String value) {
+	public void field(String name, String value) {
 		if (fields.containsKey(name))
-			errors.message(loc, "duplicate field " + name);
+			throw new CantHappenException("duplicate field " + name);
 		fields.put(name, new Field(value));
 	}
 
 	@Override
-	public void fieldOption(InputPosition location, String field, String name, String value) {
+	public void fieldOption(String field, String name, String value) {
 		Field f = fields.get(field);
 		f.options.put(name, value);
 	}

@@ -9,8 +9,8 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import com.gmmapowell.script.flow.SpanItem;
 
 public class AspectOp implements SpanItem {
-	private final float x;
-	private final float y;
+	public final float x;
+	public final float y;
 
 	public AspectOp(float x, float y) {
 		this.x = x;

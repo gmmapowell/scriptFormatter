@@ -9,7 +9,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import com.gmmapowell.script.flow.SpanItem;
 
 public class BgColorOp implements SpanItem {
-	private final String color;
+	public final String color;
 
 	public BgColorOp(String color) {
 		this.color = color;

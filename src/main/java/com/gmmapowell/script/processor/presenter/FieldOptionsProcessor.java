@@ -4,11 +4,15 @@ import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
+import com.gmmapowell.script.modules.presenter.FieldOptionOp;
+
 public class FieldOptionsProcessor implements LineProcessor {
+	private final SlideCollector collector;
 	private final ErrorReporter errors;
 	private final String field;
 
-	public FieldOptionsProcessor(ErrorReporter errors, String field) {
+	public FieldOptionsProcessor(SlideCollector collector, ErrorReporter errors, String field) {
+		this.collector = collector;
 		this.errors = errors;
 		this.field = field;
 	}
@@ -45,7 +49,7 @@ public class FieldOptionsProcessor implements LineProcessor {
 		}
 		String name = ((NameToken)field).name;
 		String sval = ((StringToken)val).value;
-//		slide.fieldOption(field.location(), this.field, name, sval);
+		collector.metaOp(new FieldOptionOp(this.field, name, sval));
 		return new NoNestingProcessor();
 	}
 

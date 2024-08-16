@@ -9,7 +9,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import com.gmmapowell.script.flow.SpanItem;
 
 public class FormatOp implements SpanItem {
-	private String format;
+	public final String format;
 
 	public FormatOp(String format) {
 		this.format = format;

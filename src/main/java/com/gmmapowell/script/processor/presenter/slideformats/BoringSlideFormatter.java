@@ -3,16 +3,14 @@ package com.gmmapowell.script.processor.presenter.slideformats;
 import java.io.IOException;
 import java.util.List;
 
-import org.flasck.flas.errors.ErrorReporter;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.gmmapowell.script.presenter.nodes.Slide;
 
 public class BoringSlideFormatter extends CommonSlideFormatter {
 	private int y = 0;
 	
-	public BoringSlideFormatter(ErrorReporter errors, Slide slide) {
-		super(errors, slide);
+	public BoringSlideFormatter(Slide slide) {
+		super(slide);
 	}
 
 	@Override

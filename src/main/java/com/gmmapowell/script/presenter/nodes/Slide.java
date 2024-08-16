@@ -25,6 +25,10 @@ public class Slide implements KNodeItem {
 		return name;
 	}
 
+	public SlideFormatter formatter() {
+		return sf;
+	}
+
 	public void aspect(float xt, float yt) {
 		this.xt = xt;
 		this.yt = yt;
