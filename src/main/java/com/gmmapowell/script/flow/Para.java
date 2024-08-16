@@ -8,6 +8,9 @@ public class Para {
 	public final List<HorizSpan> spans = new ArrayList<>();
 
 	public Para(List<String> formats) {
-		this.formats = new ArrayList<>(formats);
+		if (formats == null)
+			this.formats = new ArrayList<>();
+		else
+			this.formats = new ArrayList<>(formats);
 	}
 }

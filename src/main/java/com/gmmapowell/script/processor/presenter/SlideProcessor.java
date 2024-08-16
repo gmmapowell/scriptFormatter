@@ -1,28 +1,41 @@
 package com.gmmapowell.script.processor.presenter;
 
 import org.flasck.flas.blockForm.ContinuedLine;
-import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
 import com.gmmapowell.script.flow.Flow;
-import com.gmmapowell.script.presenter.nodes.Slide;
-import com.gmmapowell.script.presenter.nodes.SlideStep;
-import com.gmmapowell.script.processor.presenter.slideformats.BoringSlideFormatter;
-import com.gmmapowell.script.processor.presenter.slideformats.TitleSlideFormatter;
+import com.gmmapowell.script.flow.HorizSpan;
+import com.gmmapowell.script.flow.Para;
+import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.SpanItem;
+import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.modules.presenter.AspectOp;
+import com.gmmapowell.script.modules.presenter.BgColorOp;
+import com.gmmapowell.script.modules.presenter.BgImageOp;
+import com.gmmapowell.script.modules.presenter.FormatOp;
 import com.gmmapowell.script.sink.Sink;
 
 public class SlideProcessor implements LineProcessor {
-	private final ErrorReporter errors;
-	private final Slide slide;
-	private final String imagedir;
 	private final Sink sink;
+	private final ErrorReporter errors;
+	private final String imagedir;
+	private final Flow flow;
+	private final Section present;
+	private final Section notes;
+	private final Section meta;
 
-	public SlideProcessor(Sink sink, ErrorReporter errors, Slide slide, String imagedir) {
+	public SlideProcessor(Sink sink, ErrorReporter errors, String imagedir, Flow flow) {
 		this.sink = sink;
 		this.errors = errors;
-		this.slide = slide;
 		this.imagedir = imagedir;
+		this.flow = flow;
+		meta = new Section("meta");
+		flow.sections.add(meta);
+		present = new Section("present");
+		flow.sections.add(present);
+		notes = new Section("notes");
+		flow.sections.add(notes);
 	}
 
 	@Override
@@ -52,7 +65,7 @@ public class SlideProcessor implements LineProcessor {
 					return new IgnoreNestingProcessor();
 				}
 				Token.assertEnd(errors, tx);
-				slide.aspect(((NumberToken)xt).value, ((NumberToken)yt).value);
+				metaOp(new AspectOp(((NumberToken)xt).value, ((NumberToken)yt).value));
 				return new NoNestingProcessor();
 			}
 			case "background": {
@@ -63,7 +76,7 @@ public class SlideProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (name instanceof StringToken)
-					slide.backgroundColor(((StringToken)name).value);
+					metaOp(new BgColorOp(((StringToken)name).value));
 				else
 					errors.message(name.location(), "color must be a string");
 				return new NoNestingProcessor();
@@ -77,11 +90,12 @@ public class SlideProcessor implements LineProcessor {
 				Token.assertEnd(errors, tx);
 				if (name instanceof NameToken) {
 					String format = ((NameToken)name).name;
-					SlideFormatter sf = findSlideFormatter(name.location(), format);
-					if (sf == null)
-						return new IgnoreNestingProcessor();
-					slide.setFormat(sf);
-					return new FormatFieldProcessor(errors, sf, imagedir);
+//					SlideFormatter sf = findSlideFormatter(name.location(), format);
+//					if (sf == null)
+//						return new IgnoreNestingProcessor();
+//					slide.setFormat(sf);
+					metaOp(new FormatOp(format));
+					return new FormatFieldProcessor(errors, imagedir);
 				} else {
 					errors.message(name.location(), "format must be a name");
 					return new IgnoreNestingProcessor();
@@ -95,7 +109,7 @@ public class SlideProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (name instanceof StringToken)
-					slide.backgroundImage(imagedir + ((StringToken)name).value);
+					metaOp(new BgImageOp(imagedir + ((StringToken)name).value));
 				else
 					errors.message(name.location(), "image name must speak a string");
 				return new NoNestingProcessor();
@@ -108,15 +122,13 @@ public class SlideProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (name instanceof StringToken)
-					slide.speak(((StringToken)name).value);
+					text(notes, ((StringToken)name).value);
 				else
 					errors.message(name.location(), "speaker must speak a string");
 				return new NoNestingProcessor();
 			}
 			case "step": {
-				SlideStep step = new SlideStep();
-				slide.addStep(step);
-				return new StepProcessor(errors, step);
+				return new StepProcessor(errors, span(present), span(notes));
 			}
 			default:
 				errors.message(tx, "invalid keyword for slide: " + kw);
@@ -128,21 +140,32 @@ public class SlideProcessor implements LineProcessor {
 		}
 	}
 
-	private SlideFormatter findSlideFormatter(InputPosition loc, String format) {
-		switch (format) {
-		case "title-slide":
-			return new TitleSlideFormatter(errors, slide);
-		case "boring-slide":
-			return new BoringSlideFormatter(errors, slide);
-		default:
-			errors.message(loc, "there is no formatter for slide " + format);
-			return null;
-		}
+	private void metaOp(SpanItem op) {
+		Para p = new Para(null);
+		HorizSpan span = new HorizSpan(null, null);
+		p.spans.add(span);
+		span.items.add(op);
+		meta.paras.add(p);
+	}
+
+	private void text(Section s, String tx) {
+		Para p = new Para(null);
+		HorizSpan span = new HorizSpan(null, null);
+		p.spans.add(span);
+		span.items.add(new TextSpanItem(tx));
+		s.paras.add(p);
+	}
+
+	private HorizSpan span(Section s) {
+		Para p = new Para(null);
+		HorizSpan span = new HorizSpan(null, null);
+		p.spans.add(span);
+		s.paras.add(p);
+		return span;
 	}
 
 	@Override
 	public void flush() {
-		Flow flow = new Flow(slide.name(), false);
 		sink.flow(flow);
 	}
 

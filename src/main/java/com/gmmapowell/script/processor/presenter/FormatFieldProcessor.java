@@ -6,12 +6,10 @@ import org.flasck.flas.tokenizers.Tokenizable;
 
 public class FormatFieldProcessor implements LineProcessor {
 	private final ErrorReporter errors;
-	private final SlideFormatter slide;
 	private final String imagedir;
 
-	public FormatFieldProcessor(ErrorReporter errors, SlideFormatter sf, String imagedir) {
+	public FormatFieldProcessor(ErrorReporter errors, String imagedir) {
 		this.errors = errors;
-		this.slide = sf;
 		this.imagedir = imagedir;
 	}
 
@@ -49,8 +47,8 @@ public class FormatFieldProcessor implements LineProcessor {
 		String sval = ((StringToken)val).value;
 		if (name.equals("image"))
 			sval = imagedir + sval;
-		slide.field(field.location(), name, sval);
-		return new FieldOptionsProcessor(errors, slide, name);
+//		slide.field(field.location(), name, sval);
+		return new FieldOptionsProcessor(errors, name);
 	}
 
 	@Override

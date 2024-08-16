@@ -4,15 +4,19 @@ import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
-import com.gmmapowell.script.presenter.nodes.SlideStep;
+import com.gmmapowell.script.flow.HorizSpan;
+import com.gmmapowell.script.flow.ImageOp;
+import com.gmmapowell.script.flow.TextSpanItem;
 
 public class StepProcessor implements LineProcessor {
 	private final ErrorReporter errors;
-	private final SlideStep step;
+	private final HorizSpan present;
+	private final HorizSpan notes;
 
-	public StepProcessor(ErrorReporter errors, SlideStep step) {
+	public StepProcessor(ErrorReporter errors, HorizSpan present, HorizSpan notes) {
 		this.errors = errors;
-		this.step = step;
+		this.present = present;
+		this.notes = notes;
 	}
 
 	@Override
@@ -30,7 +34,7 @@ public class StepProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (file instanceof StringToken)
-					step.img(((StringToken)file).value);
+					present.items.add(new ImageOp(((StringToken)file).value));
 				else
 					errors.message(file.location(), "file must be a string");
 				return new NoNestingProcessor();
@@ -43,7 +47,7 @@ public class StepProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (file instanceof StringToken)
-					step.img(((StringToken)file).value);
+					present.items.add(new ImageOp(((StringToken)file).value));
 				else
 					errors.message(file.location(), "remove file must be a string");
 				return new NoNestingProcessor();
@@ -56,7 +60,7 @@ public class StepProcessor implements LineProcessor {
 				}
 				Token.assertEnd(errors, tx);
 				if (speech instanceof StringToken)
-					step.speak(((StringToken)speech).value);
+					notes.items.add(new TextSpanItem(((StringToken)speech).value));
 				else
 					errors.message(speech.location(), "speech must be a string");
 				return new NoNestingProcessor();

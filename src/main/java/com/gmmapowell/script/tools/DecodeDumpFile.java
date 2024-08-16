@@ -18,6 +18,7 @@ import com.gmmapowell.script.modules.article.ArticleModule;
 import com.gmmapowell.script.modules.doc.DocModule;
 import com.gmmapowell.script.modules.manual.ManualModule;
 import com.gmmapowell.script.modules.movie.MovieModule;
+import com.gmmapowell.script.modules.presenter.PresenterModule;
 
 public class DecodeDumpFile implements DumpDecoder {
 
@@ -202,6 +203,10 @@ public class DecodeDumpFile implements DumpDecoder {
 		}
 		case ManualModule.ID: {
 			ManualModule.decode(this, dis, si);
+			break;
+		}
+		case PresenterModule.ID: {
+			PresenterModule.decode(this, dis, si);
 			break;
 		}
 		default: {

@@ -4,7 +4,7 @@ import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
-import com.gmmapowell.script.presenter.nodes.Slide;
+import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.sink.Sink;
 
 public class PresentationProcessor implements LineProcessor {
@@ -39,8 +39,8 @@ public class PresentationProcessor implements LineProcessor {
 					errors.message(tx, "end of line expected");
 					return new IgnoreNestingProcessor();
 				}
-				Slide slide = new Slide(((NameToken)nt).name);
-				return new SlideProcessor(sink, errors, slide, imagedir);
+				Flow flow = new Flow(((NameToken)nt).name, false);
+				return new SlideProcessor(sink, errors, imagedir, flow);
 			}
 			default:
 				errors.message(tx, "invalid keyword: " + kw);

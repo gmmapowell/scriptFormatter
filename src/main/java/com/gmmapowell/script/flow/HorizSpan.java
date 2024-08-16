@@ -12,7 +12,10 @@ public class HorizSpan {
 
 	public HorizSpan(HorizSpan parent, List<String> formats) {
 		this.parent = parent;
-		this.formats = new ArrayList<>(formats);
+		if (formats == null)
+			this.formats = new ArrayList<>();
+		else
+			this.formats = new ArrayList<>(formats);
 	}
 
 	public void intForm(DataOutputStream os) throws IOException {

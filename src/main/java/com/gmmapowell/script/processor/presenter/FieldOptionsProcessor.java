@@ -6,12 +6,10 @@ import org.flasck.flas.tokenizers.Tokenizable;
 
 public class FieldOptionsProcessor implements LineProcessor {
 	private final ErrorReporter errors;
-	private final SlideFormatter slide;
 	private final String field;
 
-	public FieldOptionsProcessor(ErrorReporter errors, SlideFormatter sf, String field) {
+	public FieldOptionsProcessor(ErrorReporter errors, String field) {
 		this.errors = errors;
-		this.slide = sf;
 		this.field = field;
 	}
 
@@ -47,7 +45,7 @@ public class FieldOptionsProcessor implements LineProcessor {
 		}
 		String name = ((NameToken)field).name;
 		String sval = ((StringToken)val).value;
-		slide.fieldOption(field.location(), this.field, name, sval);
+//		slide.fieldOption(field.location(), this.field, name, sval);
 		return new NoNestingProcessor();
 	}
 
