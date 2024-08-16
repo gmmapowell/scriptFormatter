@@ -16,6 +16,7 @@ public class PresenterModule {
 	public static final byte BG_COLOR_OP = 0x04;
 	public static final byte FIELD_OPTION_OP = 0x11;
 	public static final byte FIELD_OPTION_INNER_OP = 0x12;
+	public static final byte NEW_STEP = 0x21;
 	
 	public static void decode(DumpDecoder decoder, DataInputStream dis, int si) throws IOException {
 		byte c = dis.readByte();
@@ -59,6 +60,10 @@ public class PresenterModule {
 			decoder.showText("  option is: '" + opt + "'");
 			String val = dis.readUTF();
 			decoder.showText("     <- '" + val + "'");
+			break;
+		}
+		case NEW_STEP: {
+			decoder.showText("next step");
 			break;
 		}
 		default: {

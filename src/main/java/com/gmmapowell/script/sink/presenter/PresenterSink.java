@@ -13,6 +13,7 @@ import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.HorizSpan;
+import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
@@ -24,7 +25,9 @@ import com.gmmapowell.script.modules.presenter.BgImageOp;
 import com.gmmapowell.script.modules.presenter.FieldOp;
 import com.gmmapowell.script.modules.presenter.FieldOptionOp;
 import com.gmmapowell.script.modules.presenter.FormatOp;
+import com.gmmapowell.script.modules.presenter.PresentStepOp;
 import com.gmmapowell.script.presenter.nodes.Slide;
+import com.gmmapowell.script.presenter.nodes.SlideStep;
 import com.gmmapowell.script.processor.presenter.SlideFormatter;
 import com.gmmapowell.script.processor.presenter.slideformats.BoringSlideFormatter;
 import com.gmmapowell.script.processor.presenter.slideformats.TitleSlideFormatter;
@@ -86,14 +89,16 @@ public class PresenterSink implements Sink {
 		for (Section s : f.sections) {
 			if ("meta".equals(s.format))
 				doMetas(ret, s);
-			else
-				doMetas(ret, s); // this kind of feels wrong, but it seems to work for now...
+		}
+		for (Section s : f.sections) {
+			if (!"meta".equals(s.format))
+				doText(ret, s);
 		}
 		return ret;
 	}
 	
 	private void doMetas(Slide slide, Section s) {
-		SlideFormatter ret = slide.formatter();
+		SlideFormatter ret = null;
 		for (Para p : s.paras) {
 			for (HorizSpan span : p.spans) {
 				for (SpanItem item : span.items) {
@@ -113,8 +118,51 @@ public class PresenterSink implements Sink {
 					} else if (item instanceof FieldOptionOp) {
 						FieldOptionOp f = (FieldOptionOp) item;
 						ret.fieldOption(f.field, f.name, f.sval);
+//					} else if (item instanceof TextSpanItem) {
+//						ret.field("title", ((TextSpanItem) item).text);
+					} else
+						System.out.println("huh? " + item);
+				}
+			}
+		}
+		if (ret == null)
+			throw new CantHappenException("there was no slide format for " + slide.name());
+
+		slide.setFormat(ret);
+	}
+
+	private void doText(Slide slide, Section s) {
+		SlideFormatter ret = slide.formatter();
+		SlideStep curr = new SlideStep();
+		for (Para p : s.paras) {
+			for (HorizSpan span : p.spans) {
+				for (SpanItem item : span.items) {
+					if (item instanceof PresentStepOp) {
+						curr = new SlideStep();
+						slide.addStep(curr);
+//					} else
+//					System.out.println(" have " + item);
+//					if (item instanceof FormatOp) {
+//						ret = findSlideFormatter(slide, ((FormatOp)item).format);
+//					} else if (item instanceof AspectOp) {
+//						AspectOp as = (AspectOp)item;
+//						slide.aspect(as.x, as.y);
+//					} else if (item instanceof BgImageOp) {
+//						slide.backgroundImage(((BgImageOp)item).url);
+//					} else if (item instanceof BgColorOp) {
+//						slide.backgroundColor(((BgColorOp)item).color);
+//					} else if (item instanceof FieldOp) {
+//						FieldOp f = (FieldOp) item;
+//						ret.field(f.name, f.sval);
+//					} else if (item instanceof FieldOptionOp) {
+//						FieldOptionOp f = (FieldOptionOp) item;
+//						ret.fieldOption(f.field, f.name, f.sval);
 					} else if (item instanceof TextSpanItem) {
-						ret.field("title", ((TextSpanItem) item).text);
+						if ("notes".equals(s.format))
+							curr.speak(((TextSpanItem) item).text);
+					} else if (item instanceof ImageOp) {
+						if ("present".equals(s.format))
+							curr.img(((ImageOp)item).uri);
 					} else
 						System.out.println("huh? " + item);
 				}

@@ -7,6 +7,7 @@ import org.flasck.flas.tokenizers.Tokenizable;
 import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.modules.presenter.PresentStepOp;
 
 public class StepProcessor implements LineProcessor {
 	private final ErrorReporter errors;
@@ -17,6 +18,8 @@ public class StepProcessor implements LineProcessor {
 		this.errors = errors;
 		this.present = present;
 		this.notes = notes;
+		present.items.add(new PresentStepOp());
+		notes.items.add(new PresentStepOp());
 	}
 
 	@Override
