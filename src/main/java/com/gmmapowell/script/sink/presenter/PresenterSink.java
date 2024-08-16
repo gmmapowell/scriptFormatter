@@ -2,6 +2,7 @@ package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
@@ -86,14 +87,17 @@ public class PresenterSink implements Sink {
 	public Slide renderSlide(Flow f) {
 		Slide ret = new Slide(f.name);
 		
+		Section p = null;
+		Section n = null;
 		for (Section s : f.sections) {
 			if ("meta".equals(s.format))
 				doMetas(ret, s);
+			else if ("present".equals(s.format))
+				p = s;
+			else if ("notes".equals(s.format))
+				n = s;
 		}
-		for (Section s : f.sections) {
-			if (!"meta".equals(s.format))
-				doText(ret, s);
-		}
+		doText(ret, p, n);
 		return ret;
 	}
 	
@@ -131,47 +135,56 @@ public class PresenterSink implements Sink {
 		slide.setFormat(ret);
 	}
 
-	private void doText(Slide slide, Section s) {
-		SlideFormatter ret = slide.formatter();
-		SlideStep curr = new SlideStep();
-		for (Para p : s.paras) {
-			for (HorizSpan span : p.spans) {
-				for (SpanItem item : span.items) {
-					if (item instanceof PresentStepOp) {
-						curr = new SlideStep();
-						slide.addStep(curr);
-//					} else
-//					System.out.println(" have " + item);
-//					if (item instanceof FormatOp) {
-//						ret = findSlideFormatter(slide, ((FormatOp)item).format);
-//					} else if (item instanceof AspectOp) {
-//						AspectOp as = (AspectOp)item;
-//						slide.aspect(as.x, as.y);
-//					} else if (item instanceof BgImageOp) {
-//						slide.backgroundImage(((BgImageOp)item).url);
-//					} else if (item instanceof BgColorOp) {
-//						slide.backgroundColor(((BgColorOp)item).color);
-//					} else if (item instanceof FieldOp) {
-//						FieldOp f = (FieldOp) item;
-//						ret.field(f.name, f.sval);
-//					} else if (item instanceof FieldOptionOp) {
-//						FieldOptionOp f = (FieldOptionOp) item;
-//						ret.fieldOption(f.field, f.name, f.sval);
-					} else if (item instanceof TextSpanItem) {
-						if ("notes".equals(s.format))
-							curr.speak(((TextSpanItem) item).text);
-					} else if (item instanceof ImageOp) {
-						if ("present".equals(s.format))
-							curr.img(((ImageOp)item).uri);
-					} else
-						System.out.println("huh? " + item);
+	private void doText(Slide slide, Section present, Section notes) {
+		ZippedItems zi = zipItems(present, notes);
+		
+		for (ZipItem zz : zi) {
+			SlideStep curr = new SlideStep();
+			slide.addStep(curr);
+			for (SpanItem si : zz.present) {
+				if (si instanceof ImageOp) {
+					curr.img(((ImageOp)si).uri);
+				} else
+					System.out.println("huh? " + si);
+			}
+			for (SpanItem si : zz.notes) {
+				if (si instanceof TextSpanItem) {
+					curr.speak(((TextSpanItem) si).text);
+				} else
+					System.out.println("huh? " + si);
+			}
+		}
+	}
+
+	private ZippedItems zipItems(Section present, Section notes) {
+		List<List<SpanItem>> ps = collect(present);
+		List<List<SpanItem>> ns = collect(notes);
+		return new ZippedItems(ps, ns);
+	}
+	
+	
+	private List<List<SpanItem>> collect(Section present) {
+		List<List<SpanItem>> ret = new ArrayList<List<SpanItem>>();
+		List<SpanItem> ls = null;
+		for (Para p : present.paras) {
+			for (HorizSpan h : p.spans) {
+				for (SpanItem s : h.items) {
+					if (s instanceof PresentStepOp) {
+						if (ls != null) {
+							ret.add(ls);
+						}
+						ls = new ArrayList<>();
+					} else {
+						if (ls == null)
+							ls = new ArrayList<SpanItem>();
+						ls.add(s);
+					}
 				}
 			}
 		}
-		if (ret == null)
-			throw new CantHappenException("there was no slide format for " + slide.name());
-
-		slide.setFormat(ret);
+		if (ls != null)
+			ret.add(ls);
+		return ret;
 	}
 
 	private SlideFormatter findSlideFormatter(Slide slide, String format) {
