@@ -12,9 +12,8 @@ public class Main {
 		Universe uv = new SimpleUniverse();
 		LocalFileSystem lfs = new LocalFileSystem(uv);
 		try {
-			Config cfg = ConfigArgs.processConfig(lfs, args);
-			FilesToProcess files;
-			files = cfg.updateIndex();
+			Config cfg = ConfigArgs.processConfig(lfs, args).read();
+			FilesToProcess files = cfg.updateIndex();
 			cfg.generate(files);
 			cfg.show();
 			cfg.upload();

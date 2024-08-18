@@ -33,6 +33,8 @@ import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Utils;
 
 public class ScriptConfig implements Config {
+	// This is a hack to make regression tests quicker.
+	// TODO: it should be configured from the environment
 	private final boolean ALLOW_UPLOADS = false;
 	
 	private final Universe universe;
@@ -161,18 +163,6 @@ public class ScriptConfig implements Config {
 			String storeInto = vars.remove("store");
 			if (storeInto == null)
 				throw new ConfigException("store directory was not defined");
-//			String creds = vars.remove("credentials");
-//			if (creds == null)
-//				throw new ConfigException("credentials was not defined");
-//			String blogUrl = vars.remove("blogurl");
-//			if (blogUrl == null)
-//				throw new ConfigException("blogurl was not defined");
-//			String posts = vars.remove("posts");
-//			if (posts == null)
-//				throw new ConfigException("posts was not defined");
-//			File pf = new File(posts);
-//			if (!pf.isAbsolute())
-//				pf = new File(root, posts);
 			try {
 				sinks.add(new HTMLSink(root, storeInto));
 			} catch (Exception ex) {

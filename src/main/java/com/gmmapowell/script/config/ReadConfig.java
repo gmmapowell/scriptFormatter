@@ -2,40 +2,30 @@ package com.gmmapowell.script.config;
 
 import java.io.IOException;
 
+import org.zinutils.exceptions.WrappedException;
+
 import com.gmmapowell.geofs.Place;
-import com.gmmapowell.geofs.Region;
-import com.gmmapowell.geofs.World;
+import com.gmmapowell.geofs.Universe;
 
-public class ReadConfig {
+public class ReadConfig implements ConfigReader {
+	private final Universe universe;
+	private final Place place;
 
-	private World world;
-
-	public ReadConfig(World world) {
-		this.world = world;
+	public ReadConfig(Universe universe, Place place) {
+		this.universe = universe;
+		this.place = place;
 	}
 
-	public Config read(String file) {
-		Place place = world.placePath(file);
-		// This should be a catch exception
-//		if (!file.exists()) {
-//			System.out.println("There is no file " + file);
-//			return null;
-//		}
-		Region root = place.region();
-		ConfigParser parser = new ConfigParser(world.getUniverse(), root);
+	@Override
+	public Config read() throws ConfigException {
+		ConfigParser parser = new ConfigParser(universe, place.region());
 		place.lines(parser);
 		try {
 			return parser.config();
 		} catch (IOException ex) {
-			System.out.println("Could not read configuration " + file);
-			return null;
-		} catch (ConfigException ex) {
-			System.out.println(ex.getMessage());
-			return null;
+			throw new ConfigException("Could not read configuration " + place + ": " + ex.toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
+			throw WrappedException.wrap(ex);
 		}
 	}
-
 }
