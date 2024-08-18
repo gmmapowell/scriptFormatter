@@ -1,7 +1,9 @@
-package com.gmmapowell.script.config;
+package com.gmmapowell.script.config.reader;
 
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.script.ScriptFormatterHelpException;
+import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.ConfigReader;
 
 public class ConfigArgs {
 	public static ConfigReader processConfig(World world, String[] args) throws ScriptFormatterHelpException, ConfigException {

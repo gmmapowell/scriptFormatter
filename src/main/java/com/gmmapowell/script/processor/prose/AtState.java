@@ -11,17 +11,4 @@ public abstract class AtState extends CurrentState {
 	public AtState(Map<String, Flow> flows) {
 		super(flows);
 	}
-
-	@Override
-	public void line(int lineNumber) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String inputLocation() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

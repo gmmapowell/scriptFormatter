@@ -3,8 +3,9 @@ package com.gmmapowell.script.processor;
 import java.util.List;
 
 import com.gmmapowell.script.flow.SpanItem;
+import com.gmmapowell.script.utils.FileWithLocation;
 
-public interface TextState {
+public interface TextState extends FileWithLocation {
 	String formatAs();
 
 	void newPara(String... formats);
@@ -20,8 +21,4 @@ public interface TextState {
 	void op(SpanItem op);
 
 	int nextFootnoteMarker();
-	String inputLocation();
-
-
-
 }

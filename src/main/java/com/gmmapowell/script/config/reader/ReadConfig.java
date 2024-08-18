@@ -1,4 +1,4 @@
-package com.gmmapowell.script.config;
+package com.gmmapowell.script.config.reader;
 
 import java.io.IOException;
 
@@ -6,6 +6,9 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.script.config.Config;
+import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.ConfigReader;
 
 public class ReadConfig implements ConfigReader {
 	private final Universe universe;

@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.prose;
+package com.gmmapowell.script.utils;
 
 import java.util.Map;
 

@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.gmmapowell.script.processor.prose.DocState;
-import com.gmmapowell.script.processor.prose.SBLineArgsParser;
+import com.gmmapowell.script.utils.SBLineArgsParser;
 
 public class CommandArgParsingTest {
 

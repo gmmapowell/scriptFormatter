@@ -15,11 +15,10 @@ import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.processor.TextState;
+import com.gmmapowell.script.utils.SBLocation;
 
-public abstract class CurrentState implements TextState {
+public abstract class CurrentState extends SBLocation implements TextState {
 	public final Map<String, Flow> flows;
-	protected String file;
-	protected int line;
 	protected Section currSection;
 	protected Para currPara;
 	protected HorizSpan currSpan;
@@ -40,9 +39,6 @@ public abstract class CurrentState implements TextState {
 	public int nextFootnoteText() {
 		return nextFnText++;
 	}
-
-	public abstract void line(int lineNumber);
-	public abstract String inputLocation();
 
 	protected boolean trimLine() {
 		return true;

@@ -1,50 +1,56 @@
-package com.gmmapowell.script.config;
+package com.gmmapowell.script.config.reader;
+
+import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
+import com.gmmapowell.script.config.Config;
+import com.gmmapowell.script.config.ScriptConfig;
+import com.gmmapowell.script.config.VarMap;
+import com.gmmapowell.script.utils.Command;
+import com.gmmapowell.script.utils.CommandDispatcher;
+import com.gmmapowell.script.utils.NestedCommandDispatcher;
+import com.gmmapowell.script.utils.SBLineArgsParser;
 import com.gmmapowell.script.utils.Utils;
 
 public class ConfigParser implements NumberedLineListener {
-	private ScriptConfig config;
-	VarMap vars = null;
-	boolean debug = false;
-	Place index = null;
-	Region workdir = null;
-	String sshid = null;
-	String what = null, type = null;
-	int wline = 0;
-	private Region root;
 	private Exception capture;
+	private final ReadConfigState state;
+	private final NestedCommandDispatcher<ReadConfigState> dispatcher;
 
 	public ConfigParser(Universe universe, Region root) {
-		this.root = root;
-		config = new ScriptConfig(universe, root);
+		state = new ReadConfigState(root, new ScriptConfig(universe, root));
+		dispatcher = new NestedCommandDispatcher<ReadConfigState>(state, new ConfigBlockListener(state));
 	}
 	
 	@Override
 	public void line(int lno, String s) {
-		if (config == null)
+		System.out.println("have " + lno + ": " + s);
+		// if we've already seen an exception, stop
+		if (capture != null)
 			return;
-		if (s.length() == 0 || s.startsWith("#"))
+		
+		// Parse this input line
+		SBLineArgsParser<ReadConfigState> lp = new SBLineArgsParser<>(state, s);
+		Command cmd = lp.readCommand();
+		if (cmd == null)
 			return;
-		int nesting = 0;
-		while (nesting < s.length() && Character.isWhitespace(s.charAt(nesting)))
-			nesting++;
-		s = s.trim();
-		if (s.length() == 0 || s.startsWith("#"))
-			return;
-		int idx = s.indexOf(' ');
-		if (idx == -1) {
-			System.out.println("Syntax error on line " + lno);
-			System.out.println("  " + s);
-			config = null;
-			return;
-		}
-		String key = s.substring(0, idx);
-		String value = s.substring(idx+1).trim();
+		
+		dispatcher.dispatch(cmd);
+	}
+	/*
+//		int idx = s.indexOf(' ');
+//		if (idx == -1) {
+//			System.out.println("Syntax error on line " + lno);
+//			System.out.println("  " + s);
+//			config = null;
+//			return;
+//		}
+//		String key = s.substring(0, idx);
+//		String value = s.substring(idx+1).trim();
 		if (nesting == 0) {
 			// if a new block is starting, flush (any) previous block
 			if (workdir == null)
@@ -62,9 +68,6 @@ public class ConfigParser implements NumberedLineListener {
 			}
 			case "index": {
 				index = root.ensurePlace(value);
-//				index = new File(value);
-//				if (!index.isAbsolute())
-//					index = new File(root, value);
 				break;
 			}
 			case "sshid": {
@@ -73,9 +76,6 @@ public class ConfigParser implements NumberedLineListener {
 			}
 			case "workdir": {
 				workdir = root.regionPath(value);
-//				workdir = new File(value);
-//				if (!workdir.isAbsolute())
-//					workdir = new File(root, value);
 				break;
 			}
 			default: {
@@ -90,15 +90,17 @@ public class ConfigParser implements NumberedLineListener {
 		} else {
 			vars.put(nesting, key, value);
 		}
-	}
+	*/
 	
 	@Override
 	public void complete() {
+		/*
 		if (workdir == null)
 			workdir = GeoFSUtils.ensureRegionPath(root, "downloads");
 		if (!handleCreation()) {
 			config = null;
 		}
+		*/
 	}
 	
 	private boolean handleCreation() {
@@ -109,11 +111,6 @@ public class ConfigParser implements NumberedLineListener {
 			config.setWorkdir(workdir);
 			switch (what) {
 			case "loader": {
-				if (index == null) {
-					System.out.println(wline + ": must specify index before loader");
-					return false;
-				}
-				config.handleLoader(vars, type, index, workdir, debug);
 				break;
 			}
 			case "processor": {
@@ -147,8 +144,9 @@ public class ConfigParser implements NumberedLineListener {
 	}
 
 	public Config config() throws Exception {
-		if (this.capture != null)
-			throw this.capture;
-		return config;
+		throw new NotImplementedException();
+//		if (this.capture != null)
+//			throw this.capture;
+//		return config;
 	}
 }

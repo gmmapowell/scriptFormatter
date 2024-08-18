@@ -12,26 +12,17 @@ public class BlogState extends CurrentState implements GitState {
 
 	public BlogState(Map<String, Flow> flows, String file) {
 		super(flows);
-		this.file = file;
+		processingFile(file);
 	}
+	
 	@Override
 	public String formatAs() {
 		return "blockquote";
 	}
 
 	@Override
-	public void line(int lineNumber) {
-		this.line = lineNumber;
-	}
-
-	@Override
 	protected boolean trimLine() {
 		return !blockquote;
-	}
-
-	@Override
-	public String inputLocation() {
-		return file + ":" + line;
 	}
 
 	public void gitdir(String dir) {

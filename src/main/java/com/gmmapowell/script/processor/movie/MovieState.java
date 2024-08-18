@@ -16,21 +16,10 @@ public class MovieState extends CurrentState {
 	}
 	
 	public void reset(String file) {
-		this.file = file;
+		processingFile(file);
 	}
 
-	@Override
-	public void line(int lineNumber) {
-		this.line = lineNumber;
-	}
-
-	public String inputLocation() {
-		return file + ":" + line;
-	}
-	
 	public String location() {
 		return "undefined";
 	}
-	
-
 }

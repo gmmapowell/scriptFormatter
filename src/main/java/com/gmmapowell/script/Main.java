@@ -4,7 +4,7 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.geofs.simple.SimpleUniverse;
 import com.gmmapowell.script.config.Config;
-import com.gmmapowell.script.config.ConfigArgs;
+import com.gmmapowell.script.config.reader.ConfigArgs;
 import com.gmmapowell.script.intf.FilesToProcess;
 
 public class Main {

@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.prose;
+package com.gmmapowell.script.utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,13 +7,34 @@ import java.util.TreeMap;
 
 import com.gmmapowell.script.processor.ParsingException;
 
-public class SBLineArgsParser<T extends CurrentState> implements LineArgsParser {
+public class SBLineArgsParser<T extends FileWithLocation> implements LineArgsParser {
 	private final T state;
 	private final StringBuilder args;
 
 	public SBLineArgsParser(T state, String args) {
 		this.state = state;
 		this.args = new StringBuilder(args);
+	}
+
+	public Command readCommand() {
+		if (args.length() == 0 || args.toString().startsWith("#"))
+			return null;
+		int nesting = 0;
+		while (nesting < args.length() && Character.isWhitespace(args.charAt(0))) {
+			args.delete(0, 1);
+			nesting++;
+		}
+		if (args.length() == 0 || args.toString().startsWith("#"))
+			return null;
+		int firstSpace = 0;
+		while (firstSpace < args.length() && !Character.isWhitespace(args.charAt(firstSpace)))
+			firstSpace++;
+		NestedCommand ret = new NestedCommand(nesting, args.substring(0, firstSpace), this);
+		args.delete(0, firstSpace);
+		while (args.length() > 0 && Character.isWhitespace(args.charAt(0))) {
+			args.delete(0, 1);
+		}
+		return ret;
 	}
 	
 	@Override

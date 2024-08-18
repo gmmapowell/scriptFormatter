@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.prose.DocState;
-import com.gmmapowell.script.processor.prose.LineArgsParser;
 import com.gmmapowell.script.processor.prose.LineCommand;
+import com.gmmapowell.script.utils.LineArgsParser;
 
 public class EmailThreadsCommand implements LineCommand {
 	private final DocState state;

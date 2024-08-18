@@ -43,7 +43,7 @@ public class DocState extends AtState {
 	}
 	
 	public void newfile(String file) {
-		this.file = file;
+		processingFile(file);
 		this.numbering.clear();
 		this.scanMode = ScanMode.NONE;
 	}
@@ -57,16 +57,6 @@ public class DocState extends AtState {
 		this.inRefComment = false;
 	}
 
-	@Override
-	public void line(int lineNumber) {
-		this.line = lineNumber;
-	}
-
-	@Override
-	public String inputLocation() {
-		return file + ":" + line;
-	}
-	
 	public String location() {
 		return (chapter-1) + "." + (section-1) + (commentary?"c":"");
 	}

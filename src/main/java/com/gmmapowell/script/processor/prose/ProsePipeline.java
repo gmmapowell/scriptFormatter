@@ -22,6 +22,7 @@ import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.utils.LineArgsParser;
 
 public abstract class ProsePipeline<T extends CurrentState> implements Processor, ProcessorConfig {
 	public class ConfigProc {
