@@ -2,7 +2,6 @@ package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
@@ -165,25 +164,21 @@ public class PresenterSink implements Sink {
 	
 	private List<List<SpanItem>> collect(Section present) {
 		List<List<SpanItem>> ret = new ArrayList<List<SpanItem>>();
-		List<SpanItem> ls = null;
+		List<SpanItem> ls = new ArrayList<>();
 		for (Para p : present.paras) {
 			for (HorizSpan h : p.spans) {
 				for (SpanItem s : h.items) {
 					if (s instanceof PresentStepOp) {
-						if (ls != null) {
-							ret.add(ls);
-						}
+						ret.add(ls);
 						ls = new ArrayList<>();
 					} else {
-						if (ls == null)
-							ls = new ArrayList<SpanItem>();
+						ls = new ArrayList<SpanItem>();
 						ls.add(s);
 					}
 				}
 			}
 		}
-		if (ls != null)
-			ret.add(ls);
+		ret.add(ls);
 		return ret;
 	}
 
