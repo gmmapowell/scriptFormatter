@@ -32,13 +32,16 @@ public class GoogleDriveWorld implements World {
 	private final Universe universe;
 	private final String appName;
 	private final Place creds;
-	private final Drive service;
+	private Drive service;
 
-	public GoogleDriveWorld(Universe universe, String appName, Place creds) throws IOException, GeneralSecurityException {
+	public GoogleDriveWorld(Universe universe, String appName, Place creds) {
 		this.universe = universe;
 		universe.register("google", this);
 		this.appName = appName;
 		this.creds = creds;
+	}
+	
+	public void prepare() throws IOException, GeneralSecurityException {
 		int i=0;
 		Drive s = null;
 		while (i<2) {

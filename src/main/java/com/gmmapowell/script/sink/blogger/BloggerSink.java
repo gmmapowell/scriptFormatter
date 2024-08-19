@@ -68,7 +68,11 @@ public class BloggerSink implements Sink {
 		this.postsFile = pf;
 		this.localOnly = localOnly;
 		this.saveContentAs = saveContentAs;
-		index = readPosts();
+		this.index = new PostIndex();
+	}
+	
+	public void prepare() throws Exception {
+		index.readFrom(postsFile);
 		if (!localOnly) {
 			try {
 				connect();
@@ -286,12 +290,6 @@ public class BloggerSink implements Sink {
 	
 	@Override
 	public void upload() throws Exception {
-	}
-
-	private PostIndex readPosts() throws IOException {
-		PostIndex index = new PostIndex();
-		index.readFrom(postsFile);
-		return index;
 	}
 
 	private BlogEntry findInPosts(String title) {

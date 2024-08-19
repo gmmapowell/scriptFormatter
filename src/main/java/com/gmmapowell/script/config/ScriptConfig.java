@@ -20,7 +20,6 @@ import com.gmmapowell.script.loader.drive.Index;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 import com.gmmapowell.script.sink.epub.EPubSink;
 import com.gmmapowell.script.sink.html.HTMLSink;
@@ -52,13 +51,6 @@ public class ScriptConfig implements Config {
 		this.root = root;
 	}
 	
-	public void handleLoader(VarMap vars, String loader, Place index, Region workdir, boolean debug) throws ConfigException {
-		this.debug = debug;
-		if ("google-drive".equals(loader)) {
-		} else
-			throw new ConfigException("Unrecognized loader type " + loader);
-	}
-
 	public void handleOutput(VarMap vars, String output, boolean debug, String sshid) throws ConfigException, Exception {
 		switch (output) {
 		case "epub": {
@@ -111,34 +103,6 @@ public class ScriptConfig implements Config {
 				}
 			}
 			sinks.add(new PDFSink(root, catalog, file, wantOpen, upload, debug, sshid, vars));
-			break;
-		}
-		case "blogger": {
-			String creds = vars.remove("credentials");
-			if (creds == null)
-				throw new ConfigException("credentials was not defined");
-			String blogUrl = vars.remove("blogurl");
-			if (blogUrl == null)
-				throw new ConfigException("blogurl was not defined");
-			String posts = vars.remove("posts");
-			if (posts == null)
-				throw new ConfigException("posts was not defined");
-			boolean localOnly = false;
-			String lo = vars.remove("local");
-			if (lo != null && "true".equalsIgnoreCase(lo))
-				localOnly = true;
-			Place saveContentAs = null;
-			String sca = vars.remove("saveAs");
-			if (sca != null)
-				saveContentAs = root.place(sca);
-			Place pf = root.placePath(posts);
-			Place cp = root.placePath(creds);
-			try {
-				sinks.add(new BloggerSink(root, cp, blogUrl, pf, localOnly, saveContentAs));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
-			}
 			break;
 		}
 		case "html": {
@@ -278,5 +242,25 @@ public class ScriptConfig implements Config {
 
 	public void loader(Loader loader) {
 		this.loader = loader;
+	}
+
+	public void sink(Sink sink) {
+		this.sinks.add(sink);
+	}
+
+	public Sink makeSink() throws IOException {
+		Sink sink;
+		if (sinks.size() == 1)
+			sink = sinks.get(0);
+		else
+			sink = new MultiSink(sinks);
+		// TODO: should be configured
+		// TODO: we also want to change the responsibilities here, so this will be very different later
+		sink = new CaptureSinkInFile(root, sink);
+		return sink;
+	}
+
+	public void processor(Processor processor) {
+		this.processor = processor;
 	}
 }

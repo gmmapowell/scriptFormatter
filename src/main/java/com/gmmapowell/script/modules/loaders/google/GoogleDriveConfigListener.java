@@ -50,12 +50,13 @@ public class GoogleDriveConfigListener implements ConfigListener {
 		if (folder == null)
 			throw new ConfigException("folder was not defined");
 		
+		// TODO: I feel that this should be elsewhere
+		// Specifically, there should be a module that loads it
 		Universe universe = state.universe();
 		try {
-			// TODO: I feel that this should be elsewhere
 			Place credsPath = state.root.placePath(creds);
 			new GoogleDriveWorld(universe, "ScriptFormatter", credsPath);
-		} catch (GeneralSecurityException | IOException ex) {
+		} catch (Exception ex) {
 			throw new ConfigException(ex.toString());
 		}
 		// TODO: this should not depend on Google Drive 
