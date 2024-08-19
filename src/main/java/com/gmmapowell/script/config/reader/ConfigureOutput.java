@@ -8,6 +8,7 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.output.blogger.BloggerOutputConfigListener;
+import com.gmmapowell.script.modules.output.pdf.PDFOutputConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
@@ -18,6 +19,7 @@ public class ConfigureOutput implements ConfigListenerProvider {
 	public ConfigureOutput(ReadConfigState state) {
 		this.state = state;
 		this.outputs.put("blogger", BloggerOutputConfigListener.class);
+		this.outputs.put("pdf", PDFOutputConfigListener.class);
 	}
 
 	@Override
