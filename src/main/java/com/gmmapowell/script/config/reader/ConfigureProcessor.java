@@ -8,6 +8,7 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.processors.blog.BlogProcessorConfigListener;
+import com.gmmapowell.script.modules.processors.doc.DocProcessorConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
@@ -18,6 +19,7 @@ public class ConfigureProcessor implements ConfigListenerProvider {
 	public ConfigureProcessor(ReadConfigState state) {
 		this.state = state;
 		this.processors.put("blog", BlogProcessorConfigListener.class);
+		this.processors.put("doc", DocProcessorConfigListener.class);
 	}
 
 	@Override

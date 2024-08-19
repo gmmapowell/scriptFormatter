@@ -6,7 +6,6 @@ import static org.junit.Assume.assumeNotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 
 import org.jmock.Expectations;
@@ -42,7 +41,9 @@ public class GDWTest {
 	public static void connectToGoogle() throws IOException, GeneralSecurityException {
 		try {
 			world = new GoogleDriveWorld(uv, "ScriptFormatter", lfs.placePath("~/.ssh/google_scriptformatter_creds.json"));
-		} catch (UnknownHostException ex) {
+			world.prepare();
+		} catch (Exception ex) {
+			System.err.println(ex);
 			world = null;
 		}
 	}

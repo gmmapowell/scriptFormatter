@@ -15,6 +15,11 @@ public class CaptureSinkInFile implements Sink {
 		dumper = new FlowDumper(region.ensurePlace("fred.flow"));
 	}
 
+	@Override
+	public void prepare() throws Exception {
+		sink.prepare();
+	}
+
 	public void flow(Flow flow) {
 		try {
 			dumper.dump(flow);

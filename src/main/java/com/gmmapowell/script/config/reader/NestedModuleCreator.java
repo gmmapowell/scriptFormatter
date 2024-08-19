@@ -7,31 +7,29 @@ import java.util.TreeMap;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
-import com.gmmapowell.script.modules.output.blogger.BloggerOutputConfigListener;
+import com.gmmapowell.script.modules.emailquoter.EmailQuoterConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
-import com.gmmapowell.script.utils.LineArgsParser;
 
-public class ConfigureOutput implements ConfigListenerProvider {
-	private final Map<String, Class<? extends ConfigListener>> outputs = new TreeMap<>();
+// TODO: I think this should actually be created early on and be available in state
+public class NestedModuleCreator {
+	private final Map<String, Class<? extends ConfigListener>> modules = new TreeMap<>();
 	private final ReadConfigState state;
 
-	public ConfigureOutput(ReadConfigState state) {
+	public NestedModuleCreator(ReadConfigState state) {
 		this.state = state;
-		this.outputs.put("blogger", BloggerOutputConfigListener.class);
+		this.modules.put("emailquoter", EmailQuoterConfigListener.class);
 	}
-
-	@Override
-	public ConfigListener make(LineArgsParser lap) {
+	
+	public ModuleConfigListener module(String mod) {
 		try {
-			String type = lap.readArg();
-			if (!this.outputs.containsKey(type)) {
-				throw new CantHappenException("there is no output '" + type + "'");
+			if (!this.modules.containsKey(mod)) {
+				throw new CantHappenException("there is no module '" + mod + "'");
 			}
-			Class<? extends ConfigListener> clz = this.outputs.get(type);
+			Class<? extends ConfigListener> clz = this.modules.get(mod);
 			Constructor<?>[] ctors = clz.getConstructors();
 			for (Constructor<?> c : ctors) {
 				if (c.getParameterCount() == 1 && FileWithLocation.class.isAssignableFrom(c.getParameters()[0].getType()))
-					return (ConfigListener) c.newInstance(state);
+					return (ModuleConfigListener) c.newInstance(state);
 			}
 			throw new CantHappenException("the class '" + clz + "' does not have a constructor that takes a state");
 		} catch (Exception ex) {

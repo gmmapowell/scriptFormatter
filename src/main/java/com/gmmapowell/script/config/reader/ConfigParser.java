@@ -28,11 +28,11 @@ public class ConfigParser implements NumberedLineListener {
 	
 	@Override
 	public void line(int lno, String s) {
-		System.out.println("have " + lno + ": " + s);
 		// if we've already seen an exception, stop
 		if (capture != null)
 			return;
 		
+		System.out.println("have " + lno + ": " + s);
 		try {
 			// Parse this input line
 			SBLineArgsParser<ReadConfigState> lp = new SBLineArgsParser<>(state, s);

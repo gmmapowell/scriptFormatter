@@ -1,44 +1,53 @@
-package com.gmmapowell.script.modules.processors.blog;
+package com.gmmapowell.script.modules.processors.doc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
+import com.gmmapowell.script.config.reader.ModuleConfigListener;
+import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.prose.BlogPipeline;
+import com.gmmapowell.script.processor.prose.DocPipeline;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
-public class BlogProcessorConfigListener implements ConfigListener {
+public class DocProcessorConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
+	private List<ModuleConfigListener> modules = new ArrayList<>();
 
-	public BlogProcessorConfigListener(ReadConfigState state) {
+	public DocProcessorConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
 	@Override
 	public ConfigListener dispatch(Command cmd) {
-//		switch (cmd.name()) {
-//		case "credentials": 
-//		case "blogurl":
-//		case "posts":
-//		case "local":
-//		case "saveAs":
-//		{
-//			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
-//			return null;
-//		}
-//		default: {
-			throw new NotImplementedException("blog processor does not have any parameters");
-//		}
-//		}
+		switch (cmd.name()) {
+		case "module": {
+			ModuleConfigListener nmc = new NestedModuleCreator(state).module(cmd.line().readArg());
+			modules.add(nmc);
+			return nmc;
+		}
+		case "joinspace": 
+		case "meta":
+		{
+			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
+			return null;
+		}
+		default: {
+			throw new NotImplementedException("doc processor does not have parameter " + cmd.name());
+		}
+		}
 	}
 
 	@Override
 	public void complete() throws ConfigException {
+			
 //		String creds = vars.remove("credentials");
 //		if (creds == null)
 //			throw new ConfigException("credentials was not defined");
@@ -60,7 +69,11 @@ public class BlogProcessorConfigListener implements ConfigListener {
 //		Place cp = state.root.placePath(creds);
 		try {
 			Sink sink = state.config.makeSink();
-			state.config.processor(new BlogPipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug));
+			DocPipeline proc = new DocPipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			state.config.processor(proc);
+			for (ModuleConfigListener m : modules) {
+				m.activate(proc);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());

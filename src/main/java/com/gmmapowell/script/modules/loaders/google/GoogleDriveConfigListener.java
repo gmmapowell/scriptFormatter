@@ -1,8 +1,5 @@
 package com.gmmapowell.script.modules.loaders.google;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
