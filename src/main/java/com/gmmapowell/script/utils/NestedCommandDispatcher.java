@@ -25,7 +25,7 @@ public class NestedCommandDispatcher<T extends FileWithLocation> implements Comm
 		lsnrs.add(new DepthListener(0, top));
 	}
 
-	public void dispatch(Command cmd) {
+	public void dispatch(Command cmd)  throws Exception {
 		int k = cmd.depth();
 		if (k > lsnrs.get(0).depth) {
 			if (pendingNest == null)

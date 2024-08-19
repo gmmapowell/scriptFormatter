@@ -12,12 +12,10 @@ import org.zinutils.exceptions.UtilException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
-import com.gmmapowell.geofs.gdw.GoogleDriveWorld;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Loader;
-import com.gmmapowell.script.loader.drive.DriveLoader;
 import com.gmmapowell.script.loader.drive.Index;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
@@ -57,22 +55,6 @@ public class ScriptConfig implements Config {
 	public void handleLoader(VarMap vars, String loader, Place index, Region workdir, boolean debug) throws ConfigException {
 		this.debug = debug;
 		if ("google-drive".equals(loader)) {
-			String creds = vars.remove("credentials");
-			if (creds == null)
-				throw new ConfigException("credentials was not defined");
-			String folder = vars.remove("folder");
-			if (folder == null)
-				throw new ConfigException("folder was not defined");
-			
-			try {
-				// TODO: I feel that this should be elsewhere
-				Place credsPath = root.placePath(creds);
-				new GoogleDriveWorld(universe, "ScriptFormatter", credsPath);
-			} catch (GeneralSecurityException | IOException ex) {
-				throw new ConfigException(ex.toString());
-			}
-			// TODO: this should not depend on Google Drive 
-			this.loader = new DriveLoader(universe, root, workdir, index, folder, debug);
 		} else
 			throw new ConfigException("Unrecognized loader type " + loader);
 	}
@@ -292,5 +274,9 @@ public class ScriptConfig implements Config {
 
 	public void setWorkdir(Region workdir) {
 		this.workdir = workdir;
+	}
+
+	public void loader(Loader loader) {
+		this.loader = loader;
 	}
 }

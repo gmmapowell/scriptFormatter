@@ -7,6 +7,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
@@ -30,6 +31,11 @@ public class LFSRegion implements Region {
 		if (file.exists())
 			throw new CantHappenException("the region exists (may be file): " + file);
 		this.file = file;
+	}
+
+	@Override
+	public Universe getUniverse() {
+		return world.getUniverse();
 	}
 
 	@Override

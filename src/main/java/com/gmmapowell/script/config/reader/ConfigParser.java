@@ -33,13 +33,17 @@ public class ConfigParser implements NumberedLineListener {
 		if (capture != null)
 			return;
 		
-		// Parse this input line
-		SBLineArgsParser<ReadConfigState> lp = new SBLineArgsParser<>(state, s);
-		Command cmd = lp.readCommand();
-		if (cmd == null)
-			return;
-		
-		dispatcher.dispatch(cmd);
+		try {
+			// Parse this input line
+			SBLineArgsParser<ReadConfigState> lp = new SBLineArgsParser<>(state, s);
+			Command cmd = lp.readCommand();
+			if (cmd == null)
+				return;
+			
+			dispatcher.dispatch(cmd);
+		} catch (Exception ex) {
+			this.capture = ex;
+		}
 	}
 	/*
 //		int idx = s.indexOf(' ');
@@ -144,9 +148,8 @@ public class ConfigParser implements NumberedLineListener {
 	}
 
 	public Config config() throws Exception {
-		throw new NotImplementedException();
-//		if (this.capture != null)
-//			throw this.capture;
-//		return config;
+		if (this.capture != null)
+			throw this.capture;
+		return state.config;
 	}
 }

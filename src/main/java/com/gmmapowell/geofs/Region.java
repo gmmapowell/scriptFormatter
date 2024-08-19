@@ -90,6 +90,12 @@ public interface Region {
 	 */
 	Region parent();
 
+	/** Get the overall Universe
+	 * 
+	 * @return the Universe where this Region is ultimately located
+	 */
+	Universe getUniverse();
+
 	/** The name of this element of the region
 	 * 
 	 * @return the name of this element of the region
@@ -106,5 +112,5 @@ public interface Region {
 	Region ensureSubregion(String name);
 	void places(PlaceListener lsnr);
 	void regions(RegionListener lsnr);
-	
+
 }
