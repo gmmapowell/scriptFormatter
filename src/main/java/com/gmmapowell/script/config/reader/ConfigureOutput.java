@@ -9,7 +9,9 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.output.blogger.BloggerOutputConfigListener;
 import com.gmmapowell.script.modules.output.epub.EPubOutputConfigListener;
+import com.gmmapowell.script.modules.output.html.HTMLOutputConfigListener;
 import com.gmmapowell.script.modules.output.pdf.PDFOutputConfigListener;
+import com.gmmapowell.script.modules.output.presenter.PresenterOutputConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
@@ -21,7 +23,9 @@ public class ConfigureOutput implements ConfigListenerProvider {
 		this.state = state;
 		this.outputs.put("blogger", BloggerOutputConfigListener.class);
 		this.outputs.put("epub", EPubOutputConfigListener.class);
+		this.outputs.put("html", HTMLOutputConfigListener.class);
 		this.outputs.put("pdf", PDFOutputConfigListener.class);
+		this.outputs.put("presenter", PresenterOutputConfigListener.class);
 	}
 
 	@Override

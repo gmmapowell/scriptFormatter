@@ -8,6 +8,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
@@ -25,6 +26,11 @@ public class GDWRegion implements Region {
 		this.regionId = regionId;
 		this.name = name;
 		this.parent = parent;
+	}
+
+	@Override
+	public Universe getUniverse() {
+		throw new NotImplementedException();
 	}
 
 	@Override

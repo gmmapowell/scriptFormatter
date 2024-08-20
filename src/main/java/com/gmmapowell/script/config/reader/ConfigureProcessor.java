@@ -7,8 +7,11 @@ import java.util.TreeMap;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
+import com.gmmapowell.script.modules.processors.article.ArticleProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.blog.BlogProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.doc.DocProcessorConfigListener;
+import com.gmmapowell.script.modules.processors.movie.MovieProcessorConfigListener;
+import com.gmmapowell.script.modules.processors.presenter.PresenterProcessorConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
@@ -18,8 +21,11 @@ public class ConfigureProcessor implements ConfigListenerProvider {
 
 	public ConfigureProcessor(ReadConfigState state) {
 		this.state = state;
+		this.processors.put("article", ArticleProcessorConfigListener.class);
 		this.processors.put("blog", BlogProcessorConfigListener.class);
 		this.processors.put("doc", DocProcessorConfigListener.class);
+		this.processors.put("movie", MovieProcessorConfigListener.class);
+		this.processors.put("presenter", PresenterProcessorConfigListener.class);
 	}
 
 	@Override

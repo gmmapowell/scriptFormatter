@@ -13,6 +13,12 @@ public class MultiSink implements Sink {
 	}
 
 	@Override
+	public void prepare() throws Exception {
+		for (Sink s : sinks)
+			s.prepare();
+	}
+	
+	@Override
 	public void flow(Flow flow) {
 		for (Sink s : sinks)
 			s.flow(flow);

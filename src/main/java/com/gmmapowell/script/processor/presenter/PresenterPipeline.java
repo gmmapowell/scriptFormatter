@@ -5,16 +5,20 @@ import java.io.PrintWriter;
 
 import org.flasck.flas.blocker.Blocker;
 import org.flasck.flas.errors.ErrorResult;
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.Processor;
+import com.gmmapowell.script.processor.prose.LineCommand;
 import com.gmmapowell.script.sink.Sink;
 
-public class PresenterPipeline implements Processor {
+public class PresenterPipeline implements Processor, ProcessorConfig {
 	private final Sink sink;
 	private final boolean debug;
 	private final BlockDispatcher handler;
@@ -33,6 +37,11 @@ public class PresenterPipeline implements Processor {
 		this.blocker = new Blocker(errors, handler);
 	}
 	
+	@Override
+	public void installCommand(String cmd, Class<? extends LineCommand> proc, Object cfg) throws ConfigException {
+		throw new NotImplementedException();
+	}
+
 	@Override
 	public void process(FilesToProcess places) throws IOException {
 		for (Place f : places.included()) {

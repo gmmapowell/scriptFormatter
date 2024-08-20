@@ -1,20 +1,13 @@
 package com.gmmapowell.script.config.reader;
 
-import org.zinutils.exceptions.NotImplementedException;
-
-import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
-import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.Config;
 import com.gmmapowell.script.config.ScriptConfig;
-import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.utils.Command;
-import com.gmmapowell.script.utils.CommandDispatcher;
 import com.gmmapowell.script.utils.NestedCommandDispatcher;
 import com.gmmapowell.script.utils.SBLineArgsParser;
-import com.gmmapowell.script.utils.Utils;
 
 public class ConfigParser implements NumberedLineListener {
 	private Exception capture;
@@ -96,30 +89,6 @@ public class ConfigParser implements NumberedLineListener {
 		}
 	*/
 	
-	@Override
-	public void complete() {
-		/*
-		if (workdir == null)
-			workdir = GeoFSUtils.ensureRegionPath(root, "downloads");
-		if (!handleCreation()) {
-			config = null;
-		}
-		*/
-	}
-	
-	private boolean handleCreation() {
-		try {
-			case "webedit": {
-				config.handleWebedit(vars, type, debug, sshid);
-				break;
-			}
-			return true;
-		} catch (Exception ex) {
-			this.capture = ex;
-			return false;
-		}
-	}
-
 	public Config config() throws Exception {
 		if (this.capture != null)
 			throw this.capture;

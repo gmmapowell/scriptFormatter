@@ -25,12 +25,13 @@ public class ConfigBlockListener implements ConfigListener {
 		blocks.put("loader", new ConfigureLoader(state));
 		blocks.put("output", new ConfigureOutput(state));
 		blocks.put("processor", new ConfigureProcessor(state));
+		blocks.put("webedit", new ConfigureWebEdit(state));
 	}
 
 	@Override
 	public ConfigListener dispatch(Command cmd) {
 		LineArgsParser lap = cmd.line();
-		if (!lap.hasMore()) {
+		if (!lap.hasMore() && !"webedit".equals(cmd.name())) { // TODO: each processor should do this for itself
 			throw WrappedException.wrap(new ConfigException("command '" + cmd.name() + "' requires an argument"));
 		}
 		if (blocks.containsKey(cmd.name())) {

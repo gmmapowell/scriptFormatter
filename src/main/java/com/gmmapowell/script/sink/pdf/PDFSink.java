@@ -59,6 +59,10 @@ public class PDFSink implements Sink {
 	}
 
 	@Override
+	public void prepare() throws Exception {
+	}
+
+	@Override
 	public void flow(Flow flow) {
 		this.flows.add(flow);
 	}

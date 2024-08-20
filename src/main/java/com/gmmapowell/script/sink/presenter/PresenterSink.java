@@ -46,6 +46,10 @@ public class PresenterSink implements Sink {
 	}
 
 	@Override
+	public void prepare() throws Exception {
+	}
+
+	@Override
 	public void flow(Flow flow) {
 		flows.add(flow);
 	}

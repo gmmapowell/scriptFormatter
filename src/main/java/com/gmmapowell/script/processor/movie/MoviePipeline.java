@@ -5,17 +5,21 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.Processor;
+import com.gmmapowell.script.processor.prose.LineCommand;
 import com.gmmapowell.script.sink.Sink;
 
-public class MoviePipeline implements Processor {
+public class MoviePipeline implements Processor, ProcessorConfig {
 	public enum Mode {
 		COMMENT, SLUG1, SLUG2, NORMAL;
 	}
@@ -40,6 +44,11 @@ public class MoviePipeline implements Processor {
 			throw new ConfigException("There is no definition of dramatis");
 		this.dramatis = root.place(d);
 		this.sink = outputTo;
+	}
+
+	@Override
+	public void installCommand(String cmd, Class<? extends LineCommand> proc, Object cfg) throws ConfigException {
+		throw new NotImplementedException();
 	}
 
 	@Override

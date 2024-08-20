@@ -1,54 +1,44 @@
-package com.gmmapowell.script.modules.processors.doc;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.gmmapowell.script.modules.processors.article;
 
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
-import com.gmmapowell.script.config.reader.ModuleConfigListener;
-import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.prose.DocPipeline;
+import com.gmmapowell.script.processor.prose.ArticlePipeline;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
-public class DocProcessorConfigListener implements ConfigListener {
+public class ArticleProcessorConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
-	private List<ModuleConfigListener> modules = new ArrayList<>();
 
-	public DocProcessorConfigListener(ReadConfigState state) {
+	public ArticleProcessorConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
 	@Override
 	public ConfigListener dispatch(Command cmd) {
-		switch (cmd.name()) {
-		case "module": {
-			ModuleConfigListener nmc = new NestedModuleCreator(state).module(cmd.line().readArg());
-			modules.add(nmc);
-			return nmc;
-		}
-		case "joinspace": 
-		case "meta":
-		case "scanmode":
-		{
-			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
-			return null;
-		}
-		default: {
-			throw new NotImplementedException("doc processor does not have parameter " + cmd.name());
-		}
-		}
+//		switch (cmd.name()) {
+//		case "credentials": 
+//		case "blogurl":
+//		case "posts":
+//		case "local":
+//		case "saveAs":
+//		{
+//			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
+//			return null;
+//		}
+//		default: {
+			throw new NotImplementedException("article processor does not have any parameters");
+//		}
+//		}
 	}
 
 	@Override
 	public void complete() throws ConfigException {
-			
 //		String creds = vars.remove("credentials");
 //		if (creds == null)
 //			throw new ConfigException("credentials was not defined");
@@ -70,11 +60,7 @@ public class DocProcessorConfigListener implements ConfigListener {
 //		Place cp = state.root.placePath(creds);
 		try {
 			Sink sink = state.config.makeSink();
-			DocPipeline proc = new DocPipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug);
-			state.config.processor(proc);
-			for (ModuleConfigListener m : modules) {
-				m.activate(proc);
-			}
+			state.config.processor(new ArticlePipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());

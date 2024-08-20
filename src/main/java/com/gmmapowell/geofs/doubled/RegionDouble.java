@@ -8,11 +8,17 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
 
 public class RegionDouble implements Region, RegionPlace {
 	public Map<String, RegionPlace> entries = new TreeMap<>();
+
+	@Override
+	public Universe getUniverse() {
+		throw new NotImplementedException();
+	}
 
 	@Override
 	public Region subregion(String name) {

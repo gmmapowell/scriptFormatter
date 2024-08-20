@@ -79,6 +79,9 @@ public class EPubSink implements Sink {
 //		stock = styles.getStock(stockName);
 	}
 
+	public void prepare() {
+	}
+	
 	@Override
 	public void flow(Flow flow) {
 		this.flows.add(flow);
