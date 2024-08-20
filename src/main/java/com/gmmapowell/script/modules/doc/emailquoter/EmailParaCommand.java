@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.emailquoter;
+package com.gmmapowell.script.modules.doc.emailquoter;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;

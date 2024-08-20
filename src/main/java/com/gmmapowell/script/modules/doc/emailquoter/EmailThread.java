@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.emailquoter;
+package com.gmmapowell.script.modules.doc.emailquoter;
 
 import java.util.Set;
 import java.util.TreeSet;

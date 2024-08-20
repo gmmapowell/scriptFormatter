@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.emailquoter;
+package com.gmmapowell.script.modules.doc.emailquoter;
 
 import java.util.ArrayList;
 import java.util.List;

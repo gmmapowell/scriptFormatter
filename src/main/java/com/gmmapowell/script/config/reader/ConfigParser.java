@@ -109,36 +109,9 @@ public class ConfigParser implements NumberedLineListener {
 	
 	private boolean handleCreation() {
 		try {
-			if (what == null || config == null)
-				return true;
-			config.setIndex(index);
-			config.setWorkdir(workdir);
-			switch (what) {
-			case "loader": {
-				break;
-			}
-			case "processor": {
-				config.handleProcessor(vars, type, debug);
-				break;
-			}
-			case "output": {
-				config.handleOutput(vars, type, debug, sshid);
-				break;
-			}
 			case "webedit": {
 				config.handleWebedit(vars, type, debug, sshid);
 				break;
-			}
-			default: {
-				System.out.println(wline +": there is no block " + what);
-				return false;
-			}
-			}
-			if (!vars.isEmpty()) {
-				System.out.println(wline + ": block " + what + " was given vars but did not use them:");
-				for (String v : vars.keySet())
-					System.out.println("  " + v);
-				return false;
 			}
 			return true;
 		} catch (Exception ex) {

@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.emailquoter;
+package com.gmmapowell.script.modules.doc.emailquoter;
 
 public class SnapUser implements SnapLine {
 	public final String snapper;

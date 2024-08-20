@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.emailquoter;
+package com.gmmapowell.script.modules.doc.includecode;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -10,20 +10,19 @@ import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.utils.Command;
 
-public class EmailQuoterConfigListener implements ModuleConfigListener {
+public class IncludeCodeConfigListener implements ModuleConfigListener {
 	private final ReadConfigState state;
 	private final VarMap vars = new VarMap();
-	private EmailQuoter quoter;
+	private Includer includer;
 
-	public EmailQuoterConfigListener(ReadConfigState state) {
+	public IncludeCodeConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
 	@Override
 	public ConfigListener dispatch(Command cmd) throws Exception {
 		switch (cmd.name()) {
-		case "threads": 
-		case "snaps":
+		case "samples": 
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;
@@ -36,11 +35,11 @@ public class EmailQuoterConfigListener implements ModuleConfigListener {
 
 	@Override
 	public void complete() throws Exception {
-		quoter = new EmailQuoter(state, vars);
+		includer = new Includer(state, vars);
 	}
 
 	@Override
 	public void activate(ProcessorConfig proc) throws ConfigException {
-		quoter.activate(proc);
+		includer.activate(proc);
 	}
 }

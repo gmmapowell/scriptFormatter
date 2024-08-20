@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.emailquoter;
+package com.gmmapowell.script.modules.doc.emailquoter;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;

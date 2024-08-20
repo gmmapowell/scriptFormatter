@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.gmmapowell.script.modules.emailquoter.Citation;
+import com.gmmapowell.script.modules.doc.emailquoter.Citation;
 
 public class CitationParsing {
 

@@ -23,7 +23,6 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 import com.gmmapowell.script.sink.epub.EPubSink;
 import com.gmmapowell.script.sink.html.HTMLSink;
-import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.sink.presenter.PresenterSink;
 import com.gmmapowell.script.styles.ConfigurableStyleCatalog;
 import com.gmmapowell.script.styles.StyleCatalog;
@@ -53,32 +52,6 @@ public class ScriptConfig implements Config {
 	
 	public void handleOutput(VarMap vars, String output, boolean debug, String sshid) throws ConfigException, Exception {
 		switch (output) {
-		case "epub": {
-			String file = vars.remove("file");
-			if (file == null)
-				throw new ConfigException("output file was not defined");
-			String open = vars.remove("open");
-			boolean wantOpen = false;
-			if ("true".equals(open))
-				wantOpen = true;
-			String upload = vars.remove("upload");
-			String styles = vars.remove("styles");
-			if (styles == null)
-				throw new ConfigException("style catalog was not defined");
-			styles = Utils.subenvs(styles);
-			StyleCatalog catalog;
-			try {
-				catalog = (StyleCatalog) Class.forName(styles).getConstructor().newInstance();
-			} catch (ClassNotFoundException ex) {
-				try {
-					catalog = new ConfigurableStyleCatalog(root.place(styles), debug);
-				} catch (Exception e2) {
-					throw new ConfigException(e2.getMessage());
-				}
-			}
-			sinks.add(new EPubSink(root, catalog, file, wantOpen, upload, debug, sshid, vars));
-			break;
-		}
 		case "html": {
 			String storeInto = vars.remove("store");
 			if (storeInto == null)
