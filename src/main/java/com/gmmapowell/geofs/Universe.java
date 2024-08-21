@@ -8,4 +8,5 @@ public interface Universe {
 
 	Region regionPath(String uri);
 
+	void prepareWorlds() throws Exception;
 }

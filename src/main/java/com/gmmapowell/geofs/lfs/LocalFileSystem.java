@@ -22,6 +22,10 @@ public class LocalFileSystem implements World {
 	}
 
 	@Override
+	public void prepare() throws Exception {
+	}
+
+	@Override
 	public Universe getUniverse() {
 		return universe;
 	}

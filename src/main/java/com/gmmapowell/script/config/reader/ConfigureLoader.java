@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
-import com.gmmapowell.script.modules.loaders.google.GoogleDriveConfigListener;
+import com.gmmapowell.script.loader.ContentLoaderConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
@@ -17,7 +17,7 @@ public class ConfigureLoader implements ConfigListenerProvider {
 
 	public ConfigureLoader(ReadConfigState state) {
 		this.state = state;
-		this.loaders.put("google-drive", GoogleDriveConfigListener.class);
+		this.loaders.put("google-drive", ContentLoaderConfigListener.class);
 	}
 
 	@Override

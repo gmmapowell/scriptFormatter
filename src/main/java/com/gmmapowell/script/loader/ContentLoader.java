@@ -1,7 +1,9 @@
-package com.gmmapowell.script.loader.drive;
+package com.gmmapowell.script.loader;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
+import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
@@ -9,9 +11,8 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.intf.FilesToProcess;
-import com.gmmapowell.script.loader.Loader;
 
-public class DriveLoader implements Loader {
+public class ContentLoader implements Loader {
 	private final String folder;
 	private final Place indexFile;
 	private final Region downloads;
@@ -20,13 +21,16 @@ public class DriveLoader implements Loader {
 	private String wetitle;
 	private final Universe u;
 
-	public DriveLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean debug)
+	public ContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean debug)
 			throws ConfigException {
 		this.u = u;
 		this.folder = folder;
 		this.indexFile = indexFile;
 		this.downloads = downloads;
 		this.debug = debug;
+		if (downloads == null) {
+			throw new ConfigException("downloads cannot be null");
+		}
 	}
 
 	@Override
@@ -61,6 +65,9 @@ public class DriveLoader implements Loader {
 	}
 
 	private void downloadFolder(Index index, Region downloads, String ind, Region dlFrom) {
+		if (downloads == null) {
+			throw new CantHappenException("downloads cannot be null");
+		}
 		dlFrom.places(place -> {
 			try {
 				Place local = downloads.ensurePlace(place.name() + ".txt");

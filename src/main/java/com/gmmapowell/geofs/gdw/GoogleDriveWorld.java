@@ -41,7 +41,7 @@ public class GoogleDriveWorld implements World {
 		this.creds = creds;
 	}
 	
-	public void prepare() throws IOException, GeneralSecurityException {
+	public void prepare() throws Exception {
 		int i=0;
 		Drive s = null;
 		while (i<2) {

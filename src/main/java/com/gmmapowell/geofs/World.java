@@ -11,6 +11,12 @@ package com.gmmapowell.geofs;
  * <tt>Region</tt>, it is possible to find sub-regions and <tt>Place</tt>s.
  */
 public interface World {
+	/** In order to support a "create-configure-use" model, before use, the "prepare" method will be called.
+	 * It is expected that prepare() is idempotent, that is, it can be called multiple times without causing problems.
+	 * @throws Exception 
+	 */
+	void prepare() throws Exception;
+
 	/** Find a single, identifiable root for this <tt>World</tt>.  This may or may not be applicable depending on
 	 * the implementation.  For example, a Linux filesystem will have a single root (<tt>/</tt>), whereas a Windows
 	 * filesystem will not (it will require a drive letter).  Each implementation should make it clear what is available and what is not.
@@ -58,5 +64,4 @@ public interface World {
 	 * @return the broader Universe of which this World is part
 	 */
 	Universe getUniverse();
-
 }

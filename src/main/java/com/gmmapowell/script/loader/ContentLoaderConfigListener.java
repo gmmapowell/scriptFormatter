@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.loaders.google;
+package com.gmmapowell.script.loader;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -9,14 +9,13 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
-import com.gmmapowell.script.loader.drive.DriveLoader;
 import com.gmmapowell.script.utils.Command;
 
-public class GoogleDriveConfigListener implements ConfigListener {
+public class ContentLoaderConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
 
-	public GoogleDriveConfigListener(ReadConfigState state) {
+	public ContentLoaderConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
@@ -40,6 +39,9 @@ public class GoogleDriveConfigListener implements ConfigListener {
 		if (state.index == null) {
 			throw new ConfigException(state.wline + ": must specify index before loader");
 		}
+		if (state.workdir == null) {
+			throw new ConfigException(state.wline + ": must specify workdir before loader");
+		}
 		String creds = vars.remove("credentials");
 		if (creds == null)
 			throw new ConfigException("credentials was not defined");
@@ -56,8 +58,7 @@ public class GoogleDriveConfigListener implements ConfigListener {
 		} catch (Exception ex) {
 			throw new ConfigException(ex.toString());
 		}
-		// TODO: this should not depend on Google Drive 
-		state.config.loader(new DriveLoader(universe, state.root, state.workdir, state.index, folder, state.debug));
+		state.config.loader(new ContentLoader(universe, state.root, state.workdir, state.index, folder, state.debug));
 
 	}
 

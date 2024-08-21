@@ -13,8 +13,7 @@ public class Main {
 		LocalFileSystem lfs = new LocalFileSystem(uv);
 		try {
 			Config cfg = ConfigArgs.processConfig(lfs, args).read();
-			System.out.println("done");
-			System.exit(0);
+			uv.prepareWorlds();
 			FilesToProcess files = cfg.updateIndex();
 			cfg.generate(files);
 			cfg.show();

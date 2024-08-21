@@ -14,6 +14,12 @@ public class SimpleUniverse implements Universe {
 	private Map<String, World> worlds = new TreeMap<>();
 
 	@Override
+	public void prepareWorlds() throws Exception {
+		for (World w : worlds.values())
+			w.prepare();
+	}
+
+	@Override
 	public World getWorld(String world) {
 		World ret = worlds .get(world);
 		if (ret == null)

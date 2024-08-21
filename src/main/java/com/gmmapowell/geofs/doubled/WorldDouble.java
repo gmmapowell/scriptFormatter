@@ -25,6 +25,10 @@ public class WorldDouble implements World {
 	}
 
 	@Override
+	public void prepare() throws Exception {
+	}
+
+	@Override
 	public Universe getUniverse() {
 		throw new NotImplementedException();
 	}
