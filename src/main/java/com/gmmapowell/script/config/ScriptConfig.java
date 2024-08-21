@@ -21,7 +21,7 @@ import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 public class ScriptConfig implements Config {
 	// This is a hack to make regression tests quicker.
 	// TODO: it should be configured from the environment
-	private final boolean ALLOW_UPLOADS = true;
+	private final boolean ALLOW_UPLOADS = false;
 	
 	private final Region root;
 	private boolean debug;
