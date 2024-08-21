@@ -11,11 +11,11 @@ import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.prose.DocState.ScanMode;
 import com.gmmapowell.script.sink.Sink;
 
-public abstract class AtPipeline<T extends AtState> extends ProsePipeline<T> {
+public abstract class AtProcessor<T extends AtState> extends ProseProcessor<T> {
 	protected final ScanMode scanmode;
 	protected final boolean joinspace;
 
-	public AtPipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
+	public AtProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 		if (options.containsKey("scanmode")) {
 			this.scanmode = ScanMode.valueOf(options.remove("scanmode").toUpperCase());

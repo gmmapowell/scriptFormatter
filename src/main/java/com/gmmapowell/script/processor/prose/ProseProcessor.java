@@ -24,7 +24,7 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
 
-public abstract class ProsePipeline<T extends CurrentState> implements Processor, ProcessorConfig {
+public abstract class ProseProcessor<T extends CurrentState> implements Processor, ProcessorConfig {
 	public class ConfigProc {
 		private final Class<? extends LineCommand> procclz;
 		private final Object cfg;
@@ -40,7 +40,7 @@ public abstract class ProsePipeline<T extends CurrentState> implements Processor
 	protected final boolean debug;
 	protected final Map<String, ConfigProc> lineProcessors = new TreeMap<>();
 
-	public ProsePipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
+	public ProseProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		this.ef = ef;
 		this.sink = sink;
 		this.debug = debug;

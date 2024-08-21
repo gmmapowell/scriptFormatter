@@ -21,10 +21,10 @@ import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
 import com.gmmapowell.script.utils.SBLineArgsParser;
 
-public class BlogPipeline extends ProsePipeline<BlogState> {
+public class BlogProcessor extends ProseProcessor<BlogState> {
 	private BlogState state;
 
-	public BlogPipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
+	public BlogProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 	}
 	

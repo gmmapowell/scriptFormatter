@@ -35,14 +35,14 @@ import com.gmmapowell.script.utils.LineArgsParser;
 import com.gmmapowell.script.utils.SBLineArgsParser;
 import com.gmmapowell.script.utils.Utils;
 
-public class DocPipeline extends AtPipeline<DocState> {
+public class DocProcessor extends AtProcessor<DocState> {
 	private DocState state;
 	private final List<File> samples = new ArrayList<>();
 	private final Grammar grammar;
 	private final TableOfContents toc;
 	private final JSONObject currentMeta;
 	
-	public DocPipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
+	public DocProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 		Place tocfile = null;
 		Place metafile = null;

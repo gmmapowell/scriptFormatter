@@ -18,10 +18,10 @@ import com.gmmapowell.script.flow.SectionTitle;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.sink.Sink;
 
-public class ArticlePipeline extends AtPipeline<ArticleState> {
+public class ArticleProcessor extends AtProcessor<ArticleState> {
 	private ArticleState state;
 
-	public ArticlePipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
+	public ArticleProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
 	}
 

@@ -12,7 +12,7 @@ import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.movie.MoviePipeline;
+import com.gmmapowell.script.processor.movie.MovieProcessor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
@@ -69,7 +69,7 @@ public class MovieProcessorConfigListener implements ConfigListener {
 //		Place cp = state.root.placePath(creds);
 		try {
 			Sink sink = state.config.makeSink();
-			MoviePipeline proc = new MoviePipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			MovieProcessor proc = new MovieProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
 			state.config.processor(proc);
 			for (ModuleConfigListener m : modules) {
 				m.activate(proc);

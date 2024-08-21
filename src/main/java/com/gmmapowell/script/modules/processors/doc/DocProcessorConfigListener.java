@@ -12,7 +12,7 @@ import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.prose.DocPipeline;
+import com.gmmapowell.script.processor.prose.DocProcessor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
@@ -70,14 +70,14 @@ public class DocProcessorConfigListener implements ConfigListener {
 //		Place cp = state.root.placePath(creds);
 		try {
 			Sink sink = state.config.makeSink();
-			DocPipeline proc = new DocPipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			DocProcessor proc = new DocProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
 			state.config.processor(proc);
 			for (ModuleConfigListener m : modules) {
 				m.activate(proc);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
+			throw new ConfigException("Error creating DocProcessor: " + ex.getMessage());
 		}
 	}
 }

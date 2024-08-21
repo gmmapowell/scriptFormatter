@@ -18,14 +18,14 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.processor.prose.LineCommand;
 import com.gmmapowell.script.sink.Sink;
 
-public class PresenterPipeline implements Processor, ProcessorConfig {
+public class PresenterProcessor implements Processor, ProcessorConfig {
 	private final Sink sink;
 	private final boolean debug;
 	private final BlockDispatcher handler;
 	private final Blocker blocker;
 	private final ErrorResult errors = new ErrorResult();
 
-	public PresenterPipeline(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
+	public PresenterProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		this.sink = sink;
 		this.debug = debug;
 		String imagedir = options.remove("imagedir");

@@ -19,7 +19,7 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.processor.prose.LineCommand;
 import com.gmmapowell.script.sink.Sink;
 
-public class MoviePipeline implements Processor, ProcessorConfig {
+public class MovieProcessor implements Processor, ProcessorConfig {
 	public enum Mode {
 		COMMENT, SLUG1, SLUG2, NORMAL;
 	}
@@ -31,7 +31,7 @@ public class MoviePipeline implements Processor, ProcessorConfig {
 	private final boolean debug;
 	private final Formatter formatter;
 
-	public MoviePipeline(Region root, ElementFactory ef, Sink outputTo, VarMap options, boolean debug) throws ConfigException {
+	public MovieProcessor(Region root, ElementFactory ef, Sink outputTo, VarMap options, boolean debug) throws ConfigException {
 		this.debug = debug;
 		this.state = new MovieState(new TreeMap<String, Flow>());
 		this.state.flows.put("main", new Flow("main", true));

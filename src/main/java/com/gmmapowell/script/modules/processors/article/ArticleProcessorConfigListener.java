@@ -7,7 +7,7 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.prose.ArticlePipeline;
+import com.gmmapowell.script.processor.prose.ArticleProcessor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
@@ -60,10 +60,10 @@ public class ArticleProcessorConfigListener implements ConfigListener {
 //		Place cp = state.root.placePath(creds);
 		try {
 			Sink sink = state.config.makeSink();
-			state.config.processor(new ArticlePipeline(state.root, new BlockishElementFactory(), sink, vars, state.debug));
+			state.config.processor(new ArticleProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug));
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			throw new ConfigException("Error creating BloggerSink: " + ex.getMessage());
+			throw new ConfigException("Error creating ArticleProcessor: " + ex.getMessage());
 		}
 	}
 }
