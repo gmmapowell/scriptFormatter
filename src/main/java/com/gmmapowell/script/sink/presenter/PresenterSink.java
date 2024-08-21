@@ -196,4 +196,8 @@ public class PresenterSink implements Sink {
 			throw new CantHappenException("there is no formatter for slide " + format);
 		}
 	}
+
+	@Override
+	public void finish() throws Exception {
+	}
 }

@@ -41,4 +41,10 @@ public class MultiSink implements Sink {
 		for (Sink s : sinks)
 			s.upload();
 	}
+
+	@Override
+	public void finish() throws Exception {
+		for (Sink s : sinks)
+			s.finish();
+	}
 }

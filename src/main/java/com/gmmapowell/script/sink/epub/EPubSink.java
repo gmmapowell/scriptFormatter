@@ -297,4 +297,8 @@ public class EPubSink implements Sink {
 			new Upload(output, upload, sshid, true).send();
 		}
 	}
+
+	@Override
+	public void finish() throws Exception {
+	}
 }

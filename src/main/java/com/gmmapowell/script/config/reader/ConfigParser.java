@@ -39,9 +39,19 @@ public class ConfigParser implements NumberedLineListener {
 		}
 	}
 	
+	@Override
+	public void complete() {
+		try {
+			dispatcher.complete();
+		} catch (Exception ex) {
+			this.capture = ex;
+		}
+	}
+	
 	public Config config() throws Exception {
 		if (this.capture != null)
 			throw this.capture;
+		state.config.check();
 		return state.config;
 	}
 }

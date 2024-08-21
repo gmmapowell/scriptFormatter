@@ -248,6 +248,10 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 	protected void done() throws IOException {
 		if (state != null)
 			commitCurrentCommand();
+		
+		// TODO: I just hacked this in here, but I think it should be a separate phase
+		for (Flow f : state.flows.values())
+			sink.flow(f);
 //		index.close();
 	}
 }

@@ -8,6 +8,9 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
@@ -61,6 +64,7 @@ public class BloggerSink implements Sink {
 	private boolean haveBreak;
 	private Place saveContentAs;
 	private boolean localOnly;
+	private Map<String, String> uploads = new TreeMap<>();
 
 	public BloggerSink(Region root, Place cp, String blogUrl, Place pf, boolean localOnly, Place saveContentAs) throws IOException, GeneralSecurityException {
 		this.creds = cp;
@@ -147,9 +151,8 @@ public class BloggerSink implements Sink {
 				transition(cf, last, "text", false);
 			}
 			writer.close();
-			upload(f.name, this.sw.toString());
+			uploads.put(f.name, this.sw.toString());
 		}
-		index.close();
 	}
 
 	private String transition(List<String> cf, String last, StyledToken tok) {
@@ -254,7 +257,14 @@ public class BloggerSink implements Sink {
 		}
 	}
 
-	public void upload(String title, String content) throws IOException {
+	@Override
+	public void upload() throws Exception {
+		for (Entry<String, String> e : uploads.entrySet()) {
+			this.upload(e.getKey(), e.getValue());
+		}
+	}
+
+	private void upload(String title, String content) throws IOException {
 		BlogEntry idx = findInPosts(title);
 		if (idx != null && idx.isLive) {
 			System.out.println("Not uploading " + title + " as it is already live");
@@ -286,10 +296,6 @@ public class BloggerSink implements Sink {
 
 	@Override
 	public void showFinal() {
-	}
-	
-	@Override
-	public void upload() throws Exception {
 	}
 
 	private BlogEntry findInPosts(String title) {
@@ -336,5 +342,9 @@ public class BloggerSink implements Sink {
 	private File tokenStore() {
 		return new File(GeoFSUtils.file(creds.region()), "google_scriptformatter_blogger_tokens");
 
+	}
+	
+	public void finish() throws Exception {
+		index.close();
 	}
 }

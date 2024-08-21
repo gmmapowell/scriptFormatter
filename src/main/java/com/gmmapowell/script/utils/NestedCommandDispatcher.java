@@ -25,6 +25,7 @@ public class NestedCommandDispatcher<T extends FileWithLocation> implements Comm
 		lsnrs.add(new DepthListener(0, top));
 	}
 
+	@Override
 	public void dispatch(Command cmd)  throws Exception {
 		int k = cmd.depth();
 		if (k > lsnrs.get(0).depth) {
@@ -44,5 +45,12 @@ public class NestedCommandDispatcher<T extends FileWithLocation> implements Comm
 			throw new CantHappenException("inconsistent nesting"); // TODO: make this a proper error
 		}
 		pendingNest = lsnrs.get(0).lsnr.dispatch(cmd);
+	}
+
+	@Override
+	public void complete() throws Exception {
+		while (!lsnrs.isEmpty()) {
+			lsnrs.remove(0).lsnr.complete();
+		}
 	}
 }

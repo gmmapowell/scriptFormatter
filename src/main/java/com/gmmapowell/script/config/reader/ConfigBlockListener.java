@@ -14,6 +14,7 @@ import com.gmmapowell.script.utils.Utils;
 public class ConfigBlockListener implements ConfigListener {
 	private final ReadConfigState state;
 	private Map<String, ConfigListenerProvider> blocks = new TreeMap<>();
+	private ConfigListener nest;
 
 	public ConfigBlockListener(ReadConfigState state) {
 		this.state = state;
@@ -30,12 +31,13 @@ public class ConfigBlockListener implements ConfigListener {
 
 	@Override
 	public ConfigListener dispatch(Command cmd) {
+		this.nest = null;
 		LineArgsParser lap = cmd.line();
 		if (!lap.hasMore() && !"webedit".equals(cmd.name())) { // TODO: each processor should do this for itself
 			throw WrappedException.wrap(new ConfigException("command '" + cmd.name() + "' requires an argument"));
 		}
 		if (blocks.containsKey(cmd.name())) {
-			ConfigListener nest = blocks.get(cmd.name()).make(lap);
+			nest = blocks.get(cmd.name()).make(lap);
 			return nest;
 		} else {
 			// legacy - move to being blocks
@@ -70,8 +72,8 @@ public class ConfigBlockListener implements ConfigListener {
 	}
 
 	@Override
-	public void complete() {
-		throw new NotImplementedException("complete " + this);
+	public void complete() throws Exception {
+		if (nest != null)
+			nest.complete();
 	}
-
 }

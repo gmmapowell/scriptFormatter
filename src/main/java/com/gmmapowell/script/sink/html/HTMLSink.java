@@ -233,4 +233,8 @@ public class HTMLSink implements Sink {
 	@Override
 	public void upload() throws Exception {
 	}
+
+	@Override
+	public void finish() throws Exception {
+	}
 }

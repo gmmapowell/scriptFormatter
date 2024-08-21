@@ -15,6 +15,7 @@ public class Main {
 			Config cfg = ConfigArgs.processConfig(lfs, args).read();
 			uv.prepareWorlds();
 			FilesToProcess files = cfg.updateIndex();
+			cfg.prepare();
 			cfg.generate(files);
 			cfg.show();
 			cfg.upload();

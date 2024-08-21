@@ -42,4 +42,8 @@ public class CaptureSinkInFile implements Sink {
 		sink.upload();
 	}
 
+	@Override
+	public void finish() throws Exception {
+		sink.finish();
+	}
 }

@@ -5,6 +5,8 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.zinutils.exceptions.CantHappenException;
+
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
@@ -19,20 +21,27 @@ import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 public class ScriptConfig implements Config {
 	// This is a hack to make regression tests quicker.
 	// TODO: it should be configured from the environment
-	private final boolean ALLOW_UPLOADS = false;
+	private final boolean ALLOW_UPLOADS = true;
 	
 	private final Region root;
 	private boolean debug;
 	private Loader loader;
 	private List<Sink> sinks = new ArrayList<>();
 	private Processor processor;
-	private Sink sink;
 	private WebEdit webedit;
 	private Place index;
 	private Region workdir;
 	
 	public ScriptConfig(Universe universe, Region root) {
 		this.root = root;
+	}
+	
+	@Override
+	public void prepare() throws Exception {
+//		loader.prepare();
+//		processor.prepare();
+		for (Sink s : sinks)
+			s.prepare();
 	}
 	
 	@Override
@@ -49,30 +58,32 @@ public class ScriptConfig implements Config {
 	@Override
 	public void generate(FilesToProcess files) throws IOException {
 		if (processor == null) {
-			if (debug) {
-				System.out.println("no processor has been defined");
-			}
-			return;
+			throw new CantHappenException("no processor has been defined");
 		}
 		processor.process(files);
 	}
 
 	@Override
 	public void show() {
-		if (sink != null)
-			sink.showFinal();
+		for (Sink s : sinks)
+			s.showFinal();
 	}
 
 	public void upload() throws Exception {
 		if (ALLOW_UPLOADS) {
-			if (sink != null)
-				sink.upload();
+			for (Sink s : sinks)
+				s.upload();
 			if (webedit != null) {
 				webedit.upload();
 			}
 		}
 	}
 
+	public void finish() throws Exception {
+		for (Sink s : sinks)
+			s.finish();
+	}
+	
 	public void setIndex(Place index) {
 		this.index = index;
 	}
@@ -107,5 +118,10 @@ public class ScriptConfig implements Config {
 
 	public void webedit(WebEdit webEdit) {
 		this.webedit = webEdit;
+	}
+
+	public void check() throws ConfigException {
+		if (processor == null)
+			throw new ConfigException("no processor was specified");
 	}
 }

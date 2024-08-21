@@ -10,4 +10,5 @@ public interface Sink {
 	void render() throws IOException;
 	void showFinal();
 	void upload() throws Exception;
+	void finish() throws Exception;
 }
