@@ -55,7 +55,7 @@ public class EPubSink implements Sink {
 //		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
-		this.output = root.placePath(output);
+		this.output = root.ensurePlace(output);
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 //		String stockName = null;
