@@ -12,7 +12,6 @@ import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.movie.MovieProcessor;
 import com.gmmapowell.script.processor.presenter.PresenterProcessor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;

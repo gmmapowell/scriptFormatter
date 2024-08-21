@@ -25,7 +25,6 @@ public class ConfigParser implements NumberedLineListener {
 		if (capture != null)
 			return;
 		
-		System.out.println("have " + lno + ": " + s);
 		try {
 			// Parse this input line
 			SBLineArgsParser<ReadConfigState> lp = new SBLineArgsParser<>(state, s);
@@ -38,56 +37,6 @@ public class ConfigParser implements NumberedLineListener {
 			this.capture = ex;
 		}
 	}
-	/*
-//		int idx = s.indexOf(' ');
-//		if (idx == -1) {
-//			System.out.println("Syntax error on line " + lno);
-//			System.out.println("  " + s);
-//			config = null;
-//			return;
-//		}
-//		String key = s.substring(0, idx);
-//		String value = s.substring(idx+1).trim();
-		if (nesting == 0) {
-			// if a new block is starting, flush (any) previous block
-			if (workdir == null)
-				workdir = root.ensureSubregion("downloads");
-			if (!handleCreation()) {
-				config = null;
-				return;
-			}
-			vars = new VarMap();
-			what = null;
-			switch (key) {
-			case "debug": {
-				debug = Boolean.parseBoolean(value);
-				break;
-			}
-			case "index": {
-				index = root.ensurePlace(value);
-				break;
-			}
-			case "sshid": {
-				sshid = Utils.subenvs(value);
-				break;
-			}
-			case "workdir": {
-				workdir = root.regionPath(value);
-				break;
-			}
-			default: {
-				what = key;
-				type = value;
-				wline = lno;
-				break;
-			}
-			}
-		} else if (what == null) {
-			System.out.println(lno + ": must have outer block to nest inside: " + s);
-		} else {
-			vars.put(nesting, key, value);
-		}
-	*/
 	
 	public Config config() throws Exception {
 		if (this.capture != null)

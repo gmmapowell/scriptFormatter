@@ -15,7 +15,6 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
-import com.gmmapowell.script.sink.presenter.PresenterSink;
 
 public class ScriptConfig implements Config {
 	// This is a hack to make regression tests quicker.

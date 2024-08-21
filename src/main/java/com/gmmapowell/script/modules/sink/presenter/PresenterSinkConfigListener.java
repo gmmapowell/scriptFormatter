@@ -6,12 +6,8 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
-import com.gmmapowell.script.sink.pdf.PDFSink;
 import com.gmmapowell.script.sink.presenter.PresenterSink;
-import com.gmmapowell.script.styles.ConfigurableStyleCatalog;
-import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Command;
-import com.gmmapowell.script.utils.Utils;
 
 public class PresenterSinkConfigListener implements ConfigListener {
 	private ReadConfigState state;
