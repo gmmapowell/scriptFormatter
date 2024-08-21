@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.output.pdf;
+package com.gmmapowell.script.modules.sink.epub;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -6,17 +6,17 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
-import com.gmmapowell.script.sink.pdf.PDFSink;
+import com.gmmapowell.script.sink.epub.EPubSink;
 import com.gmmapowell.script.styles.ConfigurableStyleCatalog;
 import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Command;
 import com.gmmapowell.script.utils.Utils;
 
-public class PDFOutputConfigListener implements ConfigListener {
+public class EPubSinkConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
 
-	public PDFOutputConfigListener(ReadConfigState state) {
+	public EPubSinkConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
@@ -25,9 +25,12 @@ public class PDFOutputConfigListener implements ConfigListener {
 		switch (cmd.name()) {
 		case "file": 
 		case "styles":
-		case "stock":
 		case "open":
 		case "upload":
+		case "bookid":
+		case "title":
+		case "author":
+		case "identifier":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;
@@ -63,10 +66,10 @@ public class PDFOutputConfigListener implements ConfigListener {
 			}
 		}
 		try {
-			state.config.sink(new PDFSink(state.root, catalog, file, wantOpen, upload, state.debug, state.sshid, vars));
+			state.config.sink(new EPubSink(state.root, catalog, file, wantOpen, upload, state.debug, state.sshid, vars));
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			throw new ConfigException("Error creating PDFSink: " + ex.getMessage());
+			throw new ConfigException("Error creating EPubSink: " + ex.getMessage());
 		}
 	}
 

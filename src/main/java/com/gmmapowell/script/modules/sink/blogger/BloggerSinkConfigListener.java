@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.output.blogger;
+package com.gmmapowell.script.modules.sink.blogger;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -10,11 +10,11 @@ import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.sink.blogger.BloggerSink;
 import com.gmmapowell.script.utils.Command;
 
-public class BloggerOutputConfigListener implements ConfigListener {
+public class BloggerSinkConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
 
-	public BloggerOutputConfigListener(ReadConfigState state) {
+	public BloggerSinkConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	

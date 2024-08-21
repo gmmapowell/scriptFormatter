@@ -23,7 +23,7 @@ public class ConfigBlockListener implements ConfigListener {
 	private void loadModules() {
 		// TODO: this should come from config earlier
 		blocks.put("loader", new ConfigureLoader(state));
-		blocks.put("output", new ConfigureOutput(state));
+		blocks.put("sink", new ConfigureSink(state));
 		blocks.put("processor", new ConfigureProcessor(state));
 		blocks.put("webedit", new ConfigureWebEdit(state));
 	}

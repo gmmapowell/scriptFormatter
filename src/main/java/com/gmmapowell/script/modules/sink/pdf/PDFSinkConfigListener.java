@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.output.presenter;
+package com.gmmapowell.script.modules.sink.pdf;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -12,11 +12,11 @@ import com.gmmapowell.script.styles.StyleCatalog;
 import com.gmmapowell.script.utils.Command;
 import com.gmmapowell.script.utils.Utils;
 
-public class PresenterOutputConfigListener implements ConfigListener {
+public class PDFSinkConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
 
-	public PresenterOutputConfigListener(ReadConfigState state) {
+	public PDFSinkConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
@@ -24,8 +24,8 @@ public class PresenterOutputConfigListener implements ConfigListener {
 	public ConfigListener dispatch(Command cmd) {
 		switch (cmd.name()) {
 		case "file": 
-		case "meta":
-		case "show":
+		case "styles":
+		case "stock":
 		case "open":
 		case "upload":
 		{

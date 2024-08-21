@@ -8,8 +8,6 @@ import java.util.List;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
-import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.loader.drive.Index;
@@ -38,28 +36,6 @@ public class ScriptConfig implements Config {
 		this.root = root;
 	}
 	
-	public void handleOutput(VarMap vars, String output, boolean debug, String sshid) throws ConfigException, Exception {
-		switch (output) {
-		case "presenter": {
-			String file = vars.remove("file");
-			if (file == null)
-				throw new ConfigException("output file was not defined");
-			String meta = vars.remove("meta");
-			if (meta == null)
-				throw new ConfigException("meta file was not defined");
-			String show = vars.remove("show");
-			boolean wantShow = false;
-			if ("true".equals(show))
-				wantShow = true;
-			String upload = vars.remove("upload");
-			sinks.add(new PresenterSink(root, file, meta, wantShow, upload, debug));
-			break;
-		}
-		default:
-			throw new ConfigException("Unrecognized output type " + output);
-		}
-	}
-
 	@Override
 	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
 		if (loader == null) {

@@ -31,7 +31,7 @@ public class MovieProcessor implements Processor, ProcessorConfig {
 	private final boolean debug;
 	private final Formatter formatter;
 
-	public MovieProcessor(Region root, ElementFactory ef, Sink outputTo, VarMap options, boolean debug) throws ConfigException {
+	public MovieProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		this.debug = debug;
 		this.state = new MovieState(new TreeMap<String, Flow>());
 		this.state.flows.put("main", new Flow("main", true));
@@ -43,7 +43,7 @@ public class MovieProcessor implements Processor, ProcessorConfig {
 		if (d == null)
 			throw new ConfigException("There is no definition of dramatis");
 		this.dramatis = root.place(d);
-		this.sink = outputTo;
+		this.sink = sink;
 	}
 
 	@Override

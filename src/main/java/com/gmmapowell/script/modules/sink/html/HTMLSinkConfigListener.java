@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.output.html;
+package com.gmmapowell.script.modules.sink.html;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -9,11 +9,11 @@ import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.sink.html.HTMLSink;
 import com.gmmapowell.script.utils.Command;
 
-public class HTMLOutputConfigListener implements ConfigListener {
+public class HTMLSinkConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
 
-	public HTMLOutputConfigListener(ReadConfigState state) {
+	public HTMLSinkConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
