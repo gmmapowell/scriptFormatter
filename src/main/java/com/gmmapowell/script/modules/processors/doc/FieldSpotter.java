@@ -1,5 +1,6 @@
 package com.gmmapowell.script.modules.processors.doc;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gmmapowell.script.processor.configured.ConfiguredState;
@@ -15,12 +16,17 @@ public class FieldSpotter implements ProcessingScanner {
 
 	@Override
 	public boolean handleLine(String s) {
-		if (fieldStart.matcher(s).matches() && ats.wantFields()) {
+		if (!ats.wantFields())
+			return false; // we do not apply here
+		
+		Matcher m = fieldStart.matcher(s);
+		if (m.matches()) {
 			System.out.println("is-field");
+			ats.cmdField(m.group(1), m.group(2));
 			return true;
 		}
 		
-		ats.wantFields(false);
+		ats.handleAtCommand();
 		return false;
 	}
 

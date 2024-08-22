@@ -14,7 +14,7 @@ public class AtSpotter implements ProcessingScanner {
 	public boolean handleLine(String s) {
 		if (s.startsWith("@")) {
 			System.out.println("is-at");
-			ats.wantFields(true);
+			ats.startCommand(s.substring(1));
 			return true;
 		}
 			
