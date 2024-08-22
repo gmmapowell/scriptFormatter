@@ -15,7 +15,6 @@ import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.processor.NewParaProcessor;
 import com.gmmapowell.script.processor.configured.ConfiguredProcessor;
 import com.gmmapowell.script.processor.configured.StandardLineProcessor;
-import com.gmmapowell.script.processor.prose.DocProcessor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
@@ -56,6 +55,8 @@ public class DocProcessorConfigListener implements ConfigListener {
 			ConfiguredProcessor proc = new ConfiguredProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
 			proc.setDefaultHandler(StandardLineProcessor.class);
 			proc.setBlankHandler(NewParaProcessor.class);
+			proc.addScanner(AtSpotter.class);
+			proc.addScanner(FieldSpotter.class);
 			state.config.processor(proc);
 			// TODO: this needs to come back in some form
 //			for (ModuleConfigListener m : modules) {

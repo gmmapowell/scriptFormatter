@@ -38,31 +38,45 @@ public class ConfiguredProcessor implements Processor {
 	
 	@Override
 	public void process(FilesToProcess places) throws IOException {
-		// create a bigger state
+		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
-			System.out.println("process " + x);
 			ConfiguredState state = new ConfiguredState();
-			
-			// Create a list of scanners so that the one defined last is tried first,
-			// and the default handler only applies if none of the others do
-			List<ProcessingScanner> all = new ArrayList<ProcessingScanner>();
-			all.add(0, new AlwaysScanner(Reflection.create(defaultHandler, state)));
-			all.add(0, new BlankScanner(Reflection.create(blankHandler, state)));
-			for (Class<? extends ProcessingScanner> c : scanners) {
-				all.add(0, Reflection.create(c, state));
-			}
+			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act
 			x.lines((n, s) -> {
 				System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
 				for (ProcessingScanner scanner : all) {
-					if (scanner.handleLine(s))
+					if (scanner.handleLine(trim(s)))
 						return;
 				}
 				throw new CantHappenException("the default scanner at least should have fired");
 			});
-			// TODO: tell all of the scanners we are done
+			for (ProcessingScanner scanner : all)
+				scanner.placeDone();
 		}
-		// and we are done
+	}
+
+	private List<ProcessingScanner> createScannerList(ConfiguredState state) {
+		// Create a list of scanners so that the one defined last is tried first,
+		// and the default handler only applies if none of the others do
+		List<ProcessingScanner> all = new ArrayList<ProcessingScanner>();
+		all.add(0, new AlwaysScanner(Reflection.create(defaultHandler, state)));
+		all.add(0, new BlankScanner(Reflection.create(blankHandler, state)));
+		for (Class<? extends ProcessingScanner> c : scanners) {
+			all.add(0, Reflection.create(c, state));
+		}
+		return all;
+	}
+
+	private String trim(String s) {
+		StringBuilder sb = new StringBuilder(s.trim());
+		for (int i=0;i<sb.length();) {
+			if (sb.charAt(i) == '\uFEFF')
+				sb.delete(i, i+1);
+			else
+				i++;
+		}
+		return sb.toString().trim();
 	}
 }

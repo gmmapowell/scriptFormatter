@@ -4,4 +4,6 @@ public interface ProcessingScanner {
 
 	boolean handleLine(String s);
 
+	default void placeDone() {}
+
 }

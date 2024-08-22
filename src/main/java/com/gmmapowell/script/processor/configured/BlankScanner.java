@@ -9,11 +9,10 @@ public class BlankScanner implements ProcessingScanner {
 
 	@Override
 	public boolean handleLine(String s) {
-		if (s.trim().length() == 0) {
+		if (s.length() == 0) {
 			this.handler.process(s);
 			return true;
 		}
 		return false;
 	}
-
 }
