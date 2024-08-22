@@ -22,13 +22,8 @@ public class WebEditConfigListener implements ConfigListener {
 	public ConfigListener dispatch(Command cmd) throws Exception {
 		switch (cmd.name()) {
 		case "file": 
-		case "styles":
-		case "open":
 		case "upload":
-		case "bookid":
 		case "title":
-		case "author":
-		case "identifier":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;

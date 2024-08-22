@@ -2,6 +2,7 @@ package com.gmmapowell.script;
 
 import org.zinutils.exceptions.WrappedException;
 
+import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.script.config.ConfigException;
 
 public class ExceptionHandler {
@@ -10,6 +11,8 @@ public class ExceptionHandler {
 		t = WrappedException.unwrapThrowable(t);
 		try {
 			throw t;
+		} catch (GeoFSException ex) {
+			System.err.println(ex.getMessage());
 		} catch (ScriptFormatterHelpException ex) {
 			ex.help();
 		} catch (ConfigException ex) {

@@ -29,6 +29,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.DriveList;
 
 public class GoogleDriveWorld implements World {
+	private final boolean CONFIGURE_WITH_INTERNET = false;
 	private final Universe universe;
 	private final String appName;
 	private final Place creds;
@@ -42,6 +43,9 @@ public class GoogleDriveWorld implements World {
 	}
 	
 	public void prepare() throws Exception {
+		if (!CONFIGURE_WITH_INTERNET)
+			return;
+		
 		int i=0;
 		Drive s = null;
 		while (i<2) {
@@ -69,6 +73,8 @@ public class GoogleDriveWorld implements World {
 	
 	@Override
 	public Region root() {
+		if (!CONFIGURE_WITH_INTERNET)
+			throw new GeoFSException(new RuntimeException("there is no internet to connect to Google Drive"));
 		try {
 			return new GDWRootRegion(this.service);
 		} catch (Exception ex) {

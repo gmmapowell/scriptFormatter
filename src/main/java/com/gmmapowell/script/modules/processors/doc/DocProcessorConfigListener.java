@@ -12,6 +12,9 @@ import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
+import com.gmmapowell.script.processor.NewParaProcessor;
+import com.gmmapowell.script.processor.configured.ConfiguredProcessor;
+import com.gmmapowell.script.processor.configured.StandardLineProcessor;
 import com.gmmapowell.script.processor.prose.DocProcessor;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
@@ -48,33 +51,16 @@ public class DocProcessorConfigListener implements ConfigListener {
 
 	@Override
 	public void complete() throws ConfigException {
-			
-//		String creds = vars.remove("credentials");
-//		if (creds == null)
-//			throw new ConfigException("credentials was not defined");
-//		String blogUrl = vars.remove("blogurl");
-//		if (blogUrl == null)
-//			throw new ConfigException("blogurl was not defined");
-//		String posts = vars.remove("posts");
-//		if (posts == null)
-//			throw new ConfigException("posts was not defined");
-//		boolean localOnly = false;
-//		String lo = vars.remove("local");
-//		if (lo != null && "true".equalsIgnoreCase(lo))
-//			localOnly = true;
-//		Place saveContentAs = null;
-//		String sca = vars.remove("saveAs");
-//		if (sca != null)
-//			saveContentAs = state.root.place(sca);
-//		Place pf = state.root.placePath(posts);
-//		Place cp = state.root.placePath(creds);
 		try {
 			Sink sink = state.config.makeSink();
-			DocProcessor proc = new DocProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			ConfiguredProcessor proc = new ConfiguredProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			proc.setDefaultHandler(StandardLineProcessor.class);
+			proc.setBlankHandler(NewParaProcessor.class);
 			state.config.processor(proc);
-			for (ModuleConfigListener m : modules) {
-				m.activate(proc);
-			}
+			// TODO: this needs to come back in some form
+//			for (ModuleConfigListener m : modules) {
+//				m.activate(proc);
+//			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating DocProcessor: " + ex.getMessage());

@@ -73,7 +73,5 @@ public class ConfigBlockListener implements ConfigListener {
 
 	@Override
 	public void complete() throws Exception {
-		if (nest != null)
-			nest.complete();
 	}
 }

@@ -13,6 +13,7 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.intf.FilesToProcess;
 
 public class ContentLoader implements Loader {
+	private final boolean LOAD_FROM_REMOTE = false;
 	private final String folder;
 	private final Place indexFile;
 	private final Region downloads;
@@ -48,14 +49,16 @@ public class ContentLoader implements Loader {
 		// Want a "marker" in the file that says "--excluded--"
 		// because it has been downloaded but not user "approved" or ordered
 
-		Region dl = u.regionPath(folder);
-		if (debug) {
-			System.out.println("Downloading files from Google ...");
-			System.out.println("  + " + dl /* item.folder + " (" + item.id + ")" */);
-		}
 		Index currentIndex = Index.read(indexFile, downloads);
 		try {
-			downloadFolder(currentIndex, downloads, "    ", dl);
+			if (LOAD_FROM_REMOTE) {
+				Region dl = u.regionPath(folder);
+				if (debug) {
+					System.out.println("Downloading files from Google ...");
+					System.out.println("  + " + dl /* item.folder + " (" + item.id + ")" */);
+				}
+				downloadFolder(currentIndex, downloads, "    ", dl);
+			}
 			if (webeditFile != null)
 				currentIndex.generateWebeditFile(webeditFile, wetitle);
 			return currentIndex;

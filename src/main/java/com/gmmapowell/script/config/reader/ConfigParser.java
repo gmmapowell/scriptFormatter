@@ -41,6 +41,9 @@ public class ConfigParser implements NumberedLineListener {
 	
 	@Override
 	public void complete() {
+		if (this.capture != null)
+			return;
+		
 		try {
 			dispatcher.complete();
 		} catch (Exception ex) {

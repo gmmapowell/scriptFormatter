@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.doc.toc;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
@@ -14,8 +16,11 @@ public class TOCPreparer implements ModuleActivator {
 
 	@Override
 	public void activate(ProcessorConfig proc) throws ConfigException {
-		// TODO Auto-generated method stub
-		
+		try {
+			throw new NotImplementedException();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 }

@@ -49,8 +49,14 @@ public class NestedCommandDispatcher<T extends FileWithLocation> implements Comm
 
 	@Override
 	public void complete() throws Exception {
+		if (pendingNest != null) {
+			// the file ended with a new block opening, which is OK if it is unconfigured, but it won't have been added to the lsnrs list yet
+			// since we are at the end, the depth is not actually used, but 99 should be more indented than anything we will actually see...
+			lsnrs.add(0, new DepthListener(99, pendingNest));
+		}
 		while (!lsnrs.isEmpty()) {
-			lsnrs.remove(0).lsnr.complete();
+			NestedCommandDispatcher<T>.DepthListener dl = lsnrs.remove(0);
+			dl.lsnr.complete();
 		}
 	}
 }
