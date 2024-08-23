@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.zinutils.collections.ListMap;
 import org.zinutils.exceptions.CantHappenException;
+import org.zinutils.reflection.Reflection;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
@@ -18,7 +22,7 @@ import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 
-public class ScriptConfig implements Config {
+public class ScriptConfig implements Config, ExtensionPointRepo {
 	// This is a hack to make regression tests quicker.
 	// TODO: it should be configured from the environment
 	private final boolean ALLOW_UPLOADS = false;
@@ -31,6 +35,8 @@ public class ScriptConfig implements Config {
 	private WebEdit webedit;
 	private Place index;
 	private Region workdir;
+	
+	private final ListMap<Class<?>, Class<?>> extensionPointClasses = new ListMap<>();
 	
 	public ScriptConfig(Universe universe, Region root) {
 		this.root = root;
@@ -123,5 +129,25 @@ public class ScriptConfig implements Config {
 	public void check() throws ConfigException {
 		if (processor == null)
 			throw new ConfigException("no processor was specified");
+	}
+
+	@Override
+	public <T extends NamedExtensionPoint, Q> Map<String, T> forPointByName(Class<T> clz, Q ctorArg) {
+		Map<String, T> ret = new TreeMap<>();
+		if (extensionPointClasses.contains(clz)) {
+			for (Class<?> m : extensionPointClasses.get(clz)) {
+				@SuppressWarnings("unchecked")
+				T nep = (T) Reflection.create(m, ctorArg);
+				if (ret.containsKey(nep.name())) {
+					throw new CantHappenException("duplicate extension point for " + nep.name());
+				}
+				ret.put(nep.name(), nep);
+			}
+		}
+		return ret;
+	}
+
+	public <T, Z extends T> void bindExtensionPoint(Class<T> ep, Class<Z> impl) {
+		extensionPointClasses.add(ep, impl);
 	}
 }

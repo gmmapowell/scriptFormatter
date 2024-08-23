@@ -9,6 +9,7 @@ import org.zinutils.reflection.Reflection;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.script.config.ExtensionPointRepo;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
@@ -19,9 +20,10 @@ public class ConfiguredProcessor implements Processor {
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
 	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
+	private ExtensionPointRepo eprepo;
 
-	public ConfiguredProcessor(Region root, BlockishElementFactory blockishElementFactory, Sink sink, VarMap vars, boolean debug) {
-		// TODO Auto-generated constructor stub
+	public ConfiguredProcessor(ExtensionPointRepo eprepo, Region root, BlockishElementFactory blockishElementFactory, Sink sink, VarMap vars, boolean debug) {
+		this.eprepo = eprepo;
 	}
 	
 	public void setDefaultHandler(Class<? extends ProcessingHandler> handler) {
@@ -40,7 +42,7 @@ public class ConfiguredProcessor implements Processor {
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
-			ConfiguredState state = new ConfiguredState();
+			ConfiguredState state = new ConfiguredState(eprepo);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act

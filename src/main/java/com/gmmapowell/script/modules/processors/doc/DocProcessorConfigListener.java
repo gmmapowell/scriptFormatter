@@ -25,6 +25,9 @@ public class DocProcessorConfigListener implements ConfigListener {
 
 	public DocProcessorConfigListener(ReadConfigState state) {
 		this.state = state;
+		
+		// TODO: this should come from a module configuration somewhere
+		this.state.config.bindExtensionPoint(AtCommandHandler.class, ChapterCommand.class);
 	}
 	
 	@Override
@@ -52,7 +55,7 @@ public class DocProcessorConfigListener implements ConfigListener {
 	public void complete() throws ConfigException {
 		try {
 			Sink sink = state.config.makeSink();
-			ConfiguredProcessor proc = new ConfiguredProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			ConfiguredProcessor proc = new ConfiguredProcessor(state.config, state.root, new BlockishElementFactory(), sink, vars, state.debug);
 			proc.setDefaultHandler(StandardLineProcessor.class);
 			proc.setBlankHandler(NewParaProcessor.class);
 			proc.addScanner(AtSpotter.class);
