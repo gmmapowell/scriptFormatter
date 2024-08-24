@@ -9,18 +9,22 @@ import org.zinutils.reflection.Reflection;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.script.config.Creator;
+import com.gmmapowell.script.config.CreatorExtensionPointRepo;
 import com.gmmapowell.script.config.ExtensionPointRepo;
+import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.Sink;
 
-public class ConfiguredProcessor implements Processor {
+public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
 	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
 	private ExtensionPointRepo eprepo;
+	private ExtensionPointRepo local = new CreatorExtensionPointRepo();
 
 	public ConfiguredProcessor(ExtensionPointRepo eprepo, Region root, BlockishElementFactory blockishElementFactory, Sink sink, VarMap vars, boolean debug) {
 		this.eprepo = eprepo;
@@ -38,6 +42,16 @@ public class ConfiguredProcessor implements Processor {
 		scanners.add(scanner);
 	}
 	
+	@Override
+	public <T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
+		local.bindExtensionPoint(ep, impl);
+	}
+
+	@Override
+	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
+		local.bindExtensionPoint(ep, impl);
+	}
+
 	@Override
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)

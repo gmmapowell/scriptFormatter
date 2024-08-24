@@ -22,6 +22,7 @@ public class ReadConfig implements ConfigReader {
 	@Override
 	public Config read() throws ConfigException {
 		ConfigParser parser = new ConfigParser(universe, place.region());
+		parser.fakeModules(); // TODO: this should be from "module ..." lines in the input file
 		place.lines(parser);
 		try {
 			return parser.config();

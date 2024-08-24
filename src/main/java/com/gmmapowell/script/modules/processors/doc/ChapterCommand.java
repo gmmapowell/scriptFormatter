@@ -1,9 +1,5 @@
 package com.gmmapowell.script.modules.processors.doc;
 
-import com.gmmapowell.script.flow.AnchorOp;
-import com.gmmapowell.script.processor.ProcessingUtils;
-import com.gmmapowell.script.processor.prose.TOCEntry;
-
 public class ChapterCommand implements AtCommandHandler {
 
 	public ChapterCommand(ScannerAtState state) {
@@ -23,6 +19,13 @@ public class ChapterCommand implements AtCommandHandler {
 		String style = cmd.args.get("style");
 		if (style == null)
 			style = "chapter";
+		
+		System.out.println("chapter " + title + ": " + style);
+		
+		// Need to grandfather this in
+		// Note that the "toc" stuff should be in a separate module with its own extension point
+		// But, I think, called from here ...
+		// But obviously without us SPECIFICALLY knowing that TOC exists
 		/*
 		if (!style.equals(state.chapterStyle))
 			state.resetNumbering();

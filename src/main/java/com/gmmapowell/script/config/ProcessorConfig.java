@@ -1,7 +1,9 @@
 package com.gmmapowell.script.config;
 
-import com.gmmapowell.script.processor.prose.LineCommand;
+import com.gmmapowell.script.processor.configured.ProcessingScanner;
 
 public interface ProcessorConfig {
-	void installCommand(String cmd, Class<? extends LineCommand> proc, Object cfg) throws ConfigException;
+	void addScanner(Class<? extends ProcessingScanner> scanner);
+	<T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl);
+	<T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl);
 }

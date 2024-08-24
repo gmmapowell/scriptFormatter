@@ -3,13 +3,17 @@ package com.gmmapowell.script.modules.doc.emailquoter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.script.flow.BreakingSpace;
+import com.gmmapowell.script.modules.processors.doc.AmpCommand;
+import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.prose.DocState;
 import com.gmmapowell.script.processor.prose.LineCommand;
 import com.gmmapowell.script.utils.LineArgsParser;
 
-public class EmailParaCommand implements LineCommand {
+public class EmailParaCommand implements LineCommand, AmpCommandHandler {
 	private final EmailConfig cfg;
 	private final DocState state;
 	private final Citation citation;
@@ -22,8 +26,17 @@ public class EmailParaCommand implements LineCommand {
 		this.citation = Citation.parse(message, quoted);
 		args.argsDone();
 	}
-	
+
 	@Override
+	public String name() {
+		return "emailpara";
+	}
+
+	@Override
+	public void invoke(AmpCommand cmd) {
+		throw new NotImplementedException(); // but obvs wants most of the code from below
+	}
+	
 	public void execute() throws IOException {
 		AtomicBoolean inPara = new AtomicBoolean(false);
 		cfg.mailPara.quoteEmail(citation, (n, s) -> {

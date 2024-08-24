@@ -8,6 +8,7 @@ import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
@@ -16,6 +17,7 @@ import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.SectionTitle;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
 
 public class ArticleProcessor extends AtProcessor<ArticleState> {
@@ -75,4 +77,24 @@ public class ArticleProcessor extends AtProcessor<ArticleState> {
 			state.endPara();
 		}
 	}
+
+	@Override
+	public void addScanner(Class<? extends ProcessingScanner> scanner) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }

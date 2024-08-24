@@ -8,6 +8,7 @@ import org.zinutils.system.RunProcess;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
@@ -17,6 +18,7 @@ import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.processor.NoSuchCommandException;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
 import com.gmmapowell.script.utils.SBLineArgsParser;
@@ -254,4 +256,24 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 			sink.flow(f);
 //		index.close();
 	}
+
+	@Override
+	public void addScanner(Class<? extends ProcessingScanner> scanner) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }

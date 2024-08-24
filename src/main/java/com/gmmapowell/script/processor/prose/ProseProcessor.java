@@ -74,14 +74,6 @@ public abstract class ProseProcessor<T extends CurrentState> implements Processo
 			throw new ConfigException("Could not activate modules");
 		}
 	}
-	
-	@Override
-	public void installCommand(String cmd, Class<? extends LineCommand> proc, Object cfg) throws ConfigException {
-		if (lineProcessors.containsKey(cmd)) {
-			throw new ConfigException("cannot install multiple commands for " + cmd);
-		}
-		lineProcessors.put(cmd, new ConfigProc(proc, cfg));
-	}
 
 	@Override
 	public void process(FilesToProcess places) throws IOException {

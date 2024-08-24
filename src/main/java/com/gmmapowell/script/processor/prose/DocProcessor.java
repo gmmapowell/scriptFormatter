@@ -19,6 +19,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.AnchorOp;
@@ -29,6 +30,7 @@ import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.processor.prose.DocState.ScanMode;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
@@ -361,75 +363,8 @@ public class DocProcessor extends AtProcessor<DocState> {
 				break;
 			}
 			case "Chapter": {
-				String title = state.cmd.args.get("title");
-				if (title == null)
-					throw new RuntimeException("Chapter without title");
-				String style = state.cmd.args.get("style");
-				if (style == null)
-					style = "chapter";
-				if (!style.equals(state.chapterStyle))
-					state.resetNumbering();
-				state.chapterStyle = style;
-				String anchor = state.cmd.args.get("anchor");
-				state.reset();
-				TOCEntry entry;
-				if (state.chapterStyle.equals("chapter")) {
-					String number = Integer.toString(state.chapter);
-					entry = toc.chapter(anchor, number, title);
-					title = number + " " + title;
-					state.wantSectionNumbering = true;
-					state.chapter++;
-					state.section = 1;
-				} else if (state.chapterStyle.equals("appendix")) {
-					String number = new String(new char[] { (char) ('@' + state.chapter) });
-					entry = toc.chapter(anchor, number, title);
-					title = number + " " + title;
-					state.wantSectionNumbering = true;
-					state.chapter++;
-					state.section = 1;
-				} else {
-					entry = toc.chapter(anchor, null, title);
-					state.wantSectionNumbering = false;
-				}
-				state.newSection("footnotes", style);
-				state.newSection("main", style);
-				state.newPara("chapter-title");
-				if (entry != null) {
-					state.newSpan();
-					state.op(new AnchorOp(entry));
-				}
-				ProcessingUtils.process(state, title);
-				state.endPara();
-				
-				break;
 			}
 			case "Section": {
-				String title = state.cmd.args.get("title");
-				if (title == null)
-					throw new RuntimeException("Section without title");
-				String anchor = state.cmd.args.get("anchor");
-				TOCEntry entry;
-				if (state.chapterStyle.equals("chapter")) {
-					String number = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
-					entry = toc.section(anchor, number, title);
-					title = number + " " + title;
-				} else if (state.chapterStyle.equals("appendix")) {
-					String number = new String(new char[] { (char) ('@' + state.chapter-1) }) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
-					entry = toc.section(anchor, number, title);
-					title = number + " " + title;
-				} else {
-					entry = toc.section(anchor, null, title);
-				}
-				state.newPara("section-title");
-				if (entry != null) {
-					state.newSpan();
-					state.op(new AnchorOp(entry));
-				}
-				ProcessingUtils.process(state, title);
-				state.endPara();
-				
-				state.section++;
-				break;
 			}
 			case "Subsection": {
 				String title = state.cmd.args.get("title");
@@ -566,4 +501,24 @@ public class DocProcessor extends AtProcessor<DocState> {
 			System.out.println("Could not write table of contents" + ex.getMessage());
 		}
 	}
+
+	@Override
+	public void addScanner(Class<? extends ProcessingScanner> scanner) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }
