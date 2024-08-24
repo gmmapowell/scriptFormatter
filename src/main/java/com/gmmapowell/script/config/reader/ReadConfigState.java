@@ -4,9 +4,17 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.script.config.ScriptConfig;
+import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.AtCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.ChapterCommand;
+import com.gmmapowell.script.modules.processors.doc.CommentaryCommand;
+import com.gmmapowell.script.modules.processors.doc.FootnoteAmp;
+import com.gmmapowell.script.modules.processors.doc.FutureAmp;
+import com.gmmapowell.script.modules.processors.doc.LinkAmp;
+import com.gmmapowell.script.modules.processors.doc.OutrageAmp;
+import com.gmmapowell.script.modules.processors.doc.ReviewAmp;
 import com.gmmapowell.script.modules.processors.doc.SectionCommand;
+import com.gmmapowell.script.modules.processors.doc.TTAmp;
 import com.gmmapowell.script.utils.SBLocation;
 
 public class ReadConfigState extends SBLocation {
@@ -28,8 +36,21 @@ public class ReadConfigState extends SBLocation {
 	// Those top level modules should basically all just add extension points
 	public void simulateModuleProcessing() {
 		// config: "module doc-processor"
+		// @ commands
+		// structure
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, ChapterCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SectionCommand.class);
+		
+		// should commentary be in a separate module?
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentaryCommand.class);
+
+		// & commands
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FootnoteAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FutureAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, OutrageAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ReviewAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, TTAmp.class);
 	}
 
 	public Universe universe() {

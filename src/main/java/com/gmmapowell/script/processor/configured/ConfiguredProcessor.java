@@ -56,11 +56,14 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
-			ConfiguredState state = new ConfiguredState(eprepo);
+			ConfiguredState state = new ConfiguredState(eprepo, x);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act
 			x.lines((n, s) -> {
+				state.line(n);
+				for (ProcessingScanner scanner : all)
+					scanner.closeIfNotContinued(trim(s));
 				System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
 				for (ProcessingScanner scanner : all) {
 					if (scanner.handleLine(trim(s)))
@@ -68,6 +71,8 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 				}
 				throw new CantHappenException("the default scanner at least should have fired");
 			});
+			for (ProcessingScanner scanner : all)
+				scanner.closeIfNotContinued(null);
 			for (ProcessingScanner scanner : all)
 				scanner.placeDone();
 		}

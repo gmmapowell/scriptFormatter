@@ -5,14 +5,17 @@ import java.util.Map;
 
 import org.zinutils.reflection.Reflection;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.config.ExtensionPointRepo;
+import com.gmmapowell.script.utils.SBLocation;
 
-public class ConfiguredState {
+public class ConfiguredState extends SBLocation {
 	private Map<Class<?>, Object> configs = new HashMap<>();
 	private ExtensionPointRepo eprepo;
 
-	public ConfiguredState(ExtensionPointRepo eprepo) {
+	public ConfiguredState(ExtensionPointRepo eprepo, Place x) {
 		this.eprepo = eprepo;
+		super.processingFile(x.name());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -27,5 +30,4 @@ public class ConfiguredState {
 	public ExtensionPointRepo extensions() {
 		return eprepo;
 	}
-
 }

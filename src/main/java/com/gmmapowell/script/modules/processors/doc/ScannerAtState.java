@@ -18,7 +18,7 @@ public class ScannerAtState {
 		this.cmd = new AtCommand(cmd);
 	}
 
-	public boolean wantFields() {
+	public boolean hasPendingCommand() {
 		return cmd != null;
 	}
 

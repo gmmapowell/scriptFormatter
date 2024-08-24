@@ -15,8 +15,15 @@ public class FieldSpotter implements ProcessingScanner {
 	}
 
 	@Override
+	public void closeIfNotContinued(String nx) {
+		if (ats.hasPendingCommand() && (nx == null || !fieldStart.matcher(nx).matches())) {
+			ats.handleAtCommand();
+		}
+	}
+
+	@Override
 	public boolean handleLine(String s) {
-		if (!ats.wantFields())
+		if (!ats.hasPendingCommand())
 			return false; // we do not apply here
 		
 		Matcher m = fieldStart.matcher(s);
@@ -25,8 +32,6 @@ public class FieldSpotter implements ProcessingScanner {
 			ats.cmdField(m.group(1), m.group(2));
 			return true;
 		}
-		
-		ats.handleAtCommand();
 		return false;
 	}
 

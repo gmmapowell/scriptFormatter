@@ -55,6 +55,7 @@ public class DocProcessorConfigListener implements ConfigListener {
 			ConfiguredProcessor proc = new ConfiguredProcessor(state.config.extensions(), state.root, new BlockishElementFactory(), sink, vars, state.debug);
 			proc.setDefaultHandler(StandardLineProcessor.class);
 			proc.setBlankHandler(NewParaProcessor.class);
+			proc.addScanner(AmpSpotter.class);
 			proc.addScanner(AtSpotter.class);
 			proc.addScanner(FieldSpotter.class);
 			state.config.processor(proc);

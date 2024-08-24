@@ -16,6 +16,7 @@ public class SBLineArgsParser<T extends FileWithLocation> implements LineArgsPar
 		this.args = new StringBuilder(args);
 	}
 
+	@Override
 	public Command readCommand() {
 		if (args.length() == 0 || args.toString().startsWith("#"))
 			return null;
