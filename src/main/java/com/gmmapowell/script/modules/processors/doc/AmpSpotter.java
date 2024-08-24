@@ -13,7 +13,7 @@ public class AmpSpotter implements ProcessingScanner {
 	public AmpSpotter(ConfiguredState state) {
 		this.state = state;
 		this.amps = state.require(ScannerAmpState.class);
-		this.amps.configure(state.extensions());
+		this.amps.configure(state, state.extensions());
 	}
 
 	@Override

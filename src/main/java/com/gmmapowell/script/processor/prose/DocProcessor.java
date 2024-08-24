@@ -135,16 +135,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 			p = new SBLineArgsParser<DocState>(state, s.substring(idx+1));
 		}
 		switch (cmd) {
-		case "tt": {
-			if (!state.inPara())
-				state.newPara();
-			if (!state.inSpan())
-				state.newSpan();
-			state.nestSpan("preformatted");
-			state.text(p.asString());
-			state.popSpan();
-			break;
-		}
 		case "bold":
 		case "italic": {
 			if (!state.inPara())
@@ -153,16 +143,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				state.newSpan();
 			state.nestSpan(cmd);
 			ProcessingUtils.processPart(state, p.asString(), 0, p.asString().length());
-			state.popSpan();
-			break;
-		}
-		case "link": {
-			String lk = p.readString();
-			String tx = p.readString();
-			if (!state.inSpan())
-				state.newSpan();
-			state.nestSpan("tt");
-			state.op(new LinkOp(lk, tx));
 			state.popSpan();
 			break;
 		}
@@ -175,15 +155,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				state.newPara("text");
 			}
 			ProcessingUtils.process(state, p.asString().trim());
-			break;
-		}
-		case "footnote": {
-			commitCurrentCommand();
-			state.switchToFlow("footnotes");
-			state.newPara("footnote");
-			state.newSpan("footnote-number");
-			state.op(new YieldToFlow("main"));
-			state.text(Integer.toString(state.nextFootnoteText()) + " ");
 			break;
 		}
 		case "include": {
@@ -279,24 +250,10 @@ public class DocProcessor extends AtProcessor<DocState> {
 			((GrammarCommand)state.inline).removeProd(params.get("prod"));
 			break;
 		}
-		case "review":
-			if (!p.hasMore())
-				throw new RuntimeException("&review command needs something to review");
-			System.out.println("review in " + state.inputLocation() + ": " + p.readString());
-			p.argsDone();
-			break;
-		case "future":
-			if (!p.hasMore())
-				throw new RuntimeException("&future command needs a comment");
-			System.out.println(state.inputLocation() + ": in the future, " + p.readString());
-			break;
 		case "morework":
 			if (!p.hasMore())
 				throw new RuntimeException("&morework command needs a description");
 			System.out.println("more work is required at " + state.inputLocation() + ": " + p.readString());
-			break;
-		case "outrageousclaim":
-			System.out.println("There is an outrageous claim at " + state.inputLocation());
 			break;
 		case "number": {
 			if (!state.activeNumbering())
@@ -362,10 +319,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				state.endPara();
 				break;
 			}
-			case "Chapter": {
-			}
-			case "Section": {
-			}
 			case "Subsection": {
 				String title = state.cmd.args.get("title");
 				if (title == null)
@@ -394,16 +347,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				}
 				ProcessingUtils.process(state, title);
 				state.endPara();
-				break;
-			}
-			case "Commentary": {
-				state.endSpan();
-				state.newPara("break");
-				state.newSpan();
-				state.op(new CommentaryBreak());
-				state.endPara();
-				state.commentary = true;
-				state.section = 1;
 				break;
 			}
 			case "Comment": {

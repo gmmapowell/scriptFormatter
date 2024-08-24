@@ -2,8 +2,10 @@ package com.gmmapowell.script.modules.processors.doc;
 
 public class OutrageAmp implements AmpCommandHandler {
 
+	private ScannerAmpState state;
+
 	public OutrageAmp(ScannerAmpState state) {
-		
+		this.state = state;
 	}
 	
 	@Override
@@ -13,8 +15,6 @@ public class OutrageAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("There is an outrageous claim at " + state.inputLocation());
 	}
-
 }
