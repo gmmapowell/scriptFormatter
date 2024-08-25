@@ -62,6 +62,8 @@ public class DocProcessorConfigListener implements ConfigListener {
 			for (ModuleConfigListener m : modules) {
 				m.activate(proc);
 			}
+		} catch (RuntimeException ex) {
+			throw ex;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating DocProcessor: " + ex.getMessage());

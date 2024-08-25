@@ -16,26 +16,25 @@ import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
 public class ConfigureProcessor implements ConfigListenerProvider {
-	private final Map<String, Class<? extends ConfigListener>> processors = new TreeMap<>();
 	private final ReadConfigState state;
 
 	public ConfigureProcessor(ReadConfigState state) {
 		this.state = state;
-		this.processors.put("article", ArticleProcessorConfigListener.class);
-		this.processors.put("blog", BlogProcessorConfigListener.class);
-		this.processors.put("doc", DocProcessorConfigListener.class);
-		this.processors.put("movie", MovieProcessorConfigListener.class);
-		this.processors.put("presenter", PresenterProcessorConfigListener.class);
+		// TODO: all of these should move to their respective global module installers
+		state.registerProcessor("article", ArticleProcessorConfigListener.class);
+		state.registerProcessor("blog", BlogProcessorConfigListener.class);
+		state.registerProcessor("movie", MovieProcessorConfigListener.class);
+		state.registerProcessor("presenter", PresenterProcessorConfigListener.class);
 	}
 
 	@Override
 	public ConfigListener make(LineArgsParser lap) {
 		try {
 			String type = lap.readArg();
-			if (!this.processors.containsKey(type)) {
+			if (!state.hasProcessor(type)) {
 				throw new CantHappenException("there is no processor '" + type + "'");
 			}
-			Class<? extends ConfigListener> clz = this.processors.get(type);
+			Class<? extends ConfigListener> clz = state.processor(type);
 			Constructor<?>[] ctors = clz.getConstructors();
 			for (Constructor<?> c : ctors) {
 				if (c.getParameterCount() == 1 && FileWithLocation.class.isAssignableFrom(c.getParameters()[0].getType()))

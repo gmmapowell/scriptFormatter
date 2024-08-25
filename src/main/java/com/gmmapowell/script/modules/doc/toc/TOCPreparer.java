@@ -18,8 +18,8 @@ public class TOCPreparer implements ModuleActivator {
 	public void activate(ProcessorConfig proc) throws ConfigException {
 		try {
 			throw new NotImplementedException();
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (NotImplementedException ex) {
+			System.err.println("Not Implemented: " + ex.getStackTrace()[0]);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.gmmapowell.script;
 
+import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.exceptions.GeoFSException;
@@ -11,6 +12,8 @@ public class ExceptionHandler {
 		t = WrappedException.unwrapThrowable(t);
 		try {
 			throw t;
+		} catch (NotImplementedException ex) {
+			System.err.println("Not Implemented: " + ex.getStackTrace()[0]);
 		} catch (GeoFSException ex) {
 			System.err.println(ex.getMessage());
 		} catch (ScriptFormatterHelpException ex) {
