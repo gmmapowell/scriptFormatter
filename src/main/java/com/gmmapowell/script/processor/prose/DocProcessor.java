@@ -27,8 +27,6 @@ import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkFromRef;
 import com.gmmapowell.script.flow.LinkFromTOC;
-import com.gmmapowell.script.flow.LinkOp;
-import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.processor.prose.DocState.ScanMode;

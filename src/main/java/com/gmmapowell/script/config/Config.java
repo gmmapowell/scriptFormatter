@@ -9,6 +9,8 @@ public interface Config {
 	void prepare() throws Exception;
 	FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException;
 	void generate(FilesToProcess files) throws IOException;
+	void dump() throws IOException;
+	void sink();
 	void show();
 	void upload() throws Exception;
 }

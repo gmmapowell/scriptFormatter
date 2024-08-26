@@ -3,7 +3,6 @@ package com.gmmapowell.script.processor.configured;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.reflection.Reflection;
 
@@ -15,19 +14,21 @@ import com.gmmapowell.script.config.ExtensionPointRepo;
 import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
+import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.Processor;
-import com.gmmapowell.script.sink.Sink;
 
 public class ConfiguredProcessor implements Processor, ProcessorConfig {
+	private final ExtensionPointRepo eprepo;
+	private final ExtensionPointRepo local = new CreatorExtensionPointRepo();
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
 	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
-	private ExtensionPointRepo eprepo;
-	private ExtensionPointRepo local = new CreatorExtensionPointRepo();
+	private final FlowMap flows;
 
-	public ConfiguredProcessor(ExtensionPointRepo eprepo, Region root, BlockishElementFactory blockishElementFactory, Sink sink, VarMap vars, boolean debug) {
+	public ConfiguredProcessor(ExtensionPointRepo eprepo, FlowMap flows, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
 		this.eprepo = eprepo;
+		this.flows = flows;
 	}
 	
 	public void setDefaultHandler(Class<? extends ProcessingHandler> handler) {
@@ -51,12 +52,12 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
 		local.bindExtensionPoint(ep, impl);
 	}
-
+	
 	@Override
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
-			ConfiguredState state = new ConfiguredState(eprepo, x);
+			ConfiguredState state = new ConfiguredState(eprepo, flows, x);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act

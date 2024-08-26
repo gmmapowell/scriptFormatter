@@ -10,6 +10,8 @@ import org.zinutils.exceptions.CantHappenException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Index;
 import com.gmmapowell.script.loader.Loader;
@@ -17,6 +19,7 @@ import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
+import com.gmmapowell.script.sink.capture.FlowDumper;
 
 public class ScriptConfig implements Config {
 	// This is a hack to make regression tests quicker.
@@ -32,7 +35,9 @@ public class ScriptConfig implements Config {
 	private Place index;
 	private Region workdir;
 	private ExtensionPointRepo eprepo = new CreatorExtensionPointRepo();
-	
+
+	private final FlowMap flows = new FlowMap();
+
 	public ScriptConfig(Universe universe, Region root) {
 		this.root = root;
 	}
@@ -41,6 +46,10 @@ public class ScriptConfig implements Config {
 		return eprepo;
 	}
 
+	public FlowMap flowMap() {
+		return flows;
+	}
+	
 	@Override
 	public void prepare() throws Exception {
 //		loader.prepare();
@@ -66,6 +75,20 @@ public class ScriptConfig implements Config {
 			throw new CantHappenException("no processor has been defined");
 		}
 		processor.process(files);
+	}
+
+	@Override
+	public void dump() throws IOException {
+		FlowDumper dumper = new FlowDumper(root.ensurePlace("fred.flow"));
+		for (Flow f : flows) {
+			dumper.dump(f);
+		}
+	}
+
+	@Override
+	public void sink() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

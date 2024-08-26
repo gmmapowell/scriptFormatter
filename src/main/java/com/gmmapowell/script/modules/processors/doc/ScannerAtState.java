@@ -4,14 +4,16 @@ import java.util.Map;
 
 import org.zinutils.exceptions.CantHappenException;
 
-import com.gmmapowell.script.config.ExtensionPointRepo;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class ScannerAtState {
 	private AtCommand cmd;
 	private Map<String, AtCommandHandler> handlers;
+	private ConfiguredState state;
 	
-	public void configure(ExtensionPointRepo extensions) {
-		this.handlers = extensions.forPointByName(AtCommandHandler.class, this);
+	public void configure(ConfiguredState state) {
+		this.state = state;
+		this.handlers = state.extensions().forPointByName(AtCommandHandler.class, this);
 	}
 	
 	public void startCommand(String cmd) {
@@ -39,5 +41,9 @@ public class ScannerAtState {
 			throw new CantHappenException("there is no handler for " + cmd.name);
 		handler.invoke(cmd);
 		this.cmd = null;
+	}
+
+	public ConfiguredState state() {
+		return state;
 	}
 }

@@ -22,5 +22,4 @@ public class TOCPreparer implements ModuleActivator {
 			System.err.println("Not Implemented: " + ex.getStackTrace()[0]);
 		}
 	}
-
 }

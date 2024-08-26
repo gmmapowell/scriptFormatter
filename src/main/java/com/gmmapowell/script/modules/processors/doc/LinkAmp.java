@@ -1,7 +1,5 @@
 package com.gmmapowell.script.modules.processors.doc;
 
-import com.gmmapowell.script.flow.LinkOp;
-
 public class LinkAmp implements AmpCommandHandler {
 	private final ScannerAmpState state;
 

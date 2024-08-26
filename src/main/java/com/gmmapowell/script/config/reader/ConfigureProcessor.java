@@ -1,15 +1,11 @@
 package com.gmmapowell.script.config.reader;
 
 import java.lang.reflect.Constructor;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.processors.article.ArticleProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.blog.BlogProcessorConfigListener;
-import com.gmmapowell.script.modules.processors.doc.DocProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.movie.MovieProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.presenter.PresenterProcessorConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;

@@ -8,7 +8,7 @@ public class AtSpotter implements ProcessingScanner {
 
 	public AtSpotter(ConfiguredState state) {
 		this.ats = state.require(ScannerAtState.class);
-		this.ats.configure(state.extensions());
+		this.ats.configure(state);
 	}
 
 	@Override

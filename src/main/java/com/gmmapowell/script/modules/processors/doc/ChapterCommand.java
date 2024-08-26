@@ -1,9 +1,14 @@
 package com.gmmapowell.script.modules.processors.doc;
 
-public class ChapterCommand implements AtCommandHandler {
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-	public ChapterCommand(ScannerAtState state) {
-		
+public class ChapterCommand implements AtCommandHandler {
+	private final ScannerAtState sas;
+	private final ConfiguredState state;
+
+	public ChapterCommand(ScannerAtState sas) {
+		this.sas = sas;
+		this.state = sas.state();
 	}
 	
 	@Override
@@ -51,16 +56,15 @@ public class ChapterCommand implements AtCommandHandler {
 			entry = toc.chapter(anchor, null, title);
 			state.wantSectionNumbering = false;
 		}
+		*/
 		state.newSection("footnotes", style);
 		state.newSection("main", style);
 		state.newPara("chapter-title");
-		if (entry != null) {
-			state.newSpan();
-			state.op(new AnchorOp(entry));
-		}
-		ProcessingUtils.process(state, title);
+//		if (entry != null) {
+//			state.newSpan();
+//			state.op(new AnchorOp(entry));
+//		}
+		state.processText(title);
 		state.endPara();
-		*/
 	}
-
 }

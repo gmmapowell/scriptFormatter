@@ -12,10 +12,10 @@ import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
+import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.processor.NewParaProcessor;
 import com.gmmapowell.script.processor.configured.ConfiguredProcessor;
 import com.gmmapowell.script.processor.configured.StandardLineProcessor;
-import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.Command;
 
 public class DocProcessorConfigListener implements ConfigListener {
@@ -51,8 +51,12 @@ public class DocProcessorConfigListener implements ConfigListener {
 	@Override
 	public void complete() throws ConfigException {
 		try {
-			Sink sink = state.config.makeSink();
-			ConfiguredProcessor proc = new ConfiguredProcessor(state.config.extensions(), state.root, new BlockishElementFactory(), sink, vars, state.debug);
+			FlowMap flows = state.config.flowMap();
+			ConfiguredProcessor proc = new ConfiguredProcessor(state.config.extensions(), flows, state.root, new BlockishElementFactory(), vars, state.debug);
+			flows.callbackFlow("header");
+			flows.flow("main");
+			flows.flow("footnotes");
+			flows.callbackFlow("footer");
 			proc.setDefaultHandler(StandardLineProcessor.class);
 			proc.setBlankHandler(NewParaProcessor.class);
 			proc.addScanner(AmpSpotter.class);
