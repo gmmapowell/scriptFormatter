@@ -61,6 +61,7 @@ public class DecodeDumpFile implements DumpDecoder {
 		try {
 			boolean b = dis.readBoolean();
 			String name = dis.readUTF();
+			// NOTE: "main" here should read "callback" but I can't change it until I have finished with regression testing ...
 			showText("flow '" + name + "'" + (b ? " is main":""));
 		} catch (EOFException ex) {
 			// no more flows ...

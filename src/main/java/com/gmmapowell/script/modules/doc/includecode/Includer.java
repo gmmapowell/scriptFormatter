@@ -17,5 +17,9 @@ public class Includer implements ModuleActivator {
 	@Override
 	public void activate(ProcessorConfig proc) throws ConfigException {
 		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeAmp.class);
+		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, RemoveAmp.class);
+		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SelectAmp.class);
+		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IndentsAmp.class);
+		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, StopAmp.class);
 	}
 }

@@ -10,11 +10,11 @@ public class FlowMap implements Iterable<Flow> {
 	private final Map<String, Flow> flows = new TreeMap<>();
 
 	public void flow(String name) {
-		flows.put(name, new Flow(name, false));
+		flows.put(name, new Flow(name, true));
 	}
 
 	public void callbackFlow(String name) {
-		flows.put(name, new Flow(name, true));
+		flows.put(name, new Flow(name, false));
 	}
 
 	public Flow get(String flow) {
