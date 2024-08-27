@@ -20,6 +20,8 @@ import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.processor.NoSuchCommandException;
+import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.utils.SBLocation;
 
 public class ConfiguredState extends SBLocation {
@@ -31,10 +33,12 @@ public class ConfiguredState extends SBLocation {
 	private Para currPara;
 	private HorizSpan currSpan;
 	private boolean ignoreBlanks = true;
+	private Map<String, InlineCommandHandler> inlineCommands;
 
 	public ConfiguredState(ExtensionPointRepo eprepo, FlowMap flows, Place x) {
 		this.eprepo = eprepo;
 		this.flows = flows;
+		this.inlineCommands = eprepo.forPointByName(InlineCommandHandler.class, new InlineCommandState(this)); 
 		super.processingFile(x.name());
 	}
 
@@ -51,6 +55,16 @@ public class ConfiguredState extends SBLocation {
 		return eprepo;
 	}
 
+	/* All of these functions (which came from processing utils) feel fundamentally different
+	 * from the ones that actually generate the flows.
+	 * 
+	 * I feel they should be in separate places in some sense, but both of them have something to do
+	 * with "generating flows", so they have ended up together.
+	 * 
+	 * In particular, the ones to do with **literally** generating flows are truly valid across all
+	 * input languages, but the text processing doesn't have to be.  Of course, on the other hand,
+	 * I think both that it is and I want it to be for consistency reasons.
+	 */
 	public void processText(String tx) {
 		newSpan();
 		try {
@@ -78,14 +92,12 @@ public class ConfiguredState extends SBLocation {
 			} else if (q == -2) { // a double character; throw it away
 				text(tx.substring(from, i+1));
 				from = ++i + 1;
-				
-// TODO: some version of this needs to be modularized
-//			} else if ((q = getCommand(st, tx, i, to)) >= 0) {
-//				if (i > from)
-//					st.text(tx.substring(from, i));
-//				processCommand(tx.substring(i+1, q));
-//				i = q;
-//				from = i+1;
+			} else if ((q = getCommand(tx, i, to)) >= 0) {
+				if (i > from)
+					text(tx.substring(from, i));
+				processCommand(tx.substring(i+1, q));
+				i = q;
+				from = i+1;
 			} else if (q == -2) { // a double &; throw it away
 				text(tx.substring(from, i+1));
 				from = ++i + 1;
@@ -119,6 +131,25 @@ public class ConfiguredState extends SBLocation {
 		return -1;
 	}
 
+	private int getCommand(String tx, int i, int to) {
+		// not a command
+		if (tx.charAt(i) != '&')
+			return -1;
+		// last on the line can't be a command
+		if (++i >= to)
+			return -1;
+		// it's a double ... return the magic value "-2"
+		if (tx.charAt(i) == '&')
+			return -2;
+		if (!Character.isLetterOrDigit(tx.charAt(i)))
+			throw new ParsingException("cannot have just &: use && for a single & at " + inputLocation());
+
+		while (i < to && Character.isLetterOrDigit(tx.charAt(i)))
+			i++;
+
+		return i;
+	}
+
 	private void makeSpan(char c) {
 		switch (c) {
 		case '_':
@@ -135,6 +166,13 @@ public class ConfiguredState extends SBLocation {
 		}
 	}
 	
+	private void processCommand(String cmd) {
+		InlineCommandHandler handler = inlineCommands.get(cmd);
+		if (handler == null)
+			throw new NoSuchCommandException(cmd, inputLocation());
+		handler.invoke();
+	}
+
 	public void switchToFlow(String flow) {
 		currFlow = flows.get(flow);
 		if (currFlow == null) {
@@ -155,6 +193,9 @@ public class ConfiguredState extends SBLocation {
 		currSpan = null;
 	}
 	
+	public boolean inPara() {
+		return this.currPara != null;
+	}
 	public void ensurePara() {
 		if (currPara == null) {
 			// TODO: this needs to be more complicated, taking into account any "all-paras-right-now-formats"
@@ -178,6 +219,10 @@ public class ConfiguredState extends SBLocation {
 	public void endPara() {
 		endSpan();
 		currPara = null;
+	}
+
+	public boolean inSpan() {
+		return this.currSpan != null;
 	}
 
 	public void newSpan(List<String> formats) {

@@ -18,6 +18,10 @@ public class ScannerAmpState {
 		this.handlers = extensions.forPointByName(AmpCommandHandler.class, this);
 	}
 	
+	public ConfiguredState state() {
+		return state;
+	}
+	
 	public void startCommand(String cmd, LineArgsParser lap) {
 		this.cmd = new AmpCommand(cmd, lap);
 	}

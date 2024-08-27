@@ -12,8 +12,7 @@ public class ScannerAtState {
 	private AtCommand cmd;
 	private Map<String, AtCommandHandler> handlers;
 	private ConfiguredState state;
-	protected int nextFnMkr = 1;
-	protected int nextFnText = 1;
+	private int nextFnText = 1;
 	private List<EndDispatcher> cmdstack = new ArrayList<>();
 
 	public void configure(ConfiguredState state) {
@@ -54,13 +53,8 @@ public class ScannerAtState {
 	}
 	
 	public void popAtCommand() {
-		System.out.println("we need a stack of currently 'active' commands");
 		EndDispatcher d = cmdstack.remove(0);
 		d.handler.onEnd(d.cmd);
-	}
-	
-	public int nextFootnoteMarker() {
-		return nextFnMkr++;
 	}
 	
 	public int nextFootnoteText() {

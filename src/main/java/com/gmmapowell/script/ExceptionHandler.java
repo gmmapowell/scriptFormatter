@@ -5,6 +5,7 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.processor.NoSuchCommandException;
 
 public class ExceptionHandler {
 
@@ -14,6 +15,8 @@ public class ExceptionHandler {
 			throw t;
 		} catch (NotImplementedException ex) {
 			System.err.println("Not Implemented: " + ex.getStackTrace()[0]);
+		} catch (NoSuchCommandException ex) {
+			System.err.println(ex.getMessage() + ": " + ex.getStackTrace()[0]);
 		} catch (GeoFSException ex) {
 			System.err.println(ex.getMessage());
 		} catch (ScriptFormatterHelpException ex) {

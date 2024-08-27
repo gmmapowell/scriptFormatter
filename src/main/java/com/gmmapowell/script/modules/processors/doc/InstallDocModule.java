@@ -2,6 +2,7 @@ package com.gmmapowell.script.modules.processors.doc;
 
 import com.gmmapowell.script.config.ScriptConfig;
 import com.gmmapowell.script.config.reader.ReadConfigState;
+import com.gmmapowell.script.processor.configured.InlineCommandHandler;
 
 public class InstallDocModule implements GlobalModuleInstaller {
 	private final ReadConfigState state;
@@ -18,6 +19,7 @@ public class InstallDocModule implements GlobalModuleInstaller {
 
 		installAtCommands();
 		installAmpCommands();
+		installInlineCommands();
 	}
 
 	// @ commands
@@ -43,4 +45,11 @@ public class InstallDocModule implements GlobalModuleInstaller {
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SpaceAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, TTAmp.class);
 	}
+
+	// & commands that appear in the line rather than at the start
+	private void installInlineCommands() {
+		this.config.extensions().bindExtensionPoint(InlineCommandHandler.class, FootnoteNumHandler.class);
+		this.config.extensions().bindExtensionPoint(InlineCommandHandler.class, ForceSpaceHandler.class);
+	}
+
 }
