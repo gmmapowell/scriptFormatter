@@ -57,6 +57,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
+			System.out.println("Handling " + x.name());
 			ConfiguredState state = new ConfiguredState(eprepo, flows, x);
 			List<ProcessingScanner> all = createScannerList(state);
 

@@ -29,11 +29,13 @@ public class InstallDocModule implements GlobalModuleInstaller {
 		
 		// should commentary be in a separate module?
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentaryCommand.class);
+		
+		// should footnote processing be in a separate module?
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, FootnoteCommand.class);
 	}
 
 	// & commands
 	private void installAmpCommands() {
-		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FootnoteAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FutureAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, OutrageAmp.class);

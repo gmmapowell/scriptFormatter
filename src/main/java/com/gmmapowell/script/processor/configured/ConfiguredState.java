@@ -15,6 +15,7 @@ import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.flow.HorizSpan;
+import com.gmmapowell.script.flow.NestedSpan;
 import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
@@ -29,6 +30,7 @@ public class ConfiguredState extends SBLocation {
 	private Section currSection;
 	private Para currPara;
 	private HorizSpan currSpan;
+	private boolean ignoreBlanks = true;
 
 	public ConfiguredState(ExtensionPointRepo eprepo, FlowMap flows, Place x) {
 		this.eprepo = eprepo;
@@ -133,6 +135,18 @@ public class ConfiguredState extends SBLocation {
 		}
 	}
 	
+	public void switchToFlow(String flow) {
+		currFlow = flows.get(flow);
+		if (currFlow == null) {
+			throw new CantHappenException("there is no flow " + flow);
+		}
+		if (currFlow.sections.isEmpty()) {
+			throw new CantHappenException("no sections for flow " + flow);
+		} else {
+			currSection = currFlow.sections.get(currFlow.sections.size()-1);
+		}
+	}
+	
 	public void newSection(String flow, String format) {
 		currFlow = flows.get(flow);
 		currSection = new Section(format);
@@ -162,19 +176,6 @@ public class ConfiguredState extends SBLocation {
 	}
 
 	public void endPara() {
-		// Hack? This is to get us back on track after footnotes, but it might be better to make that more explicit.
-		// I can see it derailing us in other situations.
-		
-		// TODO: the inline footnote should be &footnote; the actual text should be @Footnote ... @/
-		// That also provides for options such as type=page|chapter and flow=nowidow
-		/*
-		if (currFlow.name.equals("footnotes") && flows.containsKey("main")) {
-			newSpan();
-			op(new ReleaseFlow("main"));
-			switchToFlow("main");
-		}
-		*/
-
 		endSpan();
 		currPara = null;
 	}
@@ -195,23 +196,33 @@ public class ConfiguredState extends SBLocation {
 	}
 	
 	public void endSpan() {
-//		if (currSpan == null) // it's OK to try ending a span that isn't open
-//			return;
-//		if (currSpan.parent != null)
-//			throw new CantHappenException("has parent; should use popSpan first");
-//		currSpan = null;
+		if (currSpan == null) // it's OK to try ending a span that isn't open
+			return;
+		if (currSpan.parent != null)
+			throw new CantHappenException("has parent; should use popSpan first");
+		currSpan = null;
+	}
+
+	public void nestSpan(List<String> formats) {
+		if (currSpan == null) {
+			throw new CantHappenException("no current span to nest inside");
+		}
+		HorizSpan tmp;
+		tmp = new HorizSpan(currSpan, formats);
+		currSpan.items.add(new NestedSpan(tmp));
+		currSpan = tmp;
 	}
 
 	public void nestSpan(String... formats) {
-//		nestSpan(Arrays.asList(formats));
+		nestSpan(Arrays.asList(formats));
 	}
 	
 	public void popSpan() {
-//		if (currSpan == null)
-//			throw new CantHappenException("no current span");
-//		else if (currSpan.parent == null)
-//			throw new CantHappenException("not a child span");
-//		currSpan = currSpan.parent;
+		if (currSpan == null)
+			throw new CantHappenException("no current span");
+		else if (currSpan.parent == null)
+			throw new CantHappenException("not a child span");
+		currSpan = currSpan.parent;
 	}
 
 	public void text(String tx) {
@@ -226,5 +237,17 @@ public class ConfiguredState extends SBLocation {
 			throw new CantHappenException("no current span");
 		}
 		currSpan.items.add(op);
+	}
+
+	public void ignoreNextBlanks() {
+		this.ignoreBlanks = true;
+	}
+
+	public void observeBlanks() {
+		this.ignoreBlanks = false;
+	}
+
+	public boolean ignoringBlanks() {
+		return this.ignoreBlanks;
 	}
 }

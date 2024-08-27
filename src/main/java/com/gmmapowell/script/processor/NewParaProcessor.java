@@ -12,7 +12,12 @@ public class NewParaProcessor implements ProcessingHandler {
 
 	@Override
 	public void process(String s) {
-		System.out.println("blank line");
-		state.endPara();
+		if (state.ignoringBlanks()) {
+			System.out.println("ignoring blank line");
+		} else {
+			System.out.println("blank line");
+			state.endPara();
+			state.ignoreNextBlanks();
+		}
 	}
 }

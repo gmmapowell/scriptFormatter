@@ -8,5 +8,7 @@ import com.gmmapowell.script.config.NamedExtensionPoint;
 public interface AtCommandHandler extends NamedExtensionPoint {
 
 	void invoke(AtCommand cmd);
+	
+	default void onEnd(AtCommand cmd) {}
 
 }

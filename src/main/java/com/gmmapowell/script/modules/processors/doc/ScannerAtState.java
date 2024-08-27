@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.processors.doc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.zinutils.exceptions.CantHappenException;
@@ -10,10 +12,17 @@ public class ScannerAtState {
 	private AtCommand cmd;
 	private Map<String, AtCommandHandler> handlers;
 	private ConfiguredState state;
-	
+	protected int nextFnMkr = 1;
+	protected int nextFnText = 1;
+	private List<EndDispatcher> cmdstack = new ArrayList<>();
+
 	public void configure(ConfiguredState state) {
 		this.state = state;
 		this.handlers = state.extensions().forPointByName(AtCommandHandler.class, this);
+	}
+	
+	public ConfiguredState state() {
+		return state;
 	}
 	
 	public void startCommand(String cmd) {
@@ -38,12 +47,31 @@ public class ScannerAtState {
 	public void handleAtCommand() {
 		AtCommandHandler handler = handlers.get(cmd.name);
 		if (handler == null)
-			throw new CantHappenException("there is no handler for " + cmd.name);
+			throw new CantHappenException("there is no handler for " + cmd.name + " at " + state.inputLocation());
 		handler.invoke(cmd);
+		cmdstack.add(0, new EndDispatcher(handler, this.cmd));
 		this.cmd = null;
 	}
+	
+	public void popAtCommand() {
+		System.out.println("we need a stack of currently 'active' commands");
+		EndDispatcher d = cmdstack.remove(0);
+		d.handler.onEnd(d.cmd);
+	}
+	
+	public int nextFootnoteMarker() {
+		return nextFnMkr++;
+	}
+	
+	public int nextFootnoteText() {
+		return nextFnText++;
+	}
 
-	public ConfiguredState state() {
-		return state;
+	public void ignoreNextBlanks() {
+		state.ignoreNextBlanks();
+	}
+
+	public void observeBlanks() {
+		state.observeBlanks();
 	}
 }

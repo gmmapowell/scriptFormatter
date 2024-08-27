@@ -29,7 +29,7 @@ public class ScannerAmpState {
 	public void handleAmpCommand() {
 		AmpCommandHandler handler = handlers.get(cmd.name);
 		if (handler == null)
-			throw new CantHappenException("there is no handler for " + cmd.name);
+			throw new CantHappenException("there is no handler for " + cmd.name + " at " + state.inputLocation());
 		handler.invoke(cmd);
 		this.cmd = null;
 	}

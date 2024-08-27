@@ -26,6 +26,7 @@ public class StandardLineProcessor implements ProcessingHandler {
 //			state.op(new BreakingSpace());
 //		}
 		state.processText(s);
+		state.observeBlanks();
 	}
 
 }

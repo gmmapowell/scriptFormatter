@@ -29,7 +29,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.DriveList;
 
 public class GoogleDriveWorld implements World {
-	private final boolean CONFIGURE_WITH_INTERNET = false;
+	private final boolean CONFIGURE_WITH_INTERNET = true;
 	private final Universe universe;
 	private final String appName;
 	private final Place creds;
