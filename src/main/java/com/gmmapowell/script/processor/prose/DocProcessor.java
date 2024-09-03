@@ -20,6 +20,7 @@ import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.Creator;
+import com.gmmapowell.script.config.ExtensionPoint;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.AnchorOp;
@@ -450,13 +451,13 @@ public class DocProcessor extends AtProcessor<DocState> {
 	}
 
 	@Override
-	public <T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
+	public <T extends ExtensionPoint, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
+	public <T extends ExtensionPoint, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -10,6 +10,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.CreatorExtensionPointRepo;
+import com.gmmapowell.script.config.ExtensionPoint;
 import com.gmmapowell.script.config.ExtensionPointRepo;
 import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
@@ -44,12 +45,12 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	}
 	
 	@Override
-	public <T, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
+	public <T extends ExtensionPoint, Z extends T, Q> void addExtension(Class<T> ep, Creator<Z, Q> impl) {
 		local.bindExtensionPoint(ep, impl);
 	}
 
 	@Override
-	public <T, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
+	public <T extends ExtensionPoint, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
 		local.bindExtensionPoint(ep, impl);
 	}
 	

@@ -3,13 +3,12 @@ package com.gmmapowell.script.modules.processors.doc;
 import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.processor.configured.InlineCommandHandler;
-import com.gmmapowell.script.processor.configured.InlineCommandState;
 
 public class FootnoteNumHandler implements InlineCommandHandler {
 	private final ConfiguredState state;
-	private final InlineCommandState ics;
+	private final InlineDocCommandState ics;
 
-	public FootnoteNumHandler(InlineCommandState state) {
+	public FootnoteNumHandler(InlineDocCommandState state) {
 		ics = state;
 		this.state = state.state();
 	}

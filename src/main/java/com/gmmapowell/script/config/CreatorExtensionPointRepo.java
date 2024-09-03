@@ -1,6 +1,8 @@
 package com.gmmapowell.script.config;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.zinutils.collections.ListMap;
@@ -26,12 +28,25 @@ public class CreatorExtensionPointRepo implements ExtensionPointRepo {
 	}
 
 	@Override
-	public <T, Z extends T, Q> void bindExtensionPoint(Class<T> ep, Creator<Z, Q> impl) {
+	public <T extends ExtensionPoint, Q> Set<T> forPoint(Class<T> clz, Q ctorArg) {
+		Set<T> ret = new HashSet<>();
+		if (extensionPointCreators.contains(clz)) {
+			for (@SuppressWarnings("rawtypes") Creator m : extensionPointCreators.get(clz)) {
+				@SuppressWarnings("unchecked")
+				T nep = (T) m.create(ctorArg);
+				ret.add(nep);
+			}
+		}
+		return ret;
+	}
+
+	@Override
+	public <T extends ExtensionPoint, Z extends T, Q> void bindExtensionPoint(Class<T> ep, Creator<Z, Q> impl) {
 		extensionPointCreators.add(ep, impl);
 	}
 
 	@Override
-	public <T, Z extends T> void bindExtensionPoint(Class<T> ep, Class<Z> impl) {
+	public <T extends ExtensionPoint, Z extends T> void bindExtensionPoint(Class<T> ep, Class<Z> impl) {
 		bindExtensionPoint(ep, new ReflectionCreator<Z, Object>(impl));
 	}
 }

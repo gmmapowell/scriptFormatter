@@ -20,6 +20,7 @@ import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.modules.processors.doc.InlineDocCommandState;
 import com.gmmapowell.script.processor.NoSuchCommandException;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.utils.SBLocation;
@@ -38,7 +39,9 @@ public class ConfiguredState extends SBLocation {
 	public ConfiguredState(ExtensionPointRepo eprepo, FlowMap flows, Place x) {
 		this.eprepo = eprepo;
 		this.flows = flows;
-		this.inlineCommands = eprepo.forPointByName(InlineCommandHandler.class, new InlineCommandState(this)); 
+		// TODO: while most of this should be here, the InlineCommandState should not be solid ...
+		// Thus there should probably be a function passed in to create it...
+		this.inlineCommands = eprepo.forPointByName(InlineCommandHandler.class, new InlineDocCommandState(this)); 
 		super.processingFile(x.name());
 	}
 

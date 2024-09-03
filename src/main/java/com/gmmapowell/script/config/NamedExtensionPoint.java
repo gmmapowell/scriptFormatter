@@ -1,5 +1,5 @@
 package com.gmmapowell.script.config;
 
-public interface NamedExtensionPoint {
+public interface NamedExtensionPoint extends ExtensionPoint {
 	String name();
 }
