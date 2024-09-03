@@ -19,6 +19,13 @@ public class AmpSpotter implements ProcessingScanner {
 	@Override
 	public void closeIfNotContinued(String nx) {
 		if (amps.hasPendingCommand()) {
+			if (nx.startsWith("&")) {
+				System.out.println(nx);
+				LineArgsParser lap = new SBLineArgsParser<ConfiguredState>(state, nx.substring(1));
+				Command cmd = lap.readCommand();
+				if (amps.continueCommand(cmd, lap))
+					return;
+			}
 			amps.handleAmpCommand();
 		}
 	}

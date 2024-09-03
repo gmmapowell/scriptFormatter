@@ -17,6 +17,7 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.SectionTitle;
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
@@ -95,6 +96,12 @@ public class ArticleProcessor extends AtProcessor<ArticleState> {
 	public <T extends ExtensionPoint, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public GlobalState global() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

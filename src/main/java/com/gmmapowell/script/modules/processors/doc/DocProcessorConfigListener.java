@@ -52,7 +52,8 @@ public class DocProcessorConfigListener implements ConfigListener {
 	public void complete() throws ConfigException {
 		try {
 			FlowMap flows = state.config.flowMap();
-			ConfiguredProcessor proc = new ConfiguredProcessor(state.config.extensions(), flows, state.root, new BlockishElementFactory(), vars, state.debug);
+			GlobalState global = state.config.newGlobalState();
+			ConfiguredProcessor proc = new ConfiguredProcessor(global, flows, state.root, new BlockishElementFactory(), vars, state.debug);
 			flows.callbackFlow("header");
 			flows.flow("main");
 			flows.flow("footnotes");

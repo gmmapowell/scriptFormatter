@@ -1,5 +1,6 @@
 package com.gmmapowell.script.processor.configured;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +21,14 @@ import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.modules.processors.doc.InlineDocCommandState;
 import com.gmmapowell.script.processor.NoSuchCommandException;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.utils.SBLocation;
 
 public class ConfiguredState extends SBLocation {
+	private final GlobalState global;
 	private final Map<Class<?>, Object> configs = new HashMap<>();
 	private final ExtensionPointRepo eprepo;
 	public final FlowMap flows;
@@ -35,8 +38,10 @@ public class ConfiguredState extends SBLocation {
 	private HorizSpan currSpan;
 	private boolean ignoreBlanks = true;
 	private Map<String, InlineCommandHandler> inlineCommands;
+	private List<String> fmtStack = new ArrayList<String>();
 
-	public ConfiguredState(ExtensionPointRepo eprepo, FlowMap flows, Place x) {
+	public ConfiguredState(GlobalState global, ExtensionPointRepo eprepo, FlowMap flows, Place x) {
+		this.global = global;
 		this.eprepo = eprepo;
 		this.flows = flows;
 		// TODO: while most of this should be here, the InlineCommandState should not be solid ...
@@ -52,6 +57,10 @@ public class ConfiguredState extends SBLocation {
 		T obj = (T) Reflection.create(clz);
 		configs.put(clz, obj);
 		return obj;
+	}
+
+	public GlobalState global() {
+		return global;
 	}
 
 	public ExtensionPointRepo extensions() {
@@ -199,9 +208,9 @@ public class ConfiguredState extends SBLocation {
 	public boolean inPara() {
 		return this.currPara != null;
 	}
+	
 	public void ensurePara() {
 		if (currPara == null) {
-			// TODO: this needs to be more complicated, taking into account any "all-paras-right-now-formats"
 			newPara("text");
 		}
 	}
@@ -210,12 +219,17 @@ public class ConfiguredState extends SBLocation {
 		if (currSection == null) {
 			throw new CantHappenException("no current section");
 		}
-		currPara = new Para(formats);
+		List<String> merged = new ArrayList<>(fmtStack);
+		merged.addAll(formats);
+		if (merged.isEmpty())
+			merged.add("text");
+		currPara = new Para(merged);
 		currSection.paras.add(currPara);
 		currSpan = null;
 	}
 
 	public void newPara(String... formats) {
+		// TODO: should include current formats ...
 		newPara(Arrays.asList(formats));
 	}
 
@@ -297,5 +311,17 @@ public class ConfiguredState extends SBLocation {
 
 	public boolean ignoringBlanks() {
 		return this.ignoreBlanks;
+	}
+
+	public void pushFormat(String fmt) {
+		fmtStack.add(fmt);
+	}
+
+	public void popFormat(String fmt) {
+		if (fmtStack.isEmpty())
+			throw new CantHappenException("format stack is empty");
+		String last = fmtStack.remove(fmtStack .size()-1);
+		if (!fmt.equals(last))
+			throw new CantHappenException("wanted to remove " + fmt + " but top was " + last);
 	}
 }

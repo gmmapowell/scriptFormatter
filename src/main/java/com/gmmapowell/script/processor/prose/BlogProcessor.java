@@ -16,6 +16,7 @@ import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.NoSuchCommandException;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.ProcessingUtils;
@@ -274,6 +275,12 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 	public <T extends ExtensionPoint, Z extends T> void addExtension(Class<T> ep, Class<Z> impl) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public GlobalState global() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

@@ -17,18 +17,25 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.intf.FilesToProcess;
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.Processor;
 
 public class ConfiguredProcessor implements Processor, ProcessorConfig {
+	private final GlobalState global;
 	private final ExtensionPointRepo local;
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
 	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
 	private final FlowMap flows;
 
-	public ConfiguredProcessor(ExtensionPointRepo eprepo, FlowMap flows, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
-		this.local = new CreatorExtensionPointRepo(eprepo);
+	public ConfiguredProcessor(GlobalState global, FlowMap flows, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
+		this.global = global;
+		this.local = new CreatorExtensionPointRepo(global.extensions());
 		this.flows = flows;
+	}
+	
+	public GlobalState global() {
+		return global;
 	}
 	
 	public void setDefaultHandler(Class<? extends ProcessingHandler> handler) {
@@ -58,7 +65,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
 			System.out.println("Handling " + x.name());
-			ConfiguredState state = new ConfiguredState(local, flows, x);
+			ConfiguredState state = new ConfiguredState(global, local, flows, x);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act

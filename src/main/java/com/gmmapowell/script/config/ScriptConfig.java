@@ -15,6 +15,7 @@ import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Index;
 import com.gmmapowell.script.loader.Loader;
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.Processor;
 import com.gmmapowell.script.sink.MultiSink;
 import com.gmmapowell.script.sink.Sink;
@@ -151,5 +152,9 @@ public class ScriptConfig implements Config {
 	public void check() throws ConfigException {
 		if (processor == null)
 			throw new ConfigException("no processor was specified");
+	}
+
+	public GlobalState newGlobalState() {
+		return new SolidGlobalState(eprepo);
 	}
 }
