@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.doc.includecode;
 
+import java.util.Map;
+
 import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
@@ -21,12 +23,13 @@ public class RemoveAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
+		Map<String, String> params = cmd.args.readParams("from", "what");
 		if (!state.hasPendingCommand())
 			throw new CantHappenException("&remove requires active &include");
 		AmpCommand pending = state.pendingCommand();
 		if (!(pending.handler instanceof IncludeAmp))
 			throw new CantHappenException("&remove can only be in &include");
-		((IncludeAmp)pending.handler).remove(this);
+		((IncludeAmp)pending.handler).includer().butRemove(params.get("from"), params.get("what"));
 	}
 
 }

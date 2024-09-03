@@ -9,6 +9,8 @@ import com.gmmapowell.script.utils.LineArgsParser;
  */
 public interface AmpCommandHandler extends NamedExtensionPoint {
 
+	default void prepare(AmpCommand cmd) {}
+	
 	void invoke(AmpCommand cmd);
 
 	default boolean continuation(Command cont, LineArgsParser lap) { return false; }

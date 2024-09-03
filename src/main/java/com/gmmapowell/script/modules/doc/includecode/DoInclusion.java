@@ -41,6 +41,7 @@ public class DoInclusion {
 	private final ConfiguredState state;
 	private final Formatter formatter;
 	private final Place place;
+	private Region select;
 	private final List<Region> elides = new ArrayList<>();
 	private Indents indents;
 	private Pattern stopAt;
@@ -79,7 +80,6 @@ public class DoInclusion {
 			elideAtEnd = Boolean.parseBoolean(elide);
 	}
 
-	Region select;
 	boolean primed = false, stopped = false;
 	int exdent = 0;
 	int selectionIndent = 0;
@@ -123,10 +123,12 @@ public class DoInclusion {
 	}
 
 	private void processLine(int lineNo, String line) throws IOException {
-		System.out.println("processing included line " + line + " stopped = " + stopped);
-		
-		if (stopped)
+//		System.out.println("processing included line " + line + " stopped = " + stopped);
+		System.out.print("include " + lineNo + ": " + primed + ": ");
+		if (stopped) {
+			System.out.println("stopped: " + line);
 			return;
+		}
 		
 		if (select != null && !primed) {
 			exdent = select.exdent;
@@ -134,9 +136,9 @@ public class DoInclusion {
 				primed = true;
 				selectionIndent = indent(line, lineNo);
 			} else {
-//					System.out.println("skipping line " + line + " before select");
-				return;
+				System.out.println("skipping line before select: " + line);
 			}
+			return;
 		}
 //		if (primed) {
 			int il = indent(line, lineNo);
@@ -147,14 +149,14 @@ public class DoInclusion {
 				stopped = true;
 				return;
 			}
-			if (select != null && !primed && !formatter.isBlockIndent(selectionIndent, il)) {
-//					System.out.println("selection over at " + line);
+			if (select != null && !formatter.isBlockIndent(selectionIndent, il)) {
+					System.out.println("selection over at: " + line);
 				stopped = true;
 				return;
 			}
-			primed = false;
+//			primed = false;
 			if (curr != -1) {
-//					System.out.println("comparing " + il + " to " + curr + " for " + line);
+					System.out.println("comparing " + il + " to " + curr + " for " + line);
 				if (formatter.isBlockIndent(curr, il)) {
 					if (!haveSkipped) {
 						elideThis(il);
@@ -169,7 +171,7 @@ public class DoInclusion {
 			if (lookFor != null && lookFor.pattern.matcher(line).find()) {
 				curr = il;
 				String what = lookFor.what;
-//					System.out.println("Found " + lookFor.from + " removing " + what + " with curr = " + curr);
+					System.out.println("Found " + lookFor.from + " removing " + what + " with curr = " + curr);
 				lookFor = nextElide(ei);
 				if (what.equals("inner"))
 					curr++;
@@ -182,7 +184,7 @@ public class DoInclusion {
 				}
 			}
 			if (indents == null || (il >= indents.min && il <= indents.max)) {
-//					System.out.println("sinking " + line);
+					System.out.println("formatting: " + line);
 				formatter.format(line, exdent);
 				haveSkipped = false;
 			} else if (!haveSkipped) {

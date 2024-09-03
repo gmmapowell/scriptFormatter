@@ -24,6 +24,7 @@ public class IncludeAmp implements AmpCommandHandler {
 	private final IncluderConfig ic;
 	private final Region samples;
 	private final List<AmpCommandHandler> removes = new ArrayList<>();
+	private DoInclusion includer;
 
 	public IncludeAmp(ScannerAmpState state) {
 		global = state.global();
@@ -41,7 +42,9 @@ public class IncludeAmp implements AmpCommandHandler {
 	public boolean continuation(Command cont, LineArgsParser lap) {
 		switch (cont.name()) {
 		case "remove": 
-		case "select": {
+		case "select": 
+		case "indents":
+		case "stop": {
 			return true;
 		}
 		default:
@@ -50,7 +53,7 @@ public class IncludeAmp implements AmpCommandHandler {
 	}
 	
 	@Override
-	public void invoke(AmpCommand cmd) {
+	public void prepare(AmpCommand cmd) {
 		String file = cmd.args.readString();
 		Map<String, String> params = cmd.args.readParams("formatter");
 		System.out.println("want to include " + file + " with " + params);
@@ -74,19 +77,19 @@ public class IncludeAmp implements AmpCommandHandler {
 				break;
 			}
 		}
+		includer = new DoInclusion(state, code, formatter);
+	}
+	
+	@Override
+	public void invoke(AmpCommand cmd) {
 		try {
-			new DoInclusion(state, code, formatter).include();
+			includer.include();
 		} catch (IOException ex) {
 			throw WrappedException.wrap(ex);
 		}
 	}
 
-	public void remove(RemoveAmp removeAmp) {
-		this.removes.add(removeAmp);
+	public DoInclusion includer() {
+		return includer;
 	}
-
-	public void select(SelectAmp selectAmp) {
-		this.removes.add(selectAmp);
-	}
-
 }
