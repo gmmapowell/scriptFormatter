@@ -64,4 +64,10 @@ public class ScannerAtState {
 	public void observeBlanks() {
 		state.observeBlanks();
 	}
+	
+	public void outlineEntry(int level, String text, String style, String anchor) {
+		for (DocumentOutline e : outline) {
+			e.entry(level, text, style, anchor);
+		}
+	}
 }

@@ -9,11 +9,22 @@ import org.zinutils.collections.ListMap;
 import org.zinutils.exceptions.CantHappenException;
 
 public class CreatorExtensionPointRepo implements ExtensionPointRepo {
+	private final ExtensionPointRepo parent;
 	private final ListMap<Class<?>, Creator<?, ?>> extensionPointCreators = new ListMap<>();
 
+	public CreatorExtensionPointRepo(ExtensionPointRepo parent) {
+		this.parent = parent;
+		System.out.println("creating " + this + " with parent " + parent);
+	}
+	
 	@Override
 	public <T extends NamedExtensionPoint, Q> Map<String, T> forPointByName(Class<T> clz, Q ctorArg) {
-		Map<String, T> ret = new TreeMap<>();
+		Map<String, T> ret;
+		if (parent == null)
+			ret = new TreeMap<>();
+		else
+			ret = parent.forPointByName(clz, ctorArg); 
+		
 		if (extensionPointCreators.contains(clz)) {
 			for (@SuppressWarnings("rawtypes") Creator m : extensionPointCreators.get(clz)) {
 				@SuppressWarnings("unchecked")
@@ -29,7 +40,12 @@ public class CreatorExtensionPointRepo implements ExtensionPointRepo {
 
 	@Override
 	public <T extends ExtensionPoint, Q> Set<T> forPoint(Class<T> clz, Q ctorArg) {
-		Set<T> ret = new HashSet<>();
+		Set<T> ret;
+		if (parent == null)
+			ret = new HashSet<>();
+		else
+			ret = parent.forPoint(clz, ctorArg);
+		
 		if (extensionPointCreators.contains(clz)) {
 			for (@SuppressWarnings("rawtypes") Creator m : extensionPointCreators.get(clz)) {
 				@SuppressWarnings("unchecked")

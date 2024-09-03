@@ -9,7 +9,7 @@ import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 
-public class TOCPreparer implements ModuleActivator, Creator<DocumentOutline, ScannerAtState> {
+public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, ScannerAtState> {
 
 	public TOCPreparer(ReadConfigState state, VarMap vars) {
 		// TODO Auto-generated constructor stub
@@ -21,8 +21,7 @@ public class TOCPreparer implements ModuleActivator, Creator<DocumentOutline, Sc
 	}
 
 	@Override
-	public DocumentOutline create(ScannerAtState quelle) {
-		// TODO Auto-generated method stub
-		return null;
+	public TOCOutline create(ScannerAtState quelle) {
+		return new TOCOutline(quelle);
 	}
 }

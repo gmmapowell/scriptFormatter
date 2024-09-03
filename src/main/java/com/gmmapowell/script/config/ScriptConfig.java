@@ -34,7 +34,7 @@ public class ScriptConfig implements Config {
 	private WebEdit webedit;
 	private Place index;
 	private Region workdir;
-	private ExtensionPointRepo eprepo = new CreatorExtensionPointRepo();
+	private ExtensionPointRepo eprepo = new CreatorExtensionPointRepo(null);
 
 	private final FlowMap flows = new FlowMap();
 

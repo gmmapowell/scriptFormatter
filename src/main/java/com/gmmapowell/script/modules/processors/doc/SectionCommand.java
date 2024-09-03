@@ -1,9 +1,14 @@
 package com.gmmapowell.script.modules.processors.doc;
 
-public class SectionCommand implements AtCommandHandler {
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-	public SectionCommand(ScannerAtState state) {
-		
+public class SectionCommand implements AtCommandHandler {
+	private final ConfiguredState state;
+	private final ScannerAtState sas;
+
+	public SectionCommand(ScannerAtState sas) {
+		this.state = sas.state();
+		this.sas = sas;
 	}
 	
 	@Override
@@ -17,28 +22,9 @@ public class SectionCommand implements AtCommandHandler {
 		if (title == null)
 			throw new RuntimeException("Section without title");
 		String anchor = cmd.args.get("anchor");
-		/*
-		TOCEntry entry;
-		if (state.chapterStyle.equals("chapter")) {
-			String number = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
-			entry = toc.section(anchor, number, title);
-			title = number + " " + title;
-		} else if (state.chapterStyle.equals("appendix")) {
-			String number = new String(new char[] { (char) ('@' + state.chapter-1) }) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
-			entry = toc.section(anchor, number, title);
-			title = number + " " + title;
-		} else {
-			entry = toc.section(anchor, null, title);
-		}
 		state.newPara("section-title");
-		if (entry != null) {
-			state.newSpan();
-			state.op(new AnchorOp(entry));
-		}
-		ProcessingUtils.process(state, title);
+		sas.outlineEntry(2, title, null, anchor);
+		state.processText(title);
 		state.endPara();
-		
-		state.section++;
-		*/
 	}
 }

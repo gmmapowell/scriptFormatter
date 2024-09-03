@@ -20,15 +20,14 @@ import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.processor.Processor;
 
 public class ConfiguredProcessor implements Processor, ProcessorConfig {
-	private final ExtensionPointRepo eprepo;
-	private final ExtensionPointRepo local = new CreatorExtensionPointRepo();
+	private final ExtensionPointRepo local;
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
 	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
 	private final FlowMap flows;
 
 	public ConfiguredProcessor(ExtensionPointRepo eprepo, FlowMap flows, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
-		this.eprepo = eprepo;
+		this.local = new CreatorExtensionPointRepo(eprepo);
 		this.flows = flows;
 	}
 	
@@ -59,7 +58,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		// TODO: create a "bigger" state (which persists across input files)
 		for (Place x : places.included()) {
 			System.out.println("Handling " + x.name());
-			ConfiguredState state = new ConfiguredState(eprepo, flows, x);
+			ConfiguredState state = new ConfiguredState(local, flows, x);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act
