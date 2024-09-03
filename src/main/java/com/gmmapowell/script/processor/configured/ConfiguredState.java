@@ -202,7 +202,7 @@ public class ConfiguredState extends SBLocation {
 	public void ensurePara() {
 		if (currPara == null) {
 			// TODO: this needs to be more complicated, taking into account any "all-paras-right-now-formats"
-			newPara();
+			newPara("text");
 		}
 	}
 
