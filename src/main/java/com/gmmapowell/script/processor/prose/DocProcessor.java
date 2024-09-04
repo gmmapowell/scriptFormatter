@@ -154,72 +154,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 			ProcessingUtils.process(state, p.asString().trim());
 			break;
 		}
-		case "include": {
-			commitCurrentCommand();
-			String file = p.readString();
-			Map<String, String> params = p.readParams("formatter");
-//				System.out.println("want to include " + file + " with " + params);
-			File f = null;
-			for (File r : samples) {
-				File tf = new File(r, file);
-				if (tf.isFile() && tf.canRead()) {
-					f = tf;
-					break;
-				}
-			}
-			if (f == null)
-				throw new RuntimeException("cannot find " + file + " in any of " + samples);
-			// TODO: we should configure this according to the params, possibly with this as a boring default
-			Formatter formatter;
-			if (!params.containsKey("formatter"))
-				 formatter = new BoringFormatter(state);
-			switch (params.get("formatter")) {
-			case "html":
-				formatter = new HTMLFormatter(state);
-				break;
-			case "flas":
-				formatter = new FLASFormatter(state);
-				break;
-			default:
-				formatter = new BoringFormatter(state);
-				break;
-			}
-			state.inline = new IncludeCommand(state, f, formatter);
-			break;
-		}
-		case "remove": {
-			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
-				throw new RuntimeException("&remove must immediately follow &include");
-			}
-			Map<String, String> params = p.readParams("from", "what");
-//				System.out.println("want to remove from " + state.inline + " with " + params);
-			((IncludeCommand)state.inline).butRemove(params.get("from"), params.get("what"));
-			break;
-		}
-		case "select": {
-			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
-				throw new RuntimeException("&select must immediately follow &include");
-			}
-			Map<String, String> params = p.readParams("from", "what", "exdent");
-			((IncludeCommand)state.inline).selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
-			break;
-		}
-		case "stop": {
-			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
-				throw new RuntimeException("&stop must immediately follow &include");
-			}
-			Map<String, String> params = p.readParams("at", "elide");
-			((IncludeCommand)state.inline).stopAt(params.get("at"), params.get("elide"));
-			break;
-		}
-		case "indents": {
-			if (state.inline == null || !(state.inline instanceof IncludeCommand)) {
-				throw new RuntimeException("&indents must immediately follow &include");
-			}
-			Map<String, String> params = p.readParams("from", "to");
-			((IncludeCommand)state.inline).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
-			break;
-		}
 		case "grammar": {
 			commitCurrentCommand();
 			Map<String, String> params = p.readParams("rule");
@@ -314,14 +248,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				state.newPara("section-title");
 				ProcessingUtils.process(state, "Conclusions");
 				state.endPara();
-				break;
-			}
-			case "Comment": {
-				state.newPara("beginRefComment");
-				state.newSpan("comment-sign");
-				state.text("\u25A0");
-				state.endSpan();
-				state.inRefComment = true;
 				break;
 			}
 			case "Numbering": {

@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.doc.toc;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
@@ -8,7 +10,11 @@ import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ModuleActivator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
+import com.gmmapowell.script.modules.doc.emailquoter.EmailParaCommand;
+import com.gmmapowell.script.modules.doc.emailquoter.EmailQuoter.EmailParaCommandCreator;
+import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
+import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 
 public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, ScannerAtState> {
@@ -33,6 +39,7 @@ public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, Scanner
 			tocFile = root.ensurePlace(tocVar);
 		toc.configure(metaFile, tocFile);
 		proc.addExtension(DocumentOutline.class, this);
+		proc.addExtension(AmpCommandHandler.class, RefAmpCommand.class);
 	}
 
 	@Override

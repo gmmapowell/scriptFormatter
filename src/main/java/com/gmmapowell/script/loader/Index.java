@@ -78,9 +78,11 @@ public class Index implements FilesToProcess {
 			if (s.equals("--excluded--")) {
 				writtenExcluded = true;
 				return;
-			}
-			if (s.equals("--downloaded--")) {
+			} else if (s.equals("--downloaded--")) {
 				alreadyDownloaded = true;
+				return;
+			} else if (s.equals("--download--")) {
+				alreadyDownloaded = false;
 				return;
 			}
 

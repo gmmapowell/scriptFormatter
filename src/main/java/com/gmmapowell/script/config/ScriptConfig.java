@@ -111,6 +111,8 @@ public class ScriptConfig implements Config {
 			if (webedit != null) {
 				webedit.upload();
 			}
+		} else {
+			System.out.println("uploads are disabled by ENV");
 		}
 	}
 

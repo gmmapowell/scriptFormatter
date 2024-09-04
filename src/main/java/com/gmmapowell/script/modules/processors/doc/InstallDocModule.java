@@ -25,11 +25,14 @@ public class InstallDocModule implements GlobalModuleInstaller {
 	// @ commands
 	private void installAtCommands() {
 		// structure
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, TitleCommand.class);
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, AuthorCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, ChapterCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SectionCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsectionCommand.class);
 		
 		// should commentary be in a separate module?
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentaryCommand.class);
 		
 		// should footnote processing be in a separate module?
