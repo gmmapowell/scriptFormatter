@@ -63,7 +63,7 @@ public class ConfigBlockListener implements ConfigListener {
 			}
 			default: {
 				// and you should be left with this ...
-				throw new NotImplementedException("command '" + cmd.name() + "'");
+				throw WrappedException.wrap(new ConfigException("there is no command: '" + cmd.name() + "'"));
 			}
 			}
 		}

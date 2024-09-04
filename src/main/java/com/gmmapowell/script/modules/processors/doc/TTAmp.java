@@ -23,6 +23,7 @@ public class TTAmp implements AmpCommandHandler {
 		state.nestSpan("preformatted");
 		state.text(cmd.args.asString());
 		state.popSpan();
+		state.observeBlanks();
 	}
 
 }

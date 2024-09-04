@@ -24,6 +24,7 @@ public class LinkAmp implements AmpCommandHandler {
 		state.nestSpan("tt");
 		state.op(new LinkOp(lk, tx));
 		state.popSpan();
+		state.observeBlanks();
 	}
 
 }

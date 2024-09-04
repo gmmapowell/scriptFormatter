@@ -50,6 +50,7 @@ public class FLASFormatter implements Formatter {
 			} else
 				state.text(text);
 		}
+		state.endPara();
 	}
 
 	@Override

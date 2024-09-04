@@ -319,36 +319,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				state.endPara();
 				break;
 			}
-			case "Subsection": {
-				String title = state.cmd.args.get("title");
-				if (title == null)
-					throw new RuntimeException("Subsection without title");
-				String anchor = state.cmd.args.get("anchor");
-				TOCEntry entry = toc.subsection(anchor, null, title);
-				state.newPara("subsection-title");
-				if (entry != null) {
-					state.newSpan();
-					state.op(new AnchorOp(entry));
-				}
-				ProcessingUtils.process(state, title);
-				state.endPara();
-				break;
-			}
-			case "Subsubsection": {
-				String title = state.cmd.args.get("title");
-				if (title == null)
-					throw new RuntimeException("Subsubsection without title");
-				String anchor = state.cmd.args.get("anchor");
-				TOCEntry entry = toc.subsubsection(anchor, null, title);
-				state.newPara("subsubsection-title");
-				if (entry != null) {
-					state.newSpan();
-					state.op(new AnchorOp(entry));
-				}
-				ProcessingUtils.process(state, title);
-				state.endPara();
-				break;
-			}
 			case "Comment": {
 				state.newPara("beginRefComment");
 				state.newSpan("comment-sign");

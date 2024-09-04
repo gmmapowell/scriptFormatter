@@ -62,6 +62,7 @@ public class DoInclusion {
 		if (exdent != null)
 			exd = Integer.parseInt(exdent);
 		select = new Region(from, what, exd);
+		primed = false;
 	}
 
 	public void butRemove(String from, String what) {
@@ -80,7 +81,7 @@ public class DoInclusion {
 			elideAtEnd = Boolean.parseBoolean(elide);
 	}
 
-	boolean primed = false, stopped = false;
+	boolean primed = true, stopped = false;
 	int exdent = 0;
 	int selectionIndent = 0;
 	private Region lookFor;
@@ -125,73 +126,70 @@ public class DoInclusion {
 	private void processLine(int lineNo, String line) throws IOException {
 //		System.out.println("processing included line " + line + " stopped = " + stopped);
 		System.out.print("include " + lineNo + ": " + primed + ": ");
+		boolean allowStop = true;
 		if (stopped) {
 			System.out.println("stopped: " + line);
 			return;
-		}
-		
-		if (select != null && !primed) {
+		} else if (!primed) {
 			exdent = select.exdent;
 			if (select.pattern.matcher(line).find()) {
 				primed = true;
+				allowStop = false;
 				selectionIndent = indent(line, lineNo);
 			} else {
 				System.out.println("skipping line before select: " + line);
+				return;
 			}
+		}
+		int il = indent(line, lineNo);
+		if (stopAt != null && stopAt.matcher(line).find()) {
+			if (!haveSkipped && elideAtEnd) {
+				elideThis(il);
+			}
+			stopped = true;
 			return;
 		}
-//		if (primed) {
-			int il = indent(line, lineNo);
-			if (stopAt != null && stopAt.matcher(line).find()) {
-				if (!haveSkipped && elideAtEnd) {
+		if (allowStop && select != null && !formatter.isBlockIndent(selectionIndent, il)) {
+				System.out.println("selection over at: " + line);
+			stopped = true;
+			return;
+		}
+		if (curr != -1) {
+				System.out.println("comparing " + il + " to " + curr + " for " + line);
+			if (formatter.isBlockIndent(curr, il)) {
+				if (!haveSkipped) {
 					elideThis(il);
+					haveSkipped = true;
 				}
-				stopped = true;
-				return;
+				return;  // skip this line
 			}
-			if (select != null && !formatter.isBlockIndent(selectionIndent, il)) {
-					System.out.println("selection over at: " + line);
-				stopped = true;
-				return;
-			}
-//			primed = false;
-			if (curr != -1) {
-					System.out.println("comparing " + il + " to " + curr + " for " + line);
-				if (formatter.isBlockIndent(curr, il)) {
-					if (!haveSkipped) {
-						elideThis(il);
-						haveSkipped = true;
-					}
-					return;  // skip this line
+			if (!haveSkipped)
+				throw new RuntimeException("nothing was elided at " + place + ":" + lineNo);
+			curr = -1;
+		}
+		if (lookFor != null && lookFor.pattern.matcher(line).find()) {
+			curr = il;
+			String what = lookFor.what;
+				System.out.println("Found " + lookFor.from + " removing " + what + " with curr = " + curr);
+			lookFor = nextElide(ei);
+			if (what.equals("inner"))
+				curr++;
+			else {
+				if (!haveSkipped) {
+					elideThis(il);
+					haveSkipped = true;
 				}
-				if (!haveSkipped)
-					throw new RuntimeException("nothing was elided at " + place + ":" + lineNo);
-				curr = -1;
+				return; // skip this line
 			}
-			if (lookFor != null && lookFor.pattern.matcher(line).find()) {
-				curr = il;
-				String what = lookFor.what;
-					System.out.println("Found " + lookFor.from + " removing " + what + " with curr = " + curr);
-				lookFor = nextElide(ei);
-				if (what.equals("inner"))
-					curr++;
-				else {
-					if (!haveSkipped) {
-						elideThis(il);
-						haveSkipped = true;
-					}
-					return; // skip this line
-				}
-			}
-			if (indents == null || (il >= indents.min && il <= indents.max)) {
-					System.out.println("formatting: " + line);
-				formatter.format(line, exdent);
-				haveSkipped = false;
-			} else if (!haveSkipped) {
-				elideThis(il);
-				haveSkipped = true;
-			}
-//		}
+		}
+		if (indents == null || (il >= indents.min && il <= indents.max)) {
+				System.out.println("formatting: " + line);
+			formatter.format(line, exdent);
+			haveSkipped = false;
+		} else if (!haveSkipped) {
+			elideThis(il);
+			haveSkipped = true;
+		}
 	}
 
 	private void elideThis(int il) throws IOException {

@@ -26,6 +26,10 @@ public class ScannerAtState {
 	public ConfiguredState state() {
 		return state;
 	}
+
+	public GlobalState global() {
+		return state.global();
+	}
 	
 	public void startCommand(String cmd) {
 		this.cmd = new AtCommand(cmd);

@@ -87,13 +87,17 @@ public class ScriptConfig implements Config {
 	}
 
 	@Override
-	public void sink() {
-		// TODO Auto-generated method stub
-		
+	public void sink() throws IOException {
+		for (Sink s : sinks) {
+			for (Flow f : flows) {
+				s.flow(f);
+			}
+			s.render();
+		}
 	}
 
 	@Override
-	public void show() {
+	public void show() throws IOException {
 		for (Sink s : sinks)
 			s.showFinal();
 	}

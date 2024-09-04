@@ -64,6 +64,7 @@ public class HTMLFormatter implements Formatter {
 		}
 		if (text.length() != 0)
 			state.text(text);
+		state.endPara();
 	}
 
 	@Override

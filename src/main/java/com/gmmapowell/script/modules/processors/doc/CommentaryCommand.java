@@ -1,10 +1,15 @@
 package com.gmmapowell.script.modules.processors.doc;
 
-public class CommentaryCommand implements AtCommandHandler {
-	private final ScannerAtState state;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
+import com.gmmapowell.script.processor.prose.CommentaryBreak;
 
-	public CommentaryCommand(ScannerAtState state) {
-		this.state = state;
+public class CommentaryCommand implements AtCommandHandler {
+	private final ScannerAtState sas;
+	private final ConfiguredState state;
+
+	public CommentaryCommand(ScannerAtState sas) {
+		this.sas = sas;
+		this.state = sas.state();
 	}
 	
 	@Override
@@ -14,15 +19,12 @@ public class CommentaryCommand implements AtCommandHandler {
 
 	@Override
 	public void invoke(AtCommand cmd) {
-		/*
 		state.endSpan();
 		state.newPara("break");
 		state.newSpan();
 		state.op(new CommentaryBreak());
 		state.endPara();
-		state.commentary = true;
-		state.section = 1;
-		*/
+		sas.outlineEntry(3, null, null, null);
 	}
 
 }

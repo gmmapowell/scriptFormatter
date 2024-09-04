@@ -2,11 +2,11 @@ package com.gmmapowell.script.modules.processors.doc;
 
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-public class SubsectionCommand implements AtCommandHandler {
+public class SubsubsectionCommand implements AtCommandHandler {
 	private final ConfiguredState state;
 	private final ScannerAtState sas;
 
-	public SubsectionCommand(ScannerAtState sas) {
+	public SubsubsectionCommand(ScannerAtState sas) {
 		this.state = sas.state();
 		this.sas = sas;
 	}
@@ -22,8 +22,8 @@ public class SubsectionCommand implements AtCommandHandler {
 		if (title == null)
 			throw new RuntimeException("Subsection without title");
 		String anchor = cmd.args.get("anchor");
-		state.newPara("subsection-title");
-		sas.outlineEntry(4, title, null, anchor);
+		state.newPara("subsubsection-title");
+		sas.outlineEntry(5, title, null, anchor);
 		state.processText(title);
 		state.endPara();
 	}

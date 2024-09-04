@@ -14,7 +14,7 @@ public class TOCOutline implements DocumentOutline {
 
 	public TOCOutline(ScannerAtState sas) {
 		this.sink = sas.state();
-		state = sas.state().require(TOCState.class);
+		state = sas.global().requireState(TOCState.class);
 		state.configureOnCreate();
 	}
 
@@ -76,6 +76,27 @@ public class TOCOutline implements DocumentOutline {
 			}
 			
 			state.section++;
+			break;
+		}
+		case 3: {
+			state.section = 1;
+			state.commentary = true;
+			break;
+		}
+		case 4: {
+			TOCEntry entry = state.toc().subsubsection(anchor, null, title);
+			if (entry != null) {
+				sink.newSpan();
+				sink.op(new AnchorOp(entry));
+			}
+			break;
+		}
+		case 5: {
+			TOCEntry entry = state.toc().subsubsection(anchor, null, title);
+			if (entry != null) {
+				sink.newSpan();
+				sink.op(new AnchorOp(entry));
+			}
 			break;
 		}
 		default:

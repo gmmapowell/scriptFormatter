@@ -14,6 +14,7 @@ public class BoringFormatter implements Formatter {
 	public void format(String text, int exdent) {
 		state.newPara();
 		state.processText(text.replace("\t", "    "));
+		state.endPara();
 	}
 
 	@Override

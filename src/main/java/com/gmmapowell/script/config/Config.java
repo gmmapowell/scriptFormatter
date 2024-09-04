@@ -10,7 +10,7 @@ public interface Config {
 	FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException;
 	void generate(FilesToProcess files) throws IOException;
 	void dump() throws IOException;
-	void sink();
-	void show();
+	void sink() throws IOException;
+	void show() throws IOException;
 	void upload() throws Exception;
 }

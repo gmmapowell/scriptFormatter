@@ -25,6 +25,7 @@ public class SpaceAmp implements AmpCommandHandler {
 			state.newPara("text");
 		}
 		state.processText(cmd.args.asString());
+		state.observeBlanks();
 	}
 
 }
