@@ -21,4 +21,11 @@ public class AtBlankSpotter implements ProcessingScanner {
 		return false;
 	}
 
+	@Override
+	public void placeDone() {
+		if (ats.hasPendingCommand()) {
+			System.out.println("executing command at end of file");
+			ats.handleAtCommand();
+		}
+	}
 }

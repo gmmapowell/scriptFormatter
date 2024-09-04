@@ -29,7 +29,8 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.DriveList;
 
 public class GoogleDriveWorld implements World {
-	private final boolean CONFIGURE_WITH_INTERNET = false;
+	private final String have_internet = System.getenv("HAVE_INTERNET");
+	private final boolean CONFIGURE_WITH_INTERNET = ("true".equals(have_internet));
 	private final Universe universe;
 	private final String appName;
 	private final Place creds;

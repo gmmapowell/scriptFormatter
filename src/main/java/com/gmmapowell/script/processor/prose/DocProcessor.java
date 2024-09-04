@@ -23,7 +23,6 @@ import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.ExtensionPoint;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkFromRef;

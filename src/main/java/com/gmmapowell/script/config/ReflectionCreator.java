@@ -14,4 +14,8 @@ public class ReflectionCreator<T, Q> implements Creator<T, Q> {
 		return (T) Reflection.create(clz, quelle);
 	}
 
+	@Override
+	public String toString() {
+		return "ReflectionCreator[" + clz + "]";
+	}
 }

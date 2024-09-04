@@ -3,7 +3,6 @@ package com.gmmapowell.script.config.reader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.config.ConfigException;

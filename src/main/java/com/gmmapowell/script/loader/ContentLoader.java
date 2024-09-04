@@ -13,7 +13,8 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.intf.FilesToProcess;
 
 public class ContentLoader implements Loader {
-	private final boolean LOAD_FROM_REMOTE = false;
+	private final String have_internet = System.getenv("HAVE_INTERNET");
+	private final boolean LOAD_FROM_REMOTE = ("true".equals(have_internet));
 	private final String folder;
 	private final Place indexFile;
 	private final Region downloads;

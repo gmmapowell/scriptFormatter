@@ -5,7 +5,7 @@ import java.util.TreeMap;
 
 public class AtCommand {
 	final String name;
-	final Map<String, String> args = new TreeMap<>();
+	private final Map<String, String> args = new TreeMap<>();
 
 	public AtCommand(String name) {
 		this.name = name;
@@ -18,5 +18,9 @@ public class AtCommand {
 	@Override
 	public String toString() {
 		return this.name;
+	}
+
+	public String arg(String a) {
+		return args.get(a);
 	}
 }

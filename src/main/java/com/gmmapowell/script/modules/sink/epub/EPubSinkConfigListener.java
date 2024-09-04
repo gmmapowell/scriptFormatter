@@ -1,6 +1,6 @@
 package com.gmmapowell.script.modules.sink.epub;
 
-import org.zinutils.exceptions.NotImplementedException;
+import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
@@ -36,7 +36,7 @@ public class EPubSinkConfigListener implements ConfigListener {
 			return null;
 		}
 		default: {
-			throw new NotImplementedException(cmd.name());
+			throw WrappedException.wrap(new ConfigException(cmd.name()));
 		}
 		}
 	}

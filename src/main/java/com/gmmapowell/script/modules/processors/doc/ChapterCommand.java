@@ -18,13 +18,13 @@ public class ChapterCommand implements AtCommandHandler {
 
 	@Override
 	public void invoke(AtCommand cmd) {
-		String title = cmd.args.get("title");
+		String title = cmd.arg("title");
 		if (title == null)
 			throw new RuntimeException("Chapter without title");
-		String style = cmd.args.get("style");
+		String style = cmd.arg("style");
 		if (style == null)
 			style = "chapter";
-		String anchor = cmd.args.get("anchor");
+		String anchor = cmd.arg("anchor");
 
 		System.out.println("chapter " + title + ": " + style);
 		

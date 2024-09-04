@@ -18,10 +18,10 @@ public class SubsectionCommand implements AtCommandHandler {
 
 	@Override
 	public void invoke(AtCommand cmd) {
-		String title = cmd.args.get("title");
+		String title = cmd.arg("title");
 		if (title == null)
 			throw new RuntimeException("Subsection without title");
-		String anchor = cmd.args.get("anchor");
+		String anchor = cmd.arg("anchor");
 		state.newPara("subsection-title");
 		sas.outlineEntry(4, title, null, anchor);
 		state.processText(title);

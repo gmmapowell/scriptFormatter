@@ -10,6 +10,7 @@ import org.zinutils.exceptions.WrappedException;
 import com.gmmapowell.script.modules.doc.emailquoter.EmailQuoterConfigListener;
 import com.gmmapowell.script.modules.doc.flasgrammar.FlasGrammarConfigListener;
 import com.gmmapowell.script.modules.doc.includecode.IncludeCodeConfigListener;
+import com.gmmapowell.script.modules.doc.placedate.PlaceDateConfigListener;
 import com.gmmapowell.script.modules.doc.toc.TOCConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 
@@ -23,6 +24,7 @@ public class NestedModuleCreator {
 		this.modules.put("emailquoter", EmailQuoterConfigListener.class);
 		this.modules.put("flas-grammar", FlasGrammarConfigListener.class);
 		this.modules.put("include-code", IncludeCodeConfigListener.class);
+		this.modules.put("placedate", PlaceDateConfigListener.class);
 		this.modules.put("toc", TOCConfigListener.class);
 	}
 	

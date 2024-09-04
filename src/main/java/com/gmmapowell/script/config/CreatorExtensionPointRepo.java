@@ -29,6 +29,8 @@ public class CreatorExtensionPointRepo implements ExtensionPointRepo {
 			for (@SuppressWarnings("rawtypes") Creator m : extensionPointCreators.get(clz)) {
 				@SuppressWarnings("unchecked")
 				T nep = (T) m.create(ctorArg);
+				if (nep.name() == null)
+					throw new CantHappenException("have extension point creator " + m + " without a name");
 				if (ret.containsKey(nep.name())) {
 					throw new CantHappenException("duplicate extension point for " + nep.name());
 				}
