@@ -195,6 +195,8 @@ public class ConfiguredState extends SBLocation {
 		} else {
 			currSection = currFlow.sections.get(currFlow.sections.size()-1);
 		}
+		currPara = null;
+		currSpan = null;
 	}
 	
 	public void newSection(String flow, String format) {
