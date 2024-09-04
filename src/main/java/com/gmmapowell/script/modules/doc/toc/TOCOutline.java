@@ -15,7 +15,6 @@ public class TOCOutline implements DocumentOutline {
 	public TOCOutline(ScannerAtState sas) {
 		this.sink = sas.state();
 		state = sas.global().requireState(TOCState.class);
-		state.configureOnCreate();
 	}
 
 	@Override

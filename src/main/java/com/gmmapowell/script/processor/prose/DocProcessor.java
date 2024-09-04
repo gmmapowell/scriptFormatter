@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.flasck.flas.grammar.Grammar;
@@ -26,7 +25,6 @@ import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.LinkFromRef;
-import com.gmmapowell.script.flow.LinkFromTOC;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
@@ -341,41 +339,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 					state.inRefComment = false;
 				} else {
 					state.popNumbering();
-				}
-				break;
-			}
-			case "TOC": {
-				if (currentMeta == null)
-					break;
-				List<LinkFromTOC> links = new ArrayList<>();
-				try {
-					JSONArray order = currentMeta.getJSONArray("toc");
-					JSONObject headings = currentMeta.getJSONObject("headings");
-					for (int i=0;i<order.length();i++) {
-						Object e = order.get(i);
-						if (e instanceof String)
-							e = headings.getJSONObject((String)e);
-						JSONObject entry = (JSONObject) e;
-//						String type = entry.getString("type");
-						state.newPara("text"); // "tocline", "toc-" + type
-						if (entry.has("number")) {
-							state.newSpan(); // tocnumber
-							state.text(entry.getString("number"));
-							state.op(new BreakingSpace()); // NBSP?
-						}
-						state.newSpan(); // tocheading
-						state.text(entry.getString("title"));
-						state.newSpan(); // tocdots - how do we set the width of this?
-						state.text("...");
-						state.newSpan(); // tocpage - right justified
-						LinkFromTOC lk = new LinkFromTOC(entry.getString("page"), entry.getString("title"));
-						links.add(lk);
-						state.op(lk);
-						state.endPara();
-					}
-					this.toc.links(links);
-				} catch (JSONException e) {
-					throw WrappedException.wrap(e);
 				}
 				break;
 			}
