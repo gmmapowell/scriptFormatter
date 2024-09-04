@@ -122,7 +122,6 @@ public class EPubSink implements Sink {
 				break;
 
 			XHTMLCollector coll = new XHTMLCollector();
-			
 			StringBuilder title = new StringBuilder();
 			
 			List<Cursor> suspended = new ArrayList<>();
@@ -159,9 +158,6 @@ public class EPubSink implements Sink {
 								} else if (tok.it instanceof ParaBreak) {
 									coll.title(title.toString());
 //									System.out.println("title: " + title);
-									addFile(zos, opf, toc, i, title.toString());
-									
-									title = null;
 								} else if (tok.it instanceof BreakingSpace || tok.it instanceof NonBreakingSpace) {
 									title.append(" ");
 								}
@@ -218,6 +214,8 @@ public class EPubSink implements Sink {
 //				if (!advanced) {
 //					page = null;
 //				}
+				addFile(zos, opf, toc, i, title.toString());
+				title = null;
 				coll.write(zos);
 			}
 //			if (!suspended.isEmpty())

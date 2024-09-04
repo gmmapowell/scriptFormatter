@@ -23,9 +23,11 @@ import com.gmmapowell.script.sink.capture.CaptureSinkInFile;
 import com.gmmapowell.script.sink.capture.FlowDumper;
 
 public class ScriptConfig implements Config {
-	// This is a hack to make regression tests quicker.
-	// TODO: it should be configured from the environment
-	private final boolean ALLOW_UPLOADS = false;
+	private final String have_internet = System.getenv("HAVE_INTERNET");
+	private final boolean CONFIGURE_WITH_INTERNET = have_internet == null || ("true".equals(have_internet));
+	private final String enable_uploads = System.getenv("ENABLE_UPLOADS");
+	private final boolean WANT_UPLOADS = enable_uploads == null || ("true".equals(enable_uploads));
+	private final boolean ALLOW_UPLOADS = CONFIGURE_WITH_INTERNET && WANT_UPLOADS;
 	
 	private final Region root;
 	private boolean debug;

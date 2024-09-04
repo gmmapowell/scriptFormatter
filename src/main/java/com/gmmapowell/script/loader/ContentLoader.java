@@ -14,7 +14,7 @@ import com.gmmapowell.script.intf.FilesToProcess;
 
 public class ContentLoader implements Loader {
 	private final String have_internet = System.getenv("HAVE_INTERNET");
-	private final boolean LOAD_FROM_REMOTE = ("true".equals(have_internet));
+	private final boolean LOAD_FROM_REMOTE = have_internet == null || ("true".equals(have_internet));
 	private final String folder;
 	private final Place indexFile;
 	private final Region downloads;
