@@ -6,6 +6,7 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ModuleActivator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
+import com.gmmapowell.script.modules.processors.doc.AtCommandHandler;
 import com.gmmapowell.script.utils.Utils;
 
 public class GrammarDocModule implements ModuleActivator {
@@ -23,5 +24,8 @@ public class GrammarDocModule implements ModuleActivator {
 		config.setGrammar(state.root.placePath(grammarPlace));
 		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, GrammarAmp.class);
 		state.config.extensions().bindExtensionPoint(AmpCommandHandler.class, RemoveOptionAmp.class);
+		
+		// Technically, I think this should be in a different module
+		state.config.extensions().bindExtensionPoint(AtCommandHandler.class, OptionCommand.class);
 	}
 }
