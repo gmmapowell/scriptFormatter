@@ -18,7 +18,7 @@ public class TOCState {
 	public boolean wantSectionNumbering;
 	
 	public void configure(Place meta, Place toc) throws ConfigException {
-		this.toc = new TableOfContents(meta, toc);
+		this.toc = new TableOfContents(toc, meta);
 		if (meta.exists()) {
 			try {
 				currentMeta = GeoFSUtils.readJSON(meta);
@@ -46,5 +46,13 @@ public class TOCState {
 
 	public TableOfContents toc() {
 		return toc;
+	}
+
+	public void save() {
+		try {
+			toc.write();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }

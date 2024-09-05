@@ -105,7 +105,7 @@ public class TableOfContents {
 
 	public void recordPage(JSONObject entry, PDPage page, String name) {
 		try {
-//			System.out.println("recording page " + name + " for " + entry);
+			System.out.println("recording page " + name + " for " + entry);
 			entry.put("page", name);
 			if (entry.has("anchor")) {
 				String anchor = entry.getString("anchor");
@@ -120,7 +120,7 @@ public class TableOfContents {
 			if (links != null && !links.isEmpty()) {
 				LinkFromTOC next = links.remove(0);
 				next.sendTo(page);
-//				System.out.println("binding " + next + " to " + page + " with " + name);
+				System.out.println("binding " + next + " to " + page + " with " + name);
 			} else {
 				System.out.println("out of TOC links");
 			}

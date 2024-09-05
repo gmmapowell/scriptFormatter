@@ -20,6 +20,7 @@ import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.NoSuchCommandException;
 import com.gmmapowell.script.processor.ParsingException;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
@@ -283,5 +284,17 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 		return null;
 	}
 	
-	
+
+	@Override
+	public void lifecycleObserver(LifecycleObserver observer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void allDone() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -21,6 +21,7 @@ public class Main {
 			cfg.sink();
 			cfg.show();
 			cfg.upload();
+			cfg.finish();
 		} catch (Throwable t) {
 			ExceptionHandler.handleAllExceptions(t);
 		}

@@ -117,6 +117,7 @@ public class ScriptConfig implements Config {
 	}
 
 	public void finish() throws Exception {
+		processor.allDone();
 		for (Sink s : sinks)
 			s.finish();
 	}

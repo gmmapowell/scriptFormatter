@@ -17,6 +17,7 @@ import com.gmmapowell.script.elements.ElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.Processor;
+import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
 
@@ -89,5 +90,17 @@ public class PresenterProcessor implements Processor, ProcessorConfig {
 	public GlobalState global() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void lifecycleObserver(LifecycleObserver observer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void allDone() {
+		// TODO Auto-generated method stub
+		
 	}
 }

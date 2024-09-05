@@ -19,6 +19,7 @@ import com.gmmapowell.script.flow.Para;
 import com.gmmapowell.script.flow.SectionTitle;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
 
@@ -103,6 +104,16 @@ public class ArticleProcessor extends AtProcessor<ArticleState> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+	@Override
+	public void lifecycleObserver(LifecycleObserver observer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void allDone() {
+		// TODO Auto-generated method stub
+		
+	}
 }

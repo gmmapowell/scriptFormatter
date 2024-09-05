@@ -35,6 +35,7 @@ public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, Scanner
 		toc.configure(metaFile, tocFile);
 		proc.addExtension(DocumentOutline.class, this);
 		proc.addExtension(AmpCommandHandler.class, RefAmpCommand.class);
+		proc.lifecycleObserver(new TOCObserver(toc));
 	}
 
 	@Override

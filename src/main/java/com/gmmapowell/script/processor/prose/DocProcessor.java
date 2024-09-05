@@ -1,20 +1,10 @@
 package com.gmmapowell.script.processor.prose;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.flasck.flas.grammar.Grammar;
 import org.zinutils.exceptions.InvalidUsageException;
-import org.zinutils.xml.XML;
-
-import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.ExtensionPoint;
@@ -24,48 +14,18 @@ import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.processor.prose.DocState.ScanMode;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
 import com.gmmapowell.script.utils.SBLineArgsParser;
-import com.gmmapowell.script.utils.Utils;
 
 public class DocProcessor extends AtProcessor<DocState> {
 	private DocState state;
-	private final List<File> samples = new ArrayList<>();
-	private final Grammar grammar;
-	private final TableOfContents toc;
-	private final JSONObject currentMeta;
 	
 	public DocProcessor(Region root, ElementFactory ef, Sink sink, VarMap options, boolean debug) throws ConfigException {
 		super(root, ef, sink, options, debug);
-		Place tocfile = null;
-		Place metafile = null;
-		if (options.containsKey("samples"))
-			this.samples.add(new File(Utils.subenvs(options.remove("samples"))));
-		if (options.containsKey("toc"))
-			tocfile = root.place(options.remove("toc"));
-		if (options.containsKey("meta"))
-			metafile = root.ensurePlace(options.remove("meta"));
-		if (options.containsKey("grammar")) {
-			String grammarName = Utils.subenvs(options.remove("grammar"));
-			File file = new File(grammarName);
-			if (!file.exists())
-				throw new RuntimeException("Grammar file " + grammarName + " does not exist");
-			this.grammar = Grammar.from(XML.fromFile(file));
-		} else
-			this.grammar = null;
-		toc = new TableOfContents(tocfile, metafile);
-		if (metafile != null && metafile.exists()) {
-			try {
-				currentMeta = GeoFSUtils.readJSON(metafile);
-			} catch (JSONException e) {
-				throw new ConfigException("Failed to read " + metafile + ": " + e);
-			}
-		} else {
-			currentMeta = null;
-		}
 	}
 	
 	@Override
@@ -140,11 +100,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 			state.popSpan();
 			break;
 		}
-		case "morework":
-			if (!p.hasMore())
-				throw new RuntimeException("&morework command needs a description");
-			System.out.println("more work is required at " + state.inputLocation() + ": " + p.readString());
-			break;
 		case "number": {
 			if (!state.activeNumbering())
 				throw new InvalidUsageException("cannot use &number outside @Numbering...@/");
@@ -216,11 +171,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 	
 	@Override
 	protected void postRender() {
-		try {
-			toc.write();
-		} catch (Exception ex) {
-			System.out.println("Could not write table of contents" + ex.getMessage());
-		}
 	}
 
 	@Override
@@ -247,5 +197,17 @@ public class DocProcessor extends AtProcessor<DocState> {
 		return null;
 	}
 	
-	
+
+	@Override
+	public void lifecycleObserver(LifecycleObserver observer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void allDone() {
+		// TODO Auto-generated method stub
+		
+	}
 }

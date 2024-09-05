@@ -27,6 +27,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	private Class<? extends ProcessingHandler> blankHandler;
 	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
 	private final FlowMap flows;
+	private List<LifecycleObserver> observers = new ArrayList<>();
 
 	public ConfiguredProcessor(GlobalState global, FlowMap flows, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
 		this.global = global;
@@ -48,6 +49,10 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	
 	public void addScanner(Class<? extends ProcessingScanner> scanner) {
 		scanners.add(scanner);
+	}
+	
+	public void lifecycleObserver(LifecycleObserver observer) {
+		observers.add(observer);
 	}
 	
 	@Override
@@ -85,8 +90,16 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 			for (ProcessingScanner scanner : all)
 				scanner.placeDone();
 		}
+		for (LifecycleObserver o : observers)
+			o.processingDone();
 	}
 
+	@Override
+	public void allDone() {
+		for (LifecycleObserver o : observers)
+			o.allDone();
+	}
+	
 	private List<ProcessingScanner> createScannerList(ConfiguredState state) {
 		// Create a list of scanners so that the one defined last is tried first,
 		// and the default handler only applies if none of the others do

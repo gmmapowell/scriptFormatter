@@ -13,4 +13,5 @@ public interface Config {
 	void sink() throws IOException;
 	void show() throws IOException;
 	void upload() throws Exception;
+	void finish() throws Exception;
 }
