@@ -67,6 +67,27 @@ public class ConfiguredState extends SBLocation {
 		return eprepo;
 	}
 
+	public void noCommandsText(String tx) {
+		newSpan();
+		try {
+			int from = 0;
+			for (int i=0;i<tx.length();i++) {
+				if (Character.isWhitespace(tx.charAt(i))) {
+					if (from < i) {
+						text(tx.substring(from, i));
+						op(new BreakingSpace());
+					}
+					from = i+1;
+				}
+			}
+			if (from < tx.length()) {
+				text(tx.substring(from));
+			}
+		} finally {
+			endSpan();
+		}
+	}
+
 	/* All of these functions (which came from processing utils) feel fundamentally different
 	 * from the ones that actually generate the flows.
 	 * 

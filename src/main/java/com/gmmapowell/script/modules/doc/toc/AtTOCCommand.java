@@ -54,7 +54,11 @@ public class AtTOCCommand implements AtCommandHandler {
 				state.newSpan(); // tocdots - how do we set the width of this?
 				state.text("...");
 				state.newSpan(); // tocpage - right justified
-				LinkFromTOC lk = new LinkFromTOC(entry.getString("page"), entry.getString("title"));
+				String page = "??";
+				if (entry.has("page")) {
+					page = entry.getString("page");
+				}
+				LinkFromTOC lk = new LinkFromTOC(page, entry.getString("title"));
 				links.add(lk);
 				state.op(lk);
 				state.endPara();

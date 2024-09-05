@@ -1,34 +1,37 @@
 package com.gmmapowell.script.modules.doc.emailquoter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.gmmapowell.script.flow.BreakingSpace;
-import com.gmmapowell.script.processor.ProcessingUtils;
-import com.gmmapowell.script.processor.prose.DocState;
-import com.gmmapowell.script.processor.prose.LineCommand;
-import com.gmmapowell.script.utils.LineArgsParser;
+import com.gmmapowell.script.modules.processors.doc.AmpCommand;
+import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
+import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-public class SnapCommand implements LineCommand {
-	private final DocState state;
+public class SnapCommand implements AmpCommandHandler {
+	private final ConfiguredState state;
 	private final EmailConfig cfg;
-	private final SnapList snapFiles;
 
-	public SnapCommand(EmailConfig cfg, DocState state, LineArgsParser args) {
+	public SnapCommand(EmailConfig cfg, ScannerAmpState state) {
 		this.cfg = cfg;
-		this.state = state;
-		List<String> files = new ArrayList<>();
-		while (args.hasMore()) {
-			files.add(args.readArg());
-		}
-		snapFiles = new SnapList(files);
-		args.argsDone();
+		this.state = state.state();
 	}
 
 	@Override
-	public void execute() throws IOException {
+	public String name() {
+		return "snap";
+	}
+
+	@Override
+	public void invoke(AmpCommand cmd) {
+		List<String> files = new ArrayList<>();
+		while (cmd.args.hasMore()) {
+			files.add(cmd.args.readArg());
+		}
+		cmd.args.argsDone();
+		SnapList snapFiles = new SnapList(files);
 		AtomicBoolean inPara = new AtomicBoolean(false);
 		cfg.mailPara.showSnaps(snapFiles, s -> {
 			if (s instanceof SnapPara) {
@@ -44,7 +47,7 @@ public class SnapCommand implements LineCommand {
 						inPara.set(false);
 					}
 					state.newPara("emailquote", "italic");
-					ProcessingUtils.noCommands(state, ((SnapRef)s).ref);
+					state.noCommandsText(((SnapRef)s).ref);
 					state.endPara();
 				} else if (s instanceof SnapUser) {
 					if (inPara.get()) {
@@ -52,7 +55,7 @@ public class SnapCommand implements LineCommand {
 						inPara.set(false);
 					}
 					state.newPara("emailquote", "bold");
-					ProcessingUtils.noCommands(state, ((SnapUser)s).snapper);
+					state.noCommandsText(((SnapUser)s).snapper);
 					state.endPara();
 				} else {
 					if (!inPara.get()) {
@@ -62,7 +65,7 @@ public class SnapCommand implements LineCommand {
 						state.newSpan();
 						state.op(new BreakingSpace());
 					}
-					ProcessingUtils.noCommands(state, ((SnapText)s).text);
+					state.noCommandsText(((SnapText)s).text);
 				}
 			}
 		});

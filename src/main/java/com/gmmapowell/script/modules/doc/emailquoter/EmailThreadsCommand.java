@@ -1,27 +1,30 @@
 package com.gmmapowell.script.modules.doc.emailquoter;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.gmmapowell.script.processor.ProcessingUtils;
-import com.gmmapowell.script.processor.prose.DocState;
-import com.gmmapowell.script.processor.prose.LineCommand;
-import com.gmmapowell.script.utils.LineArgsParser;
+import com.gmmapowell.script.modules.processors.doc.AmpCommand;
+import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
+import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-public class EmailThreadsCommand implements LineCommand {
-	private final DocState state;
+public class EmailThreadsCommand implements AmpCommandHandler {
+	private final ConfiguredState state;
 	private final EmailConfig cfg;
 
-	public EmailThreadsCommand(EmailConfig cfg, DocState state, LineArgsParser args) {
+	public EmailThreadsCommand(EmailConfig cfg, ScannerAmpState q) {
 		this.cfg = cfg;
-		this.state = state;
-		args.argsDone();
+		this.state = q.state();
 	}
 
 	@Override
-	public void execute() throws IOException {
+	public String name() {
+		return "emailthreads";
+	}
+
+	@Override
+	public void invoke(AmpCommand cmd) {
 		Set<EmailThread> threads = new TreeSet<>();
 		cfg.threads.regions(r -> {
 			EmailThread t = new EmailThread(r);
@@ -35,7 +38,7 @@ public class EmailThreadsCommand implements LineCommand {
 			state.newSection("main", "chapter");
 			state.newPara("chapter-title");
 			state.newSpan();
-			ProcessingUtils.noCommands(state, t.name().substring(10));
+			state.noCommandsText(t.name().substring(10));
 			state.endPara();
 			
 			boolean isFirst = true;
@@ -45,21 +48,21 @@ public class EmailThreadsCommand implements LineCommand {
 				}
 				state.newPara("section-title");
 				state.newSpan();
-				ProcessingUtils.noCommands(state, a.name());
+				state.noCommandsText(a.name());
 				state.endPara();
 
 				EmailMeta meta = a.meta();
 				state.newPara("default", "tt");
 				state.newSpan();
-				ProcessingUtils.noCommands(state, "Date: " + meta.date);
+				state.noCommandsText("Date: " + meta.date);
 				state.endPara();
 				state.newPara("default", "tt");
 				state.newSpan();
-				ProcessingUtils.noCommands(state, "From: " + meta.from);
+				state.noCommandsText("From: " + meta.from);
 				state.endPara();
 				state.newPara("default", "tt");
 				state.newSpan();
-				ProcessingUtils.noCommands(state, "Subject: " + meta.subject);
+				state.noCommandsText("Subject: " + meta.subject);
 				state.endPara();
 
 				AtomicBoolean aborted = new AtomicBoolean(false);
@@ -72,7 +75,7 @@ public class EmailThreadsCommand implements LineCommand {
 						return;
 					state.newPara("emailquote");
 					state.newSpan();
-					ProcessingUtils.noCommands(state, s);
+					state.noCommandsText(s);
 					state.endPara();
 				});
 				

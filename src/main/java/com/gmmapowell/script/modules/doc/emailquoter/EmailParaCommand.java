@@ -1,30 +1,22 @@
 package com.gmmapowell.script.modules.doc.emailquoter;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.zinutils.exceptions.NotImplementedException;
+import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
-import com.gmmapowell.script.processor.ProcessingUtils;
-import com.gmmapowell.script.processor.prose.DocState;
-import com.gmmapowell.script.processor.prose.LineCommand;
-import com.gmmapowell.script.utils.LineArgsParser;
+import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-public class EmailParaCommand implements LineCommand, AmpCommandHandler {
+public class EmailParaCommand implements AmpCommandHandler {
 	private final EmailConfig cfg;
-	private final DocState state;
-	private final Citation citation;
+	private final ConfiguredState state;
 
-	public EmailParaCommand(EmailConfig cfg, DocState state, LineArgsParser args) {
+	public EmailParaCommand(EmailConfig cfg, ScannerAmpState quelle) {
 		this.cfg = cfg;
-		this.state = state;
-		String message = args.readArg();
-		String quoted = args.readArg();
-		this.citation = Citation.parse(message, quoted);
-		args.argsDone();
+		this.state = quelle.state();
 	}
 
 	@Override
@@ -34,49 +26,53 @@ public class EmailParaCommand implements LineCommand, AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		throw new NotImplementedException(); // but obvs wants most of the code from below
-	}
-	
-	public void execute() throws IOException {
-		AtomicBoolean inPara = new AtomicBoolean(false);
-		cfg.mailPara.quoteEmail(citation, (n, s) -> {
-			s = s.trim();
-			if (n == citation.first) {
-				if (citation.getFromPhrase() != null) {
-					int idx = s.indexOf(citation.getFromPhrase());
-					if (idx != -1)
-						s = s.substring(idx);
-					else
-						System.out.println("Could not find text '" + citation.getFromPhrase() + "' at line " + n + " of " + citation.file);
+		try {
+			String message = cmd.args.readArg();
+			String quoted = cmd.args.readArg();
+			cmd.args.argsDone();
+			Citation citation = Citation.parse(message, quoted);
+			AtomicBoolean inPara = new AtomicBoolean(false);
+			cfg.mailPara.quoteEmail(citation, (n, s) -> {
+				s = s.trim();
+				if (n == citation.first) {
+					if (citation.getFromPhrase() != null) {
+						int idx = s.indexOf(citation.getFromPhrase());
+						if (idx != -1)
+							s = s.substring(idx);
+						else
+							System.out.println("Could not find text '" + citation.getFromPhrase() + "' at line " + n + " of " + citation.file);
+					}
 				}
-			}
-			if (n == citation.last) {
-				if (citation.getToPhrase() != null) {
-					int idx = s.lastIndexOf(citation.getToPhrase());
-					if (idx != -1)
-						s = s.substring(0, idx + citation.getToPhrase().length());
-					else
-						System.out.println("Could not find text '" + citation.getToPhrase() + "' at line " + n + " of " + citation.file);
+				if (n == citation.last) {
+					if (citation.getToPhrase() != null) {
+						int idx = s.lastIndexOf(citation.getToPhrase());
+						if (idx != -1)
+							s = s.substring(0, idx + citation.getToPhrase().length());
+						else
+							System.out.println("Could not find text '" + citation.getToPhrase() + "' at line " + n + " of " + citation.file);
+					}
 				}
-			}
-			if (s.length() == 0) {
-				if (inPara.get()) {
-					state.endPara();
-					inPara.set(false);
-				}
-			} else {
-				if (!inPara.get()) {
-					state.newPara("emailquote");
-					state.newSpan();
-					inPara.set(true);
+				if (s.length() == 0) {
+					if (inPara.get()) {
+						state.endPara();
+						inPara.set(false);
+					}
 				} else {
-					state.newSpan();
-					state.op(new BreakingSpace());
+					if (!inPara.get()) {
+						state.newPara("emailquote");
+						state.newSpan();
+						inPara.set(true);
+					} else {
+						state.newSpan();
+						state.op(new BreakingSpace());
+					}
+					state.noCommandsText(s);
 				}
-				ProcessingUtils.noCommands(state, s);
-			}
-		});
-		if (inPara.get())
-			state.endPara();
+			});
+			if (inPara.get())
+				state.endPara();
+		} catch (Exception ex) {
+			throw WrappedException.wrap(ex);
+		}
 	}
 }

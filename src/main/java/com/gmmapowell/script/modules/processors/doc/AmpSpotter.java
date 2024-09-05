@@ -20,7 +20,6 @@ public class AmpSpotter implements ProcessingScanner {
 	public void closeIfNotContinued(String nx) {
 		while (amps.hasPendingCommand()) {
 			if (nx != null && nx.startsWith("&")) {
-				System.out.println("should amp close for " + nx + "?");
 				LineArgsParser lap = new SBLineArgsParser<ConfiguredState>(state, nx.substring(1));
 				Command cmd = lap.readCommand();
 				if (amps.continueCommand(cmd, lap))
