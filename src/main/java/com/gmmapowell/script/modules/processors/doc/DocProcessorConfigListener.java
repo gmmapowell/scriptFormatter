@@ -66,6 +66,7 @@ public class DocProcessorConfigListener implements ConfigListener {
 			proc.addScanner(AtBlankSpotter.class);
 			proc.addScanner(EndAtSpotter.class);
 			proc.addScanner(BulletSpotter.class);
+			proc.addScanner(BlockquoteSpotter.class);
 			state.config.processor(proc);
 			for (ModuleConfigListener m : modules) {
 				m.activate(proc);

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.flasck.flas.grammar.Grammar;
 import org.flasck.flas.grammar.Production;
+import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
@@ -63,9 +64,13 @@ public class GrammarAmp implements AmpCommandHandler {
 				System.out.println("including grammar for production " + ruleName);
 			try {
 				Production rule = grammar.findRule(ruleName);
+				if (rule == null) {
+					throw new CantHappenException("there is no rule in the grammar for " + ruleName);
+				}
 				genGrammar = new GrammarGenerator(rule, sink);
 			} catch (RuntimeException ex) {
 				System.out.println(sink.inputLocation() + ": " + ex.getMessage());
+				throw ex;
 			}
 		}
 	}

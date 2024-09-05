@@ -63,8 +63,10 @@ public class GrammarGenerator implements ProductionVisitor {
 			state.endPara();
 		} catch (NotImplementedException ex) {
 			ex.printStackTrace(System.out);
+			throw ex;
 		} catch (NullPointerException ex) {
 			ex.printStackTrace(System.out);
+			throw ex;
 		}
 	}
 

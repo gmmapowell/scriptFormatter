@@ -1,8 +1,6 @@
 package com.gmmapowell.script.modules.doc.includecode;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.zinutils.exceptions.WrappedException;
@@ -23,7 +21,6 @@ public class IncludeAmp implements AmpCommandHandler {
 	private final ConfiguredState state;
 	private final IncluderConfig ic;
 	private final Region samples;
-	private final List<AmpCommandHandler> removes = new ArrayList<>();
 	private DoInclusion includer;
 
 	public IncludeAmp(ScannerAmpState state) {
