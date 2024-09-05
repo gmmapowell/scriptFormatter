@@ -16,6 +16,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
+import org.zinutils.xml.XML;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
@@ -201,5 +202,9 @@ public class GeoFSUtils {
 
 	public static JSONObject readJSON(Place p) throws JSONException {
 		return new JSONObject(p.read());
+	}
+
+	public static XML readXML(Place xml) {
+		return XML.fromStream(xml.name(), xml.input());
 	}
 }

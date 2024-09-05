@@ -134,10 +134,16 @@ public class DecodeDumpFile implements DumpDecoder {
 			showText("item " + si + " is text '" + tx + "'");
 			break;
 		}
+		
 		case FlowStandard.BREAKING_SPACE: {
 			showText("item " + si + " is a breaking space");
 			break;
 		}
+		case FlowStandard.NON_BREAKING_SPACE: {
+			showText("item " + si + " is a non-breaking space");
+			break;
+		}
+		
 		
 		case FlowStandard.LINK_OP: {
 			showText("item " + si + " is a link");

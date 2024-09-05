@@ -255,19 +255,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 				state.pushNumbering("arabic", 1);
 				break;
 			}
-			case "/": {
-				// We probably actually want to have a stack of what to undo ...
-				if (state.inRefComment) {
-					state.newPara("endRefComment");
-					state.newSpan("comment-sign");
-					state.text("\u25A1");
-					state.endSpan();
-					state.inRefComment = false;
-				} else {
-					state.popNumbering();
-				}
-				break;
-			}
 			default:
 				System.out.println("cannot commit " + state.cmd + " at " + state.inputLocation());
 				break;

@@ -213,7 +213,7 @@ public class ConfiguredState extends SBLocation {
 	
 	public void ensurePara() {
 		if (currPara == null) {
-			newPara("text");
+			newPara();
 		}
 	}
 
@@ -237,6 +237,15 @@ public class ConfiguredState extends SBLocation {
 
 	public void endPara() {
 		endSpan();
+		currPara = null;
+	}
+
+	public void abortPara() {
+		if (currPara == null) {
+			return;
+		}
+		currSection.paras.remove(currPara);
+		currSpan = null;
 		currPara = null;
 	}
 

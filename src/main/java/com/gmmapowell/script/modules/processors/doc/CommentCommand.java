@@ -16,12 +16,23 @@ public class CommentCommand implements AtCommandHandler {
 
 	@Override
 	public void invoke(AtCommand cmd) {
-		// TODO: should we add "beginRefComment" to the "current styles"?
 		state.newPara("beginRefComment");
 		state.newSpan("comment-sign");
 		state.text("\u25A0");
 		state.endSpan();
+		// TODO: backwards compatibility.  Remove this after the refactoring
+		state.endPara();
+		// TODO: end backwards compatibility section
+		state.pushFormat("refComment");
 	}
-	
-	// TODO: I think this needs an "end" to handle it
+
+	@Override
+	public void onEnd(AtCommand cmd) {
+		state.popFormat("refComment");
+		state.newPara("endRefComment");
+		state.newSpan("comment-sign");
+		state.text("\u25A1");
+		state.endSpan();
+		state.endPara();
+	}
 }

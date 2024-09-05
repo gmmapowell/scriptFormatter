@@ -163,6 +163,6 @@ public class ScriptConfig implements Config {
 	}
 
 	public GlobalState newGlobalState() {
-		return new SolidGlobalState(eprepo);
+		return new SolidGlobalState(eprepo, debug);
 	}
 }
