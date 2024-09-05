@@ -2,16 +2,16 @@ package com.gmmapowell.script.modules.processors.doc;
 
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
-public class TTAmp implements AmpCommandHandler {
+public class BoldAmp implements AmpCommandHandler {
 	private final ConfiguredState state;
 
-	public TTAmp(ScannerAmpState state) {
+	public BoldAmp(ScannerAmpState state) {
 		this.state = state.state();
 	}
 	
 	@Override
 	public String name() {
-		return "tt";
+		return "bold";
 	}
 
 	@Override
@@ -20,10 +20,9 @@ public class TTAmp implements AmpCommandHandler {
 			state.newPara();
 		if (!state.inSpan())
 			state.newSpan();
-		state.nestSpan("preformatted");
+		state.nestSpan("bold");
 		state.processTextInSpan(cmd.args.asString());
 		state.popSpan();
 		state.observeBlanks();
 	}
-
 }

@@ -94,6 +94,10 @@ public class ConfiguredState extends SBLocation {
 		}
 	}
 
+	public void processTextInSpan(String tx) {
+		processPart(tx, 0, tx.length());
+	}
+
 	public void processPart(String tx, int i, int to) {
 		int from = i;
 		for (;i<to;i++) {
@@ -273,12 +277,14 @@ public class ConfiguredState extends SBLocation {
 		return this.ignoreBlanks;
 	}
 
-	public void pushFormat(String fmt) {
-		fluency.pushFormat(fmt);
+	public void pushFormat(String... fmt) {
+		for (String f : fmt)
+			fluency.pushFormat(f);
 	}
 
-	public void popFormat(String fmt) {
-		fluency.popFormat(fmt);
+	public void popFormat(String... fmt) {
+		for (String f : fmt)
+			fluency.popFormat(f);
 	}
 
 	public boolean joinspace() {

@@ -10,13 +10,11 @@ import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.ExtensionPoint;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
-import com.gmmapowell.script.processor.prose.DocState.ScanMode;
 import com.gmmapowell.script.sink.Sink;
 import com.gmmapowell.script.utils.LineArgsParser;
 import com.gmmapowell.script.utils.SBLineArgsParser;
@@ -42,37 +40,10 @@ public class DocProcessor extends AtProcessor<DocState> {
 		return state;
 	}
 
-	@Override
-	protected void handleLine(DocState state, String s) throws IOException {
-		// Skip everything in the "DETAILS" section
-		if (!"@Conclusion".equals(s) && this.scanmode == ScanMode.OVERVIEW && (state.scanMode == ScanMode.DETAILS))
-			return;
-		
-		if (commonHandleLine(state, s))
-			return;
-		else if (s.startsWith("&")) {
-			handleSingleLineCommand(state, s);
-		} else {
-			handleTextLine(state, s);
-		}
-		if (state.blockquote)
-			state.endPara();
-	}
-
 	private void handleTextLine(DocState state, String s) {
 		if (!state.inPara()) {
-			if (state.blockquote)
-				state.newPara("blockquote");
-			else if (state.inRefComment)
-				state.newPara("refComment");
 			else if (this.scanmode == ScanMode.DETAILS && (state.scanMode == ScanMode.OVERVIEW || state.scanMode == ScanMode.CONCLUSION))
 				state.newPara("text", "bold");
-			else
-				state.newPara("text");
-		} else if (joinspace) {
-			if (!state.inSpan())
-				state.newSpan();
-			state.op(new BreakingSpace());
 		}
 		ProcessingUtils.process(state, s);
 	}
@@ -89,27 +60,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 			p = new SBLineArgsParser<DocState>(state, s.substring(idx+1));
 		}
 		switch (cmd) {
-		case "bold":
-		case "italic": {
-			if (!state.inPara())
-				state.newPara("text");
-			if (!state.inSpan())
-				state.newSpan();
-			state.nestSpan(cmd);
-			ProcessingUtils.processPart(state, p.asString(), 0, p.asString().length());
-			state.popSpan();
-			break;
-		}
-		case "number": {
-			if (!state.activeNumbering())
-				throw new InvalidUsageException("cannot use &number outside @Numbering...@/");
-			state.newPara(state.numberPara());
-			state.newSpan("bullet-sign");
-			state.text(state.currentNumber());
-			state.endSpan();
-			ProcessingUtils.process(state, p.asString().trim());
-			break;
-		}
 		default: {
 			if (!handleConfiguredSingleLineCommand(state, cmd, p)) {
 				System.out.println("cannot handle " + s + " at " + state.inputLocation());
@@ -121,52 +71,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 
 	@Override
 	protected void commitCurrentCommand() throws IOException {
-		if (state.cmd != null) {
-			switch(state.cmd.name) {
-			case "Overview": {
-				state.scanMode = ScanMode.OVERVIEW;
-				break;
-			}
-			case "Details": {
-				state.scanMode = ScanMode.DETAILS;
-				break;
-			}
-			case "Conclusion": {
-				state.scanMode = ScanMode.CONCLUSION;
-				state.newPara("section-title");
-				ProcessingUtils.process(state, "Conclusions");
-				state.endPara();
-				break;
-			}
-			case "Numbering": {
-				// TODO: probably should allow a numbering format argument & start value
-				state.pushNumbering("arabic", 1);
-				break;
-			}
-			default:
-				System.out.println("cannot commit " + state.cmd + " at " + state.inputLocation());
-				break;
-			}
-			state.cmd = null;
-		} else if (state.inline != null) {
-			LineCommand inline = state.inline;
-			state.inline = null;
-			inline.execute();
-		} else if (state.inPara()) {
-			state.endPara();
-		}
-	}
-	
-	@Override
-	protected void done() {
-		if (state == null) {
-			// we did nothing
-			return;
-		}
-		if (state.inRefComment)
-			throw new RuntimeException("Ended in Ref Comment");
-		if (state.activeNumbering())
-			throw new RuntimeException("Still in numbering block");
 	}
 	
 	@Override
