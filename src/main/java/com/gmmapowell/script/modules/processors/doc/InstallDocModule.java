@@ -43,6 +43,7 @@ public class InstallDocModule implements GlobalModuleInstaller {
 	private void installAmpCommands() {
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FutureAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, MoreWorkAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, OutrageAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ReviewAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SpaceAmp.class);

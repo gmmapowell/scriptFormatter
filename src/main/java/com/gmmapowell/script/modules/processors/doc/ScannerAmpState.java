@@ -28,7 +28,7 @@ public class ScannerAmpState {
 	public void startCommand(String cmd, LineArgsParser lap) {
 		AmpCommandHandler handler = handlers.get(cmd);
 		if (handler == null)
-			throw new CantHappenException("there is no handler for " + cmd + " at " + state.inputLocation());
+			throw new CantHappenException("there is no handler for &" + cmd + " at " + state.inputLocation());
 		AmpCommand ac = new AmpCommand(handler, cmd, lap);
 		handler.prepare(ac);
 		stack.add(0, ac);

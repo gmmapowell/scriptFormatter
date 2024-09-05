@@ -55,7 +55,7 @@ public class IncludeAmp implements AmpCommandHandler {
 		Map<String, String> params = cmd.args.readParams("formatter");
 		System.out.println("want to include " + file + " with " + params);
 		if (!samples.hasPlace(file)) {
-			throw new RuntimeException("there is no sample " + file + " in " + samples);
+			throw new RuntimeException("there is no sample " + file + " in " + samples + " at " + state.inputLocation());
 		}
 		Place code = samples.place(file);
 		Formatter formatter;
