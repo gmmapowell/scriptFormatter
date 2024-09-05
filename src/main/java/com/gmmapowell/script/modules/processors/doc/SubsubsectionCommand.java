@@ -13,7 +13,7 @@ public class SubsubsectionCommand implements AtCommandHandler {
 	
 	@Override
 	public String name() {
-		return "Subsection";
+		return "Subsubsection";
 	}
 
 	@Override

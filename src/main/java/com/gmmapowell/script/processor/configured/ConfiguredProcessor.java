@@ -3,6 +3,7 @@ package com.gmmapowell.script.processor.configured;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.reflection.Reflection;
 
@@ -15,7 +16,6 @@ import com.gmmapowell.script.config.ExtensionPointRepo;
 import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.Processor;
@@ -23,16 +23,17 @@ import com.gmmapowell.script.processor.Processor;
 public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	private final GlobalState global;
 	private final ExtensionPointRepo local;
+	private final boolean joinspace;
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
-	private List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
-	private final FlowMap flows;
-	private List<LifecycleObserver> observers = new ArrayList<>();
+	private final List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
+	private final List<LifecycleObserver> observers = new ArrayList<>();
 
-	public ConfiguredProcessor(GlobalState global, FlowMap flows, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
+	public ConfiguredProcessor(GlobalState global, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
 		this.global = global;
 		this.local = new CreatorExtensionPointRepo(global.extensions());
-		this.flows = flows;
+		String joinspace = vars.remove("joinspace");
+		this.joinspace = "true".equals(joinspace);
 	}
 	
 	public GlobalState global() {
@@ -68,9 +69,10 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	@Override
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
+		Fluency fluency = new Fluency(global);
 		for (Place x : places.included()) {
 			System.out.println("Handling " + x.name());
-			ConfiguredState state = new ConfiguredState(global, local, flows, x);
+			ConfiguredState state = new ConfiguredState(global, local, fluency, joinspace, x);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			// Each of the scanners gets a chance to act

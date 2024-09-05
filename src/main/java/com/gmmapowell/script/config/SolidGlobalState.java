@@ -5,21 +5,35 @@ import java.util.Map;
 
 import org.zinutils.reflection.Reflection;
 
+import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 
 public class SolidGlobalState implements GlobalState {
-	private final boolean debug;
 	private final ExtensionPointRepo eprepo;
+	private final boolean debug;
+	private final FlowMap flows;
 	private final Map<Class<?>, Object> configs = new HashMap<>();
 
-	public SolidGlobalState(ExtensionPointRepo eprepo, boolean debug) {
+	public SolidGlobalState(ExtensionPointRepo eprepo, boolean debug, FlowMap flows) {
 		this.eprepo = eprepo;
 		this.debug = debug;
+		this.flows = flows;
 	}
 
 	@Override
 	public ExtensionPointRepo extensions() {
 		return eprepo;
+	}
+
+	@Override
+	public FlowMap flows() {
+		return flows;
+	}
+
+	@Override
+	public Flow flow(String flow) {
+		return flows.get(flow);
 	}
 
 	@Override

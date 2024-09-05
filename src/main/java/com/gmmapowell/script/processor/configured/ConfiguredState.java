@@ -1,26 +1,16 @@
 package com.gmmapowell.script.processor.configured;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.reflection.Reflection;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.config.ExtensionPointRepo;
 import com.gmmapowell.script.flow.BreakingSpace;
-import com.gmmapowell.script.flow.Flow;
-import com.gmmapowell.script.flow.FlowMap;
-import com.gmmapowell.script.flow.HorizSpan;
-import com.gmmapowell.script.flow.NestedSpan;
-import com.gmmapowell.script.flow.Para;
-import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SpanItem;
-import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.modules.processors.doc.InlineDocCommandState;
 import com.gmmapowell.script.processor.NoSuchCommandException;
@@ -31,19 +21,16 @@ public class ConfiguredState extends SBLocation {
 	private final GlobalState global;
 	private final Map<Class<?>, Object> configs = new HashMap<>();
 	private final ExtensionPointRepo eprepo;
-	public final FlowMap flows;
-	protected Flow currFlow;
-	private Section currSection;
-	private Para currPara;
-	private HorizSpan currSpan;
+	protected final Fluency fluency;
+	private final boolean joinspace;
 	private boolean ignoreBlanks = true;
 	private Map<String, InlineCommandHandler> inlineCommands;
-	private List<String> fmtStack = new ArrayList<String>();
 
-	public ConfiguredState(GlobalState global, ExtensionPointRepo eprepo, FlowMap flows, Place x) {
+	public ConfiguredState(GlobalState global, ExtensionPointRepo eprepo, Fluency fluency, boolean joinspace, Place x) {
 		this.global = global;
 		this.eprepo = eprepo;
-		this.flows = flows;
+		this.fluency = fluency;
+		this.joinspace = joinspace;
 		// TODO: while most of this should be here, the InlineCommandState should not be solid ...
 		// Thus there should probably be a function passed in to create it...
 		this.inlineCommands = eprepo.forPointByName(InlineCommandHandler.class, new InlineDocCommandState(this)); 
@@ -207,130 +194,71 @@ public class ConfiguredState extends SBLocation {
 	}
 
 	public void switchToFlow(String flow) {
-		currFlow = flows.get(flow);
-		if (currFlow == null) {
-			throw new CantHappenException("there is no flow " + flow);
-		}
-		if (currFlow.sections.isEmpty()) {
-			throw new CantHappenException("no sections for flow " + flow);
-		} else {
-			currSection = currFlow.sections.get(currFlow.sections.size()-1);
-		}
-		currPara = null;
-		currSpan = null;
+		fluency.switchToFlow(flow);
 	}
-	
+
 	public void newSection(String flow, String format) {
-		currFlow = flows.get(flow);
-		currSection = new Section(format);
-		currFlow.sections.add(currSection);
-		currPara = null;
-		currSpan = null;
+		fluency.newSection(flow, format);
 	}
-	
+
 	public boolean inPara() {
-		return this.currPara != null;
+		return fluency.inPara();
 	}
-	
+
 	public void ensurePara() {
-		if (currPara == null) {
-			newPara();
-		}
+		fluency.ensurePara();
 	}
 
 	public void newPara(List<String> formats) {
-		if (currSection == null) {
-			throw new CantHappenException("no current section");
-		}
-		List<String> merged = new ArrayList<>(fmtStack);
-		merged.addAll(formats);
-		if (merged.isEmpty())
-			merged.add("text");
-		currPara = new Para(merged);
-		currSection.paras.add(currPara);
-		currSpan = null;
+		fluency.newPara(formats);
 	}
 
 	public void newPara(String... formats) {
-		// TODO: should include current formats ...
-		newPara(Arrays.asList(formats));
+		fluency.newPara(formats);
 	}
 
 	public void endPara() {
-		endSpan();
-		currPara = null;
+		fluency.endPara();
 	}
 
 	public void abortPara() {
-		if (currPara == null) {
-			return;
-		}
-		currSection.paras.remove(currPara);
-		currSpan = null;
-		currPara = null;
+		fluency.abortPara();
 	}
 
 	public boolean inSpan() {
-		return this.currSpan != null;
+		return fluency.inSpan();
 	}
 
 	public void newSpan(List<String> formats) {
-		if (currPara == null) {
-			throw new CantHappenException("no current para");
-		}
-		if (currSpan != null && currSpan.parent != null) {
-			throw new CantHappenException("closed nested span first");
-		}
-		currSpan = new HorizSpan(null, formats);
-		currPara.spans.add(currSpan);
+		fluency.newSpan(formats);
 	}
 
 	public void newSpan(String... formats) {
-		newSpan(Arrays.asList(formats));
+		fluency.newSpan(formats);
 	}
-	
+
 	public void endSpan() {
-		if (currSpan == null) // it's OK to try ending a span that isn't open
-			return;
-		if (currSpan.parent != null)
-			throw new CantHappenException("has parent; should use popSpan first");
-		currSpan = null;
+		fluency.endSpan();
 	}
 
 	public void nestSpan(List<String> formats) {
-		if (currSpan == null) {
-			throw new CantHappenException("no current span to nest inside");
-		}
-		HorizSpan tmp;
-		tmp = new HorizSpan(currSpan, formats);
-		currSpan.items.add(new NestedSpan(tmp));
-		currSpan = tmp;
+		fluency.nestSpan(formats);
 	}
 
 	public void nestSpan(String... formats) {
-		nestSpan(Arrays.asList(formats));
+		fluency.nestSpan(formats);
 	}
-	
+
 	public void popSpan() {
-		if (currSpan == null)
-			throw new CantHappenException("no current span");
-		else if (currSpan.parent == null)
-			throw new CantHappenException("not a child span");
-		currSpan = currSpan.parent;
+		fluency.popSpan();
 	}
 
 	public void text(String tx) {
-		if (currSpan == null) {
-			throw new CantHappenException("no current span");
-		}
-		currSpan.items.add(new TextSpanItem(tx));
+		fluency.text(tx);
 	}
-	
+
 	public void op(SpanItem op) {
-		if (currSpan == null) {
-			throw new CantHappenException("no current span");
-		}
-		currSpan.items.add(op);
+		fluency.op(op);
 	}
 
 	public void ignoreNextBlanks() {
@@ -346,14 +274,14 @@ public class ConfiguredState extends SBLocation {
 	}
 
 	public void pushFormat(String fmt) {
-		fmtStack.add(fmt);
+		fluency.pushFormat(fmt);
 	}
 
 	public void popFormat(String fmt) {
-		if (fmtStack.isEmpty())
-			throw new CantHappenException("format stack is empty");
-		String last = fmtStack.remove(fmtStack .size()-1);
-		if (!fmt.equals(last))
-			throw new CantHappenException("wanted to remove " + fmt + " but top was " + last);
+		fluency.popFormat(fmt);
+	}
+
+	public boolean joinspace() {
+		return joinspace;
 	}
 }

@@ -49,10 +49,6 @@ public class ScriptConfig implements Config {
 		return eprepo;
 	}
 
-	public FlowMap flowMap() {
-		return flows;
-	}
-	
 	@Override
 	public void prepare() throws Exception {
 //		loader.prepare();
@@ -164,6 +160,6 @@ public class ScriptConfig implements Config {
 	}
 
 	public GlobalState newGlobalState() {
-		return new SolidGlobalState(eprepo, debug);
+		return new SolidGlobalState(eprepo, debug, flows);
 	}
 }

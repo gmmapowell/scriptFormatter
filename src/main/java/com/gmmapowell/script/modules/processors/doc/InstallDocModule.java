@@ -30,6 +30,7 @@ public class InstallDocModule implements GlobalModuleInstaller {
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, ChapterCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SectionCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsectionCommand.class);
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsubsectionCommand.class);
 		
 		// should commentary be in a separate module?
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentCommand.class);

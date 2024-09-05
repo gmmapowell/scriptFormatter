@@ -36,7 +36,6 @@ public class DocProcessorConfigListener implements ConfigListener {
 			return nmc;
 		}
 		case "joinspace": 
-		case "meta":
 		case "scanmode":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
@@ -51,9 +50,9 @@ public class DocProcessorConfigListener implements ConfigListener {
 	@Override
 	public void complete() throws ConfigException {
 		try {
-			FlowMap flows = state.config.flowMap();
 			GlobalState global = state.config.newGlobalState();
-			ConfiguredProcessor proc = new ConfiguredProcessor(global, flows, state.root, new BlockishElementFactory(), vars, state.debug);
+			ConfiguredProcessor proc = new ConfiguredProcessor(global, state.root, new BlockishElementFactory(), vars, state.debug);
+			FlowMap flows = global.flows();
 			flows.callbackFlow("header");
 			flows.flow("main");
 			flows.flow("footnotes");
