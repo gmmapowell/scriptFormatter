@@ -25,6 +25,7 @@ public class ConfigParser implements NumberedLineListener {
 	
 	@Override
 	public void line(int lno, String s) {
+		System.out.println("Processing " + lno + ": " + s);
 		state.wline = lno;
 		// if we've already seen an exception, stop
 		if (capture != null)
@@ -39,6 +40,7 @@ public class ConfigParser implements NumberedLineListener {
 			
 			dispatcher.dispatch(cmd);
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			this.capture = ex;
 		}
 	}
