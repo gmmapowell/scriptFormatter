@@ -8,7 +8,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 
 import com.gmmapowell.script.modules.doc.DocModule;
-import com.gmmapowell.script.processor.prose.TableOfContents;
+import com.gmmapowell.script.modules.doc.toc.TableOfContents;
 
 public class LinkFromRef implements SpanItem {
 	private TableOfContents toc;

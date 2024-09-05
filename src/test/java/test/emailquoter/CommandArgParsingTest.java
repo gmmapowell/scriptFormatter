@@ -4,31 +4,31 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.gmmapowell.script.processor.prose.DocState;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.utils.SBLineArgsParser;
 
 public class CommandArgParsingTest {
 
 	@Test
 	public void aNumberIsEasyToParse() {
-		DocState state = null;
-		SBLineArgsParser<DocState> p = new SBLineArgsParser<>(state, "15");
+		ConfiguredState state = null;
+		SBLineArgsParser<ConfiguredState> p = new SBLineArgsParser<>(state, "15");
 		assertEquals("15", p.readArg());
 		p.argsDone();
 	}
 
 	@Test
 	public void aColonIsCountedAsTheSameArg() {
-		DocState state = null;
-		SBLineArgsParser<DocState> p = new SBLineArgsParser<>(state, "15:xy");
+		ConfiguredState state = null;
+		SBLineArgsParser<ConfiguredState> p = new SBLineArgsParser<>(state, "15:xy");
 		assertEquals("15:xy", p.readArg());
 		p.argsDone();
 	}
 
 	@Test
 	public void aSpaceEndsAnArg() {
-		DocState state = null;
-		SBLineArgsParser<DocState> p = new SBLineArgsParser<>(state, "15 xy");
+		ConfiguredState state = null;
+		SBLineArgsParser<ConfiguredState> p = new SBLineArgsParser<>(state, "15 xy");
 		assertEquals("15", p.readArg());
 		assertEquals("xy", p.readArg());
 		p.argsDone();
@@ -36,16 +36,16 @@ public class CommandArgParsingTest {
 
 	@Test
 	public void aSpaceCanBeQuoted() {
-		DocState state = null;
-		SBLineArgsParser<DocState> p = new SBLineArgsParser<>(state, "'15 xy'");
+		ConfiguredState state = null;
+		SBLineArgsParser<ConfiguredState> p = new SBLineArgsParser<>(state, "'15 xy'");
 		assertEquals("15 xy", p.readArg());
 		p.argsDone();
 	}
 
 	@Test
 	public void aSpaceCanBeDoubleQuoted() {
-		DocState state = null;
-		SBLineArgsParser<DocState> p = new SBLineArgsParser<>(state, "\"15 xy\"");
+		ConfiguredState state = null;
+		SBLineArgsParser<ConfiguredState> p = new SBLineArgsParser<>(state, "\"15 xy\"");
 		assertEquals("15 xy", p.readArg());
 		p.argsDone();
 	}

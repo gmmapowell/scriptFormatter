@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.prose;
+package com.gmmapowell.script.modules.doc.toc;
 
 import java.io.DataOutputStream;
 

@@ -6,7 +6,6 @@ import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.prose.TOCEntry;
 
 public class TOCOutline implements DocumentOutline {
 	private final ConfiguredState sink;

@@ -6,7 +6,6 @@ import org.codehaus.jettison.json.JSONObject;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
-import com.gmmapowell.script.processor.prose.TableOfContents;
 
 public class TOCState {
 	private JSONObject currentMeta;

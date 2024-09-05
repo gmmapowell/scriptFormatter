@@ -8,7 +8,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.modules.doc.DocModule;
-import com.gmmapowell.script.processor.prose.TOCEntry;
+import com.gmmapowell.script.modules.doc.toc.TOCEntry;
 
 public class AnchorOp implements SpanItem {
 	private final TOCEntry entry;
