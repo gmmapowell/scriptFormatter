@@ -1,5 +1,6 @@
 package com.gmmapowell.script.modules.processors.doc;
 
+import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 
@@ -24,11 +25,24 @@ public class BlockquoteSpotter implements ProcessingScanner {
 			}
 			return true; // it has been handled
 		} else if (bs.active()) {
-			state.endPara(); // make sure the text will appear in a new para
-//			state.newPara();
-//			state.processText(s);
-//			return true; // we processed the line
-			return false; // the line still needs processing
+//			state.endPara(); // make sure the text will appear in a new para
+			state.newPara();
+//			state.newPara("blockquote");
+			state.newSpan();
+			int i=0;
+			for (i=0;i<s.length();i++) {
+				if (s.charAt(i) == '|') {
+					state.op(new NonBreakingSpace());
+					state.op(new NonBreakingSpace());
+				} else
+					break;
+			}
+			while (Character.isWhitespace(s.charAt(i)))
+				i++;
+			state.processText(s.substring(i));
+			state.endPara();
+			return true; // we processed the line
+//			return false; // the line still needs processing
 		} else {
 			return false;
 		}

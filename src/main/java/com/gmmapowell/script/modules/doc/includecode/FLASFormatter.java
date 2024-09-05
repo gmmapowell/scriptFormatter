@@ -34,8 +34,10 @@ public class FLASFormatter implements Formatter {
 					state.nestSpan("bold");
 					state.text(tx);
 					state.popSpan();
-				} else
+				} else {
 					state.text(tx);
+					first = false;
+				}
 				state.text(" ");
 				text = text.substring(i+1);
 				i = 0;

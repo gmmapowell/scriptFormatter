@@ -143,44 +143,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 			state.popSpan();
 			break;
 		}
-		case "sp": {
-			if (state.inPara()) {
-				if (!state.inSpan())
-					state.newSpan();
-				state.op(new BreakingSpace());
-			} else {
-				state.newPara("text");
-			}
-			ProcessingUtils.process(state, p.asString().trim());
-			break;
-		}
-		case "grammar": {
-			commitCurrentCommand();
-			Map<String, String> params = p.readParams("rule");
-			String ruleName = params.get("rule");
-			if (ruleName == null) {
-				state.inline = new GrammarCommand(grammar, state);
-			} else {
-				if (debug)
-					System.out.println("including grammar for production " + ruleName);
-				try {
-					Production rule = grammar.findRule(ruleName);
-					state.inline = new GrammarCommand(rule, state);
-				} catch (RuntimeException ex) {
-					System.out.println(state.inputLocation() + ": " + ex.getMessage());
-				}
-			}
-			break;
-		}
-		case "removeOption": {
-			if (state.inline == null || !(state.inline instanceof GrammarCommand)) {
-				throw new RuntimeException("&removeOption must immediately follow &grammar");
-			}
-			Map<String, String> params = p.readParams("prod");
-//				System.out.println("want to remove from " + state.inline + " with " + params);
-			((GrammarCommand)state.inline).removeProd(params.get("prod"));
-			break;
-		}
 		case "morework":
 			if (!p.hasMore())
 				throw new RuntimeException("&morework command needs a description");
@@ -194,32 +156,6 @@ public class DocProcessor extends AtProcessor<DocState> {
 			state.text(state.currentNumber());
 			state.endSpan();
 			ProcessingUtils.process(state, p.asString().trim());
-			break;
-		}
-		case "ref": {
-			// TODO: formatting should be customizable
-			if (!p.hasMore())
-				throw new RuntimeException("&ref command needs a reference");
-			if (!state.inSpan())
-				state.newSpan();
-			String tx = "unref";
-			String anchor = p.readString();
-			if (currentMeta != null) {
-				try {
-					JSONObject anchors = currentMeta.getJSONObject("anchors");
-					if (anchors.has(anchor)) {
-						JSONObject anch = anchors.getJSONObject(anchor);
-						if (!anch.has("number"))
-							throw new InvalidUsageException("the anchor '" + anchor + "' does not have a section number");
-						tx = anch.getString("number");
-					} else {
-						System.out.println("there is no anchor '" + anchor + "'");
-					}
-				} catch (JSONException e) {
-					throw WrappedException.wrap(e);
-				}
-			}
-			state.op(new LinkFromRef(toc, anchor, '§' + tx));
 			break;
 		}
 		default: {
