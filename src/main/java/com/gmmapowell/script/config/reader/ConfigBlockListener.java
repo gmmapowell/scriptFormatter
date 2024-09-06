@@ -17,6 +17,7 @@ public class ConfigBlockListener implements ConfigListener {
 
 	public ConfigBlockListener(ReadConfigState state) {
 		this.state = state;
+		blocks.put("module", new ModuleFinder(state));
 		loadModules();
 	}
 

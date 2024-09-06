@@ -19,10 +19,6 @@ public class ConfigParser implements NumberedLineListener {
 		dispatcher = new NestedCommandDispatcher<ReadConfigState>(state, new ConfigBlockListener(state));
 	}
 	
-	public void fakeModules() {
-		state.simulateModuleProcessing();
-	}
-	
 	@Override
 	public void line(int lno, String s) {
 		System.out.println("Processing " + lno + ": " + s);
