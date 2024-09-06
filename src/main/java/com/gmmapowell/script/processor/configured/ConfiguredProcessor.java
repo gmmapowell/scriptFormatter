@@ -106,6 +106,12 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		// Create a list of scanners so that the one defined last is tried first,
 		// and the default handler only applies if none of the others do
 		List<ProcessingScanner> all = new ArrayList<ProcessingScanner>();
+		if (defaultHandler == null) {
+			throw new CantHappenException("the processor config must specify a defaultHandler");
+		}
+		if (blankHandler == null) {
+			throw new CantHappenException("the processor config must specify a blankHandler");
+		}
 		all.add(0, new AlwaysScanner(Reflection.create(defaultHandler, state)));
 		all.add(0, new BlankScanner(Reflection.create(blankHandler, state)));
 		for (Class<? extends ProcessingScanner> c : scanners) {

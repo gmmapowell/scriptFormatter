@@ -7,7 +7,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.script.config.ScriptConfig;
-import com.gmmapowell.script.modules.processors.doc.InstallDocModule;
+import com.gmmapowell.script.modules.processors.article.InstallArticleModule;
 import com.gmmapowell.script.utils.SBLocation;
 
 public class ReadConfigState extends SBLocation {
@@ -42,7 +42,9 @@ public class ReadConfigState extends SBLocation {
 	// Those top level modules should basically all just add extension points
 	public void simulateModuleProcessing() {
 		// config: "module doc-processor"
-		new InstallDocModule(this).install();
+//		new InstallDocModule(this).install();
+		// config: "module doc-processor"
+		new InstallArticleModule(this).install();
 	}
 
 	public Universe universe() {

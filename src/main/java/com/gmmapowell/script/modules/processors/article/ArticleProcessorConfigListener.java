@@ -7,8 +7,16 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
-import com.gmmapowell.script.processor.prose.ArticleProcessor;
-import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.flow.FlowMap;
+import com.gmmapowell.script.modules.processors.doc.AmpSpotter;
+import com.gmmapowell.script.modules.processors.doc.AtBlankSpotter;
+import com.gmmapowell.script.modules.processors.doc.AtSpotter;
+import com.gmmapowell.script.modules.processors.doc.EndAtSpotter;
+import com.gmmapowell.script.modules.processors.doc.FieldSpotter;
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
+import com.gmmapowell.script.processor.NewParaProcessor;
+import com.gmmapowell.script.processor.configured.ConfiguredProcessor;
+import com.gmmapowell.script.processor.configured.StandardLineProcessor;
 import com.gmmapowell.script.utils.Command;
 
 public class ArticleProcessorConfigListener implements ConfigListener {
@@ -22,11 +30,7 @@ public class ArticleProcessorConfigListener implements ConfigListener {
 	@Override
 	public ConfigListener dispatch(Command cmd) {
 //		switch (cmd.name()) {
-//		case "credentials": 
-//		case "blogurl":
-//		case "posts":
-//		case "local":
-//		case "saveAs":
+//		case "param":
 //		{
 //			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 //			return null;
@@ -39,28 +43,19 @@ public class ArticleProcessorConfigListener implements ConfigListener {
 
 	@Override
 	public void complete() throws ConfigException {
-//		String creds = vars.remove("credentials");
-//		if (creds == null)
-//			throw new ConfigException("credentials was not defined");
-//		String blogUrl = vars.remove("blogurl");
-//		if (blogUrl == null)
-//			throw new ConfigException("blogurl was not defined");
-//		String posts = vars.remove("posts");
-//		if (posts == null)
-//			throw new ConfigException("posts was not defined");
-//		boolean localOnly = false;
-//		String lo = vars.remove("local");
-//		if (lo != null && "true".equalsIgnoreCase(lo))
-//			localOnly = true;
-//		Place saveContentAs = null;
-//		String sca = vars.remove("saveAs");
-//		if (sca != null)
-//			saveContentAs = state.root.place(sca);
-//		Place pf = state.root.placePath(posts);
-//		Place cp = state.root.placePath(creds);
 		try {
-			Sink sink = state.config.makeSink();
-			state.config.processor(new ArticleProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug));
+			GlobalState global = state.config.newGlobalState();
+			ConfiguredProcessor proc = new ConfiguredProcessor(global, state.root, new BlockishElementFactory(), vars, state.debug);
+			FlowMap flows = global.flows();
+			flows.flow("main");
+			proc.setDefaultHandler(StandardLineProcessor.class);
+			proc.setBlankHandler(NewParaProcessor.class);
+			proc.addScanner(AmpSpotter.class);
+			proc.addScanner(AtSpotter.class);
+			proc.addScanner(FieldSpotter.class);
+			proc.addScanner(AtBlankSpotter.class);
+			proc.addScanner(EndAtSpotter.class);
+			state.config.processor(proc);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating ArticleProcessor: " + ex.getMessage());

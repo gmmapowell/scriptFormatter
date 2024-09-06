@@ -1,5 +1,6 @@
 package com.gmmapowell.script.modules.processors.doc;
 
+import com.gmmapowell.script.config.GlobalModuleInstaller;
 import com.gmmapowell.script.config.ScriptConfig;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.processor.configured.InlineCommandHandler;

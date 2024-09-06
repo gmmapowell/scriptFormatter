@@ -62,7 +62,7 @@ public class HTMLSink implements Sink {
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
-					System.out.println(tok);
+//					System.out.println(tok);
 					last = transition(cf, last, tok);
 					boolean hadBreak = haveBreak;
 					figureStyles(cf, tok.styles);
