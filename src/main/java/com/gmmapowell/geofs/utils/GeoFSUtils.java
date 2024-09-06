@@ -129,13 +129,14 @@ public class GeoFSUtils {
 		} else if (f.isAbsolute()) {
 			r = findRelative(other, region, f, true);
 		} else {
-			if (other != world) {
-				throw new GeoFSInvalidWorldException();
-			}
-			// start at region
-			if (region == null) {
-				throw new GeoFSNoRegionException(path);
-			}
+			// 2024-09-06: I commented this out because it didn't correctly handle "~/.../" in CollectBlogs
+//			if (other != world) {
+//				throw new GeoFSInvalidWorldException();
+//			}
+//			// start at region
+//			if (region == null) {
+//				throw new GeoFSNoRegionException(path);
+//			}
 			r = findRelative(world, region, f, false);
 		}
 		return new RegionName(r, name);

@@ -75,6 +75,9 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 			ConfiguredState state = new ConfiguredState(global, local, fluency, joinspace, x);
 			List<ProcessingScanner> all = createScannerList(state);
 
+			for (LifecycleObserver o : observers)
+				o.newPlace(state, x);
+
 			// Each of the scanners gets a chance to act
 			x.lines((n, s) -> {
 				state.line(n);

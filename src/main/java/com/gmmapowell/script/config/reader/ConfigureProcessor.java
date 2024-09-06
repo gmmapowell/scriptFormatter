@@ -16,7 +16,6 @@ public class ConfigureProcessor implements ConfigListenerProvider {
 	public ConfigureProcessor(ReadConfigState state) {
 		this.state = state;
 		// TODO: all of these should move to their respective global module installers
-		state.registerProcessor("blog", BlogProcessorConfigListener.class);
 		state.registerProcessor("movie", MovieProcessorConfigListener.class);
 		state.registerProcessor("presenter", PresenterProcessorConfigListener.class);
 	}

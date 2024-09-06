@@ -158,6 +158,9 @@ public class BloggerSink implements Sink {
 			}
 			writer.close();
 			uploads.put(f.name, this.sw.toString());
+			if (saveContentAs != null) {
+				saveContentAs.store(sw.toString());
+			}
 		}
 	}
 
@@ -278,9 +281,6 @@ public class BloggerSink implements Sink {
 		}
 		Post p = new Post();
 		p.setTitle(title);
-		if (saveContentAs != null) {
-			saveContentAs.store(sw.toString());
-		}
 		p.setContent(sw.toString());
 		// How do you say you don't want it to publish straight away?
 //		p.setStatus("DRAFT");

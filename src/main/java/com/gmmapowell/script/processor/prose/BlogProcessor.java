@@ -46,12 +46,6 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 	protected void handleLine(BlogState state, String s) throws IOException {
 		if (s.trim().equals("$$")) {
 			state.blockquote = !state.blockquote;
-		} else if (!state.blockquote && s.startsWith("+")) {
-			state.newPara(headingLevel(s));
-			ProcessingUtils.process(state, s.substring(s.indexOf(" ")+1).trim());
-		} else if (!state.blockquote && s.startsWith("*")) {
-			state.newPara("bullet");
-			ProcessingUtils.process(state, s.substring(s.indexOf(" ")+1).trim());
 		} else {
 			if (state.blockquote) {
 				state.newPara("blockquote");

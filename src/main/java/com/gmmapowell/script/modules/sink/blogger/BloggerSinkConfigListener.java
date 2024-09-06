@@ -54,7 +54,7 @@ public class BloggerSinkConfigListener implements ConfigListener {
 		Place saveContentAs = null;
 		String sca = vars.remove("saveAs");
 		if (sca != null)
-			saveContentAs = state.root.place(sca);
+			saveContentAs = state.root.ensurePlace(sca);
 		Place pf = state.root.placePath(posts);
 		Place cp = state.root.placePath(creds);
 		try {
