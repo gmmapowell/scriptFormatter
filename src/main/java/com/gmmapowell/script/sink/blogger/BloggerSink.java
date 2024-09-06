@@ -48,6 +48,9 @@ import com.google.api.services.blogger.model.Post;
 import com.google.api.services.blogger.model.PostList;
 
 public class BloggerSink implements Sink {
+	private final String have_internet = System.getenv("HAVE_INTERNET");
+	private final boolean CONFIGURE_WITH_INTERNET = have_internet == null || ("true".equals(have_internet));
+
 	public enum Mode {
 		START, NORMAL, LIST, BLOCKQUOTE
 	}
@@ -70,7 +73,10 @@ public class BloggerSink implements Sink {
 		this.creds = cp;
 		this.blogUrl = blogUrl;
 		this.postsFile = pf;
-		this.localOnly = localOnly;
+		if (CONFIGURE_WITH_INTERNET)
+			this.localOnly = localOnly;
+		else
+			this.localOnly = true;
 		this.saveContentAs = saveContentAs;
 		this.index = new PostIndex();
 	}
