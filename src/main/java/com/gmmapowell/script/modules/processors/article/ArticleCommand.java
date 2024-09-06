@@ -7,11 +7,9 @@ import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class ArticleCommand implements AtCommandHandler {
-	private final ScannerAtState sas;
 	private final ConfiguredState state;
 
 	public ArticleCommand(ScannerAtState sas) {
-		this.sas = sas;
 		this.state = sas.state();
 	}
 	
