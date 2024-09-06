@@ -253,6 +253,10 @@ public class ConfiguredState extends SBLocation {
 		fluency.nestSpan(formats);
 	}
 
+	public boolean topSpanHas(String fmt) {
+		return fluency.topSpanHas(fmt);
+	}
+
 	public void popSpan() {
 		fluency.popSpan();
 	}

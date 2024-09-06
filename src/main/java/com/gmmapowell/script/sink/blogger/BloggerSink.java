@@ -160,6 +160,7 @@ public class BloggerSink implements Sink {
 			uploads.put(f.name, this.sw.toString());
 			if (saveContentAs != null) {
 				saveContentAs.store(sw.toString());
+				saveContentAs.region().subregion("newones").ensurePlace(f.name).store(sw.toString());
 			}
 		}
 	}

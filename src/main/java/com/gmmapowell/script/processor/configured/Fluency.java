@@ -131,6 +131,10 @@ public class Fluency {
 	public void nestSpan(String... formats) {
 		nestSpan(Arrays.asList(formats));
 	}
+
+	public boolean topSpanHas(String fmt) {
+		return currSpan != null && currSpan.parent != null && currSpan.formats.contains(fmt);
+	}
 	
 	public void popSpan() {
 		if (currSpan == null)

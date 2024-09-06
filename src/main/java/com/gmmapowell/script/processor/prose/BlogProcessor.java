@@ -69,45 +69,11 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 					p = new SBLineArgsParser<BlogState>(state, s.substring(idx+1));
 				}
 				switch (cmd) {
-				case "bold":
-				case "italic":
-				case "tt": {
-					state.newPara("text", cmd);
-					ProcessingUtils.process(state, p.asString());
-					break;
-				}
-				case "link": {
-					try {
-						String lk = p.readString();
-						String tx = p.readString();
-						
-						if (!state.inPara())
-							state.newPara("text");
-						if (!state.inSpan())
-							state.newSpan();
-						state.op(new LinkOp(lk, tx));
-					} catch (ParsingException ex) {
-						System.out.println(ex.getMessage());
-						System.out.println(" >> " + s);
-					}
-					break;
-				}
 				case "sp": {
 					if (state.inSpan())
 						state.op(new BreakingSpace());
 					if (p != null)
 						ProcessingUtils.process(state, p.asString());
-					break;
-				}
-				case "img": {
-					state.newPara("text");
-					state.newSpan();
-					// Doing this properly may require another API (picker?)
-					// See: https://bloggerdev.narkive.com/SC3HJ3UM/upload-images-using-blogger-api
-					// For now, upload the image by hand and put the URL here
-					//  Obvs you can also use any absolute URL
-					String link = p.readString();
-					state.op(new ImageOp(link));
 					break;
 				}
 				case "git": {
