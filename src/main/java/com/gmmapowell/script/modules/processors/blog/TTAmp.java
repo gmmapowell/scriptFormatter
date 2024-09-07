@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.processors.blog;
 
+import org.zinutils.exceptions.CantHappenException;
+
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
@@ -19,14 +21,14 @@ public class TTAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		if (!state.inPara())
-			state.newPara();
-		if (!state.inSpan())
-			state.newSpan();
-		state.nestSpan("preformatted");
-		state.processTextInSpan(cmd.args.asString());
-		state.popSpan();
-		state.observeBlanks();
+		if (cmd.args.toString().trim().length() > 0) {
+			throw new CantHappenException("&tt must introduce and end tt mode on its own");
+		}
+		if (state.hasFormat("preformatted")) {
+			state.popFormat("preformatted");
+		} else {
+			state.pushFormat("preformatted");
+		}
 	}
 
 }

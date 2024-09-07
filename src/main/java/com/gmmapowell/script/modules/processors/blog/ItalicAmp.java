@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.processors.blog;
 
+import org.zinutils.exceptions.CantHappenException;
+
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
@@ -19,13 +21,15 @@ public class ItalicAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		if (!state.inPara())
-			state.newPara();
-		if (!state.inSpan())
-			state.newSpan();
-		state.nestSpan("italic");
-		state.processTextInSpan(cmd.args.asString());
-		state.popSpan();
-		state.observeBlanks();
+		if (cmd.args.toString().trim().length() > 0) {
+			throw new CantHappenException("&italic must introduce and end italic mode on its own");
+		}
+		if (state.hasFormat("italic")) {
+			state.popFormat("italic");
+			state.popFormat("text");
+		} else {
+			state.pushFormat("text");
+			state.pushFormat("italic");
+		}
 	}
 }

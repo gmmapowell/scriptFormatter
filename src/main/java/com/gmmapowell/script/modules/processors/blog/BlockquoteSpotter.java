@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.processors.doc;
+package com.gmmapowell.script.modules.processors.blog;
 
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
@@ -12,7 +12,7 @@ public class BlockquoteSpotter implements ProcessingScanner {
 		this.state = state;
 		bs = state.require(BlockquoteState.class);
 	}
-
+	
 	@Override
 	public boolean wantTrimmed() {
 		return false;
@@ -45,9 +45,10 @@ public class BlockquoteSpotter implements ProcessingScanner {
 				} else
 					break;
 			}
-			while (Character.isWhitespace(s.charAt(i)))
+			while (i < s.length() && Character.isWhitespace(s.charAt(i)))
 				i++;
-			state.processText(s.substring(i));
+			if (i < s.length())
+				state.processText(s.substring(i));
 			state.endPara();
 			return true; // we processed the line
 //			return false; // the line still needs processing

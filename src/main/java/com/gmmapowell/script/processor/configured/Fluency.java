@@ -161,6 +161,10 @@ public class Fluency {
 	public void pushFormat(String fmt) {
 		fmtStack.add(fmt);
 	}
+	
+	public boolean hasFormat(String fmt) {
+		return !fmtStack.isEmpty() && fmtStack.get(fmtStack.size()-1).equals(fmt);
+	}
 
 	public void popFormat(String fmt) {
 		if (fmtStack.isEmpty())
@@ -169,5 +173,4 @@ public class Fluency {
 		if (!fmt.equals(last))
 			throw new CantHappenException("wanted to remove " + fmt + " but top was " + last);
 	}
-
 }

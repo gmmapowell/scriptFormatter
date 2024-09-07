@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.processors.blog;
 
+import org.zinutils.exceptions.CantHappenException;
+
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
@@ -19,13 +21,13 @@ public class BoldAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		if (!state.inPara())
-			state.newPara();
-		if (!state.inSpan())
-			state.newSpan();
-		state.nestSpan("bold");
-		state.processTextInSpan(cmd.args.asString());
-		state.popSpan();
-		state.observeBlanks();
+		if (cmd.args.toString().trim().length() > 0) {
+			throw new CantHappenException("&bold must introduce and end bold mode on its own");
+		}
+		if (state.hasFormat("bold")) {
+			state.popFormat("bold");
+		} else {
+			state.pushFormat("bold");
+		}
 	}
 }

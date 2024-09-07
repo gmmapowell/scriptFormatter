@@ -32,6 +32,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	public ConfiguredProcessor(GlobalState global, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
 		this.global = global;
 		this.local = new CreatorExtensionPointRepo(global.extensions());
+		// TODO: this should be a negotiation between the configlistener and an (initialized) ConfiguredProcessor
 		String joinspace = vars.remove("joinspace");
 		this.joinspace = "true".equals(joinspace);
 	}
@@ -81,11 +82,12 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 			// Each of the scanners gets a chance to act
 			x.lines((n, s) -> {
 				state.line(n);
+				String trimmed = trim(s);
 				for (ProcessingScanner scanner : all)
-					scanner.closeIfNotContinued(trim(s));
+					scanner.closeIfNotContinued(scanner.wantTrimmed() ? trimmed : s);
 				System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
 				for (ProcessingScanner scanner : all) {
-					if (scanner.handleLine(trim(s)))
+					if (scanner.handleLine(scanner.wantTrimmed() ? trimmed : s))
 						return;
 				}
 				throw new CantHappenException("the default scanner at least should have fired");

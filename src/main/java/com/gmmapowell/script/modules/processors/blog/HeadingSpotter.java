@@ -8,7 +8,7 @@ import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 
 public class HeadingSpotter implements ProcessingScanner{
-	private final Pattern head = Pattern.compile("^(\\+\\++) (.*)");
+	private final Pattern head = Pattern.compile("^(\\++) (.*)");
 	private final ConfiguredState state;
 	private final BlockquoteState bs;
 	

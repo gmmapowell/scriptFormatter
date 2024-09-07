@@ -24,6 +24,7 @@ import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.StyledToken;
@@ -103,15 +104,18 @@ public class BloggerSink implements Sink {
 	@Override
 	public void render() throws IOException {
 		for (Flow f : flows) {
+			System.out.println("Flow " + f.name);
 			this.sw = new StringWriter();
 			writer = new PrintWriter(sw);
+			int sno = 1;
 			for (Section s : f.sections) {
+				System.out.println("Section " + (sno++) + ": " + s.format);
 				Cursor c = new Cursor(f.name, s);
 				String last = "text";
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
-//					System.out.println(tok);
+					System.out.println("  " + tok);
 					last = transition(cf, last, tok);
 					haveBreak = false;
 					figureStyles(cf, tok.styles);
@@ -119,10 +123,12 @@ public class BloggerSink implements Sink {
 					if (tok.it instanceof TextSpanItem)
 						writer.print(entitify(((TextSpanItem)tok.it).text));
 					else if (tok.it instanceof BreakingSpace) {
-						if (last.equals("blockquote"))
-							writer.print("&nbsp;");
-						else
+//						if (last.equals("blockquote"))
+//							writer.print("&nbsp;");
+//						else
 							writer.print(" ");
+					} else if (tok.it instanceof NonBreakingSpace) {
+						writer.print("&nbsp;");
 					} else if (tok.it instanceof ParaBreak) {
 						switch (last) {
 						case "bullet":
@@ -132,6 +138,9 @@ public class BloggerSink implements Sink {
 						case "break":
 						case "blockquote":
 						case "preformatted":
+						case "italic":
+						case "bold":
+						case "tt":
 							writer.print("<br/>");
 							break;
 						case "h1":
@@ -152,7 +161,7 @@ public class BloggerSink implements Sink {
 						writer.print(l.tx);
 						writer.print("</a>");
 					} else
-						throw new NotImplementedException();
+						throw new NotImplementedException(tok.it.toString());
 				}
 				transition(cf, last, "text", false);
 			}
@@ -191,7 +200,7 @@ public class BloggerSink implements Sink {
 		if (next.equals("bullet")) {
 			if (!last.equals("needli"))
 				writer.println("<ul>");
-			writer.print("<li>");
+			writer.print("  <li>");
 		}
 		if (next.equals("blockquote")) {
 			writer.println("<blockquote class='tr_bq'>");
@@ -262,6 +271,8 @@ public class BloggerSink implements Sink {
 			return "i";
 		case "bold":
 			return "b";
+		case "superscript":
+			return "sup";
 		default:
 			return sty;
 		}

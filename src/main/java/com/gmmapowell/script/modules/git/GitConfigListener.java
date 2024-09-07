@@ -1,46 +1,35 @@
-package com.gmmapowell.script.modules.doc.toc;
+package com.gmmapowell.script.modules.git;
 
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ProcessorConfig;
-import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.utils.Command;
 
-public class TOCConfigListener implements ModuleConfigListener {
+public class GitConfigListener implements ModuleConfigListener {
 	private final ReadConfigState state;
-	private final VarMap vars = new VarMap();
-	private TOCPreparer toc;
+	private GitInstaller module;
 
-	public TOCConfigListener(ReadConfigState state) {
+	public GitConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
 	@Override
 	public ConfigListener dispatch(Command cmd) throws Exception {
-		switch (cmd.name()) {
-		case "toc": 
-		case "meta":
-		{
-			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
-			return null;
-		}
-		default: {
-			throw new NotImplementedException("TOC module does not have parameter " + cmd.name());
-		}
-		}
+		throw new NotImplementedException("git module does not have parameters");
 	}
 
 	@Override
 	public void complete() throws Exception {
-		toc = new TOCPreparer(state, vars);
+		module = new GitInstaller(state);
 	}
 
 	@Override
 	public void activate(ProcessorConfig proc) throws ConfigException {
-		toc.activate(proc);
+		module.activate(proc);
 	}
+
 }

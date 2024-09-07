@@ -13,6 +13,7 @@ import com.gmmapowell.script.modules.doc.includecode.IncludeCodeConfigListener;
 import com.gmmapowell.script.modules.doc.placedate.PlaceDateConfigListener;
 import com.gmmapowell.script.modules.doc.scanmode.ScanmodeConfigListener;
 import com.gmmapowell.script.modules.doc.toc.TOCConfigListener;
+import com.gmmapowell.script.modules.git.GitConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 
 // TODO: I think this should actually be created early on and be available in state
@@ -28,6 +29,8 @@ public class NestedModuleCreator {
 		this.modules.put("placedate", PlaceDateConfigListener.class);
 		this.modules.put("scanmode", ScanmodeConfigListener.class);
 		this.modules.put("toc", TOCConfigListener.class);
+		
+		this.modules.put("git", GitConfigListener.class);
 	}
 	
 	public ModuleConfigListener module(String mod) {

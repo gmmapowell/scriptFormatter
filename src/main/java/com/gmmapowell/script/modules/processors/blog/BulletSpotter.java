@@ -24,6 +24,7 @@ public class BulletSpotter implements ProcessingScanner{
 
 		Matcher m = head.matcher(s);
 		if (m.matches()) {
+			System.out.println("bullet");
 			state.newPara("bullet");
 			state.processText(m.group(2));
 			state.endPara();

@@ -9,6 +9,7 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ModuleActivator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
+import com.gmmapowell.script.modules.processors.doc.AtCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 
@@ -35,6 +36,7 @@ public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, Scanner
 		toc.configure(metaFile, tocFile);
 		proc.addExtension(DocumentOutline.class, this);
 		proc.addExtension(AmpCommandHandler.class, RefAmpCommand.class);
+		proc.addExtension(AtCommandHandler.class, AtTOCCommand.class);
 		proc.lifecycleObserver(new TOCObserver(toc));
 	}
 

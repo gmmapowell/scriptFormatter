@@ -285,6 +285,10 @@ public class ConfiguredState extends SBLocation {
 		for (String f : fmt)
 			fluency.pushFormat(f);
 	}
+	
+	public boolean hasFormat(String fmt) {
+		return fluency.hasFormat(fmt);
+	}
 
 	public void popFormat(String... fmt) {
 		for (String f : fmt)
