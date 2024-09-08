@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.function.BiFunction;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -20,7 +18,6 @@ import org.zinutils.xml.XML;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
@@ -30,8 +27,6 @@ import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
 
 public class GeoFSUtils {
-	private static Pattern uriStyle = Pattern.compile("([a-z0-9]+)://(.*)");
-	
 	static class RegionName {
 		Region r;
 		String n;
@@ -107,37 +102,25 @@ public class GeoFSUtils {
 	}
 
 	private static RegionName obtainParentRegion(World world, Region region, String path) {
-		Matcher isUri = uriStyle.matcher(path);
-		World other = world;
-		if (isUri.matches()) {
-			path = isUri.group(2);
-			Universe u = world.getUniverse();
-			if (u == null) {
-				throw new CantHappenException("the World is not part of a Universe");
-			}
-			other = u.getWorld(isUri.group(1));
-		}
-		File f = new File(path);
-		String name = f.getName();
-		f = f.getParentFile();
+		WorldPath wp = WorldPath.parse(world, path);
+		String name = wp.getName();
+		File parent = wp.getParentFile();
 		Region r;
-		if (f == null) {
+		if (parent == null) {
 			if (region == null) {
-				throw new GeoFSNoRegionException(path);
+				throw new GeoFSNoRegionException(wp.path);
 			}
 			r = region;
-		} else if (f.isAbsolute()) {
-			r = findRelative(other, region, f, true);
+		} else if (isAbsolute(parent)) {
+			r = findRelative(wp.world(), region, parent, true);
 		} else {
+			wp.assertSameWorld(world);
 			// 2024-09-06: I commented this out because it didn't correctly handle "~/.../" in CollectBlogs
-//			if (other != world) {
-//				throw new GeoFSInvalidWorldException();
-//			}
 //			// start at region
 //			if (region == null) {
 //				throw new GeoFSNoRegionException(path);
 //			}
-			r = findRelative(world, region, f, false);
+			r = findRelative(world, region, parent, false);
 		}
 		return new RegionName(r, name);
 	}
@@ -158,21 +141,12 @@ public class GeoFSUtils {
 	}
 
 	public static Place findPlace(World world, Region region, String path, BiFunction<Region, String, Place> resolve) {
-		Matcher isUri = uriStyle.matcher(path);
-		World other = world;
-		if (isUri.matches()) {
-			path = isUri.group(2);
-			Universe u = world.getUniverse();
-			if (u == null) {
-				throw new CantHappenException("the World is not part of a Universe");
-			}
-			other = u.getWorld(isUri.group(1));
-		}
+		WorldPath wp = WorldPath.parse(world, path);
 		File f = new File(path);
 		Region r;
-		if (f.isAbsolute()) { 
-			r = findRelative(other, region, f.getParentFile(), true);
-		} else if (other != world) {
+		if (isAbsolute(f)) { 
+			r = findRelative(wp.world(), region, f.getParentFile(), true);
+		} else if (wp.world() != world) {
 			throw new GeoFSInvalidWorldException();
 		} else if (f.getParentFile() != null) {
 			r = findRelative(world, region, f.getParentFile(), false);
@@ -183,6 +157,17 @@ public class GeoFSUtils {
 			r = region;
 		}
 		return resolve.apply(r, f.getName());
+	}
+	
+	private static boolean isAbsolute(File f) {
+		if (f.isAbsolute())
+			return true;
+		while (f.getParentFile() != null)
+			f = f.getParentFile();
+		String n = f.getName();
+		if (n.startsWith("~") || n.endsWith(":"))
+			return true;
+		return false;
 	}
 
 	private static Region findRelative(World world, Region region, File f, boolean startAtWorld) {
