@@ -10,6 +10,7 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class GitRegion implements Region {
 	private final GitRoot root;
@@ -60,7 +61,7 @@ public class GitRegion implements Region {
 
 	@Override
 	public Place place(String name) {
-		throw new NotImplementedException();
+		return new GitPlace(this, name);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class GitRegion implements Region {
 
 	@Override
 	public Region regionPath(String path) {
-		throw new NotImplementedException();
+		return GeoFSUtils.regionPath(root.getWorld(), this, path);
 	}
 
 	@Override
@@ -95,11 +96,19 @@ public class GitRegion implements Region {
 
 	@Override
 	public void places(PlaceListener lsnr) {
-		throw new NotImplementedException();
+		root.listChildren(myPath, (type, name) -> {
+			if (type.equals("blob"))
+				lsnr.place(place(name));
+		});
 	}
 
 	@Override
 	public void regions(RegionListener lsnr) {
 		throw new NotImplementedException();
+	}
+	
+	@Override
+	public String toString() {
+		return myPath.toString();
 	}
 }

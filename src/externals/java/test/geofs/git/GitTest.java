@@ -93,15 +93,13 @@ public class GitTest {
 	}
 
 	@Test
-	@Ignore
 	public void weCanFindThePlacesInHEAD() throws Exception {
 		PlaceListener lsnr = context.mock(PlaceListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).place(with(PlaceMatcher.called("hwtest")));
-			oneOf(lsnr).place(with(PlaceMatcher.called("secondfile")));
+			oneOf(lsnr).place(with(PlaceMatcher.called(".gitstr")));
 		}});
 
-		world.root(gitroot).subregion("testregions").places(lsnr);
+		world.root(gitroot).regionPath("src/test/resources").places(lsnr);
 	}	
 
 	@Test

@@ -1,12 +1,15 @@
 package com.gmmapowell.geofs.git;
 
 import java.io.File;
+import java.io.StringReader;
 
 import org.zinutils.exceptions.CantHappenException;
-import org.zinutils.exceptions.NotImplementedException;
+import org.zinutils.parser.LinePatternMatch;
+import org.zinutils.parser.LinePatternParser;
 import org.zinutils.system.RunProcess;
 
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.geofs.World;
 
 public class GitRoot {
 	private final GitWorld world;
@@ -17,6 +20,10 @@ public class GitRoot {
 		this.world = world;
 		this.repo = repo;
 		this.tag = tag;
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	public Universe getUniverse() {
@@ -47,4 +54,39 @@ public class GitRoot {
 			throw new CantHappenException("what type is this in git: " + out.trim() + "?");
 		}
 	}
+
+	public void listChildren(File path, GitEntryListener lsnr) {
+		RunProcess proc = new RunProcess("git");
+		proc.showArgs(true);
+		proc.captureStdout();
+		proc.arg("-C");
+		proc.arg(repo);
+		proc.arg("cat-file");
+		proc.arg("-p");
+		proc.arg(tag + ":" + path);
+		proc.execute();
+
+		LinePatternParser lpp = new LinePatternParser();
+		lpp.match("([0-7]*) (tree) ([0-9a-f]*)\t(.*)", "tree", "perm", "type", "id", "name");
+		lpp.match("([0-7]*) (blob) ([0-9a-f]*)\t(.*)", "tree", "perm", "type", "id", "name");
+		for (LinePatternMatch lpm : lpp.applyTo(new StringReader(proc.getStdout()))) {
+			System.out.println("lpm is " + lpm);
+			lsnr.entry(lpm.get("type"), lpm.get("name"));
+		}
+
+	}
+	
+	// The other command we need is -p
+	// And we should figure out how to use LPPs again
+	/*
+		lpp.match("package ([a-zA-Z0-9_.]*) does not exist", "nopackage", "pkgname");
+		lpp.match("cannot access ([a-zA-Z0-9_.]*)\\.[a-zA-Z0-9_]*", "nopackage", "pkgname");
+		lpp.match("class file for ([a-zA-Z0-9_.]*)\\.[a-zA-Z0-9_]* not found", "nopackage", "pkgname");
+		lpp.match("location: package ([a-zA-Z0-9_.]*)", "nopackage", "pkgname");
+		lpp.match("location: class ([a-zA-Z0-9_.]*)\\.[a-zA-Z0-9_]*", "location", "mypackage");
+		List<BuildResource> allAdded = new ArrayList<BuildResource>();
+		TreeSet<String> missingPackages = new TreeSet<String>();
+		for (LinePatternMatch lpm : lpp.applyTo(new StringReader(proc.getStderr())))
+
+	 */
 }
