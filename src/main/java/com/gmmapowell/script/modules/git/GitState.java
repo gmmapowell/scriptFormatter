@@ -9,13 +9,23 @@ import com.gmmapowell.script.processor.configured.ConfiguredState;
 public class GitState {
 	private Region formatterRoot;
 	private Region repositoryRoot;
+	private String repoPath;
 
 	public void formatterRoot(Region root) {
 		this.formatterRoot = root;
 	}
 
 	public void repository(String repo) {
+		this.repoPath = repo;
 		this.repositoryRoot = formatterRoot.regionPath(repo);
+	}
+	
+	public Region root() {
+		return formatterRoot;
+	}
+	
+	public String repoPath() {
+		return repoPath;
 	}
 	
 	public void showDelta(ConfiguredState sink, String branch, String filespec, String from, String to) {

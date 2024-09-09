@@ -4,9 +4,11 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ScriptConfig;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
+import com.gmmapowell.script.modules.doc.includecode.IncludeAmp;
 import com.gmmapowell.script.modules.processors.blog.BlogProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.blog.BoldAmp;
 import com.gmmapowell.script.modules.processors.blog.ImgAmp;
+import com.gmmapowell.script.modules.processors.blog.IncludeTagAmp;
 import com.gmmapowell.script.modules.processors.blog.ItalicAmp;
 import com.gmmapowell.script.modules.processors.blog.LinkAmp;
 import com.gmmapowell.script.modules.processors.blog.SupAmp;
@@ -64,7 +66,10 @@ public class InstallBlogModule implements ConfigListener {
 //		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, MoreWorkAmp.class);
 //		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, OutrageAmp.class);
 //		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ReviewAmp.class);
-//		
+		
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeTagAmp.class);
+		
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ImgAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SpaceAmp.class);

@@ -3,6 +3,7 @@ package com.gmmapowell.script.modules.doc.includecode;
 import java.io.IOException;
 import java.util.Map;
 
+import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.Place;
@@ -20,14 +21,12 @@ public class IncludeAmp implements AmpCommandHandler {
 	private final GlobalState global;
 	private final ConfiguredState state;
 	private final IncluderConfig ic;
-	private final Region samples;
 	private DoInclusion includer;
 
 	public IncludeAmp(ScannerAmpState state) {
 		global = state.global();
 		this.state = state.state();
 		ic = global.requireState(IncluderConfig.class);
-		samples = ic.samples();
 	}
 	
 	@Override
@@ -51,6 +50,9 @@ public class IncludeAmp implements AmpCommandHandler {
 	
 	@Override
 	public void prepare(AmpCommand cmd) {
+		Region samples = ic.samples();
+		if (samples == null)
+			throw new CantHappenException("samples region has not been specified");
 		String file = cmd.args.readString();
 		Map<String, String> params = cmd.args.readParams("formatter");
 		System.out.println("want to include " + file + " with " + params);
