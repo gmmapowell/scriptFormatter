@@ -36,13 +36,13 @@ public class GitWorld implements World {
 		String repo, tag;
 		if (idx == -1) {
 			repo = root;
-			tag = null;
+			tag = "HEAD";
 		} else {
 			repo = root.substring(0, idx);
 			tag = root.substring(idx+1);
 		}
 		System.out.println("GIT ROOT " + repo + " " + tag);
-		return new GitExaminer(this, repo, tag);
+		return new GitRegion(new GitRoot(this, repo, tag), null, null, null);
 	}
 
 	@Override
