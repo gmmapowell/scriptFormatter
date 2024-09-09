@@ -1,6 +1,7 @@
 package com.gmmapowell.script;
 
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.geofs.git.GitWorld;
 import com.gmmapowell.geofs.lfs.LocalFileSystem;
 import com.gmmapowell.geofs.simple.SimpleUniverse;
 import com.gmmapowell.script.config.Config;
@@ -11,6 +12,8 @@ public class Main {
 	public static void main(String[] args) {
 		Universe uv = new SimpleUniverse();
 		LocalFileSystem lfs = new LocalFileSystem(uv);
+		// TODO: this should probably be configured in somewhere
+		new GitWorld(uv);
 		try {
 			Config cfg = ConfigArgs.processConfig(lfs, args).read();
 			uv.prepareWorlds();
