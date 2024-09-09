@@ -104,7 +104,7 @@ public class FollowRegionPaths {
 	@Test
 	public void tildeNameRepresentsAnotherUsersDirectory() {
 		World world = context.mock(World.class);
-		Region root = context.mock(Region.class, "/");
+		Region root = context.mock(Region.class, "~henry");
 		Region region = context.mock(Region.class, "unused");
 		Region sr = context.mock(Region.class, "sr");
 		context.checking(new Expectations() {{
@@ -118,18 +118,31 @@ public class FollowRegionPaths {
 	@Test
 	public void windowsHasDriveLetters() {
 		World world = context.mock(World.class);
-		Region root = context.mock(Region.class, "C:");
+		Region root = context.mock(Region.class, "C");
 		Region region = context.mock(Region.class, "unused");
 		Region sr = context.mock(Region.class, "sr");
 		Region ret = context.mock(Region.class, "ret");
 
 		context.checking(new Expectations() {{
-			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(world).root("C"); will(returnValue(root));
 			oneOf(root).subregion("from"); will(returnValue(sr));
 			oneOf(sr).subregion("region"); will(returnValue(ret));
 		}});
 		Region sub = GeoFSUtils.regionPath(world, region, "C:/from/region");
 		assertEquals(ret, sub);
+	}
+
+	@Test
+	public void aWindowsDriveIsARegion() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "C");
+		Region region = context.mock(Region.class, "unused");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C"); will(returnValue(root));
+		}});
+		Region sub = GeoFSUtils.regionPath(world, region, "C:");
+		assertEquals(root, sub);
 	}
 
 	@Test
@@ -146,7 +159,7 @@ public class FollowRegionPaths {
 			oneOf(region).subregion("from"); will(returnValue(sr));
 			oneOf(sr).subregion("region"); will(returnValue(ret));
 		}});
-		Region sub = GeoFSUtils.regionPath(world, region, "file://from/region");
+		Region sub = GeoFSUtils.regionPath(world, region, "file:from/region");
 		assertEquals(ret, sub);
 	}
 
@@ -166,7 +179,7 @@ public class FollowRegionPaths {
 			oneOf(root).subregion("from"); will(returnValue(sr));
 			oneOf(sr).subregion("region"); will(returnValue(ret));
 		}});
-		Region sub = GeoFSUtils.regionPath(world, region, "file:///from/region");
+		Region sub = GeoFSUtils.regionPath(world, region, "file:/from/region");
 		assertEquals(ret, sub);
 	}
 
@@ -182,11 +195,11 @@ public class FollowRegionPaths {
 		context.checking(new Expectations() {{
 			oneOf(world).getUniverse(); will(returnValue(universe));
 			oneOf(universe).getWorld("file"); will(returnValue(world));
-			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(world).root("C"); will(returnValue(root));
 			oneOf(root).subregion("from"); will(returnValue(sr));
 			oneOf(sr).subregion("region"); will(returnValue(ret));
 		}});
-		Region sub = GeoFSUtils.regionPath(world, region, "file://C:/from/region");
+		Region sub = GeoFSUtils.regionPath(world, region, "file:C:/from/region");
 		assertEquals(ret, sub);
 	}
 
@@ -202,7 +215,7 @@ public class FollowRegionPaths {
 			oneOf(world).getUniverse(); will(returnValue(universe));
 			oneOf(universe).getWorld("google"); will(returnValue(gdw));
 		}});
-		Region sub = GeoFSUtils.regionPath(world, region, "google://from/region");
+		Region sub = GeoFSUtils.regionPath(world, region, "google:from/region");
 		assertEquals(ret, sub);
 	}
 

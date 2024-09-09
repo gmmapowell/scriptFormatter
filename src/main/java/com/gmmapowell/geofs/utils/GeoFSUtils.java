@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import org.codehaus.jettison.json.JSONException;
@@ -20,7 +21,7 @@ import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
-import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
+import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.gdw.GDWPlace;
 import com.gmmapowell.geofs.lfs.LFSPlace;
@@ -89,7 +90,10 @@ public class GeoFSUtils {
 
 	public static Region regionPath(World world, Region region, String path) {
 		RegionName rn = obtainParentRegion(world, region, path);
-		return rn.r.subregion(rn.n);
+		if (rn.n == null)
+			return rn.r;
+		else
+			return rn.r.subregion(rn.n);
 	}
 
 	public static Region newRegionPath(World world, Region region, String path) {
@@ -103,26 +107,8 @@ public class GeoFSUtils {
 
 	private static RegionName obtainParentRegion(World world, Region region, String path) {
 		WorldPath wp = WorldPath.parse(world, path);
-		String name = wp.getName();
-		File parent = wp.getParentFile();
-		Region r;
-		if (parent == null) {
-			if (region == null) {
-				throw new GeoFSNoRegionException(wp.path);
-			}
-			r = region;
-		} else if (isAbsolute(parent)) {
-			r = findRelative(wp.world(), region, parent, true);
-		} else {
-			wp.assertSameWorld(world);
-			// 2024-09-06: I commented this out because it didn't correctly handle "~/.../" in CollectBlogs
-//			// start at region
-//			if (region == null) {
-//				throw new GeoFSNoRegionException(path);
-//			}
-			r = findRelative(world, region, parent, false);
-		}
-		return new RegionName(r, name);
+		Region r = figureParentPath(wp, region);
+		return new RegionName(r, wp.childSegment());
 	}
 
 	public static Place placePath(World world, Region region, String path) {
@@ -142,48 +128,29 @@ public class GeoFSUtils {
 
 	public static Place findPlace(World world, Region region, String path, BiFunction<Region, String, Place> resolve) {
 		WorldPath wp = WorldPath.parse(world, path);
-		File f = new File(path);
-		Region r;
-		if (isAbsolute(f)) { 
-			r = findRelative(wp.world(), region, f.getParentFile(), true);
-		} else if (wp.world() != world) {
-			throw new GeoFSInvalidWorldException();
-		} else if (f.getParentFile() != null) {
-			r = findRelative(world, region, f.getParentFile(), false);
-		} else {
-			if (region == null) {
-				throw new GeoFSNoRegionException(path);
-			}
-			r = region;
-		}
-		return resolve.apply(r, f.getName());
-	}
-	
-	private static boolean isAbsolute(File f) {
-		if (f.isAbsolute())
-			return true;
-		while (f.getParentFile() != null)
-			f = f.getParentFile();
-		String n = f.getName();
-		if (n.startsWith("~") || n.endsWith(":"))
-			return true;
-		return false;
+		Region r = figureParentPath(wp, region);
+		if (wp.childSegment() == null)
+			throw new GeoFSNoPlaceException(path);
+		return resolve.apply(r, wp.childSegment());
 	}
 
-	private static Region findRelative(World world, Region region, File f, boolean startAtWorld) {
-		if (f.getParentFile() != null) {
-			region = findRelative(world, region, f.getParentFile(), startAtWorld);
+	private static Region figureParentPath(WorldPath wp, Region region) {
+		Region r;
+		if (wp.isAbsolute()) {
+			r = wp.root();
 		} else {
-			if (f.isAbsolute()) { // absolute paths - return a root
-				return world.root();
-			} else if (f.getName().endsWith(":")) { // windows drive letters - are absolute, but Java doesn't know it
-				return world.root(f.getName());
-			} else if (f.getName().startsWith("~")) { // ~ represents a home directory - like a root, and thus absolute, but Java doesn't know it
-				return world.root(f.getName());
-			}
-			// else relative paths - fall through
+			wp.assertSameWorld();
+			if (region == null)
+				throw new GeoFSNoRegionException(null);
+			r = region;
 		}
-		return region.subregion(f.getName());
+		return findRelative(r, wp.parentSegments());
+	}
+
+	private static Region findRelative(Region region, List<String> segments) {
+		for (String s : segments)
+			region = region.subregion(s);
+		return region;
 	}
 
 	public static JSONObject readJSON(Place p) throws JSONException {

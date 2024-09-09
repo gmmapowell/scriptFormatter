@@ -12,6 +12,7 @@ import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSInvalidWorldException;
+import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 
@@ -124,7 +125,7 @@ public class FollowPlacePaths {
 		Place p = context.mock(Place.class, "p");
 
 		context.checking(new Expectations() {{
-			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(world).root("C"); will(returnValue(root));
 			oneOf(root).place("place"); will(returnValue(p));
 		}});
 		Place place = GeoFSUtils.placePath(world, region, "C:/place");
@@ -140,12 +141,24 @@ public class FollowPlacePaths {
 		Place p = context.mock(Place.class, "p");
 
 		context.checking(new Expectations() {{
-			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(world).root("C"); will(returnValue(root));
 			oneOf(root).subregion("from"); will(returnValue(sr));
 			oneOf(sr).place("place"); will(returnValue(p));
 		}});
 		Place place = GeoFSUtils.placePath(world, region, "C:/from/place");
 		assertEquals(p, place);
+	}
+
+	@Test(expected=GeoFSNoPlaceException.class)
+	public void aWindowsDriveIsNotAPlace() {
+		World world = context.mock(World.class);
+		Region root = context.mock(Region.class, "C");
+		Region region = context.mock(Region.class, "unused");
+
+		context.checking(new Expectations() {{
+			oneOf(world).root("C"); will(returnValue(root));
+		}});
+		GeoFSUtils.placePath(world, region, "C:");
 	}
 
 	@Test
@@ -162,7 +175,7 @@ public class FollowPlacePaths {
 			oneOf(region).subregion("from"); will(returnValue(sr));
 			oneOf(sr).place("place"); will(returnValue(ret));
 		}});
-		Place place = GeoFSUtils.placePath(world, region, "file://from/place");
+		Place place = GeoFSUtils.placePath(world, region, "file:from/place");
 		assertEquals(ret, place);
 	}
 
@@ -182,7 +195,7 @@ public class FollowPlacePaths {
 			oneOf(root).subregion("from"); will(returnValue(sr));
 			oneOf(sr).place("place"); will(returnValue(ret));
 		}});
-		Place place = GeoFSUtils.placePath(world, region, "file:///from/place");
+		Place place = GeoFSUtils.placePath(world, region, "file:/from/place");
 		assertEquals(ret, place);
 	}
 
@@ -198,11 +211,11 @@ public class FollowPlacePaths {
 		context.checking(new Expectations() {{
 			oneOf(world).getUniverse(); will(returnValue(universe));
 			oneOf(universe).getWorld("file"); will(returnValue(world));
-			oneOf(world).root("C:"); will(returnValue(root));
+			oneOf(world).root("C"); will(returnValue(root));
 			oneOf(root).subregion("from"); will(returnValue(sr));
 			oneOf(sr).place("place"); will(returnValue(ret));
 		}});
-		Place place = GeoFSUtils.placePath(world, region, "file://C:/from/place");
+		Place place = GeoFSUtils.placePath(world, region, "file:C:/from/place");
 		assertEquals(ret, place);
 	}
 
@@ -218,7 +231,7 @@ public class FollowPlacePaths {
 			oneOf(world).getUniverse(); will(returnValue(universe));
 			oneOf(universe).getWorld("google"); will(returnValue(gdw));
 		}});
-		Place place = GeoFSUtils.placePath(world, region, "google://from/region");
+		Place place = GeoFSUtils.placePath(world, region, "google:from/region");
 		assertEquals(ret, place);
 	}
 

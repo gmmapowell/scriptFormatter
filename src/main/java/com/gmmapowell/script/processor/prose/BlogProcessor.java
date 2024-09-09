@@ -73,33 +73,10 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 						ProcessingUtils.process(state, p.asString());
 					break;
 				}
-				case "git": {
-					String dir = p.readString();
-//					System.out.println("Want to take git imports from " + dir);
-					state.gitdir(dir);
-					break;
-				}
 				case "includeTag": {
 					String tag = p.readString();
 //					System.out.println("Want to take git includes from tag " + tag);
 					state.gittag(tag);
-					break;
-				}
-				case "import": {
-					try {
-						String branch = p.readString();
-						String filespec = p.readString();
-						String from = null, to = null;
-						if (p.hasMore()) {
-							from = p.readString();
-						}
-						if (p.hasMore()) {
-							to = p.readString();
-						}
-						gitShow(state, branch, filespec, from, to);
-					} catch (Exception ex) {
-						System.err.println(ex.getMessage());
-					}
 					break;
 				}
 				case "include": {
