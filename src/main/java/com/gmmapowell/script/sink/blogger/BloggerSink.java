@@ -280,6 +280,8 @@ public class BloggerSink implements Sink {
 
 	@Override
 	public void upload() throws Exception {
+		if (localOnly)
+			return;
 		for (Entry<String, String> e : uploads.entrySet()) {
 			this.upload(e.getKey(), e.getValue());
 		}

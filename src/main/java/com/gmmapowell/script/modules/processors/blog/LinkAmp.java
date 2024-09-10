@@ -22,6 +22,7 @@ public class LinkAmp implements AmpCommandHandler {
 	public void invoke(AmpCommand cmd) {
 		String lk = cmd.args.readString();
 		String tx = cmd.args.readString();
+		state.ensurePara();
 		if (!state.inSpan())
 			state.newSpan();
 		state.op(new LinkOp(lk, tx));
