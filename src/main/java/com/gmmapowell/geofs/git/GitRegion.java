@@ -8,6 +8,7 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
@@ -67,6 +68,9 @@ public class GitRegion implements Region {
 
 	@Override
 	public Place place(String name) {
+		if (!hasPlace(name)) {
+			throw new GeoFSNoPlaceException(new File(myPath, name).toString());
+		}
 		return new GitPlace(root, this, name);
 	}
 

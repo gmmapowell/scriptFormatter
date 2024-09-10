@@ -67,7 +67,7 @@ public class IncludeAmp implements AmpCommandHandler {
 		if (!r.hasPlace(file)) {
 			throw new RuntimeException("there is no sample " + file + " in " + samples + " at " + state.inputLocation());
 		}
-		Place code = samples.place(file);
+		Place code = r.place(file);
 		Formatter formatter;
 		if (!params.containsKey("formatter"))
 			 formatter = new BoringFormatter(state);

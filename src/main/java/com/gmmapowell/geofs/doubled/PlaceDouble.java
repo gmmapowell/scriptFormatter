@@ -84,8 +84,13 @@ public abstract class PlaceDouble implements Place {
 	}
 
 	@Override
+	public Reader reader() {
+		return textContents();
+	}
+	
+	@Override
 	public InputStream input() {
-		throw new NotImplementedException();
+		return binaryContents();
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.gmmapowell.geofs.gdw;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 
 import org.zinutils.exceptions.NotImplementedException;
@@ -54,6 +55,11 @@ public class GDWPlace implements Place {
 
 	@Override
 	public InputStream input() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Reader reader() {
 		throw new NotImplementedException();
 	}
 

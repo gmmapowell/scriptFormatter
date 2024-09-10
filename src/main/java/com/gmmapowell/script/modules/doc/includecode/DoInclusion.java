@@ -102,24 +102,6 @@ public class DoInclusion {
 	}
 
 	private void openSource(NumberedLineListener lsnr) throws IOException {
-		// TODO: this is to do with the blogger ...
-		// TODO: GeoFS needs to support GIT!!!!
-		/*
-		if (state instanceof GitState && ((GitState)state).gittag() != null) {
-			GitState gs = (GitState) state;
-			// read it using gitshow
-			RunProcess gitcmd = new RunProcess("git");
-			gitcmd.arg("show");
-			gitcmd.arg(gs.gittag() + ":" + file);
-			gitcmd.captureStdout();
-			gitcmd.redirectStderr(System.err);
-			gitcmd.executeInDir(gs.gitdir());
-			gitcmd.execute();
-			is = new StringReader(gitcmd.getStdout());
-		} else
-		*/
-//			is = new FileReader(file, Charset.forName("UTF-8"));
-//		return new LineNumberReader(is);
 		place.lines(lsnr);
 	}
 

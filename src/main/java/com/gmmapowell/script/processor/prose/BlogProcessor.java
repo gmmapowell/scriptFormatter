@@ -1,10 +1,7 @@
 package com.gmmapowell.script.processor.prose;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
-import org.zinutils.system.RunProcess;
 
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.ConfigException;
@@ -12,7 +9,6 @@ import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.ExtensionPoint;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.ElementFactory;
-import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.NoSuchCommandException;
@@ -20,8 +16,6 @@ import com.gmmapowell.script.processor.ProcessingUtils;
 import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 import com.gmmapowell.script.sink.Sink;
-import com.gmmapowell.script.utils.LineArgsParser;
-import com.gmmapowell.script.utils.SBLineArgsParser;
 
 public class BlogProcessor extends ProseProcessor<BlogState> {
 	private BlogState state;
@@ -58,82 +52,12 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 			if (s.startsWith("&")) {
 				int idx = s.indexOf(" ");
 				String cmd;
-				LineArgsParser p = null;
 				if (idx == -1) {
 					cmd = s.substring(1);
 				} else {
 					cmd = s.substring(1, idx);
-					p = new SBLineArgsParser<BlogState>(state, s.substring(idx+1));
 				}
 				switch (cmd) {
-				case "sp": {
-					if (state.inSpan())
-						state.op(new BreakingSpace());
-					if (p != null)
-						ProcessingUtils.process(state, p.asString());
-					break;
-				}
-				case "includeTag": {
-					String tag = p.readString();
-//					System.out.println("Want to take git includes from tag " + tag);
-					state.gittag(tag);
-					break;
-				}
-				case "include": {
-					commitCurrentCommand();
-					String file = p.readString();
-					Map<String, String> params = p.readParams("formatter");
-					File f = new File(file);
-					Formatter formatter;
-					if (!params.containsKey("formatter"))
-						 formatter = new BoringFormatter(state);
-					switch (params.get("formatter")) {
-					case "html":
-						formatter = new HTMLFormatter(state);
-						break;
-					case "flas":
-						formatter = new FLASFormatter(state);
-						break;
-					default:
-						formatter = new BoringFormatter(state);
-						break;
-					}
-					state.include = new IncludeCommand(state, f, formatter);
-					break;
-				}
-				case "remove": {
-					if (state.include == null) {
-						throw new RuntimeException("&remove must immediately follow &include");
-					}
-					Map<String, String> params = p.readParams("from", "what");
-//					System.out.println("want to remove from " + state.inline + " with " + params);
-					((IncludeCommand)state.include).butRemove(params.get("from"), params.get("what"));
-					break;
-				}
-				case "select": {
-					if (state.include == null) {
-						throw new RuntimeException("&select must immediately follow &include");
-					}
-					Map<String, String> params = p.readParams("from", "what", "exdent");
-					((IncludeCommand)state.include).selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
-					break;
-				}
-				case "stop": {
-					if (state.include == null) {
-						throw new RuntimeException("&stop must immediately follow &include");
-					}
-					Map<String, String> params = p.readParams("at", "elide");
-					((IncludeCommand)state.include).stopAt(params.get("at"), params.get("elide"));
-					break;
-				}
-				case "indents": {
-					if (state.include == null) {
-						throw new RuntimeException("&indents must immediately follow &include");
-					}
-					Map<String, String> params = p.readParams("from", "to");
-					((IncludeCommand)state.include).indents(Integer.parseInt(params.get("from")), Integer.parseInt(params.get("to")));
-					break;
-				}
 				case "needbreak": {
 					commitCurrentCommand();
 					state.newPara("break");
@@ -150,20 +74,6 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 		}
 	}
 
-	private void gitShow(BlogState state, String branch, String filespec, String from, String to) {
-		File dir = state.gitdir();
-		if (dir == null)
-			throw new RuntimeException("Cannot use &import without &git");
-		System.out.println("git show " + dir + " " + branch + " " + filespec + " " + from + " => " + to);
-		RunProcess gitcmd = new RunProcess("git");
-		gitcmd.arg("show");
-		gitcmd.arg(branch);
-		gitcmd.redirectStderr(System.err);
-		gitcmd.processStdout(new GitShowProcessor(state, branch, filespec, from, to));
-		gitcmd.executeInDir(dir);
-		gitcmd.execute();
-	}
-
 	@Override
 	protected void commitCurrentCommand() throws IOException {
 		if (state.inPara()) {
@@ -174,13 +84,6 @@ public class BlogProcessor extends ProseProcessor<BlogState> {
 			state.include = null;
 			include.execute();
 		}
-	}
-	
-	private String headingLevel(String s) {
-		int level = 1;
-		while (s.length() > level && s.charAt(level) == '+')
-			level++;
-		return "h" + level;
 	}
 	
 	@Override
