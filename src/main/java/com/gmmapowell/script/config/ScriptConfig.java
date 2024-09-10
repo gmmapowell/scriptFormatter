@@ -87,6 +87,8 @@ public class ScriptConfig implements Config {
 	@Override
 	public void sink() throws IOException {
 		for (Sink s : sinks) {
+			if (s instanceof WantsFlowMap)
+				((WantsFlowMap)s).flowMap(flows);
 			for (Flow f : flows) {
 				s.flow(f);
 			}

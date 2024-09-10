@@ -5,16 +5,19 @@ import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
 import com.gmmapowell.script.flow.Flow;
-import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.flow.FlowMap;
+import com.gmmapowell.script.modules.processors.presenter.PresenterGlobals;
 
 public class PresentationProcessor implements LineProcessor {
-	private final Sink sink;
 	private final ErrorReporter errors;
+	private final FlowMap flows;
 	private final String imagedir;
+	private final PresenterGlobals global;
 
-	public PresentationProcessor(Sink sink, ErrorReporter errors, String imagedir) {
-		this.sink = sink;
+	public PresentationProcessor(ErrorReporter errors, PresenterGlobals global, FlowMap flows, String imagedir) {
 		this.errors = errors;
+		this.global = global;
+		this.flows = flows;
 		this.imagedir = imagedir;
 	}
 
@@ -39,8 +42,11 @@ public class PresentationProcessor implements LineProcessor {
 					errors.message(tx, "end of line expected");
 					return new IgnoreNestingProcessor();
 				}
-				Flow flow = new Flow(((NameToken)nt).name, false);
-				return new SlideProcessor(sink, errors, imagedir, flow);
+				String flowName = ((NameToken)nt).name;
+				global.nextSlide(flowName);
+				flows.callbackFlow(flowName);
+				Flow flow = flows.get(flowName);
+				return new SlideProcessor(errors, flow, imagedir);
 			}
 			default:
 				errors.message(tx, "invalid keyword: " + kw);

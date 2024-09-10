@@ -5,7 +5,6 @@ import java.lang.reflect.Constructor;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
-import com.gmmapowell.script.modules.processors.presenter.PresenterProcessorConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
 
@@ -14,7 +13,6 @@ public class ConfigureProcessor implements ConfigListenerProvider {
 
 	public ConfigureProcessor(ReadConfigState state) {
 		this.state = state;
-		state.registerProcessor("presenter", PresenterProcessorConfigListener.class);
 	}
 
 	@Override

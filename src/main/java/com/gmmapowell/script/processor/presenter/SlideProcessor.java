@@ -14,22 +14,17 @@ import com.gmmapowell.script.modules.presenter.AspectOp;
 import com.gmmapowell.script.modules.presenter.BgColorOp;
 import com.gmmapowell.script.modules.presenter.BgImageOp;
 import com.gmmapowell.script.modules.presenter.FormatOp;
-import com.gmmapowell.script.sink.Sink;
 
 public class SlideProcessor implements LineProcessor, SlideCollector {
-	private final Sink sink;
 	private final ErrorReporter errors;
 	private final String imagedir;
-	private final Flow flow;
 	private final Section present;
 	private final Section notes;
 	private final Section meta;
 
-	public SlideProcessor(Sink sink, ErrorReporter errors, String imagedir, Flow flow) {
-		this.sink = sink;
+	public SlideProcessor(ErrorReporter errors, Flow flow, String imagedir) {
 		this.errors = errors;
 		this.imagedir = imagedir;
-		this.flow = flow;
 		meta = new Section("meta");
 		flow.sections.add(meta);
 		present = new Section("present");
@@ -170,7 +165,5 @@ public class SlideProcessor implements LineProcessor, SlideCollector {
 
 	@Override
 	public void flush() {
-		sink.flow(flow);
 	}
-
 }

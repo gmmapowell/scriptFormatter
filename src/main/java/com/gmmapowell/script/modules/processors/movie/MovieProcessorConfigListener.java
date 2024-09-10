@@ -55,8 +55,6 @@ public class MovieProcessorConfigListener implements ConfigListener {
 		if (dramatis == null)
 			throw new ConfigException("must specify dramatis");
 		try {
-//			Sink sink = state.config.makeSink();
-//			MovieProcessor proc = new MovieProcessor(state.root, new BlockishElementFactory(), sink, vars, state.debug);
 			GlobalState global = state.config.newGlobalState();
 			global.flows().flow("main");
 			MovieGlobals mgl = global.requireState(MovieGlobals.class);

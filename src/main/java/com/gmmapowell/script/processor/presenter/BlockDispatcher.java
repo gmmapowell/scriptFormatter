@@ -9,17 +9,20 @@ import org.flasck.flas.blocker.BlockConsumer;
 import org.flasck.flas.errors.ErrorReporter;
 import org.zinutils.exceptions.NotImplementedException;
 
-import com.gmmapowell.script.sink.Sink;
+import com.gmmapowell.script.flow.FlowMap;
+import com.gmmapowell.script.modules.processors.presenter.PresenterGlobals;
 
 public class BlockDispatcher implements BlockConsumer {
-	private final Sink sink;
-	private final List<LineProcessor> stack = new ArrayList<>();
 	private final ErrorReporter errors;
+	private final PresenterGlobals global;
+	private final FlowMap flows;
 	private final String imagedir;
+	private final List<LineProcessor> stack = new ArrayList<>();
 
-	public BlockDispatcher(Sink sink, ErrorReporter errors, String imagedir) {
-		this.sink = sink;
+	public BlockDispatcher(ErrorReporter errors, PresenterGlobals global, FlowMap flows, String imagedir) {
 		this.errors = errors;
+		this.global = global;
+		this.flows = flows;
 		this.imagedir = imagedir;
 	}
 
@@ -31,10 +34,7 @@ public class BlockDispatcher implements BlockConsumer {
 		this.flush();
 		stack.clear();
 		
-		// TODO: this is either wrong or just inconsistent with everything else we do
-		// All the source files should be gathered together, and then one image shown
-		// in the "sink"
-		this.stack.add(new PresentationProcessor(sink, errors, imagedir));
+		this.stack.add(new PresentationProcessor(errors, global, flows, imagedir));
 	}
 
 	@Override

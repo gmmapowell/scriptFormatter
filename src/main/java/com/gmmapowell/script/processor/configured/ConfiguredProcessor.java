@@ -109,7 +109,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	@Override
 	public void allDone() {
 		for (LifecycleObserver o : observers)
-			o.allDone();
+			o.allDone(global);
 	}
 	
 	private List<ProcessingScanner> createScannerList(ConfiguredState state) {

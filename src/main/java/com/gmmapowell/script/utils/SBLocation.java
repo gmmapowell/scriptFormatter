@@ -12,6 +12,10 @@ public class SBLocation implements FileWithLocation {
 		this.line = lineNumber;
 	}
 
+	public int lineNo() {
+		return line;
+	}
+
 	public String inputLocation() {
 		return file + ":" + line;
 	}

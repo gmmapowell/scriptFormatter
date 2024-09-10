@@ -36,7 +36,7 @@ public class PresenterProcessor implements Processor, ProcessorConfig {
 			imagedir = "";
 		else if (!imagedir.endsWith("/"))
 			imagedir += "/";
-		handler = new BlockDispatcher(sink, errors, imagedir);
+		handler = new BlockDispatcher(errors, imagedir);
 		this.blocker = new Blocker(errors, handler);
 	}
 	

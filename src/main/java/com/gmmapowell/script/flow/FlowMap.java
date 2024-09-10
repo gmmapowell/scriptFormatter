@@ -8,6 +8,7 @@ import org.zinutils.exceptions.CantHappenException;
 
 public class FlowMap implements Iterable<Flow> {
 	private final Map<String, Flow> flows = new TreeMap<>();
+	private final Map<String, Object> oobs = new TreeMap<>();
 
 	public void flow(String name) {
 		if (flows.get(name) != null)
@@ -21,6 +22,15 @@ public class FlowMap implements Iterable<Flow> {
 		flows.put(name, new Flow(name, false));
 	}
 
+	public <T> void bindOOB(String called, T oob) {
+		oobs.put(called, oob);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T oob(String called) {
+		return (T) oobs.get(called);
+	}
+	
 	public Flow get(String flow) {
 		Flow ret = flows.get(flow);
 		if (ret == null) {

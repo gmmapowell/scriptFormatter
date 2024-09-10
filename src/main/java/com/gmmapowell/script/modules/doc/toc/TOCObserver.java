@@ -1,5 +1,6 @@
 package com.gmmapowell.script.modules.doc.toc;
 
+import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.configured.LifecycleObserver;
 
 public class TOCObserver implements LifecycleObserver {
@@ -10,7 +11,7 @@ public class TOCObserver implements LifecycleObserver {
 	}
 
 	@Override
-	public void allDone() {
+	public void allDone(GlobalState state) {
 		System.out.println("saving toc");
 		toc.save();
 	}

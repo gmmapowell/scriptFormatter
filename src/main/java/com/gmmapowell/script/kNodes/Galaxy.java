@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.zinutils.exceptions.CantHappenException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -55,9 +56,6 @@ public class Galaxy<T extends KNodeItem> {
 				continue;
 			occupation[i].locate(ncells, occupation, r);
 		}
-		for (int i=1;i<sparse.size();i++) {
-			sparse.get(i-1).join(sparse.get(i));
-		}
 	}
 
 	private void place(int idx, int ncells, KNode<T>[] occupation, Random r, T item, JSONObject mi) {
@@ -77,6 +75,19 @@ public class Galaxy<T extends KNodeItem> {
 		KNode<T> kn = new KNode<T>(item, which, ncells, mi);
 		occupation[which] = kn;
 		sparse.add(kn);
+	}
+
+	public void linkFrom(String f, String t) {
+		KNode<T> from = find(f);
+		KNode<T> to = find(t);
+		from.join(to);
+	}
+
+	private KNode<T> find(String name) {
+		for (KNode<T> k : sparse)
+			if (k.name().equals(name))
+				return k;
+		throw new CantHappenException("there is no item " + name + " in list");
 	}
 
 	private int figureCount(int size) {

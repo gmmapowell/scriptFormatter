@@ -3,15 +3,21 @@ package com.gmmapowell.script.sink.presenter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.zinutils.exceptions.CantHappenException;
+import org.zinutils.graphs.DirectedCyclicGraph;
+import org.zinutils.graphs.Link;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
+import com.gmmapowell.script.config.WantsFlowMap;
 import com.gmmapowell.script.flow.Flow;
+import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.Para;
@@ -33,11 +39,12 @@ import com.gmmapowell.script.processor.presenter.slideformats.BoringSlideFormatt
 import com.gmmapowell.script.processor.presenter.slideformats.TitleSlideFormatter;
 import com.gmmapowell.script.sink.Sink;
 
-public class PresenterSink implements Sink {
+public class PresenterSink implements Sink, WantsFlowMap {
 	private Region root;
 	private String output;
 	private String meta;
 	private final List<Flow> flows = new ArrayList<>();
+	private FlowMap map;
 	
 	public PresenterSink(Region root, String output, String meta, boolean wantOpen, String upload, boolean debug) throws IOException {
 		this.root = root;
@@ -47,6 +54,11 @@ public class PresenterSink implements Sink {
 
 	@Override
 	public void prepare() throws Exception {
+	}
+
+	@Override
+	public void flowMap(FlowMap flows) {
+		map = flows;
 	}
 
 	@Override
@@ -67,9 +79,16 @@ public class PresenterSink implements Sink {
 		}
 		List<Slide> slides = new ArrayList<>();
 		for (Flow f : flows) {
-			slides.add(renderSlide(f));
+			Slide s = renderSlide(f);
+			slides.add(s);
 		}
-		Galaxy<Slide> g = new Galaxy<Slide>(metaJson, slides );
+		Galaxy<Slide> g = new Galaxy<Slide>(metaJson, slides);
+		DirectedCyclicGraph<String> graph = map.oob("links");
+		for (Link<String> l : graph.links()) {
+			System.out.println(l.getFrom() + " => " + l.getTo());
+			g.linkFrom(l.getFrom(), l.getTo());
+		}
+
 		Place f = root.ensurePlace(output);
 		try {
 			g.asJson(f.writer());
