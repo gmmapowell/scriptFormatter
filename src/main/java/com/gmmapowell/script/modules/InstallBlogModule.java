@@ -19,6 +19,7 @@ import com.gmmapowell.script.modules.processors.blog.SupAmp;
 import com.gmmapowell.script.modules.processors.blog.TTAmp;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.ForceSpaceHandler;
+import com.gmmapowell.script.modules.processors.doc.NeedBreakAmp;
 import com.gmmapowell.script.modules.processors.doc.SpaceAmp;
 import com.gmmapowell.script.processor.configured.InlineCommandHandler;
 import com.gmmapowell.script.utils.Command;
@@ -81,6 +82,7 @@ public class InstallBlogModule implements ConfigListener {
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ImgAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SpaceAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, NeedBreakAmp.class);
 
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, BoldAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ItalicAmp.class);

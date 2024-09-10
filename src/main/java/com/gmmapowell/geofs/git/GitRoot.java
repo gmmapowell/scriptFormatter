@@ -59,7 +59,7 @@ public class GitRoot {
 
 	public void listChildren(File path, GitEntryListener lsnr) {
 		RunProcess proc = new RunProcess("git");
-		proc.showArgs(true);
+		proc.showArgs(false);
 		proc.captureStdout();
 		proc.arg("-C");
 		proc.arg(repo);
@@ -91,7 +91,7 @@ public class GitRoot {
 
 	private InputStream inputStream(File path) {
 		RunProcess proc = new RunProcess("git");
-		proc.showArgs(true);
+		proc.showArgs(false);
 		proc.captureStdout();
 		proc.arg("-C");
 		proc.arg(repo);
