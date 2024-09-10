@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.presenter;
+package com.gmmapowell.script.modules.processors.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,6 @@ import org.flasck.flas.errors.ErrorReporter;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.script.flow.FlowMap;
-import com.gmmapowell.script.modules.processors.presenter.PresenterGlobals;
 
 public class BlockDispatcher implements BlockConsumer {
 	private final ErrorReporter errors;

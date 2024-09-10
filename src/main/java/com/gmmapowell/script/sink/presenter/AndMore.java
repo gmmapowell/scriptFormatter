@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.presenter.slideformats;
+package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 

@@ -1,11 +1,10 @@
-package com.gmmapowell.script.presenter.nodes;
+package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.gmmapowell.script.processor.presenter.SlideFormatter;
 
 public class SlideStep {
 	private final List<String> speaker = new ArrayList<>();

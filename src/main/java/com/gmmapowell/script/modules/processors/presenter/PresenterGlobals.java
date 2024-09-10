@@ -11,7 +11,6 @@ import org.zinutils.graphs.DirectedCyclicGraph;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.flow.FlowMap;
-import com.gmmapowell.script.processor.presenter.BlockDispatcher;
 
 public class PresenterGlobals {
 	private ErrorResult errors;

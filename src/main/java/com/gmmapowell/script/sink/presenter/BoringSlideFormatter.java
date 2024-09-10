@@ -1,10 +1,9 @@
-package com.gmmapowell.script.processor.presenter.slideformats;
+package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.gmmapowell.script.presenter.nodes.Slide;
 
 public class BoringSlideFormatter extends CommonSlideFormatter {
 	private int y = 0;

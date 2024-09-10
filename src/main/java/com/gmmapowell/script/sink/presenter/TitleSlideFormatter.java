@@ -1,9 +1,8 @@
-package com.gmmapowell.script.processor.presenter.slideformats;
+package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.gmmapowell.script.presenter.nodes.Slide;
 
 public class TitleSlideFormatter extends CommonSlideFormatter {
 	public TitleSlideFormatter(Slide slide) {

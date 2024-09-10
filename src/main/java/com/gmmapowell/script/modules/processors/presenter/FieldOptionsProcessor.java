@@ -1,20 +1,20 @@
-package com.gmmapowell.script.processor.presenter;
+package com.gmmapowell.script.modules.processors.presenter;
 
 import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
 import org.flasck.flas.tokenizers.Tokenizable;
 
-import com.gmmapowell.script.modules.presenter.FieldOp;
+import com.gmmapowell.script.modules.presenter.FieldOptionOp;
 
-public class FormatFieldProcessor implements LineProcessor {
+public class FieldOptionsProcessor implements LineProcessor {
 	private final SlideCollector collector;
 	private final ErrorReporter errors;
-	private final String imagedir;
+	private final String field;
 
-	public FormatFieldProcessor(SlideCollector collector, ErrorReporter errors, String imagedir) {
+	public FieldOptionsProcessor(SlideCollector collector, ErrorReporter errors, String field) {
 		this.collector = collector;
 		this.errors = errors;
-		this.imagedir = imagedir;
+		this.field = field;
 	}
 
 	@Override
@@ -49,10 +49,8 @@ public class FormatFieldProcessor implements LineProcessor {
 		}
 		String name = ((NameToken)field).name;
 		String sval = ((StringToken)val).value;
-		if (name.equals("image"))
-			sval = imagedir + sval;
-		collector.metaOp(new FieldOp(name, sval));
-		return new FieldOptionsProcessor(collector, errors, name);
+		collector.metaOp(new FieldOptionOp(this.field, name, sval));
+		return new NoNestingProcessor();
 	}
 
 	@Override

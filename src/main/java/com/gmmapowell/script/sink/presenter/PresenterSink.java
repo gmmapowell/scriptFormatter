@@ -3,8 +3,6 @@ package com.gmmapowell.script.sink.presenter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -32,11 +30,6 @@ import com.gmmapowell.script.modules.presenter.FieldOp;
 import com.gmmapowell.script.modules.presenter.FieldOptionOp;
 import com.gmmapowell.script.modules.presenter.FormatOp;
 import com.gmmapowell.script.modules.presenter.PresentStepOp;
-import com.gmmapowell.script.presenter.nodes.Slide;
-import com.gmmapowell.script.presenter.nodes.SlideStep;
-import com.gmmapowell.script.processor.presenter.SlideFormatter;
-import com.gmmapowell.script.processor.presenter.slideformats.BoringSlideFormatter;
-import com.gmmapowell.script.processor.presenter.slideformats.TitleSlideFormatter;
 import com.gmmapowell.script.sink.Sink;
 
 public class PresenterSink implements Sink, WantsFlowMap {

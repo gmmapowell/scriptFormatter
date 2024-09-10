@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.presenter;
+package com.gmmapowell.script.modules.processors.presenter;
 
 import org.flasck.flas.blockForm.ContinuedLine;
 import org.flasck.flas.errors.ErrorReporter;
@@ -6,7 +6,6 @@ import org.flasck.flas.tokenizers.Tokenizable;
 
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.FlowMap;
-import com.gmmapowell.script.modules.processors.presenter.PresenterGlobals;
 
 public class PresentationProcessor implements LineProcessor {
 	private final ErrorReporter errors;

@@ -1,10 +1,9 @@
-package com.gmmapowell.script.processor.presenter;
+package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.gmmapowell.script.presenter.nodes.SlideStep;
 
 public interface SlideFormatter {
 	public final float[] BASELEFT = new float[] { -1f, 0 };

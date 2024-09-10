@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.presenter.slideformats;
+package com.gmmapowell.script.sink.presenter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,9 +9,6 @@ import java.util.Map.Entry;
 import org.zinutils.exceptions.CantHappenException;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.gmmapowell.script.presenter.nodes.Slide;
-import com.gmmapowell.script.presenter.nodes.SlideStep;
-import com.gmmapowell.script.processor.presenter.SlideFormatter;
 
 public abstract class CommonSlideFormatter implements SlideFormatter {
 	public class Field {
