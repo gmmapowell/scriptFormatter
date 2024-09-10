@@ -42,36 +42,12 @@ public class InstallBlogModule implements ConfigListener {
 	public void complete() throws Exception {
 		state.registerProcessor("blog", BlogProcessorConfigListener.class);
 
-//		installAtCommands();
 		installAmpCommands();
 		installInlineCommands();
 	}
 
-//	// @ commands
-//	private void installAtCommands() {
-//		// structure
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, TitleCommand.class);
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, AuthorCommand.class);
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, ChapterCommand.class);
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SectionCommand.class);
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsectionCommand.class);
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsubsectionCommand.class);
-//		
-//		// should commentary be in a separate module?
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentCommand.class);
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentaryCommand.class);
-//		
-//		// should footnote processing be in a separate module?
-//		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, FootnoteCommand.class);
-//	}
-
 	// & commands
 	private void installAmpCommands() {
-//		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FutureAmp.class);
-//		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, MoreWorkAmp.class);
-//		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, OutrageAmp.class);
-//		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ReviewAmp.class);
-		
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeTagAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, RemoveAmp.class);
@@ -91,7 +67,6 @@ public class InstallBlogModule implements ConfigListener {
 
 	// & commands that appear in the line rather than at the start
 	private void installInlineCommands() {
-//		this.config.extensions().bindExtensionPoint(InlineCommandHandler.class, FootnoteNumHandler.class);
 		this.config.extensions().bindExtensionPoint(InlineCommandHandler.class, ForceSpaceHandler.class);
 		this.config.extensions().bindExtensionPoint(InlineCommandHandler.class, SupAmp.class);
 	}
