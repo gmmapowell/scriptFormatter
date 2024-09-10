@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.movie;
+package com.gmmapowell.script.modules.processors.movie;
 
 import java.io.IOException;
 import java.util.Map;

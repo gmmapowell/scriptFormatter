@@ -3,7 +3,6 @@ package com.gmmapowell.script.modules.processors.movie;
 import java.io.IOException;
 
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.movie.DramatisPersonae;
 
 public class MovieMode {
 	public enum Mode {

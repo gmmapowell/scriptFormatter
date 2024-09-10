@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.movie;
+package com.gmmapowell.script.modules.processors.movie;
 
 public class Persona {
 	private final String name;

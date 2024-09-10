@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.script.processor.movie.DramatisPersonae;
 
 public class MovieGlobals {
 	private String title;
