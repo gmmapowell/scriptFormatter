@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.prose;
+package com.gmmapowell.script.processor.movie;
 
 import java.util.Arrays;
 import java.util.List;

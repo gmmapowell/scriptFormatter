@@ -1,4 +1,4 @@
-package com.gmmapowell.script.processor.prose;
+package com.gmmapowell.script.elements.block;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -6,11 +6,7 @@ import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.processor.configured.LifecycleObserver;
 
 public class BloggerLifecycleObserver implements LifecycleObserver {
-
-	private final ConfiguredProcessor proc;
-
 	public BloggerLifecycleObserver(ConfiguredProcessor proc) {
-		this.proc = proc;
 	}
 
 	@Override

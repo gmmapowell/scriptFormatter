@@ -1,7 +1,6 @@
 package com.gmmapowell.script.modules.doc.includecode;
 
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.prose.Formatter;
 
 // To do this job properly, you should pull in the FLAS TDA parser as we do in the plugin ...
 public class FLASFormatter implements Formatter {

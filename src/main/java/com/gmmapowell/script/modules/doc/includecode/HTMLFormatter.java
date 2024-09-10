@@ -1,7 +1,6 @@
 package com.gmmapowell.script.modules.doc.includecode;
 
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.prose.Formatter;
 
 public class HTMLFormatter implements Formatter {
 	private boolean inTag = false;

@@ -11,7 +11,6 @@ import org.zinutils.exceptions.WrappedException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.prose.Formatter;
 
 public class DoInclusion {
 	public class Indents {

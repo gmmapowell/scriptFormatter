@@ -1,7 +1,7 @@
 package com.gmmapowell.script.modules.processors.doc;
 
+import com.gmmapowell.script.elements.block.CommentaryBreak;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.prose.CommentaryBreak;
 
 public class CommentaryCommand implements AtCommandHandler {
 	private final ScannerAtState sas;

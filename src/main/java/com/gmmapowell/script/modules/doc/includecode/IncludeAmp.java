@@ -15,7 +15,6 @@ import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.processor.prose.Formatter;
 import com.gmmapowell.script.utils.Command;
 import com.gmmapowell.script.utils.LineArgsParser;
 

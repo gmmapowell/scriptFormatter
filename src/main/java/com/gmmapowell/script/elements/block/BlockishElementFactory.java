@@ -9,7 +9,6 @@ import com.gmmapowell.script.elements.Span;
 import com.gmmapowell.script.elements.SpanBlock;
 import com.gmmapowell.script.modules.movie.BoxyAdBreak;
 import com.gmmapowell.script.processor.movie.MultiBlock;
-import com.gmmapowell.script.processor.prose.CommentaryBreak;
 
 public class BlockishElementFactory implements ElementFactory {
 
