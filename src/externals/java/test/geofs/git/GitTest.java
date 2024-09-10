@@ -69,27 +69,25 @@ public class GitTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testWeCanStreamAFileFromGitHead() throws Exception {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).line("\uFEFFhello, world!");
+			oneOf(lsnr).line("hello, world");
 			oneOf(lsnr).complete();
 		}});
 
-		world.root(gitroot).place("hw").lines(lsnr);
+		world.root(gitroot).place("src/test/resources/test/geofs/git/seconddir/hello.txt").lines(lsnr);
 	}
 
 	@Test
-	@Ignore
 	public void testWeCanStreamAFileFromGitTag() throws Exception {
 		LineListener lsnr = context.mock(LineListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).line("\uFEFFhello, world!");
+			oneOf(lsnr).line("tag FIRST_TEST");
 			oneOf(lsnr).complete();
 		}});
 
-		world.root(gitroot).place("hw").lines(lsnr);
+		world.root(gitroot+":FIRST_TEST").place("src/test/resources/test/geofs/git/file1.txt").lines(lsnr);
 	}
 
 	@Test
@@ -104,15 +102,13 @@ public class GitTest {
 	}	
 
 	@Test
-	@Ignore
 	public void weCanFindThePlacesInATag() throws Exception {
 		PlaceListener lsnr = context.mock(PlaceListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).place(with(PlaceMatcher.called("hwtest")));
-			oneOf(lsnr).place(with(PlaceMatcher.called("secondfile")));
+			oneOf(lsnr).place(with(PlaceMatcher.called("file1.txt")));
 		}});
 
-		world.root(gitroot).subregion("testregions").places(lsnr);
+		world.root(gitroot+":FIRST_TEST").subregion("src/test/resources/test/geofs/git").places(lsnr);
 	}	
 
 	@Test
@@ -120,19 +116,19 @@ public class GitTest {
 		RegionListener lsnr = context.mock(RegionListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).region(with(RegionMatcher.called("indir")));
+			oneOf(lsnr).region(with(RegionMatcher.called("seconddir")));
 		}});
 
 		world.root(gitroot).subregion("src/test/resources/test/geofs/git").regions(lsnr);
 	}	
 
 	@Test
-	@Ignore
 	public void weCanFindTheRegionsInARegionFromATag() throws Exception {
 		RegionListener lsnr = context.mock(RegionListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).region(with(RegionMatcher.called("nested")));
+			oneOf(lsnr).region(with(RegionMatcher.called("indir")));
 		}});
 
-		world.root(gitroot).subregion("testregions").regions(lsnr);
+		world.root(gitroot+":FIRST_TEST").subregion("src/test/resources/test/geofs/git").regions(lsnr);
 	}	
 }

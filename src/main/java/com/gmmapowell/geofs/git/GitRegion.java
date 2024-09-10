@@ -61,7 +61,7 @@ public class GitRegion implements Region {
 
 	@Override
 	public Place place(String name) {
-		return new GitPlace(this, name);
+		return new GitPlace(root, this, name);
 	}
 
 	@Override
@@ -113,5 +113,9 @@ public class GitRegion implements Region {
 	@Override
 	public String toString() {
 		return myPath.toString();
+	}
+
+	public File placeFile(String name) {
+		return new File(myPath, name);
 	}
 }

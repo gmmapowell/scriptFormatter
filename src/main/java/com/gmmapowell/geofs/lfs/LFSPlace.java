@@ -7,8 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 
 import org.zinutils.exceptions.CantHappenException;
@@ -24,6 +24,7 @@ import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class LFSPlace implements Place {
 	private final LocalFileSystem world;
@@ -73,25 +74,22 @@ public class LFSPlace implements Place {
 	}
 	
 	private void streamLines(LineListener lsnr, NumberedLineListener nlsnr) {
-		try (LineNumberReader lnr = new LineNumberReader(new FileReader(file))) {
-			String s;
-			while ((s = lnr.readLine()) != null) {
-				if (s.endsWith("\r"))
-					s = s.substring(0, s.length()-1);
-				if (lsnr != null)
-					lsnr.line(s);
-				else
-					nlsnr.line(lnr.getLineNumber(), s);
-			}
-			if (lsnr != null)
-				lsnr.complete();
-			else
-				nlsnr.complete();
+		try (FileReader reader = new FileReader(file)) {
+			GeoFSUtils.linesTo(reader, lsnr, nlsnr);
 		} catch (IOException ex) {
 			throw new FileStreamingException(ex);
 		}
 	}
 
+	@Override
+	public Reader reader() {
+		try {
+			return new FileReader(file);
+		} catch (IOException ex) {
+			throw new FileStreamingException(ex);
+		}
+	}
+	
 	@Override
 	public InputStream input() {
 		try {

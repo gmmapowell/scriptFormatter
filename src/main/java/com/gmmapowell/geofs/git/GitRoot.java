@@ -1,6 +1,9 @@
 package com.gmmapowell.geofs.git;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 
 import org.zinutils.exceptions.CantHappenException;
@@ -32,7 +35,7 @@ public class GitRoot {
 	
 	public GitType findPath(File path) {
 		RunProcess proc = new RunProcess("git");
-		proc.showArgs(true);
+		proc.showArgs(false);
 		proc.captureStdout();
 		proc.arg("-C");
 		proc.arg(repo);
@@ -42,7 +45,6 @@ public class GitRoot {
 		proc.execute();
 		
 		String out = proc.getStdout();
-		System.out.println("GIT: " + out);
 		switch (out.trim()) {
 		case "":
 			return GitType.NONEXIST;
@@ -57,7 +59,7 @@ public class GitRoot {
 
 	public void listChildren(File path, GitEntryListener lsnr) {
 		RunProcess proc = new RunProcess("git");
-		proc.showArgs(true);
+		proc.showArgs(false);
 		proc.captureStdout();
 		proc.arg("-C");
 		proc.arg(repo);
@@ -68,12 +70,28 @@ public class GitRoot {
 
 		LinePatternParser lpp = new LinePatternParser();
 		lpp.match("([0-7]*) (tree) ([0-9a-f]*)\t(.*)", "tree", "perm", "type", "id", "name");
-		lpp.match("([0-7]*) (blob) ([0-9a-f]*)\t(.*)", "tree", "perm", "type", "id", "name");
+		lpp.match("([0-7]*) (blob) ([0-9a-f]*)\t(.*)", "blob", "perm", "type", "id", "name");
 		for (LinePatternMatch lpm : lpp.applyTo(new StringReader(proc.getStdout()))) {
-			System.out.println("lpm is " + lpm);
 			lsnr.entry(lpm.get("type"), lpm.get("name"));
 		}
 
+	}
+
+	public Reader reader(File path) {
+		return new InputStreamReader(inputStream(path));
+	}
+
+	private InputStream inputStream(File path) {
+		RunProcess proc = new RunProcess("git");
+		proc.showArgs(true);
+		proc.captureStdout();
+		proc.arg("-C");
+		proc.arg(repo);
+		proc.arg("show");
+		proc.arg(tag + ":" + path);
+		proc.execute();
+
+		return proc.getStdoutStream();
 	}
 	
 	// The other command we need is -p

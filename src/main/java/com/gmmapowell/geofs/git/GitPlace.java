@@ -1,23 +1,29 @@
 package com.gmmapowell.geofs.git;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.exceptions.FileStreamingException;
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
 import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class GitPlace implements Place {
+	private final GitRoot root;
 	private final GitRegion inRegion;
 	private final String name;
 
-	public GitPlace(GitRegion gitRegion, String name) {
+	public GitPlace(GitRoot root, GitRegion gitRegion, String name) {
+		this.root = root;
 		this.inRegion = gitRegion;
 		this.name = name;
 	}
@@ -29,12 +35,20 @@ public class GitPlace implements Place {
 
 	@Override
 	public void lines(LineListener lsnr) {
-		throw new NotImplementedException();
+		try {
+			GeoFSUtils.linesTo(reader(), lsnr, null);
+		} catch (IOException ex) {
+			throw new FileStreamingException(ex);
+		}
 	}
 
 	@Override
 	public void lines(NumberedLineListener lsnr) {
-		throw new NotImplementedException();
+		try {
+			GeoFSUtils.linesTo(reader(), null, lsnr);
+		} catch (IOException ex) {
+			throw new FileStreamingException(ex);
+		}
 	}
 
 	@Override
@@ -45,6 +59,11 @@ public class GitPlace implements Place {
 	@Override
 	public void chars(CharBlockListener lsnr) {
 		throw new NotImplementedException();
+	}
+
+	@Override
+	public Reader reader() {
+		return root.reader(inRegion.placeFile(name));
 	}
 
 	@Override

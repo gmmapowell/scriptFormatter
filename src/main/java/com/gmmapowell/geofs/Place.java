@@ -2,6 +2,7 @@ package com.gmmapowell.geofs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
@@ -63,6 +64,12 @@ public interface Place {
 	 */
 	OutputStream stream();
 
+	/** Open the place for reading text
+	 * 
+	 * @return a Reader to read the file
+	 */
+	Reader reader();
+	
 	/** Open the place for writing text, deleting any existing contents
 	 * 
 	 * @return a Writer to write to the file

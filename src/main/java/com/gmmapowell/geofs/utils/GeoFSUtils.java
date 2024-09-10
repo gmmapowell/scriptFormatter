@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -26,6 +27,8 @@ import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.gdw.GDWPlace;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
+import com.gmmapowell.geofs.listeners.LineListener;
+import com.gmmapowell.geofs.listeners.NumberedLineListener;
 
 public class GeoFSUtils {
 	static class RegionName {
@@ -151,6 +154,23 @@ public class GeoFSUtils {
 		for (String s : segments)
 			region = region.subregion(s);
 		return region;
+	}
+	
+	public static void linesTo(Reader reader, LineListener lsnr, NumberedLineListener nlsnr) throws IOException {
+		LineNumberReader lnr = new LineNumberReader(reader);
+		String s;
+		while ((s = lnr.readLine()) != null) {
+			if (s.endsWith("\r"))
+				s = s.substring(0, s.length()-1);
+			if (lsnr != null)
+				lsnr.line(s);
+			else
+				nlsnr.line(lnr.getLineNumber(), s);
+		}
+		if (lsnr != null)
+			lsnr.complete();
+		else
+			nlsnr.complete();
 	}
 
 	public static JSONObject readJSON(Place p) throws JSONException {

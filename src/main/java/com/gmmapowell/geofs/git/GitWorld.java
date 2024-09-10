@@ -41,7 +41,6 @@ public class GitWorld implements World {
 			repo = root.substring(0, idx);
 			tag = root.substring(idx+1);
 		}
-		System.out.println("GIT ROOT " + repo + " " + tag);
 		return new GitRegion(new GitRoot(this, repo, tag), null, null, null);
 	}
 
