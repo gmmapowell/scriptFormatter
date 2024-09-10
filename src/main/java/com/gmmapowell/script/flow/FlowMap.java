@@ -10,10 +10,14 @@ public class FlowMap implements Iterable<Flow> {
 	private final Map<String, Flow> flows = new TreeMap<>();
 
 	public void flow(String name) {
+		if (flows.get(name) != null)
+			throw new CantHappenException("cannot have duplicate flow with name " + name);
 		flows.put(name, new Flow(name, true));
 	}
 
 	public void callbackFlow(String name) {
+		if (flows.get(name) != null)
+			throw new CantHappenException("cannot have duplicate callback flow with name " + name);
 		flows.put(name, new Flow(name, false));
 	}
 

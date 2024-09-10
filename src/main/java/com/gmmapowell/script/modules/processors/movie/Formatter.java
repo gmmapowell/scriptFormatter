@@ -1,15 +1,15 @@
-package com.gmmapowell.script.processor.movie;
+package com.gmmapowell.script.modules.processors.movie;
 
 import java.io.IOException;
 
 import com.gmmapowell.script.modules.movie.BoxyAdBreak;
-import com.gmmapowell.script.processor.ProcessingUtils;
+import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class Formatter {
-	private final MovieState state;
+	private final ConfiguredState state;
 	private final boolean debug;
 
-	public Formatter(MovieState state, boolean debug) {
+	public Formatter(ConfiguredState state, boolean debug) {
 		this.state = state;
 		this.debug = debug;
 	}
@@ -42,14 +42,14 @@ public class Formatter {
 		if (debug)
 			System.out.println("| " + text);
 		state.newPara("direction");
-		ProcessingUtils.process(state, text);
+		state.processText(text);
 	}
 
 	public void speech(String speech) throws IOException {
 		if (debug)
 			System.out.println("<< " + speech);
 		state.newPara("speech");
-		ProcessingUtils.process(state, speech);
+		state.processText(speech);
 	}
 
 	public void endSpeech() throws IOException {
@@ -59,7 +59,7 @@ public class Formatter {
 		if (debug)
 			System.out.println("... " + text);
 		state.newPara("scene");
-		ProcessingUtils.process(state, text);
+		state.processText(text);
 	}
 
 	public void fileDone() throws IOException {

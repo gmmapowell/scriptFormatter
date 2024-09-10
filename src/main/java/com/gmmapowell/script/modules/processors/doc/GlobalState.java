@@ -16,5 +16,4 @@ public interface GlobalState {
 
 	Flow flow(String flow);
 
-
 }

@@ -1,10 +1,10 @@
 package com.gmmapowell.script.config.reader;
 
 import java.lang.reflect.Constructor;
+
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
-import com.gmmapowell.script.modules.processors.movie.MovieProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.presenter.PresenterProcessorConfigListener;
 import com.gmmapowell.script.utils.FileWithLocation;
 import com.gmmapowell.script.utils.LineArgsParser;
@@ -14,8 +14,6 @@ public class ConfigureProcessor implements ConfigListenerProvider {
 
 	public ConfigureProcessor(ReadConfigState state) {
 		this.state = state;
-		// TODO: all of these should move to their respective global module installers
-		state.registerProcessor("movie", MovieProcessorConfigListener.class);
 		state.registerProcessor("presenter", PresenterProcessorConfigListener.class);
 	}
 

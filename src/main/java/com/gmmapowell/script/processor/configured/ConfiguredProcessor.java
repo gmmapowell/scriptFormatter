@@ -33,8 +33,11 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		this.global = global;
 		this.local = new CreatorExtensionPointRepo(global.extensions());
 		// TODO: this should be a negotiation between the configlistener and an (initialized) ConfiguredProcessor
-		String joinspace = vars.remove("joinspace");
-		this.joinspace = "true".equals(joinspace);
+		if (vars != null) {
+			String joinspace = vars.remove("joinspace");
+			this.joinspace = "true".equals(joinspace);
+		} else
+			this.joinspace = false;
 	}
 	
 	public GlobalState global() {
@@ -96,6 +99,8 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 				scanner.closeIfNotContinued(null);
 			for (ProcessingScanner scanner : all)
 				scanner.placeDone();
+			for (LifecycleObserver o : observers)
+				o.placeDone(state);
 		}
 		for (LifecycleObserver o : observers)
 			o.processingDone();
