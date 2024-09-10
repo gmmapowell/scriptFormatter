@@ -96,10 +96,11 @@ public class GitTest {
 	public void weCanFindThePlacesInHEAD() throws Exception {
 		PlaceListener lsnr = context.mock(PlaceListener.class);
 		context.checking(new Expectations() {{
-			oneOf(lsnr).place(with(PlaceMatcher.called(".gitstr")));
+			oneOf(lsnr).place(with(PlaceMatcher.called("file1.txt")));
+			oneOf(lsnr).place(with(PlaceMatcher.called("file3.txt")));
 		}});
 
-		world.root(gitroot).regionPath("src/test/resources").places(lsnr);
+		world.root(gitroot).regionPath("src/test/resources/test/geofs/git").places(lsnr);
 	}	
 
 	@Test
@@ -115,8 +116,18 @@ public class GitTest {
 	}	
 
 	@Test
+	public void weCanFindTheRegionsInARegionFromHead() throws Exception {
+		RegionListener lsnr = context.mock(RegionListener.class);
+		context.checking(new Expectations() {{
+			oneOf(lsnr).region(with(RegionMatcher.called("indir")));
+		}});
+
+		world.root(gitroot).subregion("src/test/resources/test/geofs/git").regions(lsnr);
+	}	
+
+	@Test
 	@Ignore
-	public void weCanFindTheRegionsInARegion() throws Exception {
+	public void weCanFindTheRegionsInARegionFromATag() throws Exception {
 		RegionListener lsnr = context.mock(RegionListener.class);
 		context.checking(new Expectations() {{
 			oneOf(lsnr).region(with(RegionMatcher.called("nested")));

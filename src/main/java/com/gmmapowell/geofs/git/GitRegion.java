@@ -104,7 +104,10 @@ public class GitRegion implements Region {
 
 	@Override
 	public void regions(RegionListener lsnr) {
-		throw new NotImplementedException();
+		root.listChildren(myPath, (type, name) -> {
+			if (type.equals("tree"))
+				lsnr.region(subregion(name));
+		});
 	}
 	
 	@Override
