@@ -20,6 +20,7 @@ import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
 import com.gmmapowell.geofs.simple.SimpleUniverse;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 import matchers.geofs.PlaceMatcher;
 import matchers.geofs.RegionMatcher;
@@ -87,7 +88,7 @@ public class GitTest {
 			oneOf(lsnr).complete();
 		}});
 
-		world.root(gitroot).place("src/test/resources/test/geofs/git/seconddir/hello.txt").lines(lsnr);
+		GeoFSUtils.regionPath(world, world.root(gitroot), "src/test/resources/test/geofs/git/seconddir").place("hello.txt").lines(lsnr);
 	}
 
 	@Test
@@ -98,7 +99,7 @@ public class GitTest {
 			oneOf(lsnr).complete();
 		}});
 
-		world.root(gitroot+":FIRST_TEST").place("src/test/resources/test/geofs/git/file1.txt").lines(lsnr);
+		GeoFSUtils.regionPath(world, world.root(gitroot+":FIRST_TEST"), "src/test/resources/test/geofs/git").place("file1.txt").lines(lsnr);
 	}
 
 	@Test
