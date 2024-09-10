@@ -41,7 +41,7 @@ public class GitRoot {
 		proc.arg(repo);
 		proc.arg("cat-file");
 		proc.arg("-t");
-		proc.arg(tag + ":" + path);
+		proc.arg(tag + ":" + nullPath(path));
 		proc.execute();
 		
 		String out = proc.getStdout();
@@ -59,22 +59,30 @@ public class GitRoot {
 
 	public void listChildren(File path, GitEntryListener lsnr) {
 		RunProcess proc = new RunProcess("git");
-		proc.showArgs(false);
+		proc.showArgs(true);
 		proc.captureStdout();
 		proc.arg("-C");
 		proc.arg(repo);
 		proc.arg("cat-file");
 		proc.arg("-p");
-		proc.arg(tag + ":" + path);
+		proc.arg(tag + ":" + nullPath(path));
 		proc.execute();
 
 		LinePatternParser lpp = new LinePatternParser();
 		lpp.match("([0-7]*) (tree) ([0-9a-f]*)\t(.*)", "tree", "perm", "type", "id", "name");
 		lpp.match("([0-7]*) (blob) ([0-9a-f]*)\t(.*)", "blob", "perm", "type", "id", "name");
-		for (LinePatternMatch lpm : lpp.applyTo(new StringReader(proc.getStdout()))) {
+		String stdout = proc.getStdout();
+		for (LinePatternMatch lpm : lpp.applyTo(new StringReader(stdout))) {
 			lsnr.entry(lpm.get("type"), lpm.get("name"));
 		}
 
+	}
+
+	private String nullPath(File path) {
+		if (path == null)
+			return "";
+		else
+			return path.toString();
 	}
 
 	public Reader reader(File path) {
@@ -88,23 +96,9 @@ public class GitRoot {
 		proc.arg("-C");
 		proc.arg(repo);
 		proc.arg("show");
-		proc.arg(tag + ":" + path);
+		proc.arg(tag + ":" + nullPath(path));
 		proc.execute();
 
 		return proc.getStdoutStream();
 	}
-	
-	// The other command we need is -p
-	// And we should figure out how to use LPPs again
-	/*
-		lpp.match("package ([a-zA-Z0-9_.]*) does not exist", "nopackage", "pkgname");
-		lpp.match("cannot access ([a-zA-Z0-9_.]*)\\.[a-zA-Z0-9_]*", "nopackage", "pkgname");
-		lpp.match("class file for ([a-zA-Z0-9_.]*)\\.[a-zA-Z0-9_]* not found", "nopackage", "pkgname");
-		lpp.match("location: package ([a-zA-Z0-9_.]*)", "nopackage", "pkgname");
-		lpp.match("location: class ([a-zA-Z0-9_.]*)\\.[a-zA-Z0-9_]*", "location", "mypackage");
-		List<BuildResource> allAdded = new ArrayList<BuildResource>();
-		TreeSet<String> missingPackages = new TreeSet<String>();
-		for (LinePatternMatch lpm : lpp.applyTo(new StringReader(proc.getStderr())))
-
-	 */
 }

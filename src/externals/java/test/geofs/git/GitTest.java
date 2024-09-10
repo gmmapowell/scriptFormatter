@@ -1,12 +1,13 @@
 package test.geofs.git;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -55,6 +56,16 @@ public class GitTest {
 	@Test(expected=GeoFSNoRegionException.class)
 	public void testWeCannotFindASubregionThatDoesNotExist() throws Exception {
 		world.root(gitroot).subregion("foobar");
+	}
+
+	@Test
+	public void testWeCanCheckIfAPlaceExists() throws Exception {
+		assertTrue(world.root(gitroot).hasPlace(".classpath"));
+	}
+
+	@Test
+	public void testWeCanCheckIfAPlaceDoesntExist() throws Exception {
+		assertFalse(world.root(gitroot).hasPlace("mars"));
 	}
 
 	@Test

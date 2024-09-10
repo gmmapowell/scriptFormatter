@@ -1,6 +1,7 @@
 package com.gmmapowell.geofs.git;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -55,8 +56,13 @@ public class GitRegion implements Region {
 	}
 
 	@Override
-	public boolean hasPlace(String string) {
-		throw new NotImplementedException();
+	public boolean hasPlace(String place) {
+		AtomicBoolean ret = new AtomicBoolean(false);
+		root.listChildren(myPath, (type, name) -> {
+			if (type.equals("blob") && place.equals(name))
+				ret.set(true);
+		});
+		return ret.get();
 	}
 
 	@Override
@@ -112,7 +118,10 @@ public class GitRegion implements Region {
 	
 	@Override
 	public String toString() {
-		return myPath.toString();
+		if (myPath == null)
+			return "";
+		else
+			return myPath.toString();
 	}
 
 	public File placeFile(String name) {
