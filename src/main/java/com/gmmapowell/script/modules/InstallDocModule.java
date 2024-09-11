@@ -41,7 +41,7 @@ public class InstallDocModule implements ConfigListener {
 
 	@Override
 	public ConfigListener dispatch(Command cmd) throws Exception {
-		throw new ConfigException("InstallDocModule cannot be configured right now");
+		throw new ConfigException("InstallEmailQuoterModule cannot be configured right now");
 	}
 
 	@Override

@@ -19,8 +19,15 @@ public class ModuleFinder implements ConfigListenerProvider {
 	@Override
 	public ConfigListener make(LineArgsParser lap) {
 		String type = lap.readArg();
-		String name = "Install" + StringUtil.capitalize(type) + "Module";
-		String clzname = "com.gmmapowell.script.modules." + name;
+		String clzname;
+		if (lap.hasMore()) {
+			// the more is an explicit module loader
+			clzname = lap.readArg();
+		} else {
+			// the built-in "processor" modules
+			String name = "Install" + StringUtil.capitalize(type) + "Module";
+			clzname = "com.gmmapowell.script.modules." + name;
+		}
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends ConfigListener> clz = (Class<? extends ConfigListener>) Class.forName(clzname);

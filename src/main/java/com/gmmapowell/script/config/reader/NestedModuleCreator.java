@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
-import com.gmmapowell.script.modules.doc.emailquoter.EmailQuoterConfigListener;
 import com.gmmapowell.script.modules.doc.flasgrammar.FlasGrammarConfigListener;
 import com.gmmapowell.script.modules.doc.includecode.IncludeCodeConfigListener;
 import com.gmmapowell.script.modules.doc.placedate.PlaceDateConfigListener;
@@ -23,7 +22,6 @@ public class NestedModuleCreator {
 
 	public NestedModuleCreator(ReadConfigState state) {
 		this.state = state;
-		this.modules.put("emailquoter", EmailQuoterConfigListener.class);
 		this.modules.put("flas-grammar", FlasGrammarConfigListener.class);
 		this.modules.put("include-code", IncludeCodeConfigListener.class);
 		this.modules.put("placedate", PlaceDateConfigListener.class);
@@ -31,6 +29,10 @@ public class NestedModuleCreator {
 		this.modules.put("toc", TOCConfigListener.class);
 		
 		this.modules.put("git", GitConfigListener.class);
+	}
+
+	public void register(String name, Class<? extends ConfigListener> clz) {
+		this.modules.put(name, clz);
 	}
 	
 	public ModuleConfigListener module(String mod) {

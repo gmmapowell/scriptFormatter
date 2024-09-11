@@ -11,6 +11,7 @@ import com.gmmapowell.script.utils.SBLocation;
 
 public class ReadConfigState extends SBLocation {
 	public ScriptConfig config;
+	private NestedModuleCreator modules;
 	private final Map<String, Class<? extends ConfigListener>> processors = new TreeMap<>();
 	public boolean debug = false;
 	public Place index = null;
@@ -23,6 +24,11 @@ public class ReadConfigState extends SBLocation {
 	public ReadConfigState(Region root, ScriptConfig sc) {
 		this.root = root;
 		this.config = sc;
+		this.modules = new NestedModuleCreator(this);
+	}
+
+	public void registerModule(String name, Class<? extends ConfigListener> clz) {
+		modules.register(name, clz);
 	}
 
 	public void registerProcessor(String name, Class<? extends ConfigListener> clz) {
@@ -39,5 +45,9 @@ public class ReadConfigState extends SBLocation {
 
 	public Universe universe() {
 		return root.getUniverse();
+	}
+
+	public ModuleConfigListener module(String mod) {
+		return modules.module(mod);
 	}
 }

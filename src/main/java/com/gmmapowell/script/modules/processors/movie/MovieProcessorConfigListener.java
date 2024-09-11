@@ -8,7 +8,6 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ModuleConfigListener;
-import com.gmmapowell.script.config.reader.NestedModuleCreator;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
@@ -29,7 +28,7 @@ public class MovieProcessorConfigListener implements ConfigListener {
 	public ConfigListener dispatch(Command cmd) {
 		switch (cmd.name()) {
 		case "module": {
-			ModuleConfigListener nmc = new NestedModuleCreator(state).module(cmd.line().readArg());
+			ModuleConfigListener nmc = state.module(cmd.line().readArg());
 			modules.add(nmc);
 			return nmc;
 		}
