@@ -7,9 +7,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.script.flow.ParaBreak;
+import com.gmmapowell.script.flow.ReleaseFlow;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.flow.YieldToFlow;
+import com.gmmapowell.script.intf.KeepTogether;
+import com.gmmapowell.script.intf.ReleaseTogether;
 import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
@@ -98,6 +101,10 @@ public class Region {
 			}
 		} else if (token.it instanceof YieldToFlow) {
 			return new Acceptance(Acceptability.SUSPEND, token).enableFlow(((YieldToFlow)token.it).yieldTo());
+		} else if (token.it instanceof KeepTogether) {
+			return new Acceptance(Acceptability.PROCESSED, token);
+		} else if (token.it instanceof ReleaseTogether) {
+			return new Acceptance(Acceptability.PROCESSED, token);
 		} else {
 			if (token.it instanceof SyncAfterFlow) {
 				wantYield = ((SyncAfterFlow)token.it).yieldTo();

@@ -114,7 +114,7 @@ public class PDFSink implements Sink {
 								active.remove(c);
 								continue whileActive;
 							}
-//							System.out.println(tok);
+							System.out.println(tok);
 							if (tok.it instanceof AnchorOp) {
 								records.add((AnchorOp)tok.it);
 								continue;

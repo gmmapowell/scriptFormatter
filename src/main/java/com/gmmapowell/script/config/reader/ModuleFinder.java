@@ -38,7 +38,7 @@ public class ModuleFinder implements ConfigListenerProvider {
 			}
 			throw new CantHappenException("the class '" + clz + "' does not have a constructor that takes a state");
 		} catch (ClassNotFoundException ex) {
-			throw new CantHappenException("there is no loader '" + type + "'");
+			throw new CantHappenException("there is no loader for '" + type + "': cannot find class " + clzname);
 		} catch (Exception ex) {
 			throw WrappedException.wrap(ex);
 		}

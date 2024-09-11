@@ -58,7 +58,7 @@ public class Line {
 			throw new RuntimeException("no style found for " + bsname);
 		if (isNew)
 			just = baseStyle.getJustification();
-		Style style = baseStyle.apply(token.styles);
+		Style style = baseStyle.apply(token.styles.subList(1, token.styles.size()));
 		Justification cellJust = style.getJustification();
 		Float cellWidth = style.getWidth();
 		PDFont font = style.getFont();
