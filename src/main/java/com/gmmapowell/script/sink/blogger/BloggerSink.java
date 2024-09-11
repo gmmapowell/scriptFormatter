@@ -104,18 +104,18 @@ public class BloggerSink implements Sink {
 	@Override
 	public void render() throws IOException {
 		for (Flow f : flows) {
-			System.out.println("Flow " + f.name);
+//			System.out.println("Flow " + f.name);
 			this.sw = new StringWriter();
 			writer = new PrintWriter(sw);
-			int sno = 1;
+//			int sno = 1;
 			for (Section s : f.sections) {
-				System.out.println("Section " + (sno++) + ": " + s.format);
+//				System.out.println("Section " + (sno++) + ": " + s.format);
 				Cursor c = new Cursor(f.name, s);
 				String last = "text";
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
-					System.out.println("  " + tok);
+//					System.out.println("  " + tok);
 					last = transition(cf, last, tok);
 					haveBreak = false;
 					figureStyles(cf, tok.styles);
@@ -295,7 +295,7 @@ public class BloggerSink implements Sink {
 		}
 		Post p = new Post();
 		p.setTitle(title);
-		p.setContent(sw.toString());
+		p.setContent(content);
 		// How do you say you don't want it to publish straight away?
 //		p.setStatus("DRAFT");
 		if (idx == null) {
