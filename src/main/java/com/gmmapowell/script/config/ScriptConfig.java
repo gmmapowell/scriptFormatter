@@ -7,13 +7,11 @@ import java.util.List;
 
 import org.zinutils.exceptions.CantHappenException;
 
-import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.FlowMap;
 import com.gmmapowell.script.intf.FilesToProcess;
-import com.gmmapowell.script.loader.Index;
 import com.gmmapowell.script.loader.Loader;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.Processor;
@@ -35,8 +33,6 @@ public class ScriptConfig implements Config {
 	private List<Sink> sinks = new ArrayList<>();
 	private Processor processor;
 	private WebEdit webedit;
-	private Place index;
-	private Region workdir;
 	private ExtensionPointRepo eprepo = new CreatorExtensionPointRepo(null);
 
 	private final FlowMap flows = new FlowMap();
@@ -45,6 +41,11 @@ public class ScriptConfig implements Config {
 		this.root = root;
 	}
 	
+	@Override
+	public Region root() {
+		return this.root;
+	}
+
 	public ExtensionPointRepo extensions() {
 		return eprepo;
 	}
@@ -60,14 +61,24 @@ public class ScriptConfig implements Config {
 	@Override
 	public FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException {
 		if (loader == null) {
-	        Index currentIndex = Index.read(index, workdir);
-			return currentIndex;
+			throw new CantHappenException("you should have specified a loader");
 		}
 		if (webedit != null)
 			loader.createWebeditIn(webedit.file, webedit.title);
 		return loader.updateIndex();
 	}
 
+	
+	@Override
+	public void indexLoad(FilesToProcess files) {
+		loader.reload(files);
+	}
+
+	@Override
+	public void reset() {
+		flows.reset();
+	}
+	
 	@Override
 	public void generate(FilesToProcess files) throws IOException {
 		if (processor == null) {
@@ -120,14 +131,6 @@ public class ScriptConfig implements Config {
 			s.finish();
 	}
 	
-	public void setIndex(Place index) {
-		this.index = index;
-	}
-
-	public void setWorkdir(Region workdir) {
-		this.workdir = workdir;
-	}
-
 	public void loader(Loader loader) {
 		this.loader = loader;
 	}

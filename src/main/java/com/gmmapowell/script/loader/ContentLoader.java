@@ -23,8 +23,7 @@ public class ContentLoader implements Loader {
 	private String wetitle;
 	private final Universe u;
 
-	public ContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean debug)
-			throws ConfigException {
+	public ContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean debug) throws ConfigException {
 		this.u = u;
 		this.folder = folder;
 		this.indexFile = indexFile;
@@ -65,6 +64,16 @@ public class ContentLoader implements Loader {
 			return currentIndex;
 		} finally {
 			currentIndex.close();
+		}
+	}
+
+	@Override
+	public void reload(FilesToProcess files) {
+		if (!LOAD_FROM_REMOTE)
+			return; // we can't do the thing we've been asked to do ...
+		Region dl = u.regionPath(folder);
+		for (Place p : files.included()) {
+			dl.place(p.name().replace(".txt", "")).copyTo(p);
 		}
 	}
 

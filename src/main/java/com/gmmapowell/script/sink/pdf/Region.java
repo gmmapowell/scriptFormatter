@@ -7,7 +7,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.zinutils.exceptions.CantHappenException;
 
 import com.gmmapowell.script.flow.ParaBreak;
-import com.gmmapowell.script.flow.ReleaseFlow;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.flow.YieldToFlow;

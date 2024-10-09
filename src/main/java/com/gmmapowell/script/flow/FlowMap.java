@@ -10,6 +10,11 @@ public class FlowMap implements Iterable<Flow> {
 	private final Map<String, Flow> flows = new TreeMap<>();
 	private final Map<String, Object> oobs = new TreeMap<>();
 
+	public void reset() {
+		flows.clear();
+		oobs.clear();
+	}
+	
 	public void flow(String name) {
 		if (flows.get(name) != null)
 			throw new CantHappenException("cannot have duplicate flow with name " + name);

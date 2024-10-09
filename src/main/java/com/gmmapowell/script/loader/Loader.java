@@ -10,4 +10,5 @@ import com.gmmapowell.script.intf.FilesToProcess;
 public interface Loader {
 	void createWebeditIn(Place file, String title);
 	FilesToProcess updateIndex() throws IOException, GeneralSecurityException, ConfigException;
+	void reload(FilesToProcess files);
 }

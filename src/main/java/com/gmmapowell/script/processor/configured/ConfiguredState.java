@@ -121,6 +121,8 @@ public class ConfiguredState extends SBLocation {
 					text(tx.substring(from, i));
 				processCommand(tx.substring(i+1, q));
 				i = q;
+				if (i < tx.length() && !Character.isWhitespace(tx.charAt(i)))
+					--i;
 				from = i+1;
 			} else if (q == -2) { // a double &; throw it away
 				text(tx.substring(from, i+1));

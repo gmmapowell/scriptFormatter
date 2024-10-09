@@ -49,7 +49,6 @@ public class ConfigBlockListener implements ConfigListener {
 			}
 			case "index": {
 				state.index = state.root.ensurePlace(value);
-				state.config.setIndex(state.index);
 				break;
 			}
 			case "sshid": {
@@ -58,7 +57,6 @@ public class ConfigBlockListener implements ConfigListener {
 			}
 			case "workdir": {
 				state.workdir = state.root.regionPath(value);
-				state.config.setWorkdir(state.workdir);
 				break;
 			}
 			default: {

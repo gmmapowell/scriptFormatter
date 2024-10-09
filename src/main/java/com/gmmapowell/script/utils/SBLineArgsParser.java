@@ -51,7 +51,7 @@ public class SBLineArgsParser<T extends FileWithLocation> implements LineArgsPar
 	public String readString() {
 		if (args == null || args.length() == 0)
 			throw new ParsingException("cannot read from empty string at " + state.inputLocation());
-		while (args.length() > 0 && Character.isWhitespace(args.charAt(0)))
+		while (args.length() > 0 && firstIsWS())
 			args.delete(0, 1);
 		if (args.length() == 0)
 			throw new ParsingException("cannot read from empty string at " + state.inputLocation());
@@ -74,6 +74,13 @@ public class SBLineArgsParser<T extends FileWithLocation> implements LineArgsPar
 		if (ret == null)
 			throw new ParsingException("unterminated string at " + state.inputLocation());
 		return ret;
+	}
+
+	private boolean firstIsWS() {
+		int cp = args.codePointAt(0);
+		if (cp == 0x200b) // zero-width space
+			return true;
+		return Character.isWhitespace(cp) || Character.isISOControl(cp);
 	}
 	
 	@Override

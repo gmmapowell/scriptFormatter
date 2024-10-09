@@ -60,7 +60,7 @@ public class GDWRegion implements Region {
 		try {
 			FileList result = service.files().list().setQ("name='" + name + "' and '" + regionId + "' in parents and mimeType != 'application/vnd.google-apps.folder'").execute();
 	        if (result.getFiles().size() != 1)
-	        	throw new GeoFSException("Could not find root folder: " + name);
+	        	throw new GeoFSException("Could not find place: " + name + " in " + this);
 	        String id = result.getFiles().get(0).getId();
 			return new GDWPlace(service, id, name, this);
 		} catch (Exception ex) {
@@ -139,7 +139,7 @@ public class GDWRegion implements Region {
 	@Override
 	public String toString() {
 		if (parent == null) {
-			return "google://";
+			return "google:";
 		} else
 			return parent.toString() + "/" + name;
 	}
