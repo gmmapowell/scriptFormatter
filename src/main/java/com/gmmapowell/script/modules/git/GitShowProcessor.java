@@ -110,8 +110,16 @@ public class GitShowProcessor extends Thread implements ProcessOutReader {
 			}
 			if (!matchedFile) {
 				System.err.println("Did not find file like " + filespec + " in " + branch);
+				state.newPara("blockquote");
+				state.newSpan();
+				state.text("Did not find file like " + filespec + " in " + branch);
+				state.endPara();
 			} else if (!matchedRange) {
 				System.err.println("Did not find starting expression " + from + " in " + filespec + " in " + branch);
+				state.newPara("blockquote");
+				state.newSpan();
+				state.text("Did not find starting expression " + from + " in " + filespec + " in " + branch);
+				state.endPara();
 			}
 		} catch (IOException e) {
 			throw WrappedException.wrap(e);

@@ -6,12 +6,12 @@ import com.gmmapowell.script.modules.processors.doc.ScannerAmpState;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class GitImportAmp implements AmpCommandHandler {
-	private final GitState gitstate;
+	private final GitRepo gitrepo;
 	private final ConfiguredState sink;
 
 	public GitImportAmp(ScannerAmpState state) {
 		sink = state.state();
-		gitstate = state.global().requireState(GitState.class);
+		gitrepo = state.state().require(GitRepo.class);
 	}
 	
 	@Override
@@ -30,7 +30,9 @@ public class GitImportAmp implements AmpCommandHandler {
 		if (cmd.args.hasMore()) {
 			to = cmd.args.readString();
 		}
-		gitstate.showDelta(sink, branch, filespec, from, to);
+		gitrepo.showDelta(sink, branch, filespec, from, to);
+		
+		sink.endPara();
+		sink.ignoreNextBlanks();
 	}
-
 }
