@@ -23,13 +23,12 @@ public class HierarchyTests {
 	
 		h.flush(body);
 		String out = body.serialize(false);
-		System.out.println(out);
 		assertEquals("<body><h1>The Title</h1></body>", out);
 	}
 
 	@Test
 	public void simpleTextInPara() {
-		Hierarchy h = new Hierarchy(Arrays.asList("text"));
+		Hierarchy h = new Hierarchy(Arrays.asList());
 		h.addText("A");
 		h.addText(" ");
 		h.addText("simple");
@@ -38,8 +37,34 @@ public class HierarchyTests {
 	
 		h.flush(body);
 		String out = body.serialize(false);
-		System.out.println(out);
 		assertEquals("<body><p>A simple para.</p></body>", out);
 	}
 
+	@Test
+	public void italicTextWholePara() {
+		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
+		h.addText("An");
+		h.addText(" ");
+		h.addText("italic");
+		h.addText(" ");
+		h.addText("para.");
+	
+		h.flush(body);
+		String out = body.serialize(false);
+		assertEquals("<body><p><i>An italic para.</i></p></body>", out);
+	}
+
+	@Test
+	public void boldTextWholePara() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold"));
+		h.addText("A");
+		h.addText(" ");
+		h.addText("bold");
+		h.addText(" ");
+		h.addText("para.");
+	
+		h.flush(body);
+		String out = body.serialize(false);
+		assertEquals("<body><p><b>A bold para.</b></p></body>", out);
+	}
 }

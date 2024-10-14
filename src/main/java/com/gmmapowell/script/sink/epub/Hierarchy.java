@@ -24,6 +24,8 @@ public class Hierarchy {
 	}
 
 	private final Hierarchy parent;
+	
+	// The only things that should be in styles here are the ones that parent *doesn't* have.
 	private final List<String> styles;
 	private final List<Contents> contents = new ArrayList<>();
 
@@ -39,8 +41,29 @@ public class Hierarchy {
 		else
 			ctag = body.addElement("p");
 		
+		for (String s : styles) {
+			String m = mappedStyle(s);
+			if (m != null) {
+				ctag = ctag.addElement(m);
+			}
+		}
+		
 		for (Contents c : contents) {
 			c.addTo(ctag);
+		}
+	}
+
+	private String mappedStyle(String s) {
+		switch (s) {
+		case "chapter-title":
+			return null;
+		case "bold":
+			return "b";
+		case "italic":
+			return "i";
+		default:
+			System.out.println("unknown style: " + s);
+			return null;
 		}
 	}
 
