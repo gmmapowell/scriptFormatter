@@ -5,10 +5,11 @@ import java.util.List;
 
 import org.zinutils.xml.XMLElement;
 
-public class Hierarchy {
-	public interface Contents {
-		void addTo(XMLElement ctag);
-	}
+interface Contents {
+	void addTo(XMLElement ctag);
+}
+
+public class Hierarchy implements Contents {
 
 	public class StringContents implements Contents {
 		private final String text;
@@ -30,17 +31,16 @@ public class Hierarchy {
 	private final List<Contents> contents = new ArrayList<>();
 
 	public Hierarchy(List<String> styles) {
-		this.parent = null;
-		this.styles = styles;
+		this(null, styles);
 	}
 
-	public void flush(XMLElement body) {
-		XMLElement ctag;
-		if (styles.contains("chapter-title"))
-			ctag = body.addElement("h1");
-		else
-			ctag = body.addElement("p");
-		
+	public Hierarchy(Hierarchy parent, List<String> news) {
+		this.parent = parent;
+		styles = news;
+	}
+
+	@Override
+	public void addTo(XMLElement ctag) {
 		for (String s : styles) {
 			String m = mappedStyle(s);
 			if (m != null) {
@@ -51,6 +51,15 @@ public class Hierarchy {
 		for (Contents c : contents) {
 			c.addTo(ctag);
 		}
+	}
+
+	public void flush(XMLElement body) {
+		XMLElement ctag;
+		if (styles.contains("chapter-title"))
+			ctag = body.addElement("h1");
+		else
+			ctag = body.addElement("p");
+		addTo(ctag);
 	}
 
 	private String mappedStyle(String s) {
@@ -73,17 +82,18 @@ public class Hierarchy {
 	}
 
 	public Hierarchy extractParentWithSome(List<String> styles) {
-		// TODO Auto-generated method stub
-		return null;
+		return parent;
 	}
 
 	public Hierarchy push(List<String> styles) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<String> news = new ArrayList<>(styles);
+		news.removeAll(this.styles);
+		Hierarchy ret = new Hierarchy(this, news);
+		contents.add(ret);
+		return ret;
 	}
 
 	public void addText(String text) {
 		this.contents.add(new StringContents(text));
 	}
-
 }
