@@ -43,8 +43,10 @@ public class XHTMLCollector {
 
 	// write the close tag of the current para tag
 	public void closePara() {
-		if (hierarchy != null)
+		if (hierarchy != null) {
 			hierarchy.flush(body);
+			hierarchy = null;
+		}
 	}
 
 	public void write(ZipOutputStream zos) {

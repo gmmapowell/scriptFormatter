@@ -2,6 +2,7 @@ package test.epub;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -149,4 +150,72 @@ public class HierarchyTests {
 		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
 		assertFalse(h.hasExactly(Arrays.asList("bold", "italic")));
 	}
+
+	@Test
+	public void emptyHasItselfForEmpty() {
+		Hierarchy h = new Hierarchy(Arrays.asList());
+		assertEquals(h, h.extractParentWithSome(Arrays.asList()));
+	}
+
+	@Test
+	public void emptyItalicHasEmptyParentWhenItalicRemoved() {
+		Hierarchy h = new Hierarchy(Arrays.asList());
+		Hierarchy h1 = h.push(Arrays.asList("italic"));
+		assertEquals(h, h1.extractParentWithSome(Arrays.asList()));
+	}
+
+	@Test
+	public void boldHasItselfAsParentForBold() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold"));
+		assertEquals(h, h.extractParentWithSome(Arrays.asList("bold")));
+	}
+
+	@Test
+	public void boldHasItselfAsParentForBoldItalic() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold"));
+		assertEquals(h, h.extractParentWithSome(Arrays.asList("bold", "italic")));
+	}
+
+	@Test
+	public void boldThenItalicHasBoldParentWhenItalicRemoved() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold"));
+		Hierarchy h1 = h.push(Arrays.asList("bold", "italic"));
+		assertEquals(h, h1.extractParentWithSome(Arrays.asList("bold")));
+	}
+
+	@Test
+	public void emptyItalicHasEmptyParentWhenLookingForBold() {
+		Hierarchy h = new Hierarchy(Arrays.asList());
+		Hierarchy h1 = h.push(Arrays.asList("italic"));
+		assertEquals(h, h1.extractParentWithSome(Arrays.asList("bold")));
+	}
+
+	@Test
+	public void boldItalicMakesBoldParentWhenItalicRemoved() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold", "italic"));
+		Hierarchy h1 = h.extractParentWithSome(Arrays.asList("bold"));
+		assertNotNull(h1);
+		assertTrue(h1.hasExactly(Arrays.asList("bold")));
+		assertTrue(h.hasExactly(Arrays.asList("italic")));
+	}
+
+	@Test
+	public void boldItalicMakesBoldParentWhenItalicRemovedEvenWithEmptyRoot() {
+		Hierarchy he = new Hierarchy(Arrays.asList());
+		Hierarchy h = he.push(Arrays.asList("bold", "italic"));
+		Hierarchy h1 = h.extractParentWithSome(Arrays.asList("bold"));
+		assertNotNull(h1);
+		assertTrue(h1.hasExactly(Arrays.asList("bold")));
+		assertTrue(h.hasExactly(Arrays.asList("italic")));
+	}
+
+	@Test
+	public void italicMakesEmptyParentWhenItalicRemoved() {
+		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
+		Hierarchy h1 = h.extractParentWithSome(Arrays.asList("bold"));
+		assertNotNull(h1);
+		assertTrue(h1.hasExactly(Arrays.asList()));
+	}
+	
+	// TODO: bolditalic with empty parent can give you a "bold" parent with this just being "italic" 
 }
