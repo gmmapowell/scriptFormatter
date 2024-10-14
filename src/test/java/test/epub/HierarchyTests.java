@@ -84,4 +84,19 @@ public class HierarchyTests {
 		assertEquals("<body><p>An <i>italic</i> para.</p></body>", out);
 	}
 
+	@Test
+	public void nestBoldAndItalicInAPara() {
+		Hierarchy h = new Hierarchy(Arrays.asList());
+		h.addText("A");
+		h.addText(" ");
+		h = h.push(Arrays.asList("bold", "italic"));
+		h.addText("bold-italic");
+		h = h.extractParentWithSome(Arrays.asList());
+		h.addText(" ");
+		h.addText("para.");
+	
+		h.flush(body);
+		String out = body.serialize(false);
+		assertEquals("<body><p>A <b><i>bold-italic</i></b> para.</p></body>", out);
+	}
 }
