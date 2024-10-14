@@ -53,14 +53,19 @@ public class Upload {
 		File f = new File(to);
 
 		File privateKeyPath;
-		if (sshid != null)
+		if (sshid != null) {
+			System.out.println("Using private key from " + sshid);
 			privateKeyPath = new File(sshid);
-		else
+		} else {
+			System.out.println("Using private key from ~/.ssh/id_rsa");
 			privateKeyPath = new File(System.getProperty("user.home"), ".ssh/id_rsa");
+		}
+		JSch.setLogger(new JSCHLogger());
 		JSch jsch = new JSch();
 		jsch.addIdentity(privateKeyPath.getPath());
 		Session s = null;
 		try {
+			System.out.println("username = " + username + " host = " + host + " port = " + port);
 			s = jsch.getSession(username, host, port);
 			s.setConfig("StrictHostKeyChecking", "no");
 			s.connect();

@@ -1,5 +1,7 @@
 package com.gmmapowell.script;
 
+import java.util.Date;
+
 import org.zinutils.exceptions.NotImplementedException;
 import org.zinutils.exceptions.WrappedException;
 
@@ -24,6 +26,7 @@ public class ExceptionHandler {
 		} catch (ConfigException ex) {
 			System.err.println("Error configuring ScriptFormatter: " + ex.getMessage());
 		} catch (Throwable ex) {
+			System.err.println("Date: " + new Date());
 			ex.printStackTrace();
 			System.exit(99);
 		}
