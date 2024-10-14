@@ -77,8 +77,7 @@ public class Hierarchy implements Contents {
 	}
 
 	public boolean hasExactly(List<String> styles) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.styles.containsAll(styles) && styles.containsAll(this.styles);
 	}
 
 	public Hierarchy extractParentWithSome(List<String> styles) {

@@ -1,6 +1,8 @@
 package test.epub;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
@@ -98,5 +100,53 @@ public class HierarchyTests {
 		h.flush(body);
 		String out = body.serialize(false);
 		assertEquals("<body><p>A <b><i>bold-italic</i></b> para.</p></body>", out);
+	}
+
+	@Test
+	public void emptyHasExactlyEmpty() {
+		Hierarchy h = new Hierarchy(Arrays.asList());
+		assertTrue(h.hasExactly(Arrays.asList()));
+	}
+
+	@Test
+	public void italicHasExactlyItalic() {
+		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
+		assertTrue(h.hasExactly(Arrays.asList("italic")));
+	}
+
+	@Test
+	public void bolditalicHasExactlyBoldItalic() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold", "italic"));
+		assertTrue(h.hasExactly(Arrays.asList("bold", "italic")));
+	}
+
+	@Test
+	public void bolditalicHasExactlyItalicBold() {
+		Hierarchy h = new Hierarchy(Arrays.asList("bold", "italic"));
+		assertTrue(h.hasExactly(Arrays.asList("italic", "bold")));
+	}
+
+	@Test
+	public void emptyDoesNotHaveExactlyItalic() {
+		Hierarchy h = new Hierarchy(Arrays.asList());
+		assertFalse(h.hasExactly(Arrays.asList("italic")));
+	}
+
+	@Test
+	public void italicDoesNotHaveExactlyEmpty() {
+		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
+		assertFalse(h.hasExactly(Arrays.asList()));
+	}
+
+	@Test
+	public void italicDoesNotHaveExactlyBold() {
+		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
+		assertFalse(h.hasExactly(Arrays.asList("bold")));
+	}
+
+	@Test
+	public void italicDoesNotHaveExactlyBoldItalic() {
+		Hierarchy h = new Hierarchy(Arrays.asList("italic"));
+		assertFalse(h.hasExactly(Arrays.asList("bold", "italic")));
 	}
 }
