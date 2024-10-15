@@ -171,6 +171,11 @@ public class EPubSink implements Sink {
 								coll.text(" ");
 							else if (tok.it instanceof ParaBreak)
 								coll.closePara();
+							else if (tok.it instanceof EPubAware)
+								((EPubAware)tok.it).handle(coll);
+							else {
+								System.out.println("cannot handle " + tok.it.getClass());
+							}
 //							if (tok.it instanceof AnchorOp) {
 //								records.add((AnchorOp)tok.it);
 //								continue;

@@ -10,6 +10,20 @@ interface Contents {
 }
 
 public class Hierarchy implements Contents {
+	public class XMLContents implements Contents {
+		private final XMLElement xhtml;
+
+		public XMLContents(XMLElement xhtml) {
+			this.xhtml = xhtml;
+		}
+
+		@Override
+		public void addTo(XMLElement ctag) {
+			ctag.addElement(xhtml);
+		}
+
+	}
+
 	public class StringContents implements Contents {
 		private final String text;
 
@@ -148,6 +162,10 @@ public class Hierarchy implements Contents {
 
 	public void addText(String text) {
 		this.contents.add(new StringContents(text));
+	}
+	
+	public void insert(XMLElement xhtml) {
+		this.contents.add(new XMLContents(xhtml));
 	}
 	
 	@Override

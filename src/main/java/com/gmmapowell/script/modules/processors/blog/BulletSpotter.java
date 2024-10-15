@@ -7,7 +7,7 @@ import com.gmmapowell.script.modules.processors.doc.BlockquoteState;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 
-public class BulletSpotter implements ProcessingScanner{
+public class BulletSpotter implements ProcessingScanner {
 	private final Pattern head = Pattern.compile("^(\\*) (.*)");
 	private final ConfiguredState state;
 	private final BlockquoteState bs;

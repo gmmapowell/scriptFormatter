@@ -41,6 +41,10 @@ public class XHTMLCollector {
 		hierarchy.addText(text);
 	}
 
+	public void insert(XMLElement xhtml) {
+		hierarchy.insert(xhtml);
+	}
+
 	// write the close tag of the current para tag
 	public void closePara() {
 		if (hierarchy != null) {
