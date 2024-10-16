@@ -83,12 +83,14 @@ public class Item {
 			throw new RuntimeException("What is the plan?");
 		page.setFont(font, fontsz);
 		String tx = brk.boxText();
-		float txl = font.getStringWidth(tx)*fontsz/1000; 
-		page.beginText();
-		page.setFont(font, fontsz);
-		page.newLineAtOffset(x + (pageStyle.getPageWidth()-pageStyle.getLeftMargin()-pageStyle.getRightMargin())/2 - txl/2, y+brk.textY());
-		page.showText(tx);
-		page.endText();
+		if (tx != null) {
+			float txl = font.getStringWidth(tx)*fontsz/1000; 
+			page.beginText();
+			page.setFont(font, fontsz);
+			page.newLineAtOffset(x + (pageStyle.getPageWidth()-pageStyle.getLeftMargin()-pageStyle.getRightMargin())/2 - txl/2, y+brk.textY());
+			page.showText(tx);
+			page.endText();
+		}
 	}
 
 	private void showText(PDPageContentStream page, float x, float y, TextSpanItem si) throws IOException {

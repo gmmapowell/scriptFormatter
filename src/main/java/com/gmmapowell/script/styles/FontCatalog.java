@@ -20,6 +20,7 @@ public abstract class FontCatalog implements StyleCatalog {
 			return null;
 		switch (font) {
 		case "courier":
+		case "monospace":
 			if (bold && italic)
 				return PDType1Font.COURIER_BOLD_OBLIQUE;
 			else if (bold)
