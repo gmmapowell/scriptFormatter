@@ -20,6 +20,14 @@ public class Cursor implements Comparable<Cursor> {
 		reset();
 	}
 
+	public String flowName() {
+		return flow;
+	}
+
+	public String format() {
+		return si.format;
+	}
+
 	private void reset() {
 		this.item = new ArrayList<AtomicInteger>();
 		this.item.add(new AtomicInteger(0));
@@ -109,6 +117,9 @@ public class Cursor implements Comparable<Cursor> {
 
 	@Override
 	public int compareTo(Cursor o) {
+		// TODO: it is insane that we sort by name
+		// When we create the flows, we should specify the order in which we wish to see
+		// them processed, and then do that.
 		return flow.compareTo(o.flow);
 	}
 
