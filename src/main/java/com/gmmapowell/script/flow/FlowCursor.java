@@ -19,7 +19,13 @@ public class FlowCursor {
 
 	public void run(CursorClient cc) throws IOException {
 		for (int i=0;haveSection(i);i++) {
-			new SectionHandler(cc).doSection(sectionsFor(i));
+			Set<Cursor> sections = sectionsFor(i);
+			SectionHandler sh = new SectionHandler(cc);
+			sh.beginSection(sections);
+			while (!sections.isEmpty()) {
+				sh.doSection();
+			}
+			sh.endSection();
 		}
 	}
 

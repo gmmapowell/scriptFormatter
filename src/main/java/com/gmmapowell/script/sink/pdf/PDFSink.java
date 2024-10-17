@@ -84,6 +84,7 @@ public class PDFSink implements Sink, CursorClient {
 			current.put(c.flowName(), c.format());
 		}
 		this.newSection = true;
+		this.page = null;
 	}
 
 //	public void foo() throws Throwable {
@@ -160,6 +161,8 @@ public class PDFSink implements Sink, CursorClient {
 			cursor.backTo(a.lastAccepted);
 			return true; // it still uses the same cursor, so it can "carry on"
 		case NOROOM: // we are done; the outlet is full
+			if (!page.nextRegions())
+				page = null;
 			cursor.noRoom(a.lastAccepted);
 			return false;
 		case SUSPEND: // we cannot proceed until we have seen something from elsewhere

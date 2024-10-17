@@ -23,14 +23,17 @@ public class SectionHandler implements CursorFeedback {
 
 	public SectionHandler(CursorClient cc) {
 		this.cc = cc;
-	}
-	
-	public void doSection(Set<Cursor> currentCursors) throws IOException {
-		this.cursors = currentCursors;
-		this.active = new TreeSet<>(cursors);
 		this.suspended = new ArrayList<>();
 		this.records = new HashSet<>();
+	}
+	
+	public void beginSection(Set<Cursor> currentCursors) {
+		this.cursors = currentCursors;
 		cc.beginSection(cursors);
+	}
+
+	public void doSection() throws IOException {
+		this.active = new TreeSet<>(cursors);
 		while (!active.isEmpty()) {
 			Cursor c = firstActive();
 			StyledToken tok;
@@ -55,6 +58,9 @@ public class SectionHandler implements CursorFeedback {
 				active.remove(c);
 			}
 		}
+	}
+	
+	public void endSection() {
 		cc.endSection();
 	}
 	
@@ -74,6 +80,7 @@ public class SectionHandler implements CursorFeedback {
 
 	@Override
 	public void noRoom(StyledToken lastAccepted) {
+		backTo(lastAccepted);
 		active.remove(firstActive());
 		records.clear();
 	}
