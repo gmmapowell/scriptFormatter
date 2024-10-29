@@ -86,57 +86,6 @@ public class PDFSink implements Sink, CursorClient {
 		this.newSection = true;
 		this.page = null;
 	}
-
-//	public void foo() throws Throwable {
-//		Set<Cursor> cursors = new TreeSet<>();
-//		boolean beginSection = false;
-//		while (true) {
-//			List<Suspension> suspended = new ArrayList<>();
-//			Set<AnchorOp> records = new HashSet<>();
-//			while (!cursors.isEmpty()) {
-//				if (page == null) {
-//					page = stock.getPage(current, beginSection);
-//					page.begin();
-//				}
-//				beginSection = false;
-//				Set<Cursor> active = new TreeSet<>(cursors);
-//				whileActive:
-//				while (!active.isEmpty()) {
-//					for (Cursor c : active) { // try and populate each main section
-//						while (true) {
-//							StyledToken tok = c.next();
-//							if (tok == null) {
-//								cursors.remove(c);
-//								active.remove(c);
-//								continue whileActive;
-//							}
-//							System.out.println(tok);
-//							if (tok.it instanceof AnchorOp) {
-//								records.add((AnchorOp)tok.it);
-//								continue;
-//							}
-//							if (tok.it instanceof ReleaseFlow) {
-//								Cursor en = findFlow(suspended, cursors, ((ReleaseFlow)tok.it).release());
-//								if (en == c) {
-//									throw new CantHappenException("can't enable the one you're suspending");
-//								}
-//								active.add(en);
-//								cursors.add(en);
-//								continue whileActive;
-//							}
-//						}
-//					}
-//				}
-//				boolean advanced = page.nextRegions();
-//				if (!advanced) {
-//					page = null;
-//				}
-//			}
-//			if (!suspended.isEmpty())
-//				throw new CantHappenException("suspended is not empty: " + suspended);
-//		}
-//	}
-	
 	
 	@Override
 	public boolean processToken(CursorFeedback cursor, StyledToken tok) throws IOException {

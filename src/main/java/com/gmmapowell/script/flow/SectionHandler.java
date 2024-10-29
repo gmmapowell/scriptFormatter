@@ -60,7 +60,7 @@ public class SectionHandler implements CursorFeedback {
 		}
 	}
 	
-	public void endSection() {
+	public void endSection() throws IOException {
 		cc.endSection();
 	}
 	
