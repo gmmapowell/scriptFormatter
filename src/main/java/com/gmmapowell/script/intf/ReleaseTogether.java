@@ -17,7 +17,11 @@ public class ReleaseTogether implements SpanItem {
 
 	@Override
 	public void intForm(DataOutputStream os) throws IOException {
-		System.out.println("need to write IF");
+		System.out.println("need to write IF for ReleaseTogether");
 	}
 
+	@Override
+	public String toString() {
+		return "ReleaseTogether";
+	}
 }

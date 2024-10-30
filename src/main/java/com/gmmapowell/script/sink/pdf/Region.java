@@ -1,6 +1,8 @@
 package com.gmmapowell.script.sink.pdf;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -16,6 +18,24 @@ import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class Region {
+	public static class PendingShove {
+		private final Assembling curr;
+		private final PDPage meta;
+		private final PDPageContentStream page;
+		private final float ytop;
+
+		public PendingShove(Assembling curr, PDPage meta, PDPageContentStream page, float ytop) {
+			this.curr = curr;
+			this.meta = meta;
+			this.page = page;
+			this.ytop = ytop;
+		}
+		
+		private void shove() throws IOException {
+			curr.shove(meta, page, ytop);
+		}
+	}
+
 	protected final StyleCatalog styles;
 	protected final PageStyle pageStyle;
 	protected final PDPage meta;
@@ -33,6 +53,8 @@ public class Region {
 	protected String wantYield = null;
 	protected boolean rejected;
 	private StyledToken pendingAccept;
+	private StyledToken keepFrom;
+	private List<PendingShove> pendingShoves = new ArrayList<>();
 
 	public Region(StyleCatalog styles, PageStyle pageStyle, PDPage meta, PDPageContentStream page, float lx, float ly, float rx, float uy) throws IOException {
 		this.styles = styles;
@@ -61,7 +83,10 @@ public class Region {
 
 	public Acceptance place(StyledToken token) throws IOException {
 		if (rejected) {
-			return new Acceptance(Acceptability.NOROOM, lastAccepted);
+			if (keepFrom != null)
+				return new Acceptance(Acceptability.NOROOM, keepFrom);
+			else
+				return new Acceptance(Acceptability.NOROOM, lastAccepted);
 		}
 		if (pending != null) {
 			ytop += pending.height();
@@ -86,7 +111,10 @@ public class Region {
 					curr = new Assembling(styles, pageStyle, curr.after(), lx, rx);
 					lastAccepted = token;
 //					System.out.println("    ---- accepted: " + token.flow + " " + token.location());
-					return new Acceptance(Acceptability.PROCESSED, token);
+					if (keepFrom != null)
+						return new Acceptance(Acceptability.PENDING, keepFrom);
+					else
+						return new Acceptance(Acceptability.PROCESSED, token);
 				}
 			} else {
 				// HACK!!! // This represents a page overflow for a single para
@@ -101,8 +129,14 @@ public class Region {
 		} else if (token.it instanceof YieldToFlow) {
 			return new Acceptance(Acceptability.SUSPEND, token).enableFlow(((YieldToFlow)token.it).yieldTo());
 		} else if (token.it instanceof KeepTogether) {
-			return new Acceptance(Acceptability.PROCESSED, token);
+			this.keepFrom = token;
+			return new Acceptance(Acceptability.PENDING, token);
 		} else if (token.it instanceof ReleaseTogether) {
+			this.keepFrom = null;
+			for (PendingShove ps : pendingShoves) {
+				ps.shove();
+			}
+			pendingShoves.clear();
 			return new Acceptance(Acceptability.PROCESSED, token);
 		} else {
 			if (token.it instanceof SyncAfterFlow) {
@@ -110,12 +144,16 @@ public class Region {
 			} else {
 				curr.token(token);
 			}
-			return new Acceptance(Acceptability.PENDING, lastAccepted);
+			return new Acceptance(Acceptability.PENDING, keepFrom != null ? keepFrom : lastAccepted);
 		}
 	}
 
 	protected void storeCurr() throws IOException {
-		curr.shove(meta, page, ytop);
+		if (keepFrom != null) {
+			pendingShoves.add(new PendingShove(curr, meta, page, ytop));
+		} else {
+			curr.shove(meta, page, ytop);
+		}
 		ytop -= curr.height();
 	}
 
@@ -128,7 +166,7 @@ public class Region {
 		if (lastAccepted == null)
 			throw new CantHappenException("no tokens were accepted onto the page at all");
 //		System.out.println("    ---- last accepted was: " + lastAccepted.location());
-		return new Acceptance(Acceptability.NOROOM, lastAccepted);
+		return new Acceptance(Acceptability.NOROOM, keepFrom != null ? keepFrom : lastAccepted);
 	}
 
 	public Region borrowFrom() throws IOException {
