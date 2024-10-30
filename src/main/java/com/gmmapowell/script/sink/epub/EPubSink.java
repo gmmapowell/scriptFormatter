@@ -7,12 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 import org.zinutils.xml.XMLElement;
@@ -30,7 +28,6 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.FlowCursor;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
-import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.flow.YieldToFlow;
@@ -114,92 +111,6 @@ public class EPubSink implements Sink, CursorClient {
 		}
 	}
 
-	private void extracted(ZipOutputStream zos, OPFCreator opf, TOCCreator toc) throws IOException {
-		List<Flow> mainFlows = new ArrayList<>();
-		for (Flow f : flows) {
-			if (f.isMain()) {
-				mainFlows.add(f);
-			}
-		}
-		int i=0;
-		Map<String, String> current = new TreeMap<>();
-		Set<Cursor> sections = new TreeSet<>();
-		while (true) {
-			for (Flow f : mainFlows) {
-				if (f.sections.size() > i) {
-					Section si = f.sections.get(i);
-					current.put(f.name, si.format);
-					sections.add(new Cursor(f.name, si));
-				}
-			}
-			i++;
-			if (sections.isEmpty())
-				break;
-
-			XHTMLCollector coll = new XHTMLCollector();
-			StringBuilder title = new StringBuilder();
-			
-			List<Cursor> suspended = new ArrayList<>();
-			while (!sections.isEmpty()) {
-				Set<Cursor> active = new TreeSet<>(sections);
-				whileActive:
-				while (!active.isEmpty()) {
-					for (Cursor c : active) { // try and populate each main section
-						while (true) {
-							StyledToken tok = c.next();
-							if (tok == null) {
-								sections.remove(c);
-								active.remove(c);
-								continue whileActive;
-							}
-//							System.out.println(tok);
-							if (tok.it instanceof YieldToFlow) {
-								suspended.add(c);
-								Cursor en = findFlow(suspended, sections, ((YieldToFlow)tok.it).yieldTo());
-								if (en == c) {
-									throw new CantHappenException("can't enable the one you're suspending");
-								}
-								active.add(en);
-								sections.add(en);
-								active.remove(c);
-								sections.remove(c);
-								continue whileActive;
-							}
-							if (title != null && tok.styles.contains("chapter-title")) {
-								if (tok.it instanceof TextSpanItem) {
-									TextSpanItem tsi = (TextSpanItem) tok.it;
-									title.append(tsi.text);
-								} else if (tok.it instanceof ParaBreak) {
-									coll.title(title.toString());
-//									System.out.println("title: " + title);
-								} else if (tok.it instanceof BreakingSpace || tok.it instanceof NonBreakingSpace) {
-									title.append(" ");
-								}
-							}
-							coll.styles(tok.styles);
-							if (tok.it instanceof TextSpanItem) {
-								coll.text(((TextSpanItem)tok.it).text);
-							} else if (tok.it instanceof NonBreakingSpace)
-								coll.text("&nbsp;");
-							else if (tok.it instanceof BreakingSpace)
-								coll.text(" ");
-							else if (tok.it instanceof ParaBreak)
-								coll.closePara();
-							else if (tok.it instanceof EPubAware)
-								((EPubAware)tok.it).handle(coll);
-							else {
-								System.out.println("cannot handle " + tok.it.getClass());
-							}
-						}
-					}
-				}
-				addFile(zos, opf, toc, i, title.toString());
-				title = null;
-				coll.write(zos);
-			}
-		}
-	}
-
 	private void makeMimetype(ZipOutputStream zos) throws IOException {
 		ZipEntry zem = new ZipEntry("mimetype");
 		String text = "application/epub+zip";
@@ -229,20 +140,6 @@ public class EPubSink implements Sink, CursorClient {
 		opf.addFile(file);
 		toc.addEntry(title, file, cnt);
 		zos.putNextEntry(new ZipEntry("OPS/Files/" + file + ".xhtml"));
-	}
-
-	private Cursor findFlow(List<Cursor> suspended, Set<Cursor> sections, String enable) {
-		for (Cursor susp : suspended) {
-			if (susp.isFlow(enable)) {
-				suspended.remove(susp);
-				return susp;
-			}
-		}
-		for (Cursor c : sections) {
-			if (c.isFlow(enable))
-				return c;
-		}
-		throw new CantHappenException("could not enable flow " + enable + " because it did not exist");
 	}
 
 	Map<String, String> current = new TreeMap<>();
