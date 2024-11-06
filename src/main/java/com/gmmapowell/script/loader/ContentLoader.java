@@ -22,12 +22,14 @@ public class ContentLoader implements Loader {
 	private Place webeditFile;
 	private String wetitle;
 	private final Universe u;
+	private boolean recursive;
 
-	public ContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean debug) throws ConfigException {
+	public ContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean recursive, boolean debug) throws ConfigException {
 		this.u = u;
 		this.folder = folder;
 		this.indexFile = indexFile;
 		this.downloads = downloads;
+		this.recursive = recursive;
 		this.debug = debug;
 		if (downloads == null) {
 			throw new ConfigException("downloads cannot be null");
@@ -94,9 +96,11 @@ public class ContentLoader implements Loader {
 				ex.printStackTrace();
 			}
 		});
-		dlFrom.regions(region -> {
-			Region folderInto = downloads.ensureSubregion(region.name());
-			downloadFolder(index, folderInto, ind + "  ", region);
-		});
+		if (recursive) {
+			dlFrom.regions(region -> {
+				Region folderInto = downloads.ensureSubregion(region.name());
+				downloadFolder(index, folderInto, ind + "  ", region);
+			});
+		}
 	}
 }

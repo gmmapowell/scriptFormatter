@@ -24,6 +24,7 @@ public class ContentLoaderConfigListener implements ConfigListener {
 		switch (cmd.name()) {
 		case "credentials": 
 		case "folder":
+		case "recursive":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;
@@ -48,6 +49,10 @@ public class ContentLoaderConfigListener implements ConfigListener {
 		String folder = vars.remove("folder");
 		if (folder == null)
 			throw new ConfigException("folder was not defined");
+		boolean isRecursive = false;
+		String recursive = vars.remove("recursive");
+		if (recursive != null && !recursive.equals("false") && !recursive.equals("no"))
+			isRecursive = true;
 		
 		// TODO: I feel that this should be elsewhere
 		// Specifically, there should be a module that loads it
@@ -58,7 +63,7 @@ public class ContentLoaderConfigListener implements ConfigListener {
 		} catch (Exception ex) {
 			throw new ConfigException(ex.toString());
 		}
-		state.config.loader(new ContentLoader(universe, state.root, state.workdir, state.index, folder, state.debug));
+		state.config.loader(new ContentLoader(universe, state.root, state.workdir, state.index, folder, isRecursive, state.debug));
 
 	}
 
