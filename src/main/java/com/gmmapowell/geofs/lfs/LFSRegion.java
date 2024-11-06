@@ -47,6 +47,8 @@ public class LFSRegion implements Region {
 
 	@Override
 	public Region subregion(String name) {
+		if (name == null)
+			throw new CantHappenException("cannot have a subregion be null");
 		File f = new File(file, name);
 		return new LFSRegion(world, f);
 	}
