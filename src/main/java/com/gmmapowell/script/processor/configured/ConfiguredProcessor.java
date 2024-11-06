@@ -24,6 +24,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	private final GlobalState global;
 	private final ExtensionPointRepo local;
 	private final boolean joinspace;
+	private final boolean separately;
 	private Class<? extends ProcessingHandler> defaultHandler;
 	private Class<? extends ProcessingHandler> blankHandler;
 	private final List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
@@ -36,8 +37,12 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		if (vars != null) {
 			String joinspace = vars.remove("joinspace");
 			this.joinspace = "true".equals(joinspace);
-		} else
+			String separately = vars.remove("separately");
+			this.separately = "true".equals(separately);
+		} else {
 			this.joinspace = false;
+			this.separately = false;
+		}
 	}
 	
 	public GlobalState global() {
@@ -139,5 +144,9 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 				i++;
 		}
 		return sb.toString().trim();
+	}
+
+	public boolean separately() {
+		return separately;
 	}
 }

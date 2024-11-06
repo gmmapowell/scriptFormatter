@@ -300,4 +300,8 @@ public class ConfiguredState extends SBLocation {
 	public boolean joinspace() {
 		return joinspace;
 	}
+
+	public void ensureFlow(String flow) {
+		fluency.ensureFlow(flow);
+	}
 }

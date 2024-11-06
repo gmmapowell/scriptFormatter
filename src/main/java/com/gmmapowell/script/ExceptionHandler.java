@@ -16,7 +16,7 @@ public class ExceptionHandler {
 		try {
 			throw t;
 		} catch (NotImplementedException ex) {
-			System.err.println("Not Implemented: " + ex.getStackTrace()[0]);
+			System.err.println(ex.getMessage() + "\n" + ex.getStackTrace()[0]);
 		} catch (NoSuchCommandException ex) {
 			System.err.println(ex.getMessage() + ": " + ex.getStackTrace()[0]);
 		} catch (GeoFSException ex) {

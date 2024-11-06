@@ -21,4 +21,10 @@ public class Flow {
 	public String toString() {
 		return "Flow[" + name + (main?"*":"") + "]";
 	}
+
+	public Flow renamedTo(String newName) {
+		Flow ret = new Flow(newName, main);
+		ret.sections.addAll(this.sections);
+		return ret;
+	}
 }

@@ -24,6 +24,7 @@ public class PDFSinkConfigListener implements ConfigListener {
 	public ConfigListener dispatch(Command cmd) {
 		switch (cmd.name()) {
 		case "file": 
+		case "dir":
 		case "styles":
 		case "stock":
 		case "open":
@@ -41,8 +42,9 @@ public class PDFSinkConfigListener implements ConfigListener {
 	@Override
 	public void complete() throws ConfigException {
 		String file = vars.remove("file");
-		if (file == null)
-			throw new ConfigException("output file was not defined");
+		String dir = vars.remove("dir");
+		if (file == null && dir == null)
+			throw new ConfigException("output file or directory was not defined");
 		String open = vars.remove("open");
 		boolean wantOpen = false;
 		if ("true".equals(open))
@@ -63,7 +65,7 @@ public class PDFSinkConfigListener implements ConfigListener {
 			}
 		}
 		try {
-			state.config.sink(new PDFSink(state.root, catalog, file, wantOpen, upload, state.debug, state.sshid, vars));
+			state.config.sink(new PDFSink(state.root, catalog, file, dir, wantOpen, upload, state.debug, state.sshid, vars));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating PDFSink: " + ex.getMessage());

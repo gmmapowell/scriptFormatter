@@ -30,6 +30,7 @@ import com.jcraft.jsch.SftpException;
 public class PDFSink implements Sink, CursorClient {
 	private final StyleCatalog styles;
 	private final Place output;
+	private final Region outputDir;
 	private final boolean wantOpen;
 	private final String upload;
 	private final boolean debug;
@@ -37,13 +38,19 @@ public class PDFSink implements Sink, CursorClient {
 	private final List<Flow> flows = new ArrayList<>();
 	private final Stock stock;
 
-	public PDFSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
+	public PDFSink(Region root, StyleCatalog styles, String output, String dir, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
 		if (styles == null)
 			throw new ConfigException("must specify a style catalog");
 		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
-		this.output = root.ensurePlacePath(output);
+		if (output != null) {
+			this.output = root.ensurePlacePath(output);
+			this.outputDir = null;
+		} else {
+			this.output = null;
+			this.outputDir = root.ensureSubregion(dir);
+		}
 		this.wantOpen = wantOpen;
 		this.upload = upload;
 		String stockName = null;
@@ -67,12 +74,39 @@ public class PDFSink implements Sink, CursorClient {
 	
 	@Override
 	public void render() throws IOException {
-		stock.newDocument(styles);
-		FlowCursor c = new FlowCursor(flows);
-		c.run(this); // TODO: I feel that actually it should be a newly created object ...
-		stock.close(output);
+		if (outputDir == null) {
+			stock.newDocument(styles);
+			FlowCursor c = new FlowCursor(flows);
+			c.run(this); // TODO: I feel that actually it should be a newly created object ...
+			stock.close(output);
+		} else {
+			for (Flow f : flows) {
+				if (f.isMain()) {
+					List<Flow> tmp = buildTmpFlows(f);
+					stock.newDocument(styles);
+					FlowCursor c = new FlowCursor(tmp);
+					this.current = new TreeMap<>();
+					this.page = null;
+					this.newSection = false;
+					c.run(this); // TODO: I feel that actually it should be a newly created object ...
+					stock.close(outputDir.ensurePlace(f.name + ".pdf"));
+				}
+			}
+		}
 	}
 	
+
+	private List<Flow> buildTmpFlows(Flow f) {
+		List<Flow> ret = new ArrayList<>();
+		for (Flow k : flows) {
+			if (!k.isMain())
+				ret.add(k);
+			else if (k == f)
+				ret.add(k.renamedTo("main"));
+		}
+		return ret;
+	}
+
 
 	Map<String, String> current = new TreeMap<>();
 	PageCompositor page = null;

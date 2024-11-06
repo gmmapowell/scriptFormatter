@@ -25,7 +25,7 @@ public class DocProcessorConfigListener implements ConfigListener {
 	public DocProcessorConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
-	
+
 	@Override
 	public ConfigListener dispatch(Command cmd) {
 		switch (cmd.name()) {
@@ -34,10 +34,13 @@ public class DocProcessorConfigListener implements ConfigListener {
 			modules.add(nmc);
 			return nmc;
 		}
-		case "joinspace": 
-		case "scanmode":
-		{
+		case "joinspace":
+		case "scanmode": {
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
+			return null;
+		}
+		case "separately": {
+			vars.put(cmd.depth(), cmd.name(), "true");
 			return null;
 		}
 		default: {
@@ -50,11 +53,14 @@ public class DocProcessorConfigListener implements ConfigListener {
 	public void complete() throws ConfigException {
 		try {
 			GlobalState global = state.config.newGlobalState();
-			ConfiguredProcessor proc = new ConfiguredProcessor(global, state.root, new BlockishElementFactory(), vars, state.debug);
+			ConfiguredProcessor proc = new ConfiguredProcessor(global, state.root, new BlockishElementFactory(), vars,
+					state.debug);
 			FlowMap flows = global.flows();
 			flows.callbackFlow("header");
-			flows.flow("main");
-			flows.flow("footnotes");
+			if (!proc.separately()) {
+				flows.flow("main");
+				flows.flow("footnotes"); // this should really be in a module or something
+			}
 			flows.callbackFlow("footer");
 			proc.setDefaultHandler(StandardLineProcessor.class);
 			proc.setBlankHandler(NewParaProcessor.class);

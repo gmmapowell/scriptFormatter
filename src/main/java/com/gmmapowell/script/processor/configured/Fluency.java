@@ -173,4 +173,9 @@ public class Fluency {
 		if (!fmt.equals(last))
 			throw new CantHappenException("wanted to remove " + fmt + " but top was " + last);
 	}
+
+	public void ensureFlow(String flow) {
+		global.flows().flow(flow);
+		currFlow = global.flow(flow);
+	}
 }

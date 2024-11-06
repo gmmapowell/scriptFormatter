@@ -8,6 +8,10 @@ public class SBLocation implements FileWithLocation {
 		this.file = file;
 	}
 
+	public String fileName() {
+		return file;
+	}
+	
 	public void line(int lineNumber) {
 		this.line = lineNumber;
 	}

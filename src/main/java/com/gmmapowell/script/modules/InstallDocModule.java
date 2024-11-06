@@ -12,6 +12,7 @@ import com.gmmapowell.script.modules.processors.doc.ChapterCommand;
 import com.gmmapowell.script.modules.processors.doc.CommentCommand;
 import com.gmmapowell.script.modules.processors.doc.CommentaryCommand;
 import com.gmmapowell.script.modules.processors.doc.DocProcessorConfigListener;
+import com.gmmapowell.script.modules.processors.doc.FlowByNameCommand;
 import com.gmmapowell.script.modules.processors.doc.FootnoteCommand;
 import com.gmmapowell.script.modules.processors.doc.FootnoteNumHandler;
 import com.gmmapowell.script.modules.processors.doc.ForceSpaceHandler;
@@ -62,7 +63,9 @@ public class InstallDocModule implements ConfigListener {
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SectionCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsectionCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsubsectionCommand.class);
-		
+
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, FlowByNameCommand.class);
+
 		// should commentary be in a separate module?
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, CommentaryCommand.class);
