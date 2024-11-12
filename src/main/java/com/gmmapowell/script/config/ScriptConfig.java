@@ -27,6 +27,7 @@ public class ScriptConfig implements Config {
 	private final boolean WANT_UPLOADS = enable_uploads == null || ("true".equals(enable_uploads));
 	private final boolean ALLOW_UPLOADS = CONFIGURE_WITH_INTERNET && WANT_UPLOADS;
 	
+	private final Universe universe;
 	private final Region root;
 	private boolean debug;
 	private Loader loader;
@@ -38,6 +39,7 @@ public class ScriptConfig implements Config {
 	private final FlowMap flows = new FlowMap();
 
 	public ScriptConfig(Universe universe, Region root) {
+		this.universe = universe;
 		this.root = root;
 	}
 	
@@ -165,6 +167,6 @@ public class ScriptConfig implements Config {
 	}
 
 	public GlobalState newGlobalState() {
-		return new SolidGlobalState(eprepo, debug, flows);
+		return new SolidGlobalState(universe, eprepo, debug, flows);
 	}
 }

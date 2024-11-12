@@ -98,6 +98,8 @@ public class ContentLoader implements Loader {
 		});
 		if (recursive) {
 			dlFrom.regions(region -> {
+				if (debug)
+					System.out.printf("%s%s %s%s\n", ind, "/", "", region.name());
 				Region folderInto = downloads.ensureSubregion(region.name());
 				downloadFolder(index, folderInto, ind + "  ", region);
 			});

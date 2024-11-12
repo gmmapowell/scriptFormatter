@@ -11,6 +11,7 @@ import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
+import com.gmmapowell.script.modules.processors.blog.diagram.DiagramSpotter;
 import com.gmmapowell.script.modules.processors.doc.AmpSpotter;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.NewParaProcessor;
@@ -52,6 +53,7 @@ public class BlogProcessorConfigListener implements ConfigListener {
 			proc.addScanner(HeadingSpotter.class);
 			proc.addScanner(BulletSpotter.class);
 			proc.addScanner(BlockquoteSpotter.class);
+			proc.addScanner(DiagramSpotter.class);
 			proc.lifecycleObserver(new BloggerLifecycleObserver(proc));
 			state.config.processor(proc);
 			for (ModuleConfigListener m : modules) {

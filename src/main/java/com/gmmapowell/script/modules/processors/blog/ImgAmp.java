@@ -22,10 +22,13 @@ public class ImgAmp implements AmpCommandHandler {
 	public void invoke(AmpCommand cmd) {
 		state.newPara("text");
 		state.newSpan();
-		// Doing this properly may require another API (picker?)
-		// See: https://bloggerdev.narkive.com/SC3HJ3UM/upload-images-using-blogger-api
-		// For now, upload the image by hand and put the URL here
-		//  Obvs you can also use any absolute URL
+		// You can, of course, link any public image
+		// 
+		// If you want to link anything else, we have a problem:
+		//   * Blogger API really doesn't support uploading images, so let's load them from DH
+		//   * We can upload to gmmapowell.com/blog-images/<name> and then link that here ...
+		//
+		// We could "automate" uploading local files by having an optional second argument which we upload
 		String link = cmd.args.readString();
 		state.op(new ImageOp(link));
 		state.endPara();
