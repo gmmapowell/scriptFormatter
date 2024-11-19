@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.modules.processors.blog.UploadAll;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.gmmapowell.script.processor.configured.ProcessingScanner;
 
@@ -15,7 +16,7 @@ public class DiagramSpotter implements ProcessingScanner {
 	public DiagramSpotter(ConfiguredState state) {
 		this.state = state;
 		diagram = state.require(DiagramState.class);
-		diagram.provideUniverse(state.global().getUniverse());
+		diagram.provideUploaders(state.global().requireState(UploadAll.class));
 	}
 	
 	@Override

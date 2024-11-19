@@ -3,6 +3,7 @@ package com.gmmapowell.geofs.simple;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.World;
@@ -31,6 +32,11 @@ public class SimpleUniverse implements Universe {
 		if (worlds.containsKey(name))
 			throw new GeoFSDuplicateWorldException(name);
 		worlds.put(name, world);
+	}
+
+	@Override
+	public Place placePath(String uri) {
+		return GeoFSUtils.placePath(worlds.get("lfs"), null, uri);
 	}
 
 	@Override

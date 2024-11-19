@@ -3,7 +3,9 @@ package com.gmmapowell.script.config;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.zinutils.exceptions.CantHappenException;
 
@@ -31,7 +33,8 @@ public class ScriptConfig implements Config {
 	private final Region root;
 	private boolean debug;
 	private Loader loader;
-	private List<Sink> sinks = new ArrayList<>();
+	private final List<Sink> sinks = new ArrayList<>();
+	private final Set<Finisher> finishers = new HashSet<>();
 	private Processor processor;
 	private WebEdit webedit;
 	private ExtensionPointRepo eprepo = new CreatorExtensionPointRepo(null);
@@ -131,6 +134,8 @@ public class ScriptConfig implements Config {
 		processor.allDone();
 		for (Sink s : sinks)
 			s.finish();
+		for (Finisher f : finishers )
+			f.finish();
 	}
 	
 	public void loader(Loader loader) {
@@ -167,6 +172,6 @@ public class ScriptConfig implements Config {
 	}
 
 	public GlobalState newGlobalState() {
-		return new SolidGlobalState(universe, eprepo, debug, flows);
+		return new SolidGlobalState(universe, root, eprepo, finishers, debug, flows);
 	}
 }

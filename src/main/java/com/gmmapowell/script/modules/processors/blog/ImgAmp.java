@@ -1,5 +1,10 @@
 package com.gmmapowell.script.modules.processors.blog;
 
+import org.zinutils.exceptions.CantHappenException;
+import org.zinutils.exceptions.WrappedException;
+
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
@@ -8,9 +13,11 @@ import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class ImgAmp implements AmpCommandHandler {
 	private final ConfiguredState state;
+	private final UploadAll uploader;
 
 	public ImgAmp(ScannerAmpState state) {
 		this.state = state.state();
+		this.uploader = state.global().requireState(UploadAll.class);
 	}
 	
 	@Override
@@ -28,9 +35,20 @@ public class ImgAmp implements AmpCommandHandler {
 		//   * Blogger API really doesn't support uploading images, so let's load them from DH
 		//   * We can upload to gmmapowell.com/blog-images/<name> and then link that here ...
 		//
-		// We could "automate" uploading local files by having an optional second argument which we upload
-		String link = cmd.args.readString();
-		state.op(new ImageOp(link));
+		String img;
+		try {
+			String link = cmd.args.readString();
+			if (link.startsWith("http:") || link.startsWith("https:")) {
+				img = link;
+			} else if (link.startsWith("lfs")) {
+				Place p = state.global().getUniverse().placePath(link);
+				img = uploader.upload(GeoFSUtils.file(p), p.name());
+			} else
+				throw new CantHappenException("cannot handle img link: " + link);
+		} catch (Exception ex) {
+			throw WrappedException.wrap(ex);
+		}
+		state.op(new ImageOp(img));
 		state.endPara();
 		state.observeBlanks();
 	}

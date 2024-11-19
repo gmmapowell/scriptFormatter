@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.ziniki.server.TDAServer;
@@ -21,28 +22,25 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 import org.zinutils.utils.FileUtils;
 
-import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.script.flow.ImageOp;
+import com.gmmapowell.script.modules.processors.blog.ImgUploader;
+import com.gmmapowell.script.modules.processors.blog.UploadAll;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
-import com.gmmapowell.script.utils.Upload;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
 public class DiagramState {
-	private Universe u;
+	private UploadAll uploader;
 	private TDAServer server = null;
 	private List<String> data = null;
 	private boolean args = false;
 	private Map<String, String> argValues = null;
 	private ConfiguredState state;
-	private String sshid = System.getenv("SSHID");
 	
-	public void provideUniverse(Universe u) {
-		this.u = u;
+	public void provideUploaders(UploadAll uploader) {
+		this.uploader = uploader;
 	}
 	
 	public boolean isActive() {
@@ -85,25 +83,29 @@ public class DiagramState {
 			page.navigate("http://localhost:" + server.getPort());
 			page.locator(".text-input").fill(makeInput());
 			page.locator(".toolbar-update").click();
+			if (!argValues.containsKey("tab")) {
+				throw new CantHappenException("diagram must have property 'tab'");
+			}
 			if (!argValues.containsKey("file")) {
 				throw new CantHappenException("diagram must have property 'file'");
 			}
-			String encoded = URLEncoder.encode(argValues.get("file"), Charset.forName("UTF-8"));
-			if (argValues.containsKey("tab")) {
-				page.getByText(argValues.get("tab"), new Page.GetByTextOptions().setExact(true)).click();
-				byte[] bs = page.locator(".diagram-tab.tab-body.selected-tab .diagram").screenshot();
-				System.out.println("have screenshot: " + bs.length);
-				File tmpFile = new File("/Users/gareth/tmp/file.png");
-				FileUtils.writeFile(tmpFile, bs);
-				copyToDH(tmpFile, "sftp:gmmapowell@gmmapowell.com/gmmapowell.com/blog-images/" + encoded);
-			}
+			page.getByText(argValues.get("tab"), new Page.GetByTextOptions().setExact(true)).click();
+			byte[] bs = page.locator(".diagram-tab.tab-body.selected-tab .diagram").screenshot();
+			System.out.println("have screenshot: " + bs.length);
+			// TODO: make this a true tmp file
+			File tmpFile = new File("/Users/gareth/tmp/file.png");
+			FileUtils.writeFile(tmpFile, bs);
 			browser.close();
-
 			
 			state.newPara("text");
 			state.newSpan();
 			// Blogger API really doesn't support uploading images, so let's send them to DH
-			state.op(new ImageOp("https://gmmapowell.com/blog-images/" + encoded));
+			String res = uploader.upload(tmpFile, argValues.get("file"));
+			if (res == null) {
+				throw new CantHappenException("no result image location was returned");
+			}
+			// TODO: delete the tmp file when it is a tmp file
+			state.op(new ImageOp(res));
 			state.endPara();
 			state.observeBlanks();
 		} catch (Exception e) {
@@ -113,10 +115,6 @@ public class DiagramState {
 		data = null;
 	}
 	
-	private void copyToDH(File tmpFile, String upload) throws JSchException, SftpException {
-		new Upload(u.getWorld("lfs").placePath(tmpFile.toString()), upload, sshid, true).send();;
-	}
-
 	private String makeInput() {
 		StringBuilder ret = new StringBuilder();
 		for (String s : data) {
@@ -177,5 +175,4 @@ public class DiagramState {
 			pt.add("/css/{path}", js);
 		}
 	}
-
 }
