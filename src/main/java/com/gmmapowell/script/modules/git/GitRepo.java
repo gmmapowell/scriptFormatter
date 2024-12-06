@@ -15,6 +15,10 @@ public class GitRepo {
 		this.repositoryRoot = global.formatterRoot.regionPath(repo);
 	}
 	
+	public Region root() {
+		return repositoryRoot;
+	}
+	
 	public String repoPath() {
 		return repoPath;
 	}

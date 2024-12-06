@@ -10,6 +10,7 @@ import org.zinutils.exceptions.WrappedException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
+import com.gmmapowell.script.modules.git.GitRepo;
 import com.gmmapowell.script.modules.processors.doc.AmpCommand;
 import com.gmmapowell.script.modules.processors.doc.AmpCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
@@ -23,11 +24,13 @@ public class IncludeAmp implements AmpCommandHandler {
 	private final ConfiguredState state;
 	private final IncluderConfig ic;
 	private DoInclusion includer;
+	private GitRepo gitrepo;
 
 	public IncludeAmp(ScannerAmpState state) {
 		global = state.global();
 		this.state = state.state();
 		ic = global.requireState(IncluderConfig.class);
+		gitrepo = state.state().require(GitRepo.class);
 	}
 	
 	@Override
@@ -51,20 +54,23 @@ public class IncludeAmp implements AmpCommandHandler {
 	
 	@Override
 	public void prepare(AmpCommand cmd) {
-		Region samples = ic.samples();
-		if (samples == null)
-			throw new CantHappenException("samples region has not been specified");
-		Region r = samples;
+		Region root = ic.samples();
+		if (root == null) {
+			root = gitrepo.root();
+			if (root == null)
+				throw new CantHappenException("neither samples region nor formatter root has not been specified");
+		}
+		Region r = root;
 		String file = cmd.args.readString();
 		Map<String, String> params = cmd.args.readParams("formatter");
 		System.out.println("want to include " + file + " with " + params);
 		if (file.indexOf('/') != -1) {
 			File f = new File(file);
-			r = GeoFSUtils.regionPath(null, samples, f.getParent());
+			r = GeoFSUtils.regionPath(null, root, f.getParent());
 			file = f.getName();
 		}
 		if (!r.hasPlace(file)) {
-			throw new RuntimeException("there is no sample " + file + " in " + samples + " at " + state.inputLocation());
+			throw new RuntimeException("there is no sample " + file + " in " + root + " at " + state.inputLocation());
 		}
 		Place code = r.place(file);
 		Formatter formatter;

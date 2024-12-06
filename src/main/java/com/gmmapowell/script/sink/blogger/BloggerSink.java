@@ -183,7 +183,7 @@ public class BloggerSink implements Sink {
 		if (next.equals(last) && !butStartAgain)
 			return last;
 
-		if (last.equals("blockquote")) {
+		if (last.equals("blockquote") || last.equals("preformatted")) {
 			writer.println("</span>");
 			writer.println("</blockquote>");
 		}
@@ -201,7 +201,7 @@ public class BloggerSink implements Sink {
 				writer.println("<ul>");
 			writer.print("  <li>");
 		}
-		if (next.equals("blockquote")) {
+		if (next.equals("blockquote") || next.equals("preformatted")) {
 			writer.println("<blockquote class='tr_bq'>");
 			writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small; text-wrap: nowrap; overflow-x: scroll;'>");
 		}
