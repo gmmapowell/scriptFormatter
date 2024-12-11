@@ -27,6 +27,7 @@ public class BulletSpotter implements ProcessingScanner {
 			System.out.println("bullet");
 			state.newPara("bullet");
 			state.processText(m.group(2));
+			state.observeBlanks();
 			return true;
 		}
 		return false;
