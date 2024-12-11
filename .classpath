@@ -12,7 +12,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
-	<classpathentry exported="true" kind="var" path="ZINIKI_ROOT/Tools/utils/bin/classes" sourcepath="/ZINIKI_ROOT/Tools/utils/src/main/java"/>
 	<classpathentry exported="true" kind="var" path="ZINIKI_ROOT/FLAS2/bin" sourcepath="/ZINIKI_ROOT/FLAS2/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/google-client"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/opencensus"/>
@@ -26,5 +25,6 @@
 	<classpathentry kind="lib" path="/projects-qb/mvncache/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/ziniki-paas/intf/qbout/ziniki_paas.intf.jar"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/ZiWSH/intf/qbout/ZiWSH.intf.jar"/>
+	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/qbout/utils.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

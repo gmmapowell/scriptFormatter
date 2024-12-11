@@ -22,13 +22,13 @@ public class StopAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		Map<String, String> params = cmd.args.readParams("at", "elide");
+		Map<String, String> params = cmd.args.readParams("at", "elide", "includeMe");
 		if (!state.hasPendingCommand())
 			throw new CantHappenException("&stop requires active &include");
 		AmpCommand pending = state.pendingCommand();
 		if (!(pending.handler instanceof IncludeAmp))
 			throw new CantHappenException("&stop can only be in &include");
-		((IncludeAmp)pending.handler).includer().stopAt(params.get("at"), params.get("elide"));
+		((IncludeAmp)pending.handler).includer().stopAt(params.get("at"), params.get("elide"), params.get("includeMe"));
 	}
 
 }

@@ -45,6 +45,7 @@ public class DoInclusion {
 	private Indents indents;
 	private Pattern stopAt;
 	private boolean elideAtEnd;
+	private boolean includeStopLine;
 
 	public DoInclusion(ConfiguredState state, Place place, Formatter formatter) {
 		this.state = state;
@@ -74,10 +75,12 @@ public class DoInclusion {
 		indents = new Indents(min, max);
 	}
 
-	public void stopAt(String end, String elide) {
+	public void stopAt(String end, String elide, String includeMe) {
 		this.stopAt = Pattern.compile(end);
 		if (elide != null)
 			elideAtEnd = Boolean.parseBoolean(elide);
+		if (includeMe != null)
+			this.includeStopLine = Boolean.parseBoolean(includeMe);
 	}
 
 	boolean primed = true, stopped = false;
@@ -105,8 +108,8 @@ public class DoInclusion {
 	}
 
 	private void processLine(int lineNo, String line) throws IOException {
-//		System.out.println("processing included line " + line + " stopped = " + stopped);
-		System.out.print("include " + lineNo + ": " + primed + ": ");
+//		System.out.println("processing included line " + line + " stopAt = " + stopAt + " stopped = " + stopped);
+//		System.out.print("include " + lineNo + ": " + primed + ": ");
 		boolean allowStop = true;
 		if (stopped) {
 			System.out.println("stopped: " + line);
@@ -128,15 +131,16 @@ public class DoInclusion {
 				elideThis(il);
 			}
 			stopped = true;
-			return;
+			if (!includeStopLine)
+				return;
 		}
 		if (allowStop && select != null && !formatter.isBlockIndent(selectionIndent, il)) {
-				System.out.println("selection over at: " + line);
+			System.out.println("selection over at: " + line);
 			stopped = true;
 			return;
 		}
 		if (curr != -1) {
-				System.out.println("comparing " + il + " to " + curr + " for " + line);
+			System.out.println("comparing " + il + " to " + curr + " for " + line);
 			if (formatter.isBlockIndent(curr, il)) {
 				if (!haveSkipped) {
 					elideThis(il);

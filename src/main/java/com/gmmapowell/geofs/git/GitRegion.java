@@ -131,4 +131,8 @@ public class GitRegion implements Region {
 	public File placeFile(String name) {
 		return new File(myPath, name);
 	}
+
+	public String repo() {
+		return root.repo();
+	}
 }

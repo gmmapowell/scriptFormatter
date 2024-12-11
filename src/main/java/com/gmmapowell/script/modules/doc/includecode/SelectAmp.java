@@ -24,10 +24,10 @@ public class SelectAmp implements AmpCommandHandler {
 	public void invoke(AmpCommand cmd) {
 		Map<String, String> params = cmd.args.readParams("from", "what", "exdent");
 		if (!state.hasPendingCommand())
-			throw new CantHappenException("&remove requires active &include");
+			throw new CantHappenException("&select requires active &include");
 		AmpCommand pending = state.pendingCommand();
 		if (!(pending.handler instanceof IncludeAmp))
-			throw new CantHappenException("&remove can only be in &include");
+			throw new CantHappenException("&select can only be in &include");
 		((IncludeAmp)pending.handler).includer().selectOnly(params.get("from"), params.get("what"), params.get("exdent"));
 	}
 

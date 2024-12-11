@@ -41,6 +41,9 @@ public class GitWorld implements World {
 			repo = root.substring(0, idx);
 			tag = root.substring(idx+1);
 		}
+		if (repo.startsWith("~")) {
+			repo = System.getProperty("user.home") + repo.substring(1);
+		}
 		return new GitRegion(new GitRoot(this, repo, tag), null, null, null);
 	}
 

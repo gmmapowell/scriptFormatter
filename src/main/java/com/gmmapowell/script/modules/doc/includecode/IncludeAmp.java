@@ -58,7 +58,7 @@ public class IncludeAmp implements AmpCommandHandler {
 		if (root == null) {
 			root = gitrepo.root();
 			if (root == null)
-				throw new CantHappenException("neither samples region nor formatter root has not been specified");
+				throw new CantHappenException("neither samples region nor formatter root has been specified");
 		}
 		Region r = root;
 		String file = cmd.args.readString();
@@ -78,11 +78,17 @@ public class IncludeAmp implements AmpCommandHandler {
 			 formatter = new BoringFormatter(state);
 		else {
 			switch (params.get("formatter")) {
+			case "flas":
+				formatter = new FLASFormatter(state);
+				break;
+			case "go":
+				formatter = new GoFormatter(state);
+				break;
 			case "html":
 				formatter = new HTMLFormatter(state);
 				break;
-			case "flas":
-				formatter = new FLASFormatter(state);
+			case "json":
+				formatter = new JsonFormatter(state);
 				break;
 			default:
 				formatter = new BoringFormatter(state);

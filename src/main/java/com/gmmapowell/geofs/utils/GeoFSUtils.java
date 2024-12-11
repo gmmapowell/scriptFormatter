@@ -25,6 +25,7 @@ import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.gdw.GDWPlace;
+import com.gmmapowell.geofs.git.GitRegion;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
 import com.gmmapowell.geofs.listeners.LineListener;
@@ -54,6 +55,9 @@ public class GeoFSUtils {
 	public static File file(Region r) {
 		if (r instanceof LFSRegion) {
 			return ((LFSRegion)r).getFile();
+		} else if (r instanceof GitRegion) {
+			GitRegion gr = (GitRegion) r;
+			return new File(gr.repo());
 		} else {
 			throw new CantHappenException("can't return file at " + r.getClass());
 		}

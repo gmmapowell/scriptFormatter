@@ -101,4 +101,8 @@ public class GitRoot {
 
 		return proc.getStdoutStream();
 	}
+
+	public String repo() {
+		return repo;
+	}
 }
