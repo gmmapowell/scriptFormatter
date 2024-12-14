@@ -61,7 +61,9 @@ public class GoFormatter implements Formatter {
 
 	private boolean isKW(boolean first, String tx) {
 		switch (tx) {
+		case "for":
 		case "func":
+		case "go":
 		case "if":
 		case "import":
 		case "interface":
