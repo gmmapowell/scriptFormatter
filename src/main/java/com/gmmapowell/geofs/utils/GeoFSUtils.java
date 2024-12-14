@@ -25,6 +25,7 @@ import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.gdw.GDWPlace;
+import com.gmmapowell.geofs.git.GitPlace;
 import com.gmmapowell.geofs.git.GitRegion;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
@@ -66,6 +67,9 @@ public class GeoFSUtils {
 	public static File file(Place from) {
 		if (from instanceof LFSPlace) {
 			return ((LFSPlace)from).getFile();
+		} else if (from instanceof GitPlace) {
+			GitRegion gr = (GitRegion) from.region();
+			return gr.placeFile(((GitPlace)from).name());
 		} else
 			throw new NotImplementedException("file(" + from.getClass() + ")");
 	}
@@ -183,5 +187,15 @@ public class GeoFSUtils {
 
 	public static XML readXML(Place xml) {
 		return XML.fromStream(xml.name(), xml.input());
+	}
+
+	public static String gitTag(Place place) {
+		if (place instanceof GitPlace) {
+			GitPlace gp = (GitPlace) place;
+			GitRegion gr = (GitRegion) gp.region();
+			return gr.tag();
+		} else {
+			return "";
+		}
 	}
 }

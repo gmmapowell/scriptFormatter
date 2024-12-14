@@ -4,10 +4,12 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.ScriptConfig;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
+import com.gmmapowell.script.modules.doc.includecode.FileInfoAmp;
 import com.gmmapowell.script.modules.doc.includecode.IncludeAmp;
 import com.gmmapowell.script.modules.doc.includecode.IndentsAmp;
 import com.gmmapowell.script.modules.doc.includecode.RemoveAmp;
 import com.gmmapowell.script.modules.doc.includecode.SelectAmp;
+import com.gmmapowell.script.modules.doc.includecode.ShowTagFileAmp;
 import com.gmmapowell.script.modules.doc.includecode.StopAmp;
 import com.gmmapowell.script.modules.processors.blog.BlogProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.blog.BoldAmp;
@@ -49,12 +51,15 @@ public class InstallBlogModule implements ConfigListener {
 
 	// & commands
 	private void installAmpCommands() {
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, FileInfoAmp.class);
+
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeTagAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, RemoveAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SelectAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IndentsAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, StopAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ShowTagFileAmp.class);
 		
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ImgAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);

@@ -44,6 +44,7 @@ public class IncludeAmp implements AmpCommandHandler {
 		case "remove": 
 		case "select": 
 		case "indents":
+		case "showtagfile":
 		case "stop": {
 			return true;
 		}

@@ -93,7 +93,7 @@ public class GitPlace implements Place {
 
 	@Override
 	public Region region() {
-		throw new NotImplementedException();
+		return inRegion;
 	}
 
 	@Override

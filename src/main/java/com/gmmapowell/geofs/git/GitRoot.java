@@ -105,4 +105,8 @@ public class GitRoot {
 	public String repo() {
 		return repo;
 	}
+	
+	public String tag() {
+		return tag;
+	}
 }

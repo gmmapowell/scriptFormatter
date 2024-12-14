@@ -135,4 +135,8 @@ public class GitRegion implements Region {
 	public String repo() {
 		return root.repo();
 	}
+
+	public String tag() {
+		return root.tag();
+	}
 }

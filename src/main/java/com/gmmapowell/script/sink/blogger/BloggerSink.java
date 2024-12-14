@@ -147,6 +147,7 @@ public class BloggerSink implements Sink {
 						case "h2":
 						case "h3":
 						case "h4":
+						case "fileinfo":
 							break; // it happens automatically
 						default:
 							throw new CantHappenException("cannot handle BRKPara in " + last);
@@ -187,6 +188,9 @@ public class BloggerSink implements Sink {
 			writer.println("</span>");
 			writer.println("</blockquote>");
 		}
+		if (last.equals("fileinfo")) {
+			writer.print("</p>");
+		}
 		if (last.equals("needli") && !next.equals("bullet"))
 			writer.println("</ul>");
 		if (last.startsWith("h")) {
@@ -204,6 +208,9 @@ public class BloggerSink implements Sink {
 		if (next.equals("blockquote") || next.equals("preformatted")) {
 			writer.println("<blockquote class='tr_bq'>");
 			writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small; text-wrap: nowrap; overflow-x: scroll;'>");
+		}
+		if (next.equals("fileinfo")) {
+			writer.print("<p style='margin-inline-start:40px; font-family: monospace; font-size: small; font-style:italic'>");
 		}
 		return next;
 	}

@@ -10,6 +10,7 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class DoInclusion {
@@ -90,6 +91,8 @@ public class DoInclusion {
 	private Iterator<Region> ei;
 	int curr = -1;
 	boolean haveSkipped = false;
+	private boolean showTag;
+	private boolean showFile;
 
 	public void include() throws IOException {
 		ei = elides.iterator();
@@ -97,6 +100,19 @@ public class DoInclusion {
 		state.pushFormat("preformatted");
 		openSource((n,s) -> { try { processLine(n, s); } catch (IOException ex) { throw WrappedException.wrap(ex); }});
 		state.popFormat("preformatted");
+		if (showTag || showFile) {
+			state.newPara("fileinfo");
+			state.newSpan();
+			String tag = GeoFSUtils.gitTag(place);
+			String file = GeoFSUtils.file(place).toString();
+			if (showTag && showFile)
+				state.text(tag + ":" + file);
+			else if (showTag)
+				state.text(tag);
+			else if (showFile)
+				state.text(file);
+			state.endPara();
+		}
 		if (lookFor != null)
 			throw new RuntimeException("While processing " + place + ", did not come across " + lookFor.from);
 		if (select != null && !primed)
@@ -212,5 +228,10 @@ public class DoInclusion {
 		if (!e.hasNext())
 			return null;
 		return e.next();
+	}
+
+	public void showtagfile(boolean showTag, boolean showFile) {
+		this.showTag = showTag;
+		this.showFile = showFile;
 	}
 }
