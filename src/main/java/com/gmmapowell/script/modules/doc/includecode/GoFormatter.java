@@ -11,9 +11,9 @@ public class GoFormatter implements Formatter {
 	}
 
 	@Override
-	public void format(String text, int exdent) {
+	public void format(String text, int exdent, boolean withHighlight) {
 		text = text.replace("\t", "    ");
-		state.newPara();
+		state.newPara(withHighlight?"highlight":null);
 		state.newSpan();
 		int i = 0;
 		

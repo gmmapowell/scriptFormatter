@@ -43,6 +43,7 @@ public class IncludeAmp implements AmpCommandHandler {
 		switch (cont.name()) {
 		case "remove": 
 		case "select": 
+		case "highlight":
 		case "indents":
 		case "showtagfile":
 		case "stop": {

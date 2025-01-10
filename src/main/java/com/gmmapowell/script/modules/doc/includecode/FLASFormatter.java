@@ -11,7 +11,7 @@ public class FLASFormatter implements Formatter {
 	}
 
 	@Override
-	public void format(String text, int exdent) {
+	public void format(String text, int exdent, boolean withHighlight) {
 		text = text.replace("\t", "    ");
 		state.newPara();
 		state.newSpan();

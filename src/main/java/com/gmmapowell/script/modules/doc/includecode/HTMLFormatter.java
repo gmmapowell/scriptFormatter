@@ -11,7 +11,7 @@ public class HTMLFormatter implements Formatter {
 	}
 
 	@Override
-	public void format(String text, int exdent) {
+	public void format(String text, int exdent, boolean withHighlight) {
 		text = text.replace("\t", "    ");
 		if (exdent > 0)
 			text = text.substring(exdent);

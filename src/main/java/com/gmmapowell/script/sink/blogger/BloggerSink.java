@@ -258,7 +258,14 @@ public class BloggerSink implements Sink {
 				if ("link".equals(sty) || "endlink".equals(sty))
 					; // don't print these
 				else {
-					writer.print("<" + mapStyle(sty) + ">");
+					switch (sty) {
+					case "highlight":
+						writer.println("<span style='background-color: aquamarine'>");
+						break;
+					default:
+						writer.print("<" + mapStyle(sty) + ">");
+						break;
+					}
 					cf.add(sty);
 				}
 			}
@@ -279,6 +286,8 @@ public class BloggerSink implements Sink {
 			return "b";
 		case "superscript":
 			return "sup";
+		case "highlight":
+			return "span";
 		default:
 			return sty;
 		}

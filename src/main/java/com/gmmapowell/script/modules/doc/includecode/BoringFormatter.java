@@ -10,7 +10,7 @@ public class BoringFormatter implements Formatter {
 	}
 
 	@Override
-	public void format(String text, int exdent) {
+	public void format(String text, int exdent, boolean withHighlight) {
 		state.newPara();
 		state.processText(text.replace("\t", "    "));
 		state.endPara();

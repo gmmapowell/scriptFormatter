@@ -5,6 +5,7 @@ import com.gmmapowell.script.config.ScriptConfig;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.modules.doc.includecode.FileInfoAmp;
+import com.gmmapowell.script.modules.doc.includecode.HighlightAmp;
 import com.gmmapowell.script.modules.doc.includecode.IncludeAmp;
 import com.gmmapowell.script.modules.doc.includecode.IndentsAmp;
 import com.gmmapowell.script.modules.doc.includecode.RemoveAmp;
@@ -57,6 +58,7 @@ public class InstallBlogModule implements ConfigListener {
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IncludeTagAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, RemoveAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SelectAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, HighlightAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, IndentsAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, StopAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ShowTagFileAmp.class);

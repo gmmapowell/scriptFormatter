@@ -64,7 +64,10 @@ public class Fluency {
 			throw new CantHappenException("no current section");
 		}
 		List<String> merged = new ArrayList<>(fmtStack);
-		merged.addAll(formats);
+		for (String f : formats) {
+			if (f != null)
+				merged.add(f);
+		}
 		if (merged.isEmpty())
 			merged.add("text");
 		currPara = new Para(merged);

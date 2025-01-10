@@ -14,6 +14,47 @@ import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class DoInclusion {
+	public static class HighlightRange implements Highlight {
+		private Pattern from;
+		private int lines;
+		private int cnt = 0;
+
+		public HighlightRange(String from, int lines) {
+			this.from = Pattern.compile(from);
+			this.lines = lines;
+		}
+
+		@Override
+		public boolean matches(String line) {
+			if (from.matcher(line).find()) {
+				this.cnt = this.lines;
+			}
+			if (this.cnt > 0) {
+				this.cnt--;
+				return true;
+			} else 
+				return false;
+		}
+
+	}
+
+	public interface Highlight {
+		boolean matches(String line);
+	}
+	
+	public static class MatchingHighlight implements Highlight {
+		private final Pattern regexp;
+
+		public MatchingHighlight(String regexp) {
+			this.regexp = Pattern.compile(regexp);
+		}
+		
+		@Override
+		public boolean matches(String line) {
+			return regexp.matcher(line).find();
+		}
+	}
+
 	public class Indents {
 		private final int min;
 		private final int max;
@@ -43,6 +84,7 @@ public class DoInclusion {
 	private final Place place;
 	private Region select;
 	private final List<Region> elides = new ArrayList<>();
+	private List<Highlight> highlights = new ArrayList<>();
 	private Indents indents;
 	private Pattern stopAt;
 	private boolean elideAtEnd;
@@ -185,12 +227,20 @@ public class DoInclusion {
 		}
 		if (indents == null || (il >= indents.min && il <= indents.max)) {
 				System.out.println("formatting: " + line);
-			formatter.format(line, exdent);
+			formatter.format(line, exdent, wantHighlight(line));
 			haveSkipped = false;
 		} else if (!haveSkipped) {
 			elideThis(il);
 			haveSkipped = true;
 		}
+	}
+
+	private boolean wantHighlight(String line) {
+		for (Highlight h : highlights) {
+			if (h.matches(line))
+				return true;
+		}
+		return false;
 	}
 
 	private void elideThis(int il) throws IOException {
@@ -233,5 +283,14 @@ public class DoInclusion {
 	public void showtagfile(boolean showTag, boolean showFile) {
 		this.showTag = showTag;
 		this.showFile = showFile;
+	}
+
+	public void highlightMatching(String regexp) {
+		highlights.add(new MatchingHighlight(regexp));
+	}
+
+	public void highlightRange(String from, int lines) {
+		highlights.add(new HighlightRange(from, lines));
+		
 	}
 }
