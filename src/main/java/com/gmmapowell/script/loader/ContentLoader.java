@@ -59,7 +59,7 @@ public class ContentLoader implements Loader {
 					System.out.println("Downloading files from Google ...");
 					System.out.println("  + " + dl /* item.folder + " (" + item.id + ")" */);
 				}
-				downloadFolder(currentIndex, downloads, "    ", dl);
+				downloadFolder(currentIndex, dl, downloads, "    ", "");
 			}
 			if (webeditFile != null)
 				currentIndex.generateWebeditFile(webeditFile, wetitle);
@@ -74,12 +74,12 @@ public class ContentLoader implements Loader {
 		if (!LOAD_FROM_REMOTE)
 			return; // we can't do the thing we've been asked to do ...
 		Region dl = u.regionPath(folder);
-		for (Place p : files.included()) {
-			dl.place(p.name().replace(".txt", "")).copyTo(p);
+		for (LabelledPlace p : files.included()) {
+			GeoFSUtils.placePath(null, dl, p.label.replace(".txt", "")).copyTo(p.place);
 		}
 	}
 
-	private void downloadFolder(Index index, Region downloads, String ind, Region dlFrom) {
+	private void downloadFolder(Index index, Region dlFrom, Region downloads, String ind, String prefix) {
 		if (downloads == null) {
 			throw new CantHappenException("downloads cannot be null");
 		}
@@ -87,7 +87,7 @@ public class ContentLoader implements Loader {
 			try {
 				Place local = downloads.ensurePlace(place.name() + ".txt");
 				String id = GeoFSUtils.getGoogleID(place);
-				boolean download = index.record(id, local);
+				boolean download = index.record(id, doPrefix(prefix, local.name()));
 				if (debug)
 					System.out.printf("%s%s %s%s (%s)\n", ind, download?"+":"-", "", place.name(), id);
 				if (download)
@@ -101,8 +101,16 @@ public class ContentLoader implements Loader {
 				if (debug)
 					System.out.printf("%s%s %s%s\n", ind, "/", "", region.name());
 				Region folderInto = downloads.ensureSubregion(region.name());
-				downloadFolder(index, folderInto, ind + "  ", region);
+				downloadFolder(index, region, folderInto, ind + "  ", doPrefix(prefix, region.name()));
 			});
 		}
+	}
+	
+	private String doPrefix(String prefix, String now) {
+		if (prefix.length() == 0)
+			return now;
+		else
+			return prefix + "/" + now;
+		
 	}
 }

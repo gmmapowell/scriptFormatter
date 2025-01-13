@@ -19,4 +19,11 @@ public class LFSPendingRegion extends LFSRegion {
 			throw new GeoFSCannotCreateRegionException(file.getPath());
 	}
 
+	public void ensureExists() {
+		if (file.isDirectory())
+			return;
+		else
+			this.create();
+	}
+
 }

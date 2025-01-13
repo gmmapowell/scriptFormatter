@@ -1,9 +1,9 @@
 package com.gmmapowell.script.intf;
 
-import com.gmmapowell.geofs.Place;
+import com.gmmapowell.script.loader.LabelledPlace;
 
 public interface FilesToProcess {
 
-	Iterable<Place> included();
+	Iterable<LabelledPlace> included();
 
 }

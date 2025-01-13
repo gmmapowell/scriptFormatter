@@ -97,7 +97,7 @@ public class Index implements FilesToProcess {
 		this.appendTo = fw;
 	}
 
-	public boolean record(String id, Place place) throws IOException {
+	public boolean record(String id, String place) throws IOException {
 		if (current.containsKey(id)) {
 			return !current.get(id).alreadyDownloaded;
 		}
@@ -107,17 +107,17 @@ public class Index implements FilesToProcess {
 		}
 		appendTo.append(id);
 		appendTo.append(" ");
-		appendTo.append(place.name());
+		appendTo.append(place);
 		appendTo.append("\n");
 		return !alreadyDownloaded && !writtenExcluded;
 	}
 
 	@Override
-	public Iterable<Place> included() {
-		List<Place> fs = new ArrayList<>();
+	public Iterable<LabelledPlace> included() {
+		List<LabelledPlace> fs = new ArrayList<>();
 		for (Known k : current.values()) {
 			if (k.stat == Status.INCLUDED)
-				fs.add(downloads.place(k.label));
+				fs.add(new LabelledPlace(k.label, downloads.place(k.label)));
 		}
 		return fs;
 	}

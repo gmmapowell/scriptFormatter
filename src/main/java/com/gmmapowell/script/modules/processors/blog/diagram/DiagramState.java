@@ -2,12 +2,9 @@ package com.gmmapowell.script.modules.processors.blog.diagram;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.ziniki.server.TDAServer;
@@ -23,7 +20,6 @@ import org.zinutils.exceptions.WrappedException;
 import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.script.flow.ImageOp;
-import com.gmmapowell.script.modules.processors.blog.ImgUploader;
 import com.gmmapowell.script.modules.processors.blog.UploadAll;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 import com.microsoft.playwright.Browser;

@@ -7,7 +7,6 @@ import java.util.List;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.reflection.Reflection;
 
-import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.script.config.Creator;
 import com.gmmapowell.script.config.CreatorExtensionPointRepo;
@@ -17,6 +16,7 @@ import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.intf.FilesToProcess;
+import com.gmmapowell.script.loader.LabelledPlace;
 import com.gmmapowell.script.modules.processors.doc.GlobalState;
 import com.gmmapowell.script.processor.Processor;
 
@@ -79,16 +79,16 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
 		Fluency fluency = new Fluency(global);
-		for (Place x : places.included()) {
-			System.out.println("Handling " + x.name());
-			ConfiguredState state = new ConfiguredState(global, local, fluency, joinspace, x);
+		for (LabelledPlace x : places.included()) {
+			System.out.println("Handling " + x.label);
+			ConfiguredState state = new ConfiguredState(global, local, fluency, joinspace, x.place);
 			List<ProcessingScanner> all = createScannerList(state);
 
 			for (LifecycleObserver o : observers)
-				o.newPlace(state, x);
+				o.newPlace(state, x.place);
 
 			// Each of the scanners gets a chance to act
-			x.lines((n, s) -> {
+			x.place.lines((n, s) -> {
 				state.line(n);
 				String trimmed = trim(s);
 				for (ProcessingScanner scanner : all)

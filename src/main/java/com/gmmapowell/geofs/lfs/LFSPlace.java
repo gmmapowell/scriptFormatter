@@ -28,17 +28,20 @@ import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class LFSPlace implements Place {
 	private final LocalFileSystem world;
+	private final LFSRegion region;
 	protected final File file;
 
-	public LFSPlace(LocalFileSystem world, File file) {
+	public LFSPlace(LocalFileSystem world, LFSRegion region, File file) {
 		this.world = world;
+		this.region = region;
 		if (!file.isFile())
 			throw new CantHappenException("there is no file " + file);
 		this.file = file;
 	}
 
-	protected LFSPlace(LocalFileSystem world, File file, boolean notExists) {
+	protected LFSPlace(LocalFileSystem world, LFSRegion region, File file, boolean notExists) {
 		this.world = world;
+		this.region = region;
 		if (!notExists)
 			throw new CantHappenException("this constructor must be called with notExists = true");
 		if (file.exists())
@@ -48,6 +51,8 @@ public class LFSPlace implements Place {
 
 	@Override
 	public Region region() {
+		if (region != null)
+			return region;
 		return new LFSRegion(world, file.getParentFile());
 	}
 	

@@ -27,6 +27,7 @@ import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.gdw.GDWPlace;
 import com.gmmapowell.geofs.git.GitPlace;
 import com.gmmapowell.geofs.git.GitRegion;
+import com.gmmapowell.geofs.lfs.LFSPendingRegion;
 import com.gmmapowell.geofs.lfs.LFSPlace;
 import com.gmmapowell.geofs.lfs.LFSRegion;
 import com.gmmapowell.geofs.listeners.LineListener;
@@ -112,6 +113,12 @@ public class GeoFSUtils {
 		return rn.r.newSubregion(rn.n);
 	}
 
+	public static void ensureRegionExists(Region region) {
+		if (region instanceof LFSPendingRegion) {
+			((LFSPendingRegion)region).ensureExists();
+		}
+	}
+	
 	public static Region ensureRegionPath(Region root, String string) {
 		throw new NotImplementedException();
 	}

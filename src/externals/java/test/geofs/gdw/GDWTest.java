@@ -132,7 +132,7 @@ public class GDWTest {
 	public void weCanDownloadADriveFile() throws Exception {
 		assumeNotNull(world);
 		File tf = File.createTempFile("download", ",txt");
-		LFSPlace local = new LFSPlace(null, tf);
+		LFSPlace local = new LFSPlace(null, null, tf);
 		world.root().place("hw").copyTo(local);
 		assertEquals("\uFEFFhello, world!", FileUtils.readFile(tf));
 		tf.delete();

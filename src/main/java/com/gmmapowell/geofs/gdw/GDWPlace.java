@@ -111,6 +111,7 @@ public class GDWPlace implements Place {
 	@Override
 	public void copyTo(Place to) {
 		try {
+			GeoFSUtils.ensureRegionExists(to.region());
 			service.files().export(id, "text/plain").executeMediaAndDownloadTo(GeoFSUtils.saveStreamTo(to));
 		} catch (IOException ex) {
 			throw new GeoFSException(ex);

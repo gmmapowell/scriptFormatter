@@ -9,8 +9,8 @@ import com.gmmapowell.geofs.exceptions.GeoFSPlaceExistsException;
 
 public class LFSPendingPlace extends LFSPlace {
 
-	public LFSPendingPlace(LocalFileSystem world, File file) {
-		super(world, file, true);
+	public LFSPendingPlace(LocalFileSystem world, LFSRegion region, File file) {
+		super(world, region, file, true);
 	}
 
 	@Override

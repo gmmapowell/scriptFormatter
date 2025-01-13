@@ -26,5 +26,6 @@
 	<classpathentry kind="var" path="ZINIKI_ROOT/ziniki-paas/intf/qbout/ziniki_paas.intf.jar"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/ZiWSH/intf/qbout/ZiWSH.intf.jar"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/qbout/utils.jar"/>
+	<classpathentry kind="lib" path="/Playwright FBAR/build/output/lib/playwright-1.30.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
