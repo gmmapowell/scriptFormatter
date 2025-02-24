@@ -67,6 +67,15 @@ public interface Region {
 	// or content type on S3
 	Place ensurePlace(String name);
 
+
+	/** Make sure that the place exists before writing, and recursively make sure that any
+	 * regions it is contained in also exist.
+	 * 
+	 * @param name the name of the place
+	 * @return the nested place which will be created on write
+	 */
+	Place ensureRegionAndPlace(String name);
+
 	/** For compatibility with the usual mechanism of whole paths, this method allows the user to provide an entire path which resolves to
 	 * a <tt>Region</tt>.  An error will be thrown if the path cannot be found or resolves to a <tt>Place</tt> instead of a <tt>Region</tt>.
 	 */

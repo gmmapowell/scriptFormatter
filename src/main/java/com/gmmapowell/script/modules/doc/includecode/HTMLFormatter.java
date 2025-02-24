@@ -15,7 +15,7 @@ public class HTMLFormatter implements Formatter {
 		text = text.replace("\t", "    ");
 		if (exdent > 0)
 			text = text.substring(exdent);
-		state.newPara();
+		state.newPara(withHighlight?"highlight":null);
 		state.newSpan();
 		int i = 0;
 		boolean isTag = false;

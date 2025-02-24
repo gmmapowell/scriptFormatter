@@ -20,7 +20,7 @@ public class Main {
 			FilesToProcess files = cfg.updateIndex();
 			cfg.prepare();
 			cfg.generate(files);
-			cfg.dump();
+//			cfg.dump();
 			cfg.sink();
 			cfg.show();
 			cfg.upload();

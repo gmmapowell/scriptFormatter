@@ -59,6 +59,11 @@ public class RegionDouble implements Region, RegionPlace {
 	}
 
 	@Override
+	public Place ensureRegionAndPlace(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public Region regionPath(String path) {
 		throw new NotImplementedException();
 	}

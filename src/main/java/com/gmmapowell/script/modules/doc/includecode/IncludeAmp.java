@@ -89,6 +89,12 @@ public class IncludeAmp implements AmpCommandHandler {
 			case "html":
 				formatter = new HTMLFormatter(state);
 				break;
+			case "java":
+				formatter = new JavaFormatter(state);
+				break;
+			case "js":
+				formatter = new JSFormatter(state);
+				break;
 			case "json":
 				formatter = new JsonFormatter(state);
 				break;

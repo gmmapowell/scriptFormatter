@@ -85,6 +85,11 @@ public class GitRegion implements Region {
 	}
 
 	@Override
+	public Place ensureRegionAndPlace(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public Region regionPath(String path) {
 		return GeoFSUtils.regionPath(root.getWorld(), this, path);
 	}

@@ -28,7 +28,7 @@ import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class LFSPlace implements Place {
 	private final LocalFileSystem world;
-	private final LFSRegion region;
+	protected final LFSRegion region;
 	protected final File file;
 
 	public LFSPlace(LocalFileSystem world, LFSRegion region, File file) {

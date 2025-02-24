@@ -21,7 +21,7 @@ import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
-import com.gmmapowell.script.flow.SectionTitle;
+import com.gmmapowell.script.flow.SaveAs;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
@@ -34,7 +34,6 @@ public class HTMLSink implements Sink {
 	private PrintWriter writer;
 	private StringWriter sw;
 	private List<Flow> flows = new ArrayList<>();
-	private boolean haveBreak = true;
 	private final Region storeInto;
 
 	public HTMLSink(Region root, String storeInto) throws IOException, GeneralSecurityException {
@@ -53,21 +52,25 @@ public class HTMLSink implements Sink {
 	@Override
 	public void render() throws IOException {
 		for (Flow f : flows) {
-			String title = null;
+			String saveAs = null;
 			this.sw = new StringWriter();
 			writer = new PrintWriter(sw);
+			boolean haveBreak = true;
 			for (Section s : f.sections) {
 				Cursor c = new Cursor(f.name, s);
 				String last = "text";
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
-//					System.out.println(tok);
+					System.out.println(tok);
 					last = transition(cf, last, tok);
 					boolean hadBreak = haveBreak;
 					figureStyles(cf, tok.styles);
 					cf = new ArrayList<>(tok.styles);
 					if (tok.it instanceof TextSpanItem) {
+						if (haveBreak && !last.equals("blockquote")) {
+							writer.print("<p>");
+						}
 						writer.print(entitify(((TextSpanItem)tok.it).text));
 						haveBreak = false;
 					} else if (tok.it instanceof BreakingSpace) {
@@ -80,12 +83,15 @@ public class HTMLSink implements Sink {
 							continue;
 						switch (last) {
 						case "bullet":
+							writer.print("</p>");
 							last = "needli";
 							break;
 						case "text":
-							writer.print("<br/>");
+							writer.print("</p>");
+//							writer.print("<br/>");
 							break;
 						case "blockquote":
+//							writer.print("</p>");
 							writer.print("<br/>");
 							break;
 						case "h1":
@@ -104,17 +110,17 @@ public class HTMLSink implements Sink {
 						writer.print("<a href='" + l.lk + "'>");
 						writer.print(l.tx);
 						writer.print("</a>");
-					} else if (tok.it instanceof SectionTitle) {
-						title = ((SectionTitle)tok.it).title();
+					} else if (tok.it instanceof SaveAs) {
+						saveAs = ((SaveAs)tok.it).name();
 					} else
 						throw new NotImplementedException();
 				}
 				transition(cf, last, "text");
 			}
 			writer.close();
-			if (title == null)
-				throw new CantHappenException("title was not defined");
-			Place html = storeInto.place(title + ".html");
+			if (saveAs == null)
+				throw new CantHappenException("saveAs was not defined");
+			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
 			html.store(sw.toString());
 			FileUtils.cat(GeoFSUtils.file(html));
 		}
@@ -127,7 +133,10 @@ public class HTMLSink implements Sink {
 //			writer.println("<br/>");
 //			haveBreak = true;
 //		}
-		return transition(cf, last, tok.styles.get(0));
+		String moveTo = tok.styles.get(0);
+		if ("section-title".equals(moveTo))
+			moveTo = "h2";
+		return transition(cf, last, moveTo);
 	}
 
 	private String transition(List<String> cf, String last, String next) {
@@ -135,7 +144,6 @@ public class HTMLSink implements Sink {
 			return last;
 
 		if (last.equals("blockquote")) {
-			writer.println("</span>");
 			writer.println("</blockquote>");
 		}
 		if (last.equals("needli") && !next.equals("bullet"))
@@ -153,8 +161,7 @@ public class HTMLSink implements Sink {
 			writer.print("<li>");
 		}
 		if (next.equals("blockquote")) {
-			writer.println("<blockquote class='tr_bq'>");
-			writer.println("<span style='color: blue; font-family: &quot;courier new&quot;, &quot;courier&quot;, monospace; font-size: x-small;'>");
+			writer.println("<blockquote class='article_blockquote'>");
 		}
 		return next;
 	}

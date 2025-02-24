@@ -14,6 +14,15 @@ public class LFSPendingPlace extends LFSPlace {
 	}
 
 	@Override
+	public void store(String contents) {
+		if (region instanceof LFSPendingRegion) {
+			((LFSPendingRegion)region).ensureExists();
+		}
+		createFile();
+		super.store(contents);
+	}
+	
+	@Override
 	protected void createFile() {
 		if (file.exists()) {
 			throw new GeoFSPlaceExistsException(file.getPath());

@@ -79,6 +79,11 @@ public class GDWRegion implements Region {
 	}
 
 	@Override
+	public Place ensureRegionAndPlace(String name) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public String name() {
 		return name;
 	}

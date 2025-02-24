@@ -87,6 +87,22 @@ public class LFSRegion implements Region {
 	}
 
 	@Override
+	public Place ensureRegionAndPlace(String name) {
+		File f = new File(file, name);
+		if (f.isFile())
+			return new LFSPlace(world, this, f);
+		else {
+			File dir = f.getParentFile();
+			LFSRegion r;
+			if (dir.isDirectory())
+				r = new LFSRegion(world, dir);
+			else
+				r = new LFSPendingRegion(world, dir);
+			return new LFSPendingPlace(world, r, f);
+		}
+	}
+
+	@Override
 	public Region ensureSubregion(String name) {
 		File f = new File(file, name);
 		if (f.isDirectory())

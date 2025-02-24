@@ -8,15 +8,15 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import com.gmmapowell.script.modules.article.ArticleModule;
 
-public class SectionTitle implements SpanItem {
-	private final String title;
+public class SaveAs implements SpanItem {
+	private final String name;
 
-	public SectionTitle(String title) {
-		this.title = title;
+	public SaveAs(String name) {
+		this.name = name;
 	}
 	
-	public String title() {
-		return title;
+	public String name() {
+		return name;
 	}
 
 	@Override
@@ -27,11 +27,11 @@ public class SectionTitle implements SpanItem {
 	@Override
 	public void intForm(DataOutputStream os) throws IOException {
 		os.write(ArticleModule.ID);
-		os.write(ArticleModule.SECTION_TITLE);
+		os.write(ArticleModule.SAVE_AS);
 	}
 
 	@Override
 	public String toString() {
-		return "Section[" + title + "]";
+		return "SaveAs[" + name + "]";
 	}
 }

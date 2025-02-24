@@ -8,6 +8,8 @@ import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.elements.block.BlockishElementFactory;
 import com.gmmapowell.script.flow.FlowMap;
+import com.gmmapowell.script.modules.processors.blog.BlockquoteSpotter;
+import com.gmmapowell.script.modules.processors.blog.BulletSpotter;
 import com.gmmapowell.script.modules.processors.doc.AmpSpotter;
 import com.gmmapowell.script.modules.processors.doc.AtBlankSpotter;
 import com.gmmapowell.script.modules.processors.doc.AtSpotter;
@@ -29,16 +31,15 @@ public class ArticleProcessorConfigListener implements ConfigListener {
 	
 	@Override
 	public ConfigListener dispatch(Command cmd) {
-//		switch (cmd.name()) {
-//		case "param":
-//		{
-//			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
-//			return null;
-//		}
-//		default: {
-			throw new NotImplementedException("article processor does not have any parameters");
-//		}
-//		}
+		switch (cmd.name()) {
+		case "separately": {
+			vars.put(cmd.depth(), cmd.name(), "true");
+			return null;
+		}
+		default: {
+			throw new NotImplementedException("article processor does not have parameter " + cmd.name());
+		}
+		}
 	}
 
 	@Override
@@ -47,7 +48,9 @@ public class ArticleProcessorConfigListener implements ConfigListener {
 			GlobalState global = state.config.newGlobalState();
 			ConfiguredProcessor proc = new ConfiguredProcessor(global, state.root, new BlockishElementFactory(), vars, state.debug);
 			FlowMap flows = global.flows();
-			flows.flow("main");
+			if (!proc.separately()) {
+				flows.flow("main");
+			}
 			proc.setDefaultHandler(StandardLineProcessor.class);
 			proc.setBlankHandler(NewParaProcessor.class);
 			proc.addScanner(AmpSpotter.class);
@@ -55,6 +58,8 @@ public class ArticleProcessorConfigListener implements ConfigListener {
 			proc.addScanner(FieldSpotter.class);
 			proc.addScanner(AtBlankSpotter.class);
 			proc.addScanner(EndAtSpotter.class);
+			proc.addScanner(BulletSpotter.class);
+			proc.addScanner(BlockquoteSpotter.class);
 			state.config.processor(proc);
 		} catch (Exception ex) {
 			ex.printStackTrace();

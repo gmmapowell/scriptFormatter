@@ -1,6 +1,6 @@
 package com.gmmapowell.script.modules.processors.article;
 
-import com.gmmapowell.script.flow.SectionTitle;
+import com.gmmapowell.script.flow.SaveAs;
 import com.gmmapowell.script.modules.processors.doc.AtCommand;
 import com.gmmapowell.script.modules.processors.doc.AtCommandHandler;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
@@ -23,10 +23,14 @@ public class ArticleCommand implements AtCommandHandler {
 		String title = cmd.arg("title");
 		if (title == null)
 			throw new RuntimeException("Article without title");
-		state.newSection("main", "article");
+		String saveAs = cmd.arg("saveAs");
+		if (saveAs == null)
+			saveAs = title;
+		state.ensureFlow(title);
+		state.newSection(title, "article");
 		state.newPara();
 		state.newSpan();
-		state.op(new SectionTitle(title));
+		state.op(new SaveAs(saveAs));
 		state.endPara();
 	}
 }
