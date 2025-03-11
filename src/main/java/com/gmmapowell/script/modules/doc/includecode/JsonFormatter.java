@@ -14,13 +14,8 @@ public class JsonFormatter implements Formatter {
 		text = text.replace("\t", "    ");
 		if (exdent > 0)
 			text = text.substring(exdent);
-		state.newPara();
+		state.newPara(withHighlight?"highlight":null);
 		state.newSpan();
-//		int i = 0;
-//		while (i < text.length()) {
-//			char c = text.charAt(i);
-//			i++;
-//		}
 		if (text.length() != 0)
 			state.text(text);
 		state.endPara();
