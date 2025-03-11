@@ -98,6 +98,9 @@ public class IncludeAmp implements AmpCommandHandler {
 			case "json":
 				formatter = new JsonFormatter(state);
 				break;
+			case "xml":
+				formatter = new XMLFormatter(state);
+				break;
 			default:
 				formatter = new BoringFormatter(state);
 				break;

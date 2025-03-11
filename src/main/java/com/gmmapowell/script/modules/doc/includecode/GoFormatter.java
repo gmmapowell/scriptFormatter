@@ -27,7 +27,7 @@ public class GoFormatter implements Formatter {
 		boolean first = true;
 		while (i < text.length()) {
 			char c = text.charAt(i);
-			if (c == ' ') {
+			if (c == ' ' || c == '(') {
 				String tx = text.substring(0, i);
 				if (isKW(first, tx)) {
 					state.nestSpan("bold");
@@ -37,7 +37,7 @@ public class GoFormatter implements Formatter {
 					state.text(tx);
 					first = false;
 				}
-				state.text(" ");
+				state.text(new String(new char[] { c }));
 				text = text.substring(i+1);
 				i = 0;
 			} else
