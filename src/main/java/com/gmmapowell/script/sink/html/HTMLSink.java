@@ -136,6 +136,8 @@ public class HTMLSink implements Sink {
 		String moveTo = tok.styles.get(0);
 		if ("section-title".equals(moveTo))
 			moveTo = "h2";
+		else if ("subsection-title".equals(moveTo))
+			moveTo = "h3";
 		return transition(cf, last, moveTo);
 	}
 

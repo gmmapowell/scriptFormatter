@@ -19,6 +19,7 @@ import com.gmmapowell.script.modules.processors.doc.ForceSpaceHandler;
 import com.gmmapowell.script.modules.processors.doc.NeedBreakAmp;
 import com.gmmapowell.script.modules.processors.doc.SectionCommand;
 import com.gmmapowell.script.modules.processors.doc.SpaceAmp;
+import com.gmmapowell.script.modules.processors.doc.SubsectionCommand;
 import com.gmmapowell.script.processor.configured.InlineCommandHandler;
 import com.gmmapowell.script.utils.Command;
 
@@ -50,6 +51,7 @@ public class InstallArticleModule implements ConfigListener {
 		// structure
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, ArticleCommand.class);
 		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SectionCommand.class);
+		this.config.extensions().bindExtensionPoint(AtCommandHandler.class, SubsectionCommand.class);
 	}
 
 	// & commands
