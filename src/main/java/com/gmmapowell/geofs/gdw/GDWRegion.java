@@ -58,7 +58,8 @@ public class GDWRegion implements Region {
 	@Override
 	public Place place(String name) {
 		try {
-			FileList result = service.files().list().setQ("name='" + name + "' and '" + regionId + "' in parents and mimeType != 'application/vnd.google-apps.folder'").execute();
+			String enc = name.replace("\\", "\\\\").replace("'", "\\'");
+			FileList result = service.files().list().setQ("name='" + enc + "' and '" + regionId + "' in parents and mimeType != 'application/vnd.google-apps.folder'").execute();
 	        if (result.getFiles().size() != 1)
 	        	throw new GeoFSException("Could not find place: " + name + " in " + this);
 	        String id = result.getFiles().get(0).getId();
