@@ -29,7 +29,7 @@ public class CursorTest {
 	}
 
 	@Test
-	public void testNoTokensInAnSectionWithAnEmptyPara() {
+	public void testNoTokensInASectionWithAnEmptyPara() {
 		Section section = new Section("basic");
 		section.paras.add(new Para(new ArrayList<>()));
 		Cursor c = new Cursor("main", section);

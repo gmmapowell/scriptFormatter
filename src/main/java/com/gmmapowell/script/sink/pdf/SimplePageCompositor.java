@@ -1,7 +1,6 @@
 package com.gmmapowell.script.sink.pdf;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,6 +10,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.flow.CursorIndex;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
@@ -49,8 +49,8 @@ public class SimplePageCompositor implements PageCompositor {
 					);
 			outlets.put("header", new Outlet(styles, pageStyle, meta, currentPage, header).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
-					r.place(new StyledToken("header", 0, 0, new ArrayList<>(), Arrays.asList("text"), new TextSpanItem("Page " + ream.currentPageNo())));
-					r.place(new StyledToken("header", 0, 0, new ArrayList<>(), Arrays.asList("text"), new ParaBreak()));
+					r.place(new StyledToken("header", new CursorIndex(), Arrays.asList("text"), new TextSpanItem("Page " + ream.currentPageNo())));
+					r.place(new StyledToken("header", new CursorIndex(), Arrays.asList("text"), new ParaBreak()));
 				}
 			}));
 		}
@@ -61,8 +61,8 @@ public class SimplePageCompositor implements PageCompositor {
 					);
 			outlets.put("footer", new Outlet(styles, pageStyle, meta, currentPage, footer).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
-					r.place(new StyledToken("footer", 0, 0, new ArrayList<>(), Arrays.asList("pageno"), new TextSpanItem("Page " + ream.currentPageNo())));
-					r.place(new StyledToken("footer", 0, 0, new ArrayList<>(), Arrays.asList("pageno"), new ParaBreak()));
+					r.place(new StyledToken("footer", new CursorIndex(), Arrays.asList("pageno"), new TextSpanItem("Page " + ream.currentPageNo())));
+					r.place(new StyledToken("footer", new CursorIndex(), Arrays.asList("pageno"), new ParaBreak()));
 				}
 			}));
 		}

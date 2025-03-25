@@ -1,23 +1,17 @@
 package com.gmmapowell.script.flow;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Cursor implements Comparable<Cursor> {
 	private final String flow;
 	private final Section si;
-	private int para;
-	private int span;
-	private List<AtomicInteger> item;
+	private final CursorLocation loc;
 
 	public Cursor(String name, Section si) {
+		this.loc = new CursorLocation(si);
 		this.flow = name;
 		this.si = si;
-		this.para = 0;
-		this.span = 0;
-		reset();
 	}
 
 	public String flowName() {
@@ -28,13 +22,39 @@ public class Cursor implements Comparable<Cursor> {
 		return si.format;
 	}
 
-	private void reset() {
-		this.item = new ArrayList<AtomicInteger>();
-		this.item.add(new AtomicInteger(0));
+	public StyledToken next() {
+		System.out.println("next(), this.loc = " + this.loc);
+		if (this.loc.atEnd())
+			return null;
+
+		StyledToken ret = figureThisToken();
+		loc.advance();
+		return ret;
+	}
+	
+	private StyledToken figureThisToken() {
+		List<String> styles = new ArrayList<>();
+		Para p = loc.currentPara();
+		if (p == null)
+			return null;
+		styles.addAll(p.formats);
+		if (loc.needBreak()) {
+			return new StyledToken(flow, loc.index(), styles, new ParaBreak());
+		}
+		HorizSpan hs = loc.currentSpan();
+		styles.addAll(hs.formats);
+		SpanItem it = loc.currentToken();
+//		int kk = this.item.get(0).get();
+//		System.out.println("  hssz = " + hs.items.size() + "; kk = " + kk);
+//		if (kk >= hs.items.size()) {
+//			return new StyledToken(flow, para, span, item, styles, new ParaBreak());
+//		}
+//		SpanItem it = hs.items.get(kk);
+		return new StyledToken(flow, loc.index(), styles, it);
 	}
 
-	public StyledToken next() {
-		System.out.println("next(), this.item = " + this.item);
+	/*
+	public StyledToken dead() {
 		boolean startAgain = false;
 		top:
 		while (true) {
@@ -98,20 +118,17 @@ public class Cursor implements Comparable<Cursor> {
 			return new StyledToken(flow, para, span, item, styles, it);
 		}
 	}
-
+	*/
+	
 	public void backTo(StyledToken lastAccepted) {
 		if (lastAccepted == null)
-			resetTo(0, 0, Arrays.asList(0));
+			resetTo(new CursorIndex());
 		else
 			lastAccepted.resetMe(this);
 	}
 
-	public void resetTo(int para, int span, List<Integer> item) {
-		this.para = para;
-		this.span = span;
-		this.item = new ArrayList<>();
-		for (int i=0;i<item.size();i++)
-			this.item.add(new AtomicInteger(item.get(i)));
+	public void resetTo(CursorIndex to) {
+		this.loc.resetTo(to);
 	}
 
 	public boolean isFlow(String enable) {
