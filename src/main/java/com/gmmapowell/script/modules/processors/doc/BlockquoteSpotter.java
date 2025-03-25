@@ -45,7 +45,7 @@ public class BlockquoteSpotter implements ProcessingScanner {
 				} else
 					break;
 			}
-			while (Character.isWhitespace(s.charAt(i)))
+			while (i < s.length() && Character.isWhitespace(s.charAt(i)))
 				i++;
 			state.processText(s.substring(i));
 			state.endPara();
