@@ -80,6 +80,9 @@ public class IncludeAmp implements AmpCommandHandler {
 			 formatter = new BoringFormatter(state);
 		else {
 			switch (params.get("formatter")) {
+			case "css":
+				formatter = new CSSFormatter(state);
+				break;
 			case "flas":
 				formatter = new FLASFormatter(state);
 				break;
