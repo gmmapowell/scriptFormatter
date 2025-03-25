@@ -5,21 +5,44 @@ import java.util.List;
 
 public class CursorIndex {
 	int paraNum = 0;
-	int spanNum = 0;
-	List<Integer> itemNums = new ArrayList<>();
+	List<Integer> spanIdxs = new ArrayList<>();
 
+	public CursorIndex() {
+		this.spanIdxs.add(0);
+	}
+	
 	public void setTo(CursorIndex idx) {
 		this.paraNum = idx.paraNum;
-		this.spanNum = idx.spanNum;
-		this.itemNums = new ArrayList<>();
-		for (int x : idx.itemNums) {
-			this.itemNums.add(x);
+		this.spanIdxs = new ArrayList<>();
+		for (int x : idx.spanIdxs) {
+			this.spanIdxs.add(x);
 		}
+	}
+	
+	public int top() {
+		return spanIdxs.get(spanIdxs.size()-1);
+	}
+
+	public int incr() {
+		int k = spanIdxs.get(spanIdxs.size()-1);
+		k++;
+		spanIdxs.set(spanIdxs.size()-1, k);
+		return k;
+	}
+
+	public boolean pop() {
+		spanIdxs.remove(spanIdxs.size()-1);
+		if (spanIdxs.isEmpty()) {
+			paraNum++;
+			spanIdxs.add(0);
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
 	public String toString() {
-		return itemNums + "." + spanNum + "." + paraNum;
+		return paraNum + "" + spanIdxs;
 	}
 
 }

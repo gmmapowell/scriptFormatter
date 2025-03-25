@@ -25,6 +25,7 @@ public class CursorTest {
 		Section section = new Section("basic");
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 
@@ -34,6 +35,7 @@ public class CursorTest {
 		section.paras.add(new Para(new ArrayList<>()));
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 
@@ -47,9 +49,11 @@ public class CursorTest {
 		para.spans.add(span);
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertEquals(0, tok.styles.size());
 		assertTrue(tok.it instanceof ParaBreak);
 		tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 
@@ -67,9 +71,11 @@ public class CursorTest {
 		para2.spans.add(span2);
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertEquals(0, tok.styles.size());
 		assertTrue(tok.it instanceof ParaBreak);
 		tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 
@@ -84,11 +90,14 @@ public class CursorTest {
 		span.items.add(tx);
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertEquals(0, tok.styles.size());
 		assertTrue(tok.it instanceof TextSpanItem);
 		tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof ParaBreak);
 		tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 
@@ -104,11 +113,14 @@ public class CursorTest {
 		span.items.add(tx);
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof TextSpanItem);
 		assertArrayEquals(new String[] {"para", "span"}, tok.styles.toArray());
 		tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof ParaBreak);
 		tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 }
