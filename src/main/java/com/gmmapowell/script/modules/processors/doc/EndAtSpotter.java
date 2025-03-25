@@ -14,7 +14,6 @@ public class EndAtSpotter implements ProcessingScanner {
 	@Override
 	public boolean handleLine(String s) {
 		if (s.startsWith("@/")) {
-			System.out.println("is-at-end");
 			ats.popAtCommand();
 			return true;
 		}

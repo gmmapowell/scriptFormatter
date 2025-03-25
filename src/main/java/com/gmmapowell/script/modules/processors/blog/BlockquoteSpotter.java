@@ -21,7 +21,7 @@ public class BlockquoteSpotter implements ProcessingScanner {
 	@Override
 	public boolean handleLine(String s) {
 		if (s.trim().equals("$$")) {
-			System.out.println("is-blockquote");
+//			System.out.println("is-blockquote");
 			bs.toggle();
 			if (bs.active()) {
 				state.pushFormat("blockquote");
@@ -30,7 +30,7 @@ public class BlockquoteSpotter implements ProcessingScanner {
 			}
 			return true; // it has been handled
 		} else if (bs.active()) {
-			System.out.println("in-bq");
+//			System.out.println("in-bq");
 //			state.endPara(); // make sure the text will appear in a new para
 			state.newPara();
 //			state.newPara("blockquote");

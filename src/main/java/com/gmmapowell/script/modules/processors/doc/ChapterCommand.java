@@ -26,7 +26,7 @@ public class ChapterCommand implements AtCommandHandler {
 			style = "chapter";
 		String anchor = cmd.arg("anchor");
 
-		System.out.println("chapter " + title + ": " + style);
+//		System.out.println("chapter " + title + ": " + style);
 		
 		state.newSection("footnotes", style);
 		state.newSection("main", style);

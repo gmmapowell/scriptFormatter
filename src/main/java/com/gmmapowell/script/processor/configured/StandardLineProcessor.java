@@ -11,7 +11,6 @@ public class StandardLineProcessor implements ProcessingHandler {
 
 	@Override
 	public void process(String s) {
-		System.out.println("processing line ...");
 		if (state.joinspace() && state.inPara()) {
 			if (!state.inSpan())
 				state.newSpan();

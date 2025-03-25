@@ -170,7 +170,7 @@ public class DoInclusion {
 //		System.out.print("include " + lineNo + ": " + primed + ": ");
 		boolean allowStop = true;
 		if (stopped) {
-			System.out.println("stopped: " + line);
+//			System.out.println("stopped: " + line);
 			return;
 		} else if (!primed) {
 			exdent = select.exdent;
@@ -179,7 +179,7 @@ public class DoInclusion {
 				allowStop = false;
 				selectionIndent = indent(line, lineNo);
 			} else {
-				System.out.println("skipping line before select: " + line);
+//				System.out.println("skipping line before select: " + line);
 				return;
 			}
 		}
@@ -193,12 +193,12 @@ public class DoInclusion {
 				return;
 		}
 		if (allowStop && select != null && !formatter.isBlockIndent(selectionIndent, il)) {
-			System.out.println("selection over at: " + line);
+//			System.out.println("selection over at: " + line);
 			stopped = true;
 			return;
 		}
 		if (curr != -1) {
-			System.out.println("comparing " + il + " to " + curr + " for " + line);
+//			System.out.println("comparing " + il + " to " + curr + " for " + line);
 			if (formatter.isBlockIndent(curr, il)) {
 				if (!haveSkipped) {
 					elideThis(il);
@@ -226,7 +226,7 @@ public class DoInclusion {
 			}
 		}
 		if (indents == null || (il >= indents.min && il <= indents.max)) {
-				System.out.println("formatting: " + line);
+//				System.out.println("formatting: " + line);
 			formatter.format(line, exdent, wantHighlight(line));
 			haveSkipped = false;
 		} else if (!haveSkipped) {

@@ -23,7 +23,6 @@ public class FieldSpotter implements ProcessingScanner {
 		
 		Matcher m = fieldStart.matcher(s);
 		if (m.matches()) {
-			System.out.println("is-field");
 			ats.cmdField(m.group(1), m.group(2));
 			return true;
 		} else {

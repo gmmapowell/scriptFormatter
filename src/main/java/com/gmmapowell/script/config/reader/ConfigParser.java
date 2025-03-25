@@ -10,6 +10,7 @@ import com.gmmapowell.script.utils.NestedCommandDispatcher;
 import com.gmmapowell.script.utils.SBLineArgsParser;
 
 public class ConfigParser implements NumberedLineListener {
+	private final boolean debug = false;
 	private Exception capture;
 	private final ReadConfigState state;
 	private final NestedCommandDispatcher<ReadConfigState> dispatcher;
@@ -21,7 +22,8 @@ public class ConfigParser implements NumberedLineListener {
 	
 	@Override
 	public void line(int lno, String s) {
-		System.out.println("Processing " + lno + ": " + s);
+		if (debug)
+			System.out.println("Processing " + lno + ": " + s);
 		state.wline = lno;
 		// if we've already seen an exception, stop
 		if (capture != null)

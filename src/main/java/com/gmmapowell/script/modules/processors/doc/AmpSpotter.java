@@ -33,7 +33,7 @@ public class AmpSpotter implements ProcessingScanner {
 	public boolean handleLine(String s) {
 		if (s.startsWith("&")) {
 			LineArgsParser lap = new SBLineArgsParser<ConfiguredState>(state, s.substring(1));
-			System.out.println("is-amp");
+//			System.out.println("is-amp");
 			Command cmd = lap.readCommand();
 			amps.startCommand(cmd.name(), lap);
 			return true;

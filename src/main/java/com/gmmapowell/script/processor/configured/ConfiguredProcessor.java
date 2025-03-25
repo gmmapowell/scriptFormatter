@@ -29,9 +29,11 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	private Class<? extends ProcessingHandler> blankHandler;
 	private final List<Class<? extends ProcessingScanner>> scanners = new ArrayList<>();
 	private final List<LifecycleObserver> observers = new ArrayList<>();
+	private boolean debug;
 
 	public ConfiguredProcessor(GlobalState global, Region root, BlockishElementFactory blockishElementFactory, VarMap vars, boolean debug) {
 		this.global = global;
+		this.debug = debug;
 		this.local = new CreatorExtensionPointRepo(global.extensions());
 		// TODO: this should be a negotiation between the configlistener and an (initialized) ConfiguredProcessor
 		if (vars != null) {
@@ -80,7 +82,8 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		// TODO: create a "bigger" state (which persists across input files)
 		Fluency fluency = new Fluency(global);
 		for (LabelledPlace x : places.included()) {
-			System.out.println("Handling " + x.label);
+			if (debug)
+				System.out.println("Handling " + x.label);
 			ConfiguredState state = new ConfiguredState(global, local, fluency, joinspace, x.place);
 			List<ProcessingScanner> all = createScannerList(state);
 
@@ -93,7 +96,8 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 				String trimmed = trim(s);
 				for (ProcessingScanner scanner : all)
 					scanner.closeIfNotContinued(scanner.wantTrimmed() ? trimmed : s);
-				System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
+				if (debug)
+					System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
 				for (ProcessingScanner scanner : all) {
 					if (scanner.handleLine(scanner.wantTrimmed() ? trimmed : s))
 						return;

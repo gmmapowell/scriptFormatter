@@ -25,7 +25,7 @@ public class HeadingSpotter implements ProcessingScanner{
 		Matcher m = head.matcher(s);
 		if (m.matches()) {
 			int level = m.group(1).length();
-			System.out.println("heading " + level);
+//			System.out.println("heading " + level);
 			state.newPara("h" + level);
 			state.processText(m.group(2));
 			state.endPara();

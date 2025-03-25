@@ -65,7 +65,7 @@ public class IncludeAmp implements AmpCommandHandler {
 		Region r = root;
 		String file = cmd.args.readString();
 		Map<String, String> params = cmd.args.readParams("formatter");
-		System.out.println("want to include " + file + " with " + params);
+//		System.out.println("want to include " + file + " with " + params);
 		if (file.indexOf('/') != -1) {
 			File f = new File(file);
 			r = GeoFSUtils.regionPath(null, root, f.getParent());

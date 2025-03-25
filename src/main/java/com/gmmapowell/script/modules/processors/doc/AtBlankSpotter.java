@@ -13,7 +13,6 @@ public class AtBlankSpotter implements ProcessingScanner {
 	@Override
 	public boolean handleLine(String s) {
 		if (ats.hasPendingCommand() && s.trim().length() == 0) {
-			System.out.println("blank line after command");
 			ats.handleAtCommand();
 			ats.ignoreNextBlanks();
 			return true;
@@ -24,7 +23,6 @@ public class AtBlankSpotter implements ProcessingScanner {
 	@Override
 	public void placeDone() {
 		if (ats.hasPendingCommand()) {
-			System.out.println("executing command at end of file");
 			ats.handleAtCommand();
 		}
 	}

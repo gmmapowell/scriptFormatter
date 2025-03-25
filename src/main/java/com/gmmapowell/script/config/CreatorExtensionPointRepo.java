@@ -14,7 +14,7 @@ public class CreatorExtensionPointRepo implements ExtensionPointRepo {
 
 	public CreatorExtensionPointRepo(ExtensionPointRepo parent) {
 		this.parent = parent;
-		System.out.println("creating " + this + " with parent " + parent);
+//		System.out.println("creating " + this + " with parent " + parent);
 	}
 	
 	@Override

@@ -60,7 +60,7 @@ public class Upload {
 			System.out.println("Using private key from ~/.ssh/id_rsa");
 			privateKeyPath = new File(System.getProperty("user.home"), ".ssh/id_rsa");
 		}
-		JSch.setLogger(new JSCHLogger());
+//		JSch.setLogger(new JSCHLogger());
 		JSch jsch = new JSch();
 		jsch.addIdentity(privateKeyPath.getPath());
 		Session s = null;
