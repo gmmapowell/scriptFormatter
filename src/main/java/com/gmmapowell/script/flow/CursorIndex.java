@@ -33,8 +33,6 @@ public class CursorIndex {
 	public boolean pop() {
 		spanIdxs.remove(spanIdxs.size()-1);
 		if (spanIdxs.isEmpty()) {
-			paraNum++;
-			spanIdxs.add(0);
 			return true;
 		}
 		return false;

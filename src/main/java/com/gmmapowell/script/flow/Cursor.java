@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Cursor implements Comparable<Cursor> {
 	private final String flow;
-	private final Section si;
+	private final Section section;
 	private final CursorLocation loc;
 
-	public Cursor(String name, Section si) {
-		this.loc = new CursorLocation(si);
+	public Cursor(String name, Section section) {
+		this.loc = new CursorLocation(section);
 		this.flow = name;
-		this.si = si;
+		this.section = section;
 	}
 
 	public String flowName() {
@@ -19,7 +19,7 @@ public class Cursor implements Comparable<Cursor> {
 	}
 
 	public String format() {
-		return si.format;
+		return section.format;
 	}
 
 	public StyledToken next() {
@@ -27,10 +27,10 @@ public class Cursor implements Comparable<Cursor> {
 		if (this.loc.atEnd())
 			return null;
 
-		if (loc.endPara) {
-			loc.advance();
-			return next();
-		}
+//		if (loc.endPara) {
+//			loc.advance();
+//			return next();
+//		}
 		StyledToken ret = figureThisToken();
 		loc.advance();
 		return ret;
@@ -42,11 +42,15 @@ public class Cursor implements Comparable<Cursor> {
 		if (p == null)
 			return null;
 		styles.addAll(p.formats);
-		if (loc.needBreak()) {
+		styles.remove("break");
+		if (loc.endPara) {
 			return new StyledToken(flow, loc.index(), styles, new ParaBreak());
 		}
-		for (HorizSpan hs : loc.spans) {
-			styles.addAll(hs.formats);
+		for (SpanItem hs : loc.spine()) {
+			if (hs instanceof NestedSpan) {
+				NestedSpan ns = (NestedSpan) hs;
+				styles.addAll(ns.nested.formats);
+			}
 		}
 		SpanItem it = loc.currentToken();
 //		int kk = this.item.get(0).get();
@@ -57,6 +61,7 @@ public class Cursor implements Comparable<Cursor> {
 //		SpanItem it = hs.items.get(kk);
 		return new StyledToken(flow, loc.index(), styles, it);
 	}
+	
 	public void backTo(StyledToken lastAccepted) {
 		if (lastAccepted == null)
 			resetTo(new CursorIndex());

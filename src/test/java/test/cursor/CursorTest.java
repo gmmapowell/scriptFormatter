@@ -101,7 +101,6 @@ public class CursorTest {
 		assertNull(tok);
 	}
 
-
 	@Test
 	public void testFormatsAreConcatenated() {
 		Section section = new Section("basic");
@@ -115,7 +114,46 @@ public class CursorTest {
 		StyledToken tok = c.next();
 		System.out.println(tok);
 		assertTrue(tok.it instanceof TextSpanItem);
+		assertEquals("hello", ((TextSpanItem)tok.it).text);
 		assertArrayEquals(new String[] {"para", "span"}, tok.styles.toArray());
+		tok = c.next();
+		System.out.println(tok);
+		assertTrue(tok.it instanceof ParaBreak);
+		tok = c.next();
+		System.out.println(tok);
+		assertNull(tok);
+	}
+
+
+	@Test
+	public void testSimpleTwoPara() {
+		Section section = new Section("basic");
+		Para para = new Para(Arrays.asList("para"));
+		section.paras.add(para);
+		HorizSpan span = new HorizSpan(null, Arrays.asList("span"));
+		para.spans.add(span);
+		TextSpanItem tx = new TextSpanItem("hello");
+		span.items.add(tx);
+		para = new Para(Arrays.asList("para2"));
+		section.paras.add(para);
+		span = new HorizSpan(null, Arrays.asList("span2"));
+		para.spans.add(span);
+		tx = new TextSpanItem("world");
+		span.items.add(tx);
+		Cursor c = new Cursor("main", section);
+		StyledToken tok = c.next();
+		System.out.println(tok);
+		assertTrue(tok.it instanceof TextSpanItem);
+		assertEquals("hello", ((TextSpanItem)tok.it).text);
+		assertArrayEquals(new String[] {"para", "span"}, tok.styles.toArray());
+		tok = c.next();
+		System.out.println(tok);
+		assertTrue(tok.it instanceof ParaBreak);
+		tok = c.next();
+		System.out.println(tok);
+		assertTrue(tok.it instanceof TextSpanItem);
+		assertArrayEquals(new String[] {"para2", "span2"}, tok.styles.toArray());
+		assertEquals("world", ((TextSpanItem)tok.it).text);
 		tok = c.next();
 		System.out.println(tok);
 		assertTrue(tok.it instanceof ParaBreak);

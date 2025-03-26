@@ -3,19 +3,20 @@ package com.gmmapowell.script.flow;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.zinutils.exceptions.NotImplementedException;
+
 public class CursorLocation {
-	private Section si;
+	private Section section;
 	
 	CursorIndex curr = new CursorIndex();
-	private boolean atEnd = false;
-	private boolean needBreak;
+	boolean atEnd;
 	boolean endPara;
 
 	Para para;
-	List<HorizSpan> spans = new ArrayList<>();
+	List<List<SpanItem>> cxts = new ArrayList<>();
 	
-	public CursorLocation(Section si) {
-		this.si = si;
+	public CursorLocation(Section section) {
+		this.section = section;
 		this.resetTo(new CursorIndex());
 		findNextToken();
 	}
@@ -25,34 +26,29 @@ public class CursorLocation {
 		this.moveToToken();
 	}
 	
-	private HorizSpan getSpan(List<HorizSpan> spans, int idx) {
-		if (idx >= spans.size())
-			return null;
-		return spans.get(idx);
-	}
-	
 	public void moveToToken() {
-		if (curr.paraNum >= si.paras.size()) {
+		if (curr.paraNum >= section.paras.size()) {
 			atEnd = true;
 			return;
 		}
-		this.para = si.paras.get(curr.paraNum);
-		HorizSpan s = getSpan(this.para.spans, this.curr.spanIdxs.get(0));
-		if (s == null) {
-			if (!this.para.spans.isEmpty())
-				needBreak = true;
-			endPara = true;
-			curr.paraNum++;
-			return;
-		}
-		this.spans.clear();
-		this.spans.add(s);
+		this.para = section.paras.get(curr.paraNum);
+		this.cxts.clear();
+		List<SpanItem> sl = mapToSIs(this.para.spans);
+		this.cxts.add(sl);
 		for (int i=1;i<curr.spanIdxs.size();i++) {
 			int k = curr.spanIdxs.get(i);
-			NestedSpan ns = (NestedSpan) s.items.get(k);
-			s = ns.nested;
-			this.spans.add(s);
+			NestedSpan ns = (NestedSpan) sl.get(k);
+			HorizSpan hs = ns.nested;
+			this.cxts.add(hs.items);
 		}
+	}
+
+	private List<SpanItem> mapToSIs(List<HorizSpan> spans) {
+		List<SpanItem> ret = new ArrayList<>();
+		for (HorizSpan s : spans) {
+			ret.add(new NestedSpan(s));
+		}
+		return ret;
 	}
 
 	private void findNextToken() {
@@ -64,7 +60,7 @@ public class CursorLocation {
 		while (currentToken() instanceof NestedSpan) {
 			NestedSpan span = (NestedSpan) currentToken();
 			curr.spanIdxs.add(0);
-			spans.add(span.nested);
+			cxts.add(span.nested.items);
 		}
 		if (!atRealToken())
 			advance();
@@ -73,7 +69,7 @@ public class CursorLocation {
 	public boolean atRealToken() {
 		if (para.spans.isEmpty())
 			return false;
-		if (curr.top() >= currentSpan().items.size())
+		if (curr.top() >= top().size())
 			return false;
 		if (currentToken() instanceof NestedSpan)
 			return false;
@@ -84,15 +80,9 @@ public class CursorLocation {
 		if (atEnd)
 			return;
 		endPara = false;
-		if (needBreak) {
-			needBreak = false;
-			moveToToken();
-			if (atEnd || needBreak || atRealToken())
-				return;
-		}
 		if (para.spans.isEmpty()) {
 			curr.paraNum++;
-			if (curr.paraNum >= si.paras.size()) {
+			if (curr.paraNum >= section.paras.size()) {
 				atEnd = true;
 				return;
 			} else if (curr.paraNum > 0) {
@@ -100,44 +90,69 @@ public class CursorLocation {
 				return;
 			}
 		}
-		while (true) {
+		while (!cxts.isEmpty()) {
 			int k = curr.incr();
-			if (k >= currentSpan().items.size()) {
-				needBreak = curr.pop();
-				this.spans.remove(this.spans.size()-1);
-				if (needBreak)
+			if (k >= top().size()) {
+				endPara = curr.pop();
+				this.cxts.remove(this.cxts.size()-1);
+				if (endPara)
 					return;
+			} else if (currentToken() instanceof NestedSpan) {
+				while (true) {
+					NestedSpan ns = (NestedSpan) currentToken();
+					curr.spanIdxs.add(0);
+					cxts.add(ns.nested.items);
+					if (ns.nested.items.isEmpty()) {
+						// we need to advance to the next token, so go back to the outer loop
+						break;
+					} else if (currentToken() instanceof NestedSpan) {
+						continue; // push the next one
+					} else {
+						return;
+					}
+				}
+				throw new NotImplementedException();
 			} else {
-				moveToToken();
 				return;
 			}
 		}
+		curr.paraNum++;
+		if (curr.paraNum >= section.paras.size())
+			atEnd = true;
+		else
+			endPara = true;
 	}
 
 	public boolean atEnd() {
 		return this.atEnd;
 	}
 
-	public boolean needBreak() {
-		return this.needBreak;
-	}
-
 	public Para currentPara() {
 		return para;
 	}
-
-	public HorizSpan currentSpan() {
-		return this.spans.get(this.spans.size()-1);
-	}
 	
+	public List<SpanItem> top() {
+		return cxts.get(cxts.size()-1);
+	}
+
 	public SpanItem currentToken() {
-		if (curr.top() >= currentSpan().items.size())
+		if (curr.top() >= top().size())
 			return null;
-		return currentSpan().items.get(curr.top());
+		return top().get(curr.top());
 	}
 	
 	public CursorIndex index() {
 		return curr;
+	}
+	
+	public List<SpanItem> spine() {
+		List<SpanItem> ret = new ArrayList<>();
+		
+		for (int i=0;i<curr.spanIdxs.size();i++) {
+			SpanItem si = cxts.get(i).get(curr.spanIdxs.get(i));
+			ret.add(si);
+		}
+		return ret;
 	}
 	
 	@Override
