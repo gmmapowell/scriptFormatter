@@ -31,9 +31,11 @@ public class CursorNestedSpans {
 		span.items.add(ns);
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertEquals(0, tok.styles.size());
 		assertTrue(tok.it instanceof ParaBreak);
 		tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 
@@ -51,10 +53,13 @@ public class CursorNestedSpans {
 		hs.items.add(tx);
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof TextSpanItem);
 		assertArrayEquals(new String[] {"para", "span", "nested"}, tok.styles.toArray());
 		tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof ParaBreak);
+		System.out.println(tok);
 		tok = c.next();
 		assertNull(tok);
 	}
@@ -86,20 +91,25 @@ public class CursorNestedSpans {
 		}
 		Cursor c = new Cursor("main", section);
 		StyledToken tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof TextSpanItem);
 		assertEquals("hello", ((TextSpanItem)tok.it).text);
 		assertArrayEquals(new String[] {"para", "span", "nested"}, tok.styles.toArray());
 		tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof TextSpanItem);
 		assertEquals("there", ((TextSpanItem)tok.it).text);
 		assertArrayEquals(new String[] {"para", "span"}, tok.styles.toArray());
 		tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof TextSpanItem);
 		assertEquals("world", ((TextSpanItem)tok.it).text);
 		assertArrayEquals(new String[] {"para", "span", "second"}, tok.styles.toArray());
 		tok = c.next();
+		System.out.println(tok);
 		assertTrue(tok.it instanceof ParaBreak);
 		tok = c.next();
+		System.out.println(tok);
 		assertNull(tok);
 	}
 

@@ -9,6 +9,7 @@ public class CursorLocation {
 	CursorIndex curr = new CursorIndex();
 	private boolean atEnd = false;
 	private boolean needBreak;
+	boolean endPara;
 
 	Para para;
 	List<HorizSpan> spans = new ArrayList<>();
@@ -16,9 +17,7 @@ public class CursorLocation {
 	public CursorLocation(Section si) {
 		this.si = si;
 		this.resetTo(new CursorIndex());
-		if (!atEnd && !needBreak && !atRealToken()) {
-			advance();
-		}
+		findNextToken();
 	}
 
 	public void resetTo(CursorIndex to) {
@@ -42,6 +41,8 @@ public class CursorLocation {
 		if (s == null) {
 			if (!this.para.spans.isEmpty())
 				needBreak = true;
+			endPara = true;
+			curr.paraNum++;
 			return;
 		}
 		this.spans.clear();
@@ -53,7 +54,22 @@ public class CursorLocation {
 			this.spans.add(s);
 		}
 	}
-	
+
+	private void findNextToken() {
+		if (atEnd || endPara)
+			return;
+		if (atRealToken()) {
+			return;
+		}
+		while (currentToken() instanceof NestedSpan) {
+			NestedSpan span = (NestedSpan) currentToken();
+			curr.spanIdxs.add(0);
+			spans.add(span.nested);
+		}
+		if (!atRealToken())
+			advance();
+	}
+
 	public boolean atRealToken() {
 		if (para.spans.isEmpty())
 			return false;
@@ -67,60 +83,35 @@ public class CursorLocation {
 	public void advance() {
 		if (atEnd)
 			return;
+		endPara = false;
 		if (needBreak) {
 			needBreak = false;
 			moveToToken();
 			if (atEnd || needBreak || atRealToken())
 				return;
 		}
-		while (para.spans.isEmpty()) {
+		if (para.spans.isEmpty()) {
 			curr.paraNum++;
 			if (curr.paraNum >= si.paras.size()) {
 				atEnd = true;
 				return;
+			} else if (curr.paraNum > 0) {
+				endPara = true;
+				return;
 			}
 		}
-		int k = curr.incr();
-		if (k >= currentSpan().items.size()) {
-			needBreak = curr.pop();
-			return;
-		}
-		/*
-		if (needBreak) {
-			needBreak = false;
-			curr.paraNum++;
-			curr.spanNum = 0;
-			curr.itemNums.clear();
-			moveToToken();
-			return;
-		}
-		if (items.get(0) instanceof NestedSpan) {
-			items.add(items.get(0));
-			curr.itemNums.add(-1);
-			advance();
-			return;
-		}
-		while (curr.itemNums.size() > 1) {
-			int k = curr.itemNums.get(curr.itemNums.size()-1);
-			k++;
-			if (k >= ((NestedSpan)items).nested.items.size()) {
-				items.remove(items.size()-1);
-				curr.itemNums.remove(curr.itemNums.size()-1);
+		while (true) {
+			int k = curr.incr();
+			if (k >= currentSpan().items.size()) {
+				needBreak = curr.pop();
+				this.spans.remove(this.spans.size()-1);
+				if (needBreak)
+					return;
 			} else {
-				curr.itemNums.set(curr.itemNums.size()-1, k);
+				moveToToken();
+				return;
 			}
 		}
-		int k = curr.itemNums.get(0);
-		k++;
-		if (k >= span.items.size()) {
-			curr.spanNum++;
-			curr.itemNums.clear();
-			moveToToken();
-			return;
-		}
-		this.items.add(span.items.get(k));
-		curr.itemNums.set(0, k);
-		*/
 	}
 
 	public boolean atEnd() {
@@ -140,8 +131,9 @@ public class CursorLocation {
 	}
 	
 	public SpanItem currentToken() {
-		HorizSpan me = currentSpan();
-		return me.items.get(curr.top());
+		if (curr.top() >= currentSpan().items.size())
+			return null;
+		return currentSpan().items.get(curr.top());
 	}
 	
 	public CursorIndex index() {
