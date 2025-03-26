@@ -30,12 +30,8 @@ public class CursorIndex {
 		return k;
 	}
 
-	public boolean pop() {
+	public void pop() {
 		spanIdxs.remove(spanIdxs.size()-1);
-		if (spanIdxs.isEmpty()) {
-			return true;
-		}
-		return false;
 	}
 	
 	@Override

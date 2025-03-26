@@ -3,8 +3,6 @@ package com.gmmapowell.script.flow;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.zinutils.exceptions.NotImplementedException;
-
 public class CursorLocation {
 	private Section section;
 	
@@ -79,24 +77,13 @@ public class CursorLocation {
 	public void advance() {
 		if (atEnd)
 			return;
-		endPara = false;
-		if (para.spans.isEmpty()) {
-			curr.paraNum++;
-			if (curr.paraNum >= section.paras.size()) {
-				atEnd = true;
-				return;
-			} else if (curr.paraNum > 0) {
-				endPara = true;
-				return;
-			}
-		}
 		while (!cxts.isEmpty()) {
 			int k = curr.incr();
 			if (k >= top().size()) {
-				endPara = curr.pop();
+				curr.pop();
 				this.cxts.remove(this.cxts.size()-1);
-				if (endPara)
-					return;
+				if (this.cxts.isEmpty())
+					break;
 			} else if (currentToken() instanceof NestedSpan) {
 				while (true) {
 					NestedSpan ns = (NestedSpan) currentToken();
@@ -111,16 +98,23 @@ public class CursorLocation {
 						return;
 					}
 				}
-				throw new NotImplementedException();
 			} else {
 				return;
 			}
 		}
 		curr.paraNum++;
-		if (curr.paraNum >= section.paras.size())
-			atEnd = true;
-		else
-			endPara = true;
+		if (curr.paraNum >= section.paras.size()) {
+			para = null;
+			endPara = !previousPara().spans.isEmpty();
+		} else {
+			para = section.paras.get(curr.paraNum);
+			curr.spanIdxs.add(0);
+			this.cxts.add(mapToSIs(para.spans));
+			findNextToken();
+			
+			// it's important to put this at the end, otherwise findNextToken returns
+			endPara = !previousPara().spans.isEmpty();
+		}
 	}
 
 	public boolean atEnd() {
@@ -129,6 +123,10 @@ public class CursorLocation {
 
 	public Para currentPara() {
 		return para;
+	}
+	
+	public Para previousPara() {
+		return this.section.paras.get(curr.paraNum-1);
 	}
 	
 	public List<SpanItem> top() {

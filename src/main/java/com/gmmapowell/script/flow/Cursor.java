@@ -23,14 +23,18 @@ public class Cursor implements Comparable<Cursor> {
 	}
 
 	public StyledToken next() {
-		System.out.println("next(), this.loc = " + this.loc);
-		if (this.loc.atEnd())
+//		System.out.println("next(), this.loc = " + this.loc);
+		if (loc.endPara) {
+			List<String> styles = new ArrayList<>();
+			loc.endPara = false;
+			Para p = loc.previousPara();
+			styles.addAll(p.formats);
+			styles.remove("break");
+			return new StyledToken(flow, loc.index(), styles, new ParaBreak());
+		}
+		if (this.loc.currentPara() == null)
 			return null;
 
-//		if (loc.endPara) {
-//			loc.advance();
-//			return next();
-//		}
 		StyledToken ret = figureThisToken();
 		loc.advance();
 		return ret;
@@ -44,6 +48,7 @@ public class Cursor implements Comparable<Cursor> {
 		styles.addAll(p.formats);
 		styles.remove("break");
 		if (loc.endPara) {
+			loc.endPara = false;
 			return new StyledToken(flow, loc.index(), styles, new ParaBreak());
 		}
 		for (SpanItem hs : loc.spine()) {
@@ -53,12 +58,6 @@ public class Cursor implements Comparable<Cursor> {
 			}
 		}
 		SpanItem it = loc.currentToken();
-//		int kk = this.item.get(0).get();
-//		System.out.println("  hssz = " + hs.items.size() + "; kk = " + kk);
-//		if (kk >= hs.items.size()) {
-//			return new StyledToken(flow, para, span, item, styles, new ParaBreak());
-//		}
-//		SpanItem it = hs.items.get(kk);
 		return new StyledToken(flow, loc.index(), styles, it);
 	}
 	

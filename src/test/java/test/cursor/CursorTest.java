@@ -124,7 +124,6 @@ public class CursorTest {
 		assertNull(tok);
 	}
 
-
 	@Test
 	public void testSimpleTwoPara() {
 		Section section = new Section("basic");
