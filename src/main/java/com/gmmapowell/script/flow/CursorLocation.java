@@ -15,13 +15,15 @@ public class CursorLocation {
 	
 	public CursorLocation(Section section) {
 		this.section = section;
-		this.resetTo(new CursorIndex());
+		this.curr.setTo(new CursorIndex());
+		moveToToken();
 		findNextToken();
 	}
 
 	public void resetTo(CursorIndex to) {
 		this.curr.setTo(to);
 		this.moveToToken();
+		this.advance();
 	}
 	
 	public void moveToToken() {
@@ -31,13 +33,15 @@ public class CursorLocation {
 		}
 		this.para = section.paras.get(curr.paraNum);
 		this.cxts.clear();
-		List<SpanItem> sl = mapToSIs(this.para.spans);
-		this.cxts.add(sl);
-		for (int i=1;i<curr.spanIdxs.size();i++) {
-			int k = curr.spanIdxs.get(i);
-			NestedSpan ns = (NestedSpan) sl.get(k);
-			HorizSpan hs = ns.nested;
-			this.cxts.add(hs.items);
+		if (!curr.spanIdxs.isEmpty()) {
+			List<SpanItem> sl = mapToSIs(this.para.spans);
+			this.cxts.add(sl);
+			for (int i=1;i<curr.spanIdxs.size();i++) {
+				int k = curr.spanIdxs.get(i);
+				NestedSpan ns = (NestedSpan) sl.get(k);
+				HorizSpan hs = ns.nested;
+				this.cxts.add(hs.items);
+			}
 		}
 	}
 

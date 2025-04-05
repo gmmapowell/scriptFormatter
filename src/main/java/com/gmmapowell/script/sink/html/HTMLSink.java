@@ -19,6 +19,7 @@ import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
+import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SaveAs;
@@ -78,6 +79,8 @@ public class HTMLSink implements Sink {
 							writer.println("&nbsp;");
 						else
 							writer.print(" ");
+					} else if (tok.it instanceof NonBreakingSpace) {
+						writer.println("&nbsp;");
 					} else if (tok.it instanceof ParaBreak) {
 						if (hadBreak) // ignore multiple consecutive BRKs
 							continue;
@@ -113,7 +116,7 @@ public class HTMLSink implements Sink {
 					} else if (tok.it instanceof SaveAs) {
 						saveAs = ((SaveAs)tok.it).name();
 					} else
-						throw new NotImplementedException();
+						throw new NotImplementedException("cannot handle token " + tok.it);
 				}
 				transition(cf, last, "text");
 			}

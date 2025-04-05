@@ -33,6 +33,7 @@ public class SectionHandler implements CursorFeedback {
 	}
 
 	public void doSection() throws IOException {
+		System.out.println("calling doSection");
 		this.active = new TreeSet<>(cursors);
 		while (!active.isEmpty()) {
 			Cursor c = firstActive();
