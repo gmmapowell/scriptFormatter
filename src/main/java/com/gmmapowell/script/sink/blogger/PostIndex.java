@@ -72,6 +72,7 @@ public class PostIndex {
 		appendTo.append(" ");
 		appendTo.append(title);
 		appendTo.append("\n");
+		appendTo.flush();
 	}
 
 	public BlogEntry find(String title) {

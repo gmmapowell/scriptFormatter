@@ -313,19 +313,24 @@ public class BloggerSink implements Sink {
 		p.setContent(content);
 		// How do you say you don't want it to publish straight away?
 //		p.setStatus("DRAFT");
-		if (idx == null) {
-			System.out.println("Create " + title);
-			Post inserted = posts.insert(blogId, p).execute();
-			// revert it immediately
-			posts.revert(blogId, inserted.getId()).execute();
-			index.have(inserted.getId(), "DRAFT", title);
-		} else {
-			if (localOnly) {
-				System.out.println("local mode selected - not uploading");
+		try {
+			if (idx == null) {
+				System.out.println("Create " + title);
+				Post inserted = posts.insert(blogId, p).execute();
+				// revert it immediately
+				posts.revert(blogId, inserted.getId()).execute();
+				index.have(inserted.getId(), "DRAFT", title);
 			} else {
-				System.out.println("Upload " + title + " to " + blogId + ":" + idx);
-				posts.update(blogId, idx.key, p).execute();
+				if (localOnly) {
+					System.out.println("local mode selected - not uploading");
+				} else {
+					System.out.println("Upload " + title + " to " + blogId + ":" + idx);
+					posts.update(blogId, idx.key, p).execute();
+				}
 			}
+		} catch (IOException ex) {
+			index.close();
+			throw ex;
 		}
 	}
 
