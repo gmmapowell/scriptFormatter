@@ -69,8 +69,10 @@ public class HTMLSink implements Sink {
 					figureStyles(cf, tok.styles);
 					cf = new ArrayList<>(tok.styles);
 					if (tok.it instanceof TextSpanItem) {
-						if (haveBreak && !last.equals("blockquote")) {
-							writer.print("<p>");
+						if (haveBreak) {
+							if (!last.equals("blockquote") && !last.equals("as-div")) {
+								writer.print("<p>");
+							}
 						}
 						writer.print(entitify(((TextSpanItem)tok.it).text));
 						haveBreak = false;
@@ -100,6 +102,7 @@ public class HTMLSink implements Sink {
 						case "h1":
 						case "h2":
 						case "h3":
+						case "as-div":
 							break; // it happens automatically
 						default:
 							throw new CantHappenException("cannot handle BRKPara in " + last);
@@ -214,7 +217,7 @@ public class HTMLSink implements Sink {
 				if ("link".equals(sty) || "endlink".equals(sty))
 					; // don't print these
 				else {
-					writer.print("<" + mapStyle(sty) + ">");
+					writer.print("<" + mapStyle(sty, true) + ">");
 					cf.add(sty);
 				}
 			}
@@ -223,11 +226,21 @@ public class HTMLSink implements Sink {
 	
 	private void drawDownTo(List<String> cf, int to) {
 		while (cf.size() > to) {
-			writer.print("</" + mapStyle(cf.remove(cf.size()-1)) + ">");
+			writer.print("</" + mapStyle(cf.remove(cf.size()-1), false) + ">");
 		}
 	}
 	
-	private String mapStyle(String sty) {
+	private String mapStyle(String sty, boolean open) {
+		if (sty.startsWith("div-")) {
+			if (!open) {
+				return "div";
+			}
+			String classes = sty.replace("div-", "").replace("-", " ");
+			if (classes != "") {
+				return "div class='" + classes + "'";
+			}
+			return "div";
+		}
 		switch (sty) {
 		case "italic":
 			return "i";
