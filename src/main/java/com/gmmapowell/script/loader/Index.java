@@ -20,12 +20,14 @@ public class Index implements FilesToProcess {
 			String flag() {
 				return "+";
 			}
-		}, INCLUDED {
+		},
+		INCLUDED {
 			@Override
 			String flag() {
 				return "*";
 			}
-		}, EXCLUDED {
+		},
+		EXCLUDED {
 			@Override
 			String flag() {
 				return "-";
@@ -40,7 +42,7 @@ public class Index implements FilesToProcess {
 		String label;
 		Status stat;
 		boolean alreadyDownloaded;
-		
+
 		public Known(String id, String label, Status stat, boolean alreadyDownloaded) {
 			this.id = id;
 			this.label = label;
@@ -58,7 +60,7 @@ public class Index implements FilesToProcess {
 	public static Index read(Place indexFile, Region downloads) throws IOException {
 		Index index = new Index(downloads);
 		index.readFrom(indexFile);
-		
+
 		Writer fw = indexFile.appender();
 		index.appendTo(fw);
 		return index;
@@ -67,7 +69,7 @@ public class Index implements FilesToProcess {
 	private Index(Region downloads) {
 		this.downloads = downloads;
 	}
-	
+
 	public void readFrom(Place indexFile) throws IOException {
 		if (!indexFile.exists())
 			return;
@@ -87,7 +89,8 @@ public class Index implements FilesToProcess {
 			}
 
 			int idx = s.indexOf(" ");
-			Known n = new Known(s.substring(0, idx), s.substring(idx+1), writtenExcluded?Status.EXCLUDED:Status.INCLUDED, writtenExcluded || alreadyDownloaded);
+			Known n = new Known(s.substring(0, idx), s.substring(idx + 1),
+					writtenExcluded ? Status.EXCLUDED : Status.INCLUDED, writtenExcluded || alreadyDownloaded);
 			if (!current.containsKey(n.id))
 				current.put(n.id, n);
 		});
@@ -121,7 +124,7 @@ public class Index implements FilesToProcess {
 		}
 		return fs;
 	}
-	
+
 	public void generateWebeditFile(Place webeditFile, String title) throws FileNotFoundException {
 		try (PrintWriter pw = new PrintWriter(webeditFile.writer())) {
 			pw.println("<html>");
@@ -135,7 +138,8 @@ public class Index implements FilesToProcess {
 			pw.println("    <h1>Contents of " + title + "</h1>");
 			for (Known k : current.values()) {
 				if (k.stat == Status.INCLUDED) {
-					pw.println("    <a href='https://docs.google.com/document/d/" + k.id + "'/edit>" + k.label + "</a>");
+					pw.println(
+							"    <a href='https://docs.google.com/document/d/" + k.id + "'/edit>" + k.label + "</a>");
 				}
 			}
 			pw.println("  </body>");

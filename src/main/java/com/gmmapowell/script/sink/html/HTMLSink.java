@@ -20,6 +20,7 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.ImageOp;
 import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.NonBreakingSpace;
+import com.gmmapowell.script.flow.NothingOp;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SaveAs;
@@ -74,8 +75,9 @@ public class HTMLSink implements Sink {
 								writer.print("<p>");
 							}
 						}
-						writer.print(entitify(((TextSpanItem)tok.it).text));
+						writer.print(entitify(((TextSpanItem) tok.it).text));
 						haveBreak = false;
+					} else if (tok.it instanceof NothingOp) {
 					} else if (tok.it instanceof BreakingSpace) {
 						if (last.equals("blockquote"))
 							writer.println("&nbsp;");
@@ -110,14 +112,14 @@ public class HTMLSink implements Sink {
 						writer.println();
 						haveBreak = true;
 					} else if (tok.it instanceof ImageOp) {
-						writer.print("<img border='0' src=\'" + ((ImageOp)tok.it).uri + "' />");
+						writer.print("<img border='0' src=\'" + ((ImageOp) tok.it).uri + "' />");
 					} else if (tok.it instanceof LinkOp) {
 						LinkOp l = (LinkOp) tok.it;
 						writer.print("<a href='" + l.lk + "'>");
 						writer.print(l.tx);
 						writer.print("</a>");
 					} else if (tok.it instanceof SaveAs) {
-						saveAs = ((SaveAs)tok.it).name();
+						saveAs = ((SaveAs) tok.it).name();
 					} else
 						throw new NotImplementedException("cannot handle token " + tok.it);
 				}
@@ -180,26 +182,27 @@ public class HTMLSink implements Sink {
 		while (spaces < sb.length() && Character.isWhitespace(sb.charAt(spaces)))
 			spaces++;
 		// it is sort of easier to work backwards
-		for (int i=sb.length()-1;i>=0;i--) {
+		for (int i = sb.length() - 1; i >= 0; i--) {
 			if (i < spaces) {
-				sb.replace(i, i+1, "&nbsp;");
-			} else switch (sb.charAt(i)) {
-			case '&': {
-				sb.replace(i, i+1, "&amp;");
-				break;
-			}
-			case '<': {
-				sb.replace(i, i+1, "&lt;");
-				break;
-			}
-			case '>': {
-				sb.replace(i, i+1, "&gt;");
-				break;
-			}
-			default: {
-				break;
-			}
-			}
+				sb.replace(i, i + 1, "&nbsp;");
+			} else
+				switch (sb.charAt(i)) {
+				case '&': {
+					sb.replace(i, i + 1, "&amp;");
+					break;
+				}
+				case '<': {
+					sb.replace(i, i + 1, "&lt;");
+					break;
+				}
+				case '>': {
+					sb.replace(i, i + 1, "&gt;");
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 		}
 		return sb.toString();
 	}
@@ -207,7 +210,7 @@ public class HTMLSink implements Sink {
 	private void figureStyles(List<String> cf, List<String> styles) {
 		if (styles != null) {
 			drawDownTo(cf, styles.size());
-			for (int i=1;i<styles.size();i++) {
+			for (int i = 1; i < styles.size(); i++) {
 				String sty = styles.get(i);
 				if (cf.size() > i && cf.get(i).equals(sty))
 					continue;
@@ -223,13 +226,13 @@ public class HTMLSink implements Sink {
 			}
 		}
 	}
-	
+
 	private void drawDownTo(List<String> cf, int to) {
 		while (cf.size() > to) {
-			writer.print("</" + mapStyle(cf.remove(cf.size()-1), false) + ">");
+			writer.print("</" + mapStyle(cf.remove(cf.size() - 1), false) + ">");
 		}
 	}
-	
+
 	private String mapStyle(String sty, boolean open) {
 		if (sty.startsWith("div-")) {
 			if (!open) {
@@ -254,7 +257,7 @@ public class HTMLSink implements Sink {
 	@Override
 	public void showFinal() {
 	}
-	
+
 	@Override
 	public void upload() throws Exception {
 	}
