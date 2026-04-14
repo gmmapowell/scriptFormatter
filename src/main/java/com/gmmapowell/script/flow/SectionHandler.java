@@ -33,13 +33,12 @@ public class SectionHandler implements CursorFeedback {
 	}
 
 	public void doSection() throws IOException {
-		System.out.println("calling doSection");
 		this.active = new TreeSet<>(cursors);
 		while (!active.isEmpty()) {
 			Cursor c = firstActive();
 			StyledToken tok;
 			while ((tok = c.next()) != null) {
-				System.out.println(tok);
+//				System.out.println("TOK: " + tok);
 				if (tok.it instanceof AnchorOp) {
 					records.add((AnchorOp)tok.it);
 				} else if (tok.it instanceof ReleaseFlow) {

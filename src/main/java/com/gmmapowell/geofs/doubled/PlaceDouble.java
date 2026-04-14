@@ -6,6 +6,7 @@ import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -30,6 +31,10 @@ public abstract class PlaceDouble implements Place {
 		throw new NotImplementedException();
 	}
 
+	public URI uri() {
+		throw new NotImplementedException();
+	}
+	
 	@Override
 	public String read() {
 		throw new NotImplementedException();

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
@@ -60,7 +61,11 @@ public class LFSPlace implements Place {
 	public String name() {
 		return file.getName();
 	}
-	
+
+	public URI uri() {
+		throw new NotImplementedException();
+	}
+
 	@Override
 	public String read() {
 		if (!file.exists())

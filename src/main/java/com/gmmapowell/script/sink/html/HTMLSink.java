@@ -9,11 +9,9 @@ import java.util.List;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
-import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.flow.BreakingSpace;
 import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
@@ -22,8 +20,8 @@ import com.gmmapowell.script.flow.LinkOp;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.NothingOp;
 import com.gmmapowell.script.flow.ParaBreak;
-import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.SaveAs;
+import com.gmmapowell.script.flow.Section;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.sink.Sink;
@@ -64,7 +62,7 @@ public class HTMLSink implements Sink {
 				List<String> cf = new ArrayList<>();
 				StyledToken tok;
 				while ((tok = c.next()) != null) {
-					System.out.println(tok);
+//					System.out.println("TOK: " + tok);
 					last = transition(cf, last, tok);
 					boolean hadBreak = haveBreak;
 					figureStyles(cf, tok.styles);
@@ -130,7 +128,7 @@ public class HTMLSink implements Sink {
 				throw new CantHappenException("saveAs was not defined");
 			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
 			html.store(sw.toString());
-			FileUtils.cat(GeoFSUtils.file(html));
+//			FileUtils.cat(GeoFSUtils.file(html));
 		}
 	}
 

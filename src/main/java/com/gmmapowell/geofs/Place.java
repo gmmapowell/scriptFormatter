@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
+import java.util.Date;
 
 import com.gmmapowell.geofs.listeners.BinaryBlockListener;
 import com.gmmapowell.geofs.listeners.CharBlockListener;
@@ -108,6 +110,15 @@ public interface Place {
 	 * @param to the place to copy to
 	 */
 	void copyTo(Place to);
+
+	URI uri();
+	
+	/** Return the time when the file was last modified
+	 * 
+	 * @return the time when the file was last modified
+	 */
+	Date lastModified();
+	
 	
 	// TODO: deleteMe();
 	

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -28,6 +29,10 @@ public class GitPlace implements Place {
 		this.name = name;
 	}
 
+	public URI uri() {
+		throw new NotImplementedException();
+	}
+	
 	@Override
 	public String read() {
 		throw new NotImplementedException();

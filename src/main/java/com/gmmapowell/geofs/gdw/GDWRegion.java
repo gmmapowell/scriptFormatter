@@ -13,6 +13,7 @@ import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 public class GDWRegion implements Region {

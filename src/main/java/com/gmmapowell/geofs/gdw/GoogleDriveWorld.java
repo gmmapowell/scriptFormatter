@@ -22,6 +22,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
@@ -115,17 +116,18 @@ public class GoogleDriveWorld implements World {
 	}
 
 	private Drive connectToGoogleDrive() throws IOException, GeneralSecurityException {
-		Credential cred = getCredential();
-        Drive service = new Drive.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), cred)
+		final NetHttpTransport HTTP_TRANSPORT = new NetHttpTransport.Builder().build();
+		Credential cred = getCredential(HTTP_TRANSPORT);
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JacksonFactory.getDefaultInstance(), cred)
                 .setApplicationName(appName)
                 .build();
 		return service;
 	}
 
-	private Credential getCredential() throws IOException, GeneralSecurityException {
+	private Credential getCredential(NetHttpTransport HTTP_TRANSPORT) throws IOException, GeneralSecurityException {
 //		System.out.println("Getting credential for Drive from " + creds);
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), GeoFSUtils.fileReader(creds));
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, DriveScopes.all())
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JacksonFactory.getDefaultInstance(), secrets, DriveScopes.all())
                 .setDataStoreFactory(new FileDataStoreFactory(tokensdir()))
                 .setAccessType("offline")
                 .build();

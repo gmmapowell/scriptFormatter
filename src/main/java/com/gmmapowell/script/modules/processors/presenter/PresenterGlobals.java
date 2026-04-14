@@ -30,7 +30,7 @@ public class PresenterGlobals {
 	public void newPlace(Place x) {
 		this.curr = x;
 		handler.fileIs(x.name());
-		blocker.newFile();
+		blocker.newFile(x.uri());
 	}
 
 	public void placeDone() {
@@ -46,7 +46,7 @@ public class PresenterGlobals {
 	}
 
 	public void present(int n, String s) {
-		blocker.present(curr.name(), n, s);
+		blocker.present(n, s);
 	}
 
 	public void nextSlide(String flowName) {

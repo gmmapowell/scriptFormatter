@@ -80,6 +80,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 	@Override
 	public void process(FilesToProcess places) throws IOException {
 		// TODO: create a "bigger" state (which persists across input files)
+		List<String> errors = new ArrayList<>();
 		Fluency fluency = new Fluency(global);
 		for (LabelledPlace x : places.included()) {
 			if (debug)
@@ -90,29 +91,41 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 			for (LifecycleObserver o : observers)
 				o.newPlace(state, x.place);
 
-			// Each of the scanners gets a chance to act
-			x.place.lines((n, s) -> {
-				state.line(n);
-				String trimmed = trim(s);
+			try {
+				// Each of the scanners gets a chance to act
+				x.place.lines((n, s) -> {
+					state.line(n);
+					String trimmed = trim(s);
+					for (ProcessingScanner scanner : all)
+						scanner.closeIfNotContinued(scanner.wantTrimmed() ? trimmed : s);
+					if (debug)
+						System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
+					for (ProcessingScanner scanner : all) {
+						if (scanner.handleLine(scanner.wantTrimmed() ? trimmed : s))
+							return;
+					}
+					throw new CantHappenException("the default scanner at least should have fired");
+				});
 				for (ProcessingScanner scanner : all)
-					scanner.closeIfNotContinued(scanner.wantTrimmed() ? trimmed : s);
-				if (debug)
-					System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
-				for (ProcessingScanner scanner : all) {
-					if (scanner.handleLine(scanner.wantTrimmed() ? trimmed : s))
-						return;
-				}
-				throw new CantHappenException("the default scanner at least should have fired");
-			});
-			for (ProcessingScanner scanner : all)
-				scanner.closeIfNotContinued(null);
-			for (ProcessingScanner scanner : all)
-				scanner.placeDone();
-			for (LifecycleObserver o : observers)
-				o.placeDone(state);
+					scanner.closeIfNotContinued(null);
+				for (ProcessingScanner scanner : all)
+					scanner.placeDone();
+				for (LifecycleObserver o : observers)
+					o.placeDone(state);
+			} catch (RuntimeException ex) {
+				errors.add(ex.getMessage());
+				ex.printStackTrace();
+			}
 		}
 		for (LifecycleObserver o : observers)
 			o.processingDone();
+		
+		if (!errors.isEmpty()) {
+			System.out.println("Encountered " + errors.size() + " errors:");
+			for (String s : errors) {
+				System.out.println("  " + s);
+			}
+		}
 	}
 
 	@Override

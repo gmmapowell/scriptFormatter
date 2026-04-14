@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
+import java.util.Date;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -39,6 +41,10 @@ public class GDWPlace implements Place {
 	
 	@Override
 	public String read() {
+		throw new NotImplementedException();
+	}
+	
+	public URI uri() {
 		throw new NotImplementedException();
 	}
 	
