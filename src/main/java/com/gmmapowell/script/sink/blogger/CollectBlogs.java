@@ -18,7 +18,7 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.blogger.Blogger;
@@ -45,8 +45,9 @@ public class CollectBlogs {
 	}
 
 	private void connect() throws IOException, GeneralSecurityException, TokenResponseException {
-		Credential c = getCredential();
-		Blogger blogger = new Blogger.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), c)
+		final NetHttpTransport HTTP_TRANSPORT = new NetHttpTransport.Builder().build();
+		Credential c = getCredential(HTTP_TRANSPORT);
+		Blogger blogger = new Blogger.Builder(HTTP_TRANSPORT, JacksonFactory.getDefaultInstance(), c)
             .setApplicationName("ScriptFormatter")
 			.build();
 		Blogs conn = blogger.blogs();
@@ -73,10 +74,10 @@ public class CollectBlogs {
 		}
 	}
 
-	private Credential getCredential() throws IOException, GeneralSecurityException {
+	private Credential getCredential(NetHttpTransport HTTP_TRANSPORT) throws IOException, GeneralSecurityException {
 		System.out.println("Getting credential for Blogger");
 		GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), GeoFSUtils.fileReader(creds));
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), secrets, BloggerScopes.all())
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JacksonFactory.getDefaultInstance(), secrets, BloggerScopes.all())
                 .setDataStoreFactory(new FileDataStoreFactory(tokenStore()))
                 .setAccessType("offline")
                 .build();
