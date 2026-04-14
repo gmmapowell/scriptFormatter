@@ -19,6 +19,7 @@ import com.gmmapowell.geofs.listeners.LineListener;
 import com.gmmapowell.geofs.listeners.NumberedLineListener;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.geofs.utils.LineListenerOutputStream;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.drive.Drive;
 
 public class GDWPlace implements Place {
@@ -26,11 +27,13 @@ public class GDWPlace implements Place {
 	private final String name;
 	private final String id;
 	private final GDWRegion region;
+	private final DateTime lastModified;
 
-	public GDWPlace(Drive service, String id, String name, GDWRegion region) {
+	public GDWPlace(Drive service, String id, String name, DateTime lastModified, GDWRegion region) {
 		this.service = service;
 		this.name = name;
 		this.id = id;
+		this.lastModified = lastModified;
 		this.region = region;
 	}
 
@@ -128,6 +131,14 @@ public class GDWPlace implements Place {
 		return id;
 	}
 	
+	@Override
+	public Date lastModified() {
+		if (lastModified == null) {
+			return null;
+		}
+		return new Date((lastModified.getValue() / 1000) * 1000);
+	}
+
 	@Override
 	public String toString() {
 		return region.toString() + "/" + name;

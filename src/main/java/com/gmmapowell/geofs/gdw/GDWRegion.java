@@ -63,8 +63,8 @@ public class GDWRegion implements Region {
 			FileList result = service.files().list().setQ("name='" + enc + "' and '" + regionId + "' in parents and mimeType != 'application/vnd.google-apps.folder'").execute();
 	        if (result.getFiles().size() != 1)
 	        	throw new GeoFSException("Could not find place: " + name + " in " + this);
-	        String id = result.getFiles().get(0).getId();
-			return new GDWPlace(service, id, name, this);
+	        File file = result.getFiles().get(0);
+			return new GDWPlace(service, file.getId(), name, file.getModifiedTime(), this);
 		} catch (Exception ex) {
 			throw new GeoFSException(ex);
 		}
@@ -98,11 +98,11 @@ public class GDWRegion implements Region {
 	@Override
 	public void places(PlaceListener lsnr) {
 		try {
-			FileList children = service.files().list().setQ("'" + regionId + "' in parents AND mimeType != 'application/vnd.google-apps.folder'").setFields("files(id, name, mimeType)").execute();
+			FileList children = service.files().list().setQ("'" + regionId + "' in parents AND mimeType != 'application/vnd.google-apps.folder'").setFields("files(id, name, mimeType, modifiedTime)").execute();
 	        List<com.google.api.services.drive.model.File> files = children.getFiles();
 	        Collections.reverse(files);
 	        for (com.google.api.services.drive.model.File f : files) {
-	        	lsnr.place(new GDWPlace(service, f.getId(), f.getName(), this));
+	        	lsnr.place(new GDWPlace(service, f.getId(), f.getName(), f.getModifiedTime(), this));
 	        }			
 		} catch (IOException ex) {
 			throw new GeoFSException(ex);

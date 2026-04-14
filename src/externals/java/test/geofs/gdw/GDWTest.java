@@ -101,7 +101,7 @@ public class GDWTest {
 	@Test
 	public void weCanObtainAGoogleIDFromAPlaceUsingUtils() throws Exception {
 		assumeNotNull(world);
-		GDWPlace p = new GDWPlace(null, "xx-yy-zz", null, null);
+		GDWPlace p = new GDWPlace(null, "xx-yy-zz", null, null, null);
 		assertEquals("xx-yy-zz", GeoFSUtils.getGoogleID(p));
 	}	
 

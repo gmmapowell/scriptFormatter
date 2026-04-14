@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
+import java.util.Date;
 
 import org.zinutils.exceptions.NotImplementedException;
 
@@ -120,6 +121,11 @@ public abstract class PlaceDouble implements Place {
 	
 	@Override
 	public void copyTo(Place to) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Date lastModified() {
 		throw new NotImplementedException();
 	}
 

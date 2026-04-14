@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
+import java.util.Date;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
@@ -176,6 +177,11 @@ public class LFSPlace implements Place {
 
 	protected void createFile() {
 		throw new GeoFSNoPlaceException(file.getPath());
+	}
+
+	@Override
+	public Date lastModified() {
+		throw new NotImplementedException();
 	}
 	
 	@Override

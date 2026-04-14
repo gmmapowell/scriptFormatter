@@ -11,6 +11,7 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.intf.FilesToProcess;
+import com.gmmapowell.script.loader.Index.Status;
 
 public class ContentLoader implements Loader {
 	private final String have_internet = System.getenv("HAVE_INTERNET");
@@ -87,10 +88,10 @@ public class ContentLoader implements Loader {
 			try {
 				Place local = downloads.ensurePlace(place.name() + ".txt");
 				String id = GeoFSUtils.getGoogleID(place);
-				boolean download = index.record(id, doPrefix(prefix, local.name()));
+				Status download = index.record(id, doPrefix(prefix, local.name()), place.lastModified());
 				if (debug)
-					System.out.printf("%s%s %s%s (%s)\n", ind, download?"+":"-", "", place.name(), id);
-				if (download)
+					System.out.printf("%s%s %s%s (%s)\n", ind, download.flag(), "", place.name(), id);
+				if (download.download() || (download == Status.RECORDED && !local.exists()))
 					place.copyTo(local);
 			} catch (Exception ex) {
 				ex.printStackTrace();
