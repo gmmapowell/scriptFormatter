@@ -91,7 +91,7 @@ public class ContentLoader implements Loader {
 				Status download = index.record(id, doPrefix(prefix, local.name()), place.lastModified());
 				if (debug)
 					System.out.printf("%s%s %s%s (%s)\n", ind, download.flag(), "", place.name(), id);
-				if (download.download() || (download == Status.RECORDED && !local.exists()))
+				if (download.download() || (download == Status.RECORDED && (!local.exists()) || local.size() == 0L))
 					place.copyTo(local);
 			} catch (Exception ex) {
 				ex.printStackTrace();

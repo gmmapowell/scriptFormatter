@@ -118,7 +118,7 @@ public class Index implements FilesToProcess {
 					lm = sdf.parse(name);
 					name = s.substring(idx2+1);
 				} catch (ParseException ex) {
-					ex.printStackTrace();
+//					ex.printStackTrace();
 				}
 			}
 			Known n = new Known(s.substring(0, idx), lm, name,

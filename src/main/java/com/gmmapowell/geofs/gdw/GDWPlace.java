@@ -140,6 +140,11 @@ public class GDWPlace implements Place {
 	}
 
 	@Override
+	public long size() {
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public String toString() {
 		return region.toString() + "/" + name;
 	}

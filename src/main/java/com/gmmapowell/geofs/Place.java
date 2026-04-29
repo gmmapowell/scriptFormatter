@@ -118,6 +118,12 @@ public interface Place {
 	 * @return the time when the file was last modified
 	 */
 	Date lastModified();
+
+	/** Return the size of the file
+	 * 
+	 * @return the size of the file
+	 */
+	long size();
 	
 	
 	// TODO: deleteMe();
