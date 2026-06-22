@@ -95,11 +95,16 @@ public class Hierarchy implements Contents {
 	}
 
 	public boolean hasExactly(List<String> styles) {
-		return hasAtLeast(styles) && hasNoMoreThan(styles);
+		List<String> allStyles = new ArrayList<>();
+		concatStyles(allStyles);
+		return allStyles.containsAll(styles) && styles.containsAll(allStyles);
 	}
-
-	public boolean hasAtLeast(List<String> styles) {
-		return this.styles.containsAll(styles);
+	
+	public void concatStyles(List<String> allStyles) {
+		allStyles.addAll(this.styles);
+		if (parent != null) {
+			parent.concatStyles(allStyles);
+		}
 	}
 
 	public boolean hasNoMoreThan(List<String> styles) {
