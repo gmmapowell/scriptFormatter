@@ -8,6 +8,7 @@ import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.doc.flasgrammar.FlasGrammarConfigListener;
+import com.gmmapowell.script.modules.doc.github.GithubModuleConfigListener;
 import com.gmmapowell.script.modules.doc.includecode.IncludeCodeConfigListener;
 import com.gmmapowell.script.modules.doc.placedate.PlaceDateConfigListener;
 import com.gmmapowell.script.modules.doc.scanmode.ScanmodeConfigListener;
@@ -29,6 +30,7 @@ public class NestedModuleCreator {
 		this.modules.put("toc", TOCConfigListener.class);
 		
 		this.modules.put("git", GitConfigListener.class);
+		this.modules.put("github", GithubModuleConfigListener.class);
 	}
 
 	public void register(String name, Class<? extends ConfigListener> clz) {

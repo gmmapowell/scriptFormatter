@@ -89,6 +89,7 @@ public class EPubSink implements Sink, CursorClient {
 	
 	@Override
 	public void render() throws IOException {
+		System.out.println("render() from EPubSink");
 		try (ZipOutputStream zos = new ZipOutputStream(GeoFSUtils.saveStreamTo(output))) {
 			this.zos = zos;
 			makeMimetype(zos);
@@ -197,7 +198,7 @@ public class EPubSink implements Sink, CursorClient {
 		else if (tok.it instanceof EPubAware)
 			((EPubAware)tok.it).handle(coll);
 		else {
-			System.out.println("cannot handle " + tok.it.getClass());
+			System.out.println("processToken cannot handle " + tok.it.getClass());
 		}
 		return true;
 	}

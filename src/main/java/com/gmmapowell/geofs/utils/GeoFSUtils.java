@@ -113,6 +113,11 @@ public class GeoFSUtils {
 		return rn.r.newSubregion(rn.n);
 	}
 
+	public static Region ensureRegionPath(World world, Region region, String path) {
+		RegionName rn = obtainParentRegion(world, region, path);
+		return rn.r.ensureSubregion(rn.n);
+	}
+
 	public static void ensureRegionExists(Region region) {
 		if (region instanceof LFSPendingRegion) {
 			((LFSPendingRegion)region).ensureExists();

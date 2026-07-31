@@ -15,6 +15,7 @@ import java.util.Date;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
+import org.zinutils.exceptions.WrappedException;
 import org.zinutils.utils.FileUtils;
 
 import com.gmmapowell.geofs.Place;
@@ -153,7 +154,18 @@ public class LFSPlace implements Place {
 	
 	@Override
 	public void copyTo(Place to) {
-		throw new NotImplementedException();
+		Writer w = to.writer();
+		Reader r = this.reader();
+		char[] buf = new char[1024];
+		int k;
+		try {
+			while ((k = r.read(buf)) > 0) {
+				w.write(buf, 0, k);
+			}
+			w.close();
+		} catch (IOException e) {
+			throw WrappedException.wrap(e);
+		}
 	}
 
 	@Override

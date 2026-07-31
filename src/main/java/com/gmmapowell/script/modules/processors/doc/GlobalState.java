@@ -13,6 +13,8 @@ public interface GlobalState {
 	
 	ExtensionPointRepo extensions();
 
+	<T> T existingState(Class<T> clz);
+	
 	<T> T requireState(Class<T> clz);
 
 	FlowMap flows();

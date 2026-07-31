@@ -9,6 +9,10 @@ public interface Universe {
 	Region regionPath(String uri);
 	Place placePath(String uri);
 
-	void prepareWorlds() throws Exception;
+	Place newPlacePath(String uri);
+	Region newRegionPath(String uri);
 
+	Region ensureRegionPath(String inputs);
+
+	void prepareWorlds() throws Exception;
 }

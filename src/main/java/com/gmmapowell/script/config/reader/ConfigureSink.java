@@ -9,6 +9,7 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.script.modules.sink.blogger.BloggerSinkConfigListener;
 import com.gmmapowell.script.modules.sink.epub.EPubSinkConfigListener;
+import com.gmmapowell.script.modules.sink.github.GithubSinkConfigListener;
 import com.gmmapowell.script.modules.sink.html.HTMLSinkConfigListener;
 import com.gmmapowell.script.modules.sink.pdf.PDFSinkConfigListener;
 import com.gmmapowell.script.modules.sink.presenter.PresenterSinkConfigListener;
@@ -26,6 +27,7 @@ public class ConfigureSink implements ConfigListenerProvider {
 		this.sinks.put("html", HTMLSinkConfigListener.class);
 		this.sinks.put("pdf", PDFSinkConfigListener.class);
 		this.sinks.put("presenter", PresenterSinkConfigListener.class);
+		this.sinks.put("github", GithubSinkConfigListener.class);
 	}
 
 	@Override

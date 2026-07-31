@@ -74,6 +74,7 @@ public class PDFSink implements Sink, CursorClient {
 	
 	@Override
 	public void render() throws IOException {
+		System.out.println("render() from PDFSink");
 		if (outputDir == null) {
 			stock.newDocument(styles);
 			FlowCursor c = new FlowCursor(flows);

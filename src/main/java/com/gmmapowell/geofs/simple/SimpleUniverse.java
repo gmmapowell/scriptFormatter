@@ -43,4 +43,19 @@ public class SimpleUniverse implements Universe {
 	public Region regionPath(String uri) {
 		return GeoFSUtils.regionPath(worlds.get("lfs"), null, uri);
 	}
+
+	@Override
+	public Place newPlacePath(String uri) {
+		return GeoFSUtils.newPlacePath(worlds.get("lfs"), null, uri);
+	}
+
+	@Override
+	public Region newRegionPath(String uri) {
+		return GeoFSUtils.newRegionPath(worlds.get("lfs"), null, uri);
+	}
+
+	@Override
+	public Region ensureRegionPath(String uri) {
+		return GeoFSUtils.ensureRegionPath(worlds.get("lfs"), null, uri);
+	}
 }

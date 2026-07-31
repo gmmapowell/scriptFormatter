@@ -89,7 +89,7 @@ public class Hierarchy implements Contents {
 		case "italic":
 			return "i";
 		default:
-			System.out.println("unknown style: " + s);
+//			System.out.println("unknown style: " + s);
 			return null;
 		}
 	}

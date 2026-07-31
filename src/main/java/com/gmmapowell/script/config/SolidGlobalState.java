@@ -58,6 +58,14 @@ public class SolidGlobalState implements GlobalState {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	public <T> T existingState(Class<T> clz) {
+		if (configs.containsKey(clz))
+			return (T) configs.get(clz);
+		throw new CantHappenException("there is no existing state for " + clz);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T requireState(Class<T> clz) {
 		if (configs.containsKey(clz))
 			return (T) configs.get(clz);
