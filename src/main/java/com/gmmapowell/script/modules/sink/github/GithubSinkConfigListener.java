@@ -6,7 +6,6 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
-import com.gmmapowell.script.sink.github.GithubSink;
 import com.gmmapowell.script.sink.html.HTMLSink;
 import com.gmmapowell.script.utils.Command;
 
@@ -50,8 +49,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 //			wantShow = true;
 //		String upload = vars.remove("upload");
 		try {
-			state.config.sink(new HTMLSink(state.root, state.universe().regionPath(dir)));
-			state.config.sink(new GithubSink(state.root, state.universe().regionPath(dir), state.debug));
+			state.config.sink(new HTMLSink(state.root, state.universe().ensureRegionPath(dir)));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating PresenterSink: " + ex.getMessage());

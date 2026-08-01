@@ -21,7 +21,7 @@ public class SaveAs implements SpanItem {
 
 	@Override
 	public BoundingBox bbox(PDFont font, float sz) throws IOException {
-		return null;
+		return new BoundingBox();
 	}
 
 	@Override

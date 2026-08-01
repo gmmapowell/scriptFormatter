@@ -21,7 +21,7 @@ public class HTMLSink implements Sink {
 	private final Region storeInto;
 
 	public HTMLSink(Region root, String storeInto) throws IOException, GeneralSecurityException {
-		this.storeInto = root.subregion(storeInto);
+		this.storeInto = root.ensureSubregion(storeInto);
 	}
 
 	public HTMLSink(Region root, Region storeAs) {
