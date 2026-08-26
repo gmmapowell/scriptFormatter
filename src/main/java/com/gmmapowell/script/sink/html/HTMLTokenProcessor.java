@@ -148,6 +148,9 @@ public class HTMLTokenProcessor implements CursorClient {
 		this.write(post);
 		writer.close();
 		if (saveAs != null) {
+			if (saveAs.endsWith(".txt")) {
+				saveAs = saveAs.replaceFirst(".txt$", "");
+			}
 			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
 			html.store(sw.toString());
 //			FileUtils.cat(GeoFSUtils.file(html));
