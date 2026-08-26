@@ -29,6 +29,7 @@ import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.flow.YieldToFlow;
+import com.gmmapowell.script.modules.sink.github.IndexPageCreator;
 
 public class HTMLTokenProcessor implements CursorClient {
 	private final Region storeInto;
@@ -40,11 +41,13 @@ public class HTMLTokenProcessor implements CursorClient {
 	private List<String> cf = new ArrayList<>();
 	private Place pre;
 	private Place post;
+	private IndexPageCreator ipg;
 	
-	public HTMLTokenProcessor(Region storeInto, Place pre, Place post) {
+	public HTMLTokenProcessor(Region storeInto, Place pre, Place post, IndexPageCreator ipg) {
 		this.storeInto = storeInto;
 		this.pre = pre;
 		this.post = post;
+		this.ipg = ipg;
 	}
 
 	@Override
@@ -152,6 +155,7 @@ public class HTMLTokenProcessor implements CursorClient {
 				saveAs = saveAs.replaceFirst(".txt$", "");
 			}
 			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
+			ipg.haveFile(html.name());
 			html.store(sw.toString());
 //			FileUtils.cat(GeoFSUtils.file(html));
 		}
