@@ -154,17 +154,12 @@ public class LFSPlace implements Place {
 	
 	@Override
 	public void copyTo(Place to) {
-		Writer w = to.writer();
-		Reader r = this.reader();
-		char[] buf = new char[1024];
-		int k;
 		try {
-			while ((k = r.read(buf)) > 0) {
-				w.write(buf, 0, k);
+			try (Writer w = to.writer()) {
+				writeTo(w);
 			}
-			w.close();
-		} catch (IOException e) {
-			throw WrappedException.wrap(e);
+		} catch (Exception ex) {
+			throw new GeoFSException(ex);
 		}
 	}
 
@@ -201,6 +196,20 @@ public class LFSPlace implements Place {
 		return file.length();
 	}
 	
+	@Override
+	public void writeTo(Writer w) {
+		Reader r = this.reader();
+		char[] buf = new char[1024];
+		int k;
+		try {
+			while ((k = r.read(buf)) > 0) {
+				w.write(buf, 0, k);
+			}
+		} catch (IOException e) {
+			throw WrappedException.wrap(e);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return file.toString();

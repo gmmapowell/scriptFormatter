@@ -128,6 +128,11 @@ public class GitPlace implements Place {
 	}
 	
 	@Override
+	public void writeTo(Writer writer) {
+		throw new NotImplementedException();		
+	}
+	
+	@Override
 	public String toString() {
 		return inRegion + "/" + name;
 	}

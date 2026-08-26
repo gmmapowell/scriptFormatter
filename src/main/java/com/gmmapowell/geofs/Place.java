@@ -124,6 +124,12 @@ public interface Place {
 	 * @return the size of the file
 	 */
 	long size();
+
+	/** Writer the contents of this place to a writer.
+	 * 
+	 * @param writer - the writer to writer to (will not be closed)
+	 */
+	void writeTo(Writer writer);
 	
 	
 	// TODO: deleteMe();

@@ -38,15 +38,20 @@ public class HTMLTokenProcessor implements CursorClient {
 	private boolean haveBreak = true;
 	private String last = "text";
 	private List<String> cf = new ArrayList<>();
+	private Place pre;
+	private Place post;
 	
-	public HTMLTokenProcessor(Region storeInto) {
+	public HTMLTokenProcessor(Region storeInto, Place pre, Place post) {
 		this.storeInto = storeInto;
+		this.pre = pre;
+		this.post = post;
 	}
 
 	@Override
 	public void beginSection(Set<Cursor> cursors) {
 		this.sw = new StringWriter();
 		this.writer = new PrintWriter(sw);
+		this.write(pre);
 		haveBreak = true;
 		last = "text";
 		saveAs = null;
@@ -140,6 +145,7 @@ public class HTMLTokenProcessor implements CursorClient {
 	@Override
 	public void endSection() throws IOException {
 		transition(cf, last, "text");
+		this.write(post);
 		writer.close();
 		if (saveAs != null) {
 			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
@@ -266,5 +272,12 @@ public class HTMLTokenProcessor implements CursorClient {
 		default:
 			return sty;
 		}
+	}
+
+	public void write(Place from) {
+		if (from == null) {
+			return;
+		}
+		from.writeTo(writer);
 	}
 }

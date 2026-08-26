@@ -2,6 +2,9 @@ package com.gmmapowell.script.modules.sink.github;
 
 import org.zinutils.exceptions.NotImplementedException;
 
+import com.gmmapowell.geofs.Place;
+import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
@@ -21,6 +24,8 @@ public class GithubSinkConfigListener implements ConfigListener {
 	public ConfigListener dispatch(Command cmd) {
 		switch (cmd.name()) {
 		case "dir": 
+		case "pre":
+		case "post":
 //		case "meta":
 //		case "show":
 //		case "open":
@@ -37,9 +42,18 @@ public class GithubSinkConfigListener implements ConfigListener {
 
 	@Override
 	public void complete() throws ConfigException {
+		Universe u = state.universe();
+		Region r = state.root;
 		String dir = vars.remove("dir");
 		if (dir == null)
 			throw new ConfigException("output dir was not defined");
+		Place prep = null, postp = null;
+		String pre = vars.remove("pre");
+		if (pre != null) 
+			prep = r.placePath(pre);
+		String post = vars.remove("post");
+		if (post != null)
+			postp = r.placePath(post);
 //		String meta = vars.remove("meta");
 //		if (meta == null)
 //			throw new ConfigException("meta file was not defined");
@@ -49,7 +63,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 //			wantShow = true;
 //		String upload = vars.remove("upload");
 		try {
-			state.config.sink(new HTMLSink(state.root, state.universe().ensureRegionPath(dir)));
+			state.config.sink(new HTMLSink(r, u.ensureRegionPath(dir), prep, postp));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating PresenterSink: " + ex.getMessage());

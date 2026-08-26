@@ -138,6 +138,11 @@ public abstract class PlaceDouble implements Place {
 	public long size() {
 		throw new NotImplementedException();
 	}
+
+	@Override
+	public void writeTo(Writer writer) {
+		throw new NotImplementedException();		
+	}
 	
 	protected abstract Reader textContents();
 	protected abstract InputStream binaryContents();

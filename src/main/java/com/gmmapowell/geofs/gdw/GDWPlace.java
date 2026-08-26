@@ -148,4 +148,9 @@ public class GDWPlace implements Place {
 	public String toString() {
 		return region.toString() + "/" + name;
 	}
+
+	@Override
+	public void writeTo(Writer writer) {
+		throw new NotImplementedException();		
+	}
 }
