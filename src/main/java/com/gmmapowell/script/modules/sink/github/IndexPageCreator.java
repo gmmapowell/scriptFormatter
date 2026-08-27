@@ -1,5 +1,7 @@
 package com.gmmapowell.script.modules.sink.github;
 
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +15,15 @@ import com.gmmapowell.script.processor.configured.LifecycleObserver;
 
 public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreator, ScannerAtState>, LifecycleObserver {
 	private final List<String> titles = new ArrayList<>();
+	private final PrintWriter idx;
 	
 	public IndexPageCreator(Place plc) {
-		// TODO Auto-generated constructor stub
+		Writer w = plc.writer();
+		idx = new PrintWriter(w);
+		idx.println("<html>");
+		idx.println("<head>");
+		idx.println("</head>");
+		idx.println("<body>");
 	}
 
 	@Override
@@ -32,10 +40,9 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 
 	public void haveFile(String name) {
 		System.out.println("ipg file " + name);
-		System.out.println("pulling title " + titles.remove(0));
-		if (titles.isEmpty()) {
-			System.out.println("empty");
-		}
+		String title = titles.remove(0);
+		System.out.println("pulling title " + title);
+		idx.println("<li><a href='html/" + name + "'>" + title + "</a>");
 	}
 
 	public void processToken(StyledToken tok) {
@@ -44,7 +51,9 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 
 	@Override
 	public void allDone(GlobalState state) {
-		System.out.println("all done");
+		idx.println("</body>");
+		idx.println("</html>");
+		idx.close();
 	}
 	
 	

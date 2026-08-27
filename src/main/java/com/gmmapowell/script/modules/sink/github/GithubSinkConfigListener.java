@@ -50,6 +50,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 		String dir = vars.remove("dir");
 		if (dir == null)
 			throw new ConfigException("output dir was not defined");
+		Region region = u.ensureRegionPath(dir);
 		Place prep = null, postp = null;
 		String pre = vars.remove("pre");
 		if (pre != null) 
@@ -57,7 +58,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 		String post = vars.remove("post");
 		if (post != null)
 			postp = r.placePath(post);
-		IndexPageCreator ipc = new IndexPageCreator(r.ensurePlace("index.html"));
+		IndexPageCreator ipc = new IndexPageCreator(region.parent().ensurePlace("index.html"));
 		ModuleConfigListener m = this.state.module("github");
 		((GithubModuleConfigListener)m).addLO(ipc);
 //		state.config.
@@ -70,7 +71,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 //			wantShow = true;
 //		String upload = vars.remove("upload");
 		try {
-			HTMLSink hs = new HTMLSink(r, u.ensureRegionPath(dir), prep, postp, ipc);
+			HTMLSink hs = new HTMLSink(r, region, prep, postp, ipc);
 			state.config.sink(hs);
 			state.config.extensions().bindExtensionPoint(DocumentOutline.class, ipc);
 		} catch (Exception ex) {
