@@ -67,6 +67,9 @@ public class HTMLTokenProcessor implements CursorClient {
 		boolean hadBreak = haveBreak;
 		figureStyles(cf, tok.styles);
 		cf = new ArrayList<>(tok.styles);
+		if (ipg != null) {
+			ipg.processToken(tok);
+		}
 		if (tok.it instanceof TextSpanItem) {
 			if (haveBreak) {
 				if (!last.equals("blockquote") && !last.equals("as-div")) {
@@ -155,7 +158,9 @@ public class HTMLTokenProcessor implements CursorClient {
 				saveAs = saveAs.replaceFirst(".txt$", "");
 			}
 			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
-			ipg.haveFile(html.name());
+			if (ipg != null) {
+				ipg.haveFile(html.name());
+			}
 			html.store(sw.toString());
 //			FileUtils.cat(GeoFSUtils.file(html));
 		}
