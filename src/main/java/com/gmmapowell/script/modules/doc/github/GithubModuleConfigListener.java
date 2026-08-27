@@ -8,11 +8,13 @@ import com.gmmapowell.script.config.ProcessorConfig;
 import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
+import com.gmmapowell.script.processor.configured.LifecycleObserver;
 import com.gmmapowell.script.utils.Command;
 
 public class GithubModuleConfigListener implements ModuleConfigListener {
 	private final ReadConfigState state;
 	private String inputs;
+	private ProcessorConfig proc;
 
 	public GithubModuleConfigListener(ReadConfigState state) {
 		this.state = state;
@@ -42,6 +44,10 @@ public class GithubModuleConfigListener implements ModuleConfigListener {
 		proc.global().requireState(GHGlobal.class);
 		Region r = state.universe().ensureRegionPath(inputs);
 		proc.lifecycleObserver(new CopyFile(r));
+		this.proc = proc;
 	}
 
+	public void addLO(LifecycleObserver lo) {
+		this.proc.lifecycleObserver(lo);
+	}
 }

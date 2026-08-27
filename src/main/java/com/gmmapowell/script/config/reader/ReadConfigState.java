@@ -27,7 +27,7 @@ public class ReadConfigState extends SBLocation {
 		this.modules = new NestedModuleCreator(this);
 	}
 
-	public void registerModule(String name, Class<? extends ConfigListener> clz) {
+	public void registerModule(String name, Class<? extends ModuleConfigListener> clz) {
 		modules.register(name, clz);
 	}
 

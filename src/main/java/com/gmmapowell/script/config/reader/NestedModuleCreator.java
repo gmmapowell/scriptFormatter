@@ -18,7 +18,8 @@ import com.gmmapowell.script.utils.FileWithLocation;
 
 // TODO: I think this should actually be created early on and be available in state
 public class NestedModuleCreator {
-	private final Map<String, Class<? extends ConfigListener>> modules = new TreeMap<>();
+	private final Map<String, Class<? extends ModuleConfigListener>> modules = new TreeMap<>();
+	private final Map<String, ModuleConfigListener> liveModules = new TreeMap<>();
 	private final ReadConfigState state;
 
 	public NestedModuleCreator(ReadConfigState state) {
@@ -33,20 +34,26 @@ public class NestedModuleCreator {
 		this.modules.put("github", GithubModuleConfigListener.class);
 	}
 
-	public void register(String name, Class<? extends ConfigListener> clz) {
+	public void register(String name, Class<? extends ModuleConfigListener> clz) {
 		this.modules.put(name, clz);
 	}
 	
 	public ModuleConfigListener module(String mod) {
 		try {
+			if (this.liveModules.containsKey(mod)) {
+				return liveModules.get(mod);
+			}
 			if (!this.modules.containsKey(mod)) {
 				throw new CantHappenException("there is no module '" + mod + "'");
 			}
 			Class<? extends ConfigListener> clz = this.modules.get(mod);
 			Constructor<?>[] ctors = clz.getConstructors();
 			for (Constructor<?> c : ctors) {
-				if (c.getParameterCount() == 1 && FileWithLocation.class.isAssignableFrom(c.getParameters()[0].getType()))
-					return (ModuleConfigListener) c.newInstance(state);
+				if (c.getParameterCount() == 1 && FileWithLocation.class.isAssignableFrom(c.getParameters()[0].getType())) {
+					ModuleConfigListener ret = (ModuleConfigListener) c.newInstance(state);
+					liveModules.put(mod, ret);
+					return (ModuleConfigListener) ret;
+				}
 			}
 			throw new CantHappenException("the class '" + clz + "' does not have a constructor that takes a state");
 		} catch (Exception ex) {

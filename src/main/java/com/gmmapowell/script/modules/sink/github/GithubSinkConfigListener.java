@@ -8,7 +8,9 @@ import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.config.reader.ConfigListener;
+import com.gmmapowell.script.config.reader.ModuleConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
+import com.gmmapowell.script.modules.doc.github.GithubModuleConfigListener;
 import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
 import com.gmmapowell.script.sink.html.HTMLSink;
 import com.gmmapowell.script.utils.Command;
@@ -55,7 +57,10 @@ public class GithubSinkConfigListener implements ConfigListener {
 		String post = vars.remove("post");
 		if (post != null)
 			postp = r.placePath(post);
-		IndexPageCreator ipg = new IndexPageCreator(r.ensurePlace("index.html"));
+		IndexPageCreator ipc = new IndexPageCreator(r.ensurePlace("index.html"));
+		ModuleConfigListener m = this.state.module("github");
+		((GithubModuleConfigListener)m).addLO(ipc);
+//		state.config.
 //		String meta = vars.remove("meta");
 //		if (meta == null)
 //			throw new ConfigException("meta file was not defined");
@@ -65,9 +70,9 @@ public class GithubSinkConfigListener implements ConfigListener {
 //			wantShow = true;
 //		String upload = vars.remove("upload");
 		try {
-			HTMLSink hs = new HTMLSink(r, u.ensureRegionPath(dir), prep, postp, ipg);
+			HTMLSink hs = new HTMLSink(r, u.ensureRegionPath(dir), prep, postp, ipc);
 			state.config.sink(hs);
-			state.config.extensions().bindExtensionPoint(DocumentOutline.class, ipg);
+			state.config.extensions().bindExtensionPoint(DocumentOutline.class, ipc);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating PresenterSink: " + ex.getMessage());
