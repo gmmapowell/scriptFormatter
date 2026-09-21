@@ -23,7 +23,7 @@ public class SubsectionCommand implements AtCommandHandler {
 			throw new RuntimeException("Subsection without title");
 		String anchor = cmd.arg("anchor");
 		state.newPara("subsection-title");
-		sas.outlineEntry(4, title, null, anchor);
+		sas.outlineEntry(4, null, title, null, anchor);
 		state.processText(title);
 		state.endPara();
 	}

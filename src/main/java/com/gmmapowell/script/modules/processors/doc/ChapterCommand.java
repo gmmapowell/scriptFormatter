@@ -25,13 +25,14 @@ public class ChapterCommand implements AtCommandHandler {
 		if (style == null)
 			style = "chapter";
 		String anchor = cmd.arg("anchor");
+		String tocFormat = cmd.arg("toc");
 
 //		System.out.println("chapter " + title + ": " + style);
 		
 		state.newSection("footnotes", style);
 		state.newSection("main", style);
 		state.newPara("chapter-title");
-		sas.outlineEntry(1, title, style, anchor);
+		sas.outlineEntry(1, tocFormat, title, style, anchor);
 		state.processText(title);
 		state.endPara();
 	}

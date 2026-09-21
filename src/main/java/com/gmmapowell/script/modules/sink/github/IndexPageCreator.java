@@ -14,9 +14,25 @@ import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 import com.gmmapowell.script.processor.configured.LifecycleObserver;
 
 public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreator, ScannerAtState>, LifecycleObserver {
-	private final List<String> titles = new ArrayList<>();
+	public class Title {
+		private String format;
+		private String title;
+
+		public Title(String format, String title) {
+			this.format = format;
+			this.title = title;
+		}
+		
+		@Override
+		public String toString() {
+			return "["+format+"]:" + title;
+		}
+	}
+
+	private final List<Title> titles = new ArrayList<>();
 	private final PrintWriter idx;
 	private Place idxpostp;
+	private String currentFormat = null;
 	
 	public IndexPageCreator(Place plc, Place idxprep, Place idxpostp) {
 		this.idxpostp = idxpostp;
@@ -26,9 +42,12 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 	}
 
 	@Override
-	public void entry(int level, String title, String style, String anchor) {
-		System.out.println("entry " + title);
-		titles.add(title);
+	public void entry(int level, String tocFormat, String title, String style, String anchor) {
+		System.out.println("entry " + title + " format = " + tocFormat);
+		if (tocFormat != null) {
+			this.currentFormat = tocFormat;
+		}
+		titles.add(new Title(this.currentFormat, title));
 	}
 
 	@Override
@@ -39,9 +58,9 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 
 	public void haveFile(String name) {
 		System.out.println("ipg file " + name);
-		String title = titles.remove(0);
+		Title title = titles.remove(0);
 		System.out.println("pulling title " + title);
-		idx.println("<li><a href='html/" + name + "'>" + title + "</a>");
+		idx.println("<li><a href='html/" + name + "'>" + title.title + "</a>");
 	}
 
 	public void processToken(StyledToken tok) {

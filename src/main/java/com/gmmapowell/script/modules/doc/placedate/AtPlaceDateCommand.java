@@ -11,10 +11,12 @@ import com.gmmapowell.script.processor.configured.ConfiguredState;
 public class AtPlaceDateCommand implements AtCommandHandler {
 	private final ConfiguredState sink;
 	private Set<DocumentOutline> docoutline;
+	private String tocFormat;
 
 	public AtPlaceDateCommand(ScannerAtState sas) {
 		this.sink = sas.state();
 		this.docoutline = sas.global().extensions().forPoint(DocumentOutline.class, sas);
+		this.tocFormat = "";
 	}
 
 	@Override
@@ -27,7 +29,7 @@ public class AtPlaceDateCommand implements AtCommandHandler {
 		String p = cmd.arg("place");
 		String d = cmd.arg("date");
 		for (DocumentOutline dol : docoutline) {
-			dol.entry(18, null, null, null);
+			dol.entry(18, tocFormat, null, null, null);
 		}
 		sink.newSection("footnotes", "placedate");
 		sink.newSection("main", "placedate");

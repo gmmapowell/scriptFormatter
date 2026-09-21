@@ -23,7 +23,7 @@ public class SectionCommand implements AtCommandHandler {
 			throw new RuntimeException("Section without title");
 		String anchor = cmd.arg("anchor");
 		state.newPara("section-title");
-		sas.outlineEntry(2, title, null, anchor);
+		sas.outlineEntry(2, null, title, null, anchor);
 		state.processText(title);
 		state.endPara();
 	}

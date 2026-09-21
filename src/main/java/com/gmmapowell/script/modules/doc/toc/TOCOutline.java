@@ -17,7 +17,7 @@ public class TOCOutline implements DocumentOutline {
 	}
 
 	@Override
-	public void entry(int level, String title, String style, String anchor) {
+	public void entry(int level, String tocFormat, String title, String style, String anchor) {
 		switch (level) {
 		case 1: { /* chapter */
 			if (!style.equals(state.chapterStyle))

@@ -24,7 +24,7 @@ public class CommentaryCommand implements AtCommandHandler {
 		state.newSpan();
 		state.op(new CommentaryBreak());
 		state.endPara();
-		sas.outlineEntry(3, null, null, null);
+		sas.outlineEntry(3, null, null, null, null);
 	}
 
 }

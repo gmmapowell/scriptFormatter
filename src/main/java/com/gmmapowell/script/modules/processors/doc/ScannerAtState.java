@@ -76,9 +76,9 @@ public class ScannerAtState {
 		state.observeBlanks();
 	}
 	
-	public void outlineEntry(int level, String text, String style, String anchor) {
+	public void outlineEntry(int level, String tocFormat, String text, String style, String anchor) {
 		for (DocumentOutline e : outline) {
-			e.entry(level, text, style, anchor);
+			e.entry(level, tocFormat, text, style, anchor);
 		}
 	}
 }
