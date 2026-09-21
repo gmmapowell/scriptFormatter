@@ -29,6 +29,8 @@ public class GithubSinkConfigListener implements ConfigListener {
 		case "dir": 
 		case "pre":
 		case "post":
+		case "idxpre":
+		case "idxpost":
 //		case "meta":
 //		case "show":
 //		case "open":
@@ -58,7 +60,14 @@ public class GithubSinkConfigListener implements ConfigListener {
 		String post = vars.remove("post");
 		if (post != null)
 			postp = r.placePath(post);
-		IndexPageCreator ipc = new IndexPageCreator(region.parent().ensurePlace("index.html"));
+		Place idxprep = null, idxpostp = null;
+		String idxpre = vars.remove("idxpre");
+		if (idxpre != null) 
+			idxprep = r.placePath(idxpre);
+		String idxpost = vars.remove("idxpost");
+		if (idxpost != null)
+			idxpostp = r.placePath(idxpost);
+		IndexPageCreator ipc = new IndexPageCreator(region.parent().ensurePlace("index.html"), idxprep, idxpostp);
 		ModuleConfigListener m = this.state.module("github");
 		((GithubModuleConfigListener)m).addLO(ipc);
 //		state.config.

@@ -16,14 +16,13 @@ import com.gmmapowell.script.processor.configured.LifecycleObserver;
 public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreator, ScannerAtState>, LifecycleObserver {
 	private final List<String> titles = new ArrayList<>();
 	private final PrintWriter idx;
+	private Place idxpostp;
 	
-	public IndexPageCreator(Place plc) {
+	public IndexPageCreator(Place plc, Place idxprep, Place idxpostp) {
+		this.idxpostp = idxpostp;
 		Writer w = plc.writer();
 		idx = new PrintWriter(w);
-		idx.println("<html>");
-		idx.println("<head>");
-		idx.println("</head>");
-		idx.println("<body>");
+		idxprep.writeTo(idx);
 	}
 
 	@Override
@@ -51,8 +50,7 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 
 	@Override
 	public void allDone(GlobalState state) {
-		idx.println("</body>");
-		idx.println("</html>");
+		idxpostp.writeTo(idx);
 		idx.close();
 	}
 	
