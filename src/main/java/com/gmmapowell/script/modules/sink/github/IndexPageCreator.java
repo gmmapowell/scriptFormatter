@@ -76,7 +76,7 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 		Title title = titles.remove(0);
 //		System.out.println("pulling title " + title);
 		if (title.title != null) {
-			idx.println("<li><a href='html/" + name + "'>" + title.sno + " " + title.title + "</a>");
+			idx.println("<li><a href='html/" + name + "'>" + (title.sno.length() > 0 ? title.sno + " " : "") + title.title + "</a>");
 		}
 	}
 

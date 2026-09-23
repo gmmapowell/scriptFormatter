@@ -20,7 +20,8 @@ class ArabicNumberEncoder implements NumberEncoder {
 }
 
 class RomanNumberEncoder implements NumberEncoder {
-	private static char CAPITAL = 'c';
+	private static char CAPITAL = 0;
+	private static char LOWER = 32;
 	private char mode;
 	
 	private RomanNumberEncoder(char mode) {
@@ -34,7 +35,7 @@ class RomanNumberEncoder implements NumberEncoder {
 			throw new CantHappenException("invalid number for roman formatting: " + n);
 		}
 		while (n > 1000) {
-			sb.append("M");
+			sb.append('M' + mode);
 			n -= 1000;
 		}
 		throw new NotImplementedException();
@@ -42,6 +43,7 @@ class RomanNumberEncoder implements NumberEncoder {
 	}
 	
 	public static final RomanNumberEncoder capital = new RomanNumberEncoder(CAPITAL);
+	public static final RomanNumberEncoder lower = new RomanNumberEncoder(LOWER);
 }
 
 class AlphaNumberEncoder implements NumberEncoder {

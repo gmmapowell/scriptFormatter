@@ -26,10 +26,10 @@ public class AtPlaceDateCommand implements AtCommandHandler {
 
 	@Override
 	public void invoke(AtCommand cmd) {
-		String p = cmd.arg("place");
-		String d = cmd.arg("date");
+		String p = cmd.arg("place").trim();
+		String d = cmd.arg("date").trim();
 		for (DocumentOutline dol : docoutline) {
-			dol.entry(18, tocFormat, null, null, null);
+			dol.entry(18, tocFormat, p + " " + d, null, null);
 		}
 		sink.newSection("footnotes", "placedate");
 		sink.newSection("main", "placedate");
