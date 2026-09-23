@@ -31,6 +31,8 @@ public class GithubSinkConfigListener implements ConfigListener {
 		case "post":
 		case "idxpre":
 		case "idxpost":
+		case "epub":
+		case "pdf":
 //		case "meta":
 //		case "show":
 //		case "open":
@@ -53,6 +55,9 @@ public class GithubSinkConfigListener implements ConfigListener {
 		if (dir == null)
 			throw new ConfigException("output dir was not defined");
 		Region region = u.ensureRegionPath(dir);
+		Region html = region.ensureSubregion("html");
+		Region fromCss = r.subregion("css");
+		Region css = region.ensureSubregion("css");
 		Place prep = null, postp = null;
 		String pre = vars.remove("pre");
 		if (pre != null) 
@@ -67,7 +72,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 		String idxpost = vars.remove("idxpost");
 		if (idxpost != null)
 			idxpostp = r.placePath(idxpost);
-		IndexPageCreator ipc = new IndexPageCreator(region.parent().ensurePlace("index.html"), idxprep, idxpostp);
+		IndexPageCreator ipc = new IndexPageCreator(region.ensurePlace("index.html"), idxprep, idxpostp);
 		ModuleConfigListener m = this.state.module("github");
 		((GithubModuleConfigListener)m).addLO(ipc);
 //		state.config.
@@ -80,7 +85,21 @@ public class GithubSinkConfigListener implements ConfigListener {
 //			wantShow = true;
 //		String upload = vars.remove("upload");
 		try {
-			HTMLSink hs = new HTMLSink(r, region, prep, postp, ipc);
+			String pdf = vars.remove("pdf");
+			if (pdf != null) {
+				Place topdf = region.ensurePlace(pdf);
+				r.place(pdf).copyTo(topdf);
+			}
+			String epub = vars.remove("epub");
+			if (epub != null) {
+				Place toepub = region.ensurePlace(epub);
+				r.place(epub).copyTo(toepub);
+			}
+			fromCss.places(x -> {
+				Place p = css.ensurePlace(x.name());
+				x.copyTo(p);
+			});
+			HTMLSink hs = new HTMLSink(r, html, prep, postp, ipc);
 			state.config.sink(hs);
 			state.config.extensions().bindExtensionPoint(DocumentOutline.class, ipc);
 		} catch (Exception ex) {

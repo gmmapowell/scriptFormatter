@@ -139,7 +139,13 @@ public class LFSRegion implements Region {
 
 	@Override
 	public void places(PlaceListener lsnr) {
-		throw new NotImplementedException();
+		if (!file.exists()) {
+			return;
+		}
+		for (File f : file.listFiles()) {
+			Place p = new LFSPlace(world, this, f);
+			lsnr.place(p);
+		}
 	}
 
 	@Override

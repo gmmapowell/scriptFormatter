@@ -2,6 +2,7 @@ package com.gmmapowell.geofs.lfs;
 
 import java.io.File;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.exceptions.GeoFSCannotCreateRegionException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 
@@ -26,4 +27,9 @@ public class LFSPendingRegion extends LFSRegion {
 			this.create();
 	}
 
+	@Override
+	public Place ensurePlace(String name) {
+		ensureExists();
+		return super.ensurePlace(name);
+	}
 }
