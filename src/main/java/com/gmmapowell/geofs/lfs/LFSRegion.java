@@ -3,7 +3,6 @@ package com.gmmapowell.geofs.lfs;
 import java.io.File;
 
 import org.zinutils.exceptions.CantHappenException;
-import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;

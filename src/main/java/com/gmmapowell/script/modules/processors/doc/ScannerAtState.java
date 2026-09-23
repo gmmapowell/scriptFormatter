@@ -16,11 +16,13 @@ public class ScannerAtState {
 	private ConfiguredState state;
 	private int nextFnText = 1;
 	private List<EndDispatcher> cmdstack = new ArrayList<>();
+	private OutlineNumberState olstate;
 
 	public void configure(ConfiguredState state) {
 		this.state = state;
 		this.handlers = state.extensions().forPointByName(AtCommandHandler.class, this);
 		this.outline = state.extensions().forPoint(DocumentOutline.class, this);
+		this.olstate = state.global().requireState(OutlineNumberState.class);
 	}
 	
 	public ConfiguredState state() {
@@ -77,8 +79,9 @@ public class ScannerAtState {
 	}
 	
 	public void outlineEntry(int level, String tocFormat, String text, String style, String anchor) {
+		olstate.parseFormats(tocFormat);
 		for (DocumentOutline e : outline) {
-			e.entry(level, tocFormat, text, style, anchor);
+			e.entry(level, olstate.format(), text, style, anchor);
 		}
 	}
 }

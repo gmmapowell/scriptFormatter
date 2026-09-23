@@ -1,4 +1,4 @@
-package com.gmmapowell.script.modules.sink.github;
+package com.gmmapowell.script.modules.processors.doc;
 
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
