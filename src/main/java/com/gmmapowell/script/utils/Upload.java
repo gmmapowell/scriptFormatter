@@ -65,7 +65,7 @@ public class Upload {
 		jsch.addIdentity(privateKeyPath.getPath());
 		Session s = null;
 		try {
-			System.out.println("username = " + username + " host = " + host + "key = " + privateKeyPath.getPath() + " port = " + port);
+			System.out.println("uploading " + f.getPath() + " with username = " + username + " host = " + host + " key = " + privateKeyPath.getPath() + " port = " + port);
 			s = jsch.getSession(username, host, port);
 			s.setConfig("StrictHostKeyChecking", "no");
 			s.connect();
