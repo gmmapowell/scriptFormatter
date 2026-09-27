@@ -47,6 +47,9 @@ public class Cursor implements Comparable<Cursor> {
 			return null;
 		styles.addAll(p.formats);
 		styles.remove("break");
+		if (styles.isEmpty()) {
+			styles.add("text");
+		}
 		if (loc.endPara) {
 			loc.endPara = false;
 			return new StyledToken(flow, loc.index(), styles, new ParaBreak());

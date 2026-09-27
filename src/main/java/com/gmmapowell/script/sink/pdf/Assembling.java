@@ -39,22 +39,25 @@ public class Assembling {
 		List<StyledToken> prev = null;
 		if (prevResult == null || !prevResult.forcedNewLine()) {
 			if (currLine == null) { // first token in a new para
-				String bsname = token.styles.get(0);
-				Style baseStyle = styles.getOptional(bsname);
-				if (baseStyle == null)
-					throw new RuntimeException("no style found for " + bsname);
-				style = baseStyle.apply(token.styles);
-				if (style.getBeforeBlock() != null)
-					this.before = Math.max(style.getBeforeBlock(), this.before);
-				if (style.getAfterBlock() == null)
-					this.after = 0;
-				else
-					this.after = style.getAfterBlock();
-				if (style.getRequireAfter() == null)
-					this.requireAfter = 0;
-				else
-					this.requireAfter = style.getRequireAfter();
-				lm = style.getFirstMargin();
+				String bsname = null;
+				if (!token.styles.isEmpty()) {
+					bsname = token.styles.get(0);
+					Style baseStyle = styles.getOptional(bsname);
+					if (baseStyle == null)
+						throw new RuntimeException("no style found for " + bsname);
+					style = baseStyle.apply(token.styles);
+					if (style.getBeforeBlock() != null)
+						this.before = Math.max(style.getBeforeBlock(), this.before);
+					if (style.getAfterBlock() == null)
+						this.after = 0;
+					else
+						this.after = style.getAfterBlock();
+					if (style.getRequireAfter() == null)
+						this.requireAfter = 0;
+					else
+						this.requireAfter = style.getRequireAfter();
+					lm = style.getFirstMargin();
+				}
 			} else if ((prevResult = currLine.accepts(token)) instanceof AcceptToken || prevResult instanceof PendingToken) {
 				if (prevResult.replay() == null)
 					return;
@@ -65,7 +68,7 @@ public class Assembling {
 		} else {
 			lm = ((AcceptToken)prevResult).getOverflow();
 		}
-		if (lm == null)
+		if (lm == null && style != null)
 			lm = style.getLeftMargin();
 		if (lm == null)
 			lm = 0f;

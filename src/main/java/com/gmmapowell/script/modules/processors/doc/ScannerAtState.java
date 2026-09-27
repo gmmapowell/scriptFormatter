@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.zinutils.exceptions.CantHappenException;
 
+import com.gmmapowell.script.modules.doc.toc.TOCState;
 import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class ScannerAtState {
@@ -16,13 +17,13 @@ public class ScannerAtState {
 	private ConfiguredState state;
 	private int nextFnText = 1;
 	private List<EndDispatcher> cmdstack = new ArrayList<>();
-	private OutlineNumberState olstate;
+	private OutlineNumbering olstate;
 
 	public void configure(ConfiguredState state) {
 		this.state = state;
 		this.handlers = state.extensions().forPointByName(AtCommandHandler.class, this);
 		this.outline = state.extensions().forPoint(DocumentOutline.class, this);
-		this.olstate = state.global().requireState(OutlineNumberState.class);
+		this.olstate = state.global().existingState(TOCState.class).toc.outlineNumbering;
 	}
 	
 	public ConfiguredState state() {

@@ -21,6 +21,7 @@ import org.zinutils.exceptions.WrappedException;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.script.flow.LinkFromTOC;
+import com.gmmapowell.script.modules.processors.doc.OutlineNumbering;
 
 public class TableOfContents {
 	private List<LinkFromTOC> links;
@@ -33,10 +34,12 @@ public class TableOfContents {
 	private final JSONArray toc;
 	private final Map<String, PDPage> anchorPages = new TreeMap<>();
 	private ListMap<String, PDAnnotationLink> anchorWaiting = new ListMap<>();
+	public final OutlineNumbering outlineNumbering;
 	
-	public TableOfContents(Place tocfile, Place metafile) {
+	public TableOfContents(Place tocfile, Place metafile, OutlineNumbering outlineNumbering) {
 		this.tocfile = tocfile;
 		this.metafile = metafile;
+		this.outlineNumbering = outlineNumbering;
 		try {
 			anchors = new JSONObject();
 			meta.put("anchors", anchors);

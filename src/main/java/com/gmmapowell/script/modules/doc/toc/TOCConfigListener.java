@@ -24,6 +24,7 @@ public class TOCConfigListener implements ModuleConfigListener {
 		switch (cmd.name()) {
 		case "toc": 
 		case "meta":
+		case "numbering":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;

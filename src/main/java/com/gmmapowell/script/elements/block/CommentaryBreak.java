@@ -13,7 +13,7 @@ import com.gmmapowell.script.styles.PageStyle;
 import com.gmmapowell.script.styles.StyleCatalog;
 
 public class CommentaryBreak implements Break, SpanItem {
-
+	
 	@Override
 	public String boxText() {
 		return "Commentary";

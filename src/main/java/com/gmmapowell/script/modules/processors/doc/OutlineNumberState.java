@@ -6,7 +6,7 @@ import java.util.List;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
-public class OutlineNumberState {
+public class OutlineNumberState implements OutlineNumbering {
 	public class TitleElement {
 		private static final char SET = 's';
 		private static final char INC = 'i';

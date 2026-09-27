@@ -20,7 +20,7 @@ public class CommentaryCommand implements AtCommandHandler {
 	@Override
 	public void invoke(AtCommand cmd) {
 		state.endSpan();
-		state.newPara("break");
+		state.newPara("break", "commbreak");
 		state.newSpan();
 		state.op(new CommentaryBreak());
 		state.endPara();

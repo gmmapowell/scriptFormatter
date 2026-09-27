@@ -6,18 +6,19 @@ import org.codehaus.jettison.json.JSONObject;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
+import com.gmmapowell.script.modules.processors.doc.OutlineNumbering;
 
 public class TOCState {
 	private JSONObject currentMeta;
-	private TableOfContents toc;
+	public TableOfContents toc;
 	public String chapterStyle;
 	public int chapter = 1;
 	public int section;
 	public boolean commentary;
 	public boolean wantSectionNumbering;
 	
-	public void configure(Place meta, Place toc) throws ConfigException {
-		this.toc = new TableOfContents(toc, meta);
+	public void configure(Place meta, Place toc, OutlineNumbering outlineNumbering) throws ConfigException {
+		this.toc = new TableOfContents(toc, meta, outlineNumbering);
 		if (meta.exists()) {
 			try {
 				currentMeta = GeoFSUtils.readJSON(meta);
