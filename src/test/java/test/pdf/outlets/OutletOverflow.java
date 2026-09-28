@@ -1,4 +1,4 @@
-package test.pdf;
+package test.pdf.outlets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,7 +46,7 @@ public class OutletOverflow {
 		text.setUnderline(false);
 		styles.styles.put("text", text);
 		
-		Outlet o1 = new Outlet(styles , null, null, stream, new PDRectangle(72, 72, wid-144, ht-144));
+		Outlet o1 = new Outlet(styles, null, null, stream, new PDRectangle(72, 72, wid-144, ht-144));
 		System.out.println(o1);
 
 		Acceptance acc = o1.place(new StyledToken("main", null, Arrays.asList("bigblock"), new TextSpanItem("hello, world")));

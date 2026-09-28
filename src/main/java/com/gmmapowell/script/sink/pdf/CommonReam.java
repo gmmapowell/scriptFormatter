@@ -1,5 +1,6 @@
 package com.gmmapowell.script.sink.pdf;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -28,7 +29,10 @@ public abstract class CommonReam implements Ream {
 	@Override
 	public void close(Place output) throws IOException {
 		closeAllStreams();
-		doc.save(GeoFSUtils.file(output));
+		File saveTo = GeoFSUtils.file(output);
+		if (saveTo != null) {
+			doc.save(saveTo);
+		}
 		doc.close();
 		this.doc = null;
 	}

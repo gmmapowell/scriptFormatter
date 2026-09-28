@@ -44,7 +44,7 @@ public class Assembling {
 					bsname = token.styles.get(0);
 					Style baseStyle = styles.getOptional(bsname);
 					if (baseStyle == null)
-						throw new RuntimeException("no style found for " + bsname);
+						throw new CantHappenException("no style found for " + bsname);
 					style = baseStyle.apply(token.styles);
 					if (style.getBeforeBlock() != null)
 						this.before = Math.max(style.getBeforeBlock(), this.before);

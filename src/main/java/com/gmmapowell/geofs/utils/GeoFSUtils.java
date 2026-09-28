@@ -21,6 +21,7 @@ import org.zinutils.xml.XML;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.World;
+import com.gmmapowell.geofs.doubled.PlaceDouble;
 import com.gmmapowell.geofs.exceptions.GeoFSException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
@@ -71,6 +72,8 @@ public class GeoFSUtils {
 		} else if (from instanceof GitPlace) {
 			GitRegion gr = (GitRegion) from.region();
 			return gr.placeFile(((GitPlace)from).name());
+		} else if (from instanceof PlaceDouble) {
+			return null; // no associated file
 		} else
 			throw new NotImplementedException("file(" + from.getClass() + ")");
 	}

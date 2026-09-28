@@ -3,6 +3,8 @@ package com.gmmapowell.script.flow;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.zinutils.exceptions.CantHappenException;
+
 public class Cursor implements Comparable<Cursor> {
 	private final String flow;
 	private final Section section;
@@ -10,6 +12,9 @@ public class Cursor implements Comparable<Cursor> {
 
 	public Cursor(String name, Section section) {
 		this.loc = new CursorLocation(section);
+		if (name == null) {
+			throw new CantHappenException("cursor cannot be created without a flow name");
+		}
 		this.flow = name;
 		this.section = section;
 	}

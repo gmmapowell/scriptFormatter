@@ -11,6 +11,7 @@ import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 
 public class RegionDouble implements Region, RegionPlace {
 	public Map<String, RegionPlace> entries = new TreeMap<>();
@@ -55,7 +56,14 @@ public class RegionDouble implements Region, RegionPlace {
 
 	@Override
 	public Place ensurePlace(String name) {
-		throw new NotImplementedException();
+		if (entries.containsKey(name)) {
+			if (!(entries.get(name) instanceof PlaceDouble)) {
+				throw new CantHappenException("cannot ensure place when it already has " + entries.get(name) + " for " + name);
+			}
+		}
+		PlaceString ret = new PlaceString("");
+		entries.put(name, ret);
+		return ret;
 	}
 
 	@Override
@@ -70,7 +78,7 @@ public class RegionDouble implements Region, RegionPlace {
 
 	@Override
 	public Place ensurePlacePath(String path) {
-		throw new NotImplementedException();
+		return GeoFSUtils.ensurePlacePath(null, this, path);
 	}
 
 	@Override
@@ -99,7 +107,14 @@ public class RegionDouble implements Region, RegionPlace {
 
 	@Override
 	public Region ensureSubregion(String name) {
-		throw new NotImplementedException();
+		if (entries.containsKey(name)) {
+			if (!(entries.get(name) instanceof RegionDouble)) {
+				throw new CantHappenException("cannot ensure region when it already has " + entries.get(name) + " for " + name);
+			}
+		}
+		RegionDouble ret = new RegionDouble();
+		entries.put(name, ret);
+		return ret;
 	}
 
 	@Override
