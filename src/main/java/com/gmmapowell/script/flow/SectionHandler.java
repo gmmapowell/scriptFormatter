@@ -20,7 +20,6 @@ public class SectionHandler implements CursorFeedback {
 	List<Suspension> suspended;
 	private Set<Cursor> cursors;
 
-
 	public SectionHandler(CursorClient cc) {
 		this.cc = cc;
 		this.suspended = new ArrayList<>();

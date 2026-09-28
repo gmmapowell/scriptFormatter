@@ -2,9 +2,14 @@ package test.pdf.cursor;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 
+import org.jmock.Expectations;
+import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Rule;
 import org.junit.Test;
 
+import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.doubled.RegionDouble;
 import com.gmmapowell.script.config.ConfigException;
@@ -12,20 +17,36 @@ import com.gmmapowell.script.config.VarMap;
 import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.HorizSpan;
 import com.gmmapowell.script.flow.Para;
-import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.Section;
+import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.TextSpanItem;
+import com.gmmapowell.script.sink.pdf.Acceptability;
+import com.gmmapowell.script.sink.pdf.Acceptance;
 import com.gmmapowell.script.sink.pdf.PDFSink;
+import com.gmmapowell.script.sink.pdf.PageCompositor;
+import com.gmmapowell.script.sink.pdf.Stock;
 import com.gmmapowell.script.styles.simple.SimpleStyle;
 
 import test.pdf.outlets.TestStyleCatalog;
 
 public class CursorOverflow {
+	public @Rule JUnitRuleMockery mockery = new JUnitRuleMockery();
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testWeRevertAfterNoRoom() throws IOException, ConfigException {
+		Stock stock = mockery.mock(Stock.class);
+		PageCompositor pc = mockery.mock(PageCompositor.class);
+		TestStyleCatalog styles = new TestStyleCatalog(stock);
+		mockery.checking(new Expectations() {{
+			oneOf(stock).newDocument(styles);
+			oneOf(stock).getPage(with(any(Map.class)), with(true)); will(returnValue(pc));
+			oneOf(stock).close(with(any(Place.class)));
+			oneOf(pc).begin();
+			oneOf(pc).token(with(any(StyledToken.class))); will(returnValue(new Acceptance(Acceptability.PENDING, null)));
+			oneOf(pc).token(with(any(StyledToken.class))); will(returnValue(new Acceptance(Acceptability.PROCESSED, null)));
+		}});
 		Region r = new RegionDouble();
-		TestStyleCatalog styles = new TestStyleCatalog();
 		SimpleStyle text = new SimpleStyle(styles);
 		text.setFont("courier");
 		text.setLineSpacing(16);
@@ -40,12 +61,10 @@ public class CursorOverflow {
 		Para mainPara1 = new Para(Arrays.asList("text"));
 		HorizSpan mainPara1hz1 = new HorizSpan(null, null);
 		mainPara1hz1.items.add(new TextSpanItem("hello, world"));
-		mainPara1hz1.items.add(new ParaBreak());
 		mainPara1.spans.add(mainPara1hz1);
 		main1.paras.add(mainPara1);
 		main.sections.add(main1);
 		sink.flow(main);
 		sink.render();
 	}
-
 }
