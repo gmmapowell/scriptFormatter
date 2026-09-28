@@ -96,7 +96,6 @@ public class PDFSink implements Sink, CursorClient {
 		}
 	}
 	
-
 	private List<Flow> buildTmpFlows(Flow f) {
 		List<Flow> ret = new ArrayList<>();
 		for (Flow k : flows) {
@@ -107,7 +106,6 @@ public class PDFSink implements Sink, CursorClient {
 		}
 		return ret;
 	}
-
 
 	Map<String, String> current = new TreeMap<>();
 	PageCompositor page = null;

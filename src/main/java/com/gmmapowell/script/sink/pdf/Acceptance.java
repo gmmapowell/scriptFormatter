@@ -20,4 +20,9 @@ public class Acceptance {
 	public String enable() {
 		return enable;
 	}
+	
+	@Override
+	public String toString() {
+		return "Acceptance[" + status + ": " + lastAccepted + "]";
+	}
 }

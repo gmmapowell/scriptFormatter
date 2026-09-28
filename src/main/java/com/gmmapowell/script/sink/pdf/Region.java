@@ -173,4 +173,8 @@ public class Region {
 		return new BorrowRegion(this);
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + ytop + ": " + ly + "]";
+	}
 }

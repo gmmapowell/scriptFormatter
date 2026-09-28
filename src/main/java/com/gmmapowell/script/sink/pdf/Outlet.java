@@ -53,4 +53,9 @@ public class Outlet {
 	public Outlet borrowFrom() throws IOException {
 		return new BorrowOutlet(this);
 	}
+	
+	@Override
+	public String toString() {
+		return "Outlet: " + regions;
+	}
 }
