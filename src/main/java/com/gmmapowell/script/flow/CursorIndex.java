@@ -11,6 +11,11 @@ public class CursorIndex {
 		this.spanIdxs.add(0);
 	}
 	
+	private CursorIndex(CursorIndex cursorIndex) {
+		this.paraNum = cursorIndex.paraNum;
+		this.spanIdxs = new ArrayList<>(cursorIndex.spanIdxs);
+	}
+
 	public void setTo(CursorIndex idx) {
 		this.paraNum = idx.paraNum;
 		this.spanIdxs = new ArrayList<>();
@@ -34,9 +39,12 @@ public class CursorIndex {
 		spanIdxs.remove(spanIdxs.size()-1);
 	}
 	
+	public CursorIndex freeze() {
+		return new CursorIndex(this);
+	}
+	
 	@Override
 	public String toString() {
 		return paraNum + "" + spanIdxs;
 	}
-
 }

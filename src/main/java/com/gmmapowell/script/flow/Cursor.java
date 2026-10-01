@@ -35,7 +35,9 @@ public class Cursor implements Comparable<Cursor> {
 			Para p = loc.previousPara();
 			styles.addAll(p.formats);
 			styles.remove("break");
-			return new StyledToken(flow, loc.index(), styles, new ParaBreak());
+			CursorIndex index = loc.index();
+			loc.clearPrev();
+			return new StyledToken(flow, index, styles, new ParaBreak());
 		}
 		if (this.loc.currentPara() == null)
 			return null;

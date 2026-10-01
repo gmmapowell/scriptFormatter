@@ -25,7 +25,7 @@ public class StyledToken {
 	
 	@Override
 	public String toString() {
-		return "StyledToken{" + flow + "}" + styles + "[" + it + "]";
+		return "StyledToken{" + flow + "}:" + loc + styles + "[" + it + "]";
 	}
 
 }

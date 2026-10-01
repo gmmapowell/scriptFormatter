@@ -40,7 +40,7 @@ public class AcceptMe implements Action {
 	@Override
 	public Object invoke(Invocation invocation) throws Throwable {
 		this.token = (StyledToken) invocation.getParameter(0);
-		return new Acceptance(acc, this.token);
+		return new Acceptance(acc, this.pullFrom != null ? this.pullFrom.token : null);
 	}
 
 }

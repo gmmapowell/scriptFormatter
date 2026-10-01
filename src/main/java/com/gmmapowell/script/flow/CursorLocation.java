@@ -12,6 +12,8 @@ public class CursorLocation {
 
 	Para para;
 	List<List<SpanItem>> cxts = new ArrayList<>();
+
+	private CursorIndex prev;
 	
 	public CursorLocation(Section section) {
 		this.section = section;
@@ -21,6 +23,7 @@ public class CursorLocation {
 	}
 
 	public void resetTo(CursorIndex to) {
+//		System.out.println("resetting to " + to);
 		this.curr.setTo(to);
 		this.moveToToken();
 		this.advance();
@@ -36,7 +39,7 @@ public class CursorLocation {
 		if (!curr.spanIdxs.isEmpty()) {
 			List<SpanItem> sl = mapToSIs(this.para.spans);
 			this.cxts.add(sl);
-			for (int i=1;i<curr.spanIdxs.size();i++) {
+			for (int i=0;i<curr.spanIdxs.size()-1;i++) {
 				int k = curr.spanIdxs.get(i);
 				NestedSpan ns = (NestedSpan) sl.get(k);
 				HorizSpan hs = ns.nested;
@@ -106,7 +109,9 @@ public class CursorLocation {
 				return;
 			}
 		}
+		prev = curr.freeze();
 		curr.paraNum++;
+		endPara = false;
 		if (curr.paraNum >= section.paras.size()) {
 			para = null;
 			endPara = !previousPara().spans.isEmpty();
@@ -144,7 +149,10 @@ public class CursorLocation {
 	}
 	
 	public CursorIndex index() {
-		return curr;
+		if (prev != null) {
+			return prev;
+		}
+		return curr.freeze();
 	}
 	
 	public List<SpanItem> spine() {
@@ -160,5 +168,9 @@ public class CursorLocation {
 	@Override
 	public String toString() {
 		return curr.toString();
+	}
+
+	public void clearPrev() {
+		this.prev = null;
 	}
 }

@@ -62,7 +62,7 @@ public class HTMLTokenProcessor implements CursorClient {
 
 	@Override
 	public boolean processToken(CursorFeedback cursor, StyledToken tok) throws IOException {
-		System.out.println("TOK: " + tok);
+//		System.out.println("TOK: " + tok);
 		last = transition(cf, last, tok);
 		boolean hadBreak = haveBreak;
 		figureStyles(cf, tok.styles);
