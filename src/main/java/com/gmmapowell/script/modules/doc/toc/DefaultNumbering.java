@@ -2,11 +2,7 @@ package com.gmmapowell.script.modules.doc.toc;
 
 import org.zinutils.exceptions.NotImplementedException;
 
-import com.gmmapowell.script.flow.AnchorOp;
-import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
 import com.gmmapowell.script.modules.processors.doc.OutlineNumbering;
-import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
-import com.gmmapowell.script.processor.configured.ConfiguredState;
 
 public class DefaultNumbering implements OutlineNumbering {
 //	private final ConfiguredState sink;
@@ -108,8 +104,7 @@ public class DefaultNumbering implements OutlineNumbering {
 
 	@Override
 	public void parseFormats(String tocFormat) {
-		// TODO Auto-generated method stub
-		
+		throw new NotImplementedException();		
 	}
 
 	@Override

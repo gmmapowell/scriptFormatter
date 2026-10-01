@@ -6,6 +6,8 @@ import java.util.List;
 import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
+import com.gmmapowell.script.modules.doc.toc.TOCState;
+
 public class OutlineNumberState implements OutlineNumbering {
 	public class TitleElement {
 		private static final char SET = 's';
@@ -24,6 +26,9 @@ public class OutlineNumberState implements OutlineNumbering {
 
 	private final List<TitleElement> elts = new ArrayList<>();
 
+	public OutlineNumberState(TOCState state) {
+	}
+	
 	private void update() {
 		if (elts.isEmpty()) {
 			return;

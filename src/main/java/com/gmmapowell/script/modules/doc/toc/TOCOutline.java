@@ -1,7 +1,5 @@
 package com.gmmapowell.script.modules.doc.toc;
 
-import org.zinutils.exceptions.NotImplementedException;
-
 import com.gmmapowell.script.flow.AnchorOp;
 import com.gmmapowell.script.modules.processors.doc.DocumentOutline;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
@@ -18,8 +16,16 @@ public class TOCOutline implements DocumentOutline {
 
 	@Override
 	public void entry(int level, String tocFormat, String title, String style, String anchor) {
+		if (tocFormat != null && tocFormat.length() > 0) {
+			TOCEntry entry = state.toc().chapter(anchor, tocFormat, title);
+			sink.newSpan();
+			sink.op(new AnchorOp(entry));
+			sink.processText(tocFormat);
+			sink.processText(" ");
+		}
+		/*
 		switch (level) {
-		case 1: { /* chapter */
+		case 1: { /* chapter * /
 			if (!style.equals(state.chapterStyle))
 				state.resetNumbering();
 			state.chapterStyle = style;
@@ -100,5 +106,6 @@ public class TOCOutline implements DocumentOutline {
 		default:
 			throw new NotImplementedException();
 		}
+*/
 	}
 }

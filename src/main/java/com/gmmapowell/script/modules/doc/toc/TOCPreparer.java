@@ -17,12 +17,12 @@ import com.gmmapowell.script.modules.processors.doc.OutlineNumbering;
 import com.gmmapowell.script.modules.processors.doc.ScannerAtState;
 
 public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, ScannerAtState> {
-	private final ReadConfigState state;
+//	private final ReadConfigState state;
 	private final Region root;
 	private final VarMap vars;
 
 	public TOCPreparer(ReadConfigState state, VarMap vars) {
-		this.state = state;
+//		this.state = state;
 		this.root = state.root;
 		this.vars = vars;
 	}
@@ -54,7 +54,7 @@ public class TOCPreparer implements ModuleActivator, Creator<TOCOutline, Scanner
 		} catch (ClassNotFoundException ex) {
 			throw new ConfigException("Could not find numbering class: " + numbering);
 		} catch (NoSuchMethodException ex) {
-			throw new ConfigException("Could not find default constructor for numbering class: " + numbering);
+			throw new ConfigException("Could not find TOCState constructor for numbering class: " + numbering);
 		} catch (InvocationTargetException | IllegalAccessException | InstantiationException ex) {
 			throw new ConfigException("Could not instantiate numbering class: " + numbering + ": " + ex.getMessage());
 		}
