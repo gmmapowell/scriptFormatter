@@ -113,7 +113,7 @@ public class OutlineNumberState implements OutlineNumbering {
 		}
 	}
 
-	public String format() {
+	public String format(int level, String text, String style, String anchor) {
 		StringBuilder sb = new StringBuilder();
 		for (TitleElement e : elts) {
 			sb.append(e.encoder.render(e.currNo));

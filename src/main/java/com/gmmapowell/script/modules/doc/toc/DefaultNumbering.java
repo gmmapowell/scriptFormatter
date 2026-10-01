@@ -9,7 +9,7 @@ public class DefaultNumbering implements OutlineNumbering {
 	private final TOCState state;
 
 	public DefaultNumbering(TOCState state) {
-		this.state = new TOCState();
+		this.state = state;
 //		this.sink = sas.state();
 //		state = sas.global().requireState(TOCState.class);
 	}
@@ -17,14 +17,24 @@ public class DefaultNumbering implements OutlineNumbering {
 	/*
 	@Override
 	public void entry(int level, String tocFormat, String title, String style, String anchor) {
+	}
+	 */
+
+	@Override
+	public void parseFormats(String tocFormat) {
+	}
+
+	@Override
+	public String format(int level, String title, String style, String anchor) {
+		String tx = null;
+
 		switch (level) {
-		case 1: { /* chapter * /
+		case 1: { /* chapter */
 			if (!style.equals(state.chapterStyle))
 				state.resetNumbering();
 			state.chapterStyle = style;
 			state.reset();
 			TOCEntry entry = null;
-			String tx = null;
 			if (state.chapterStyle.equals("chapter")) {
 				String number = Integer.toString(state.chapter);
 				entry = state.toc().chapter(anchor, number, title);
@@ -43,17 +53,16 @@ public class DefaultNumbering implements OutlineNumbering {
 				entry = state.toc().chapter(anchor, null, title);
 				state.wantSectionNumbering = false;
 			}
-			if (entry != null) {
-				sink.newSpan();
-				sink.op(new AnchorOp(entry));
-				if (tx != null)
-					sink.processText(tx);
-			}
+//			if (entry != null) {
+//				sink.newSpan();
+//				sink.op(new AnchorOp(entry));
+//				if (tx != null)
+//					sink.processText(tx);
+//			}
 			break;
 		}
 		case 2: {
 			TOCEntry entry;
-			String tx = null;
 			if (state.chapterStyle.equals("chapter")) {
 				String number = Integer.toString(state.chapter-1) + "." + Integer.toString(state.section) + (state.commentary?"c":"");
 				entry = state.toc().section(anchor, number, title);
@@ -65,12 +74,12 @@ public class DefaultNumbering implements OutlineNumbering {
 			} else {
 				entry = state.toc().section(anchor, null, title);
 			}
-			if (entry != null) {
-				sink.newSpan();
-				sink.op(new AnchorOp(entry));
-				if (tx != null)
-					sink.processText(tx);
-			}
+//			if (entry != null) {
+//				sink.newSpan();
+//				sink.op(new AnchorOp(entry));
+//				if (tx != null)
+//					sink.processText(tx);
+//			}
 			
 			state.section++;
 			break;
@@ -82,34 +91,24 @@ public class DefaultNumbering implements OutlineNumbering {
 		}
 		case 4: {
 			TOCEntry entry = state.toc().subsubsection(anchor, null, title);
-			if (entry != null) {
-				sink.newSpan();
-				sink.op(new AnchorOp(entry));
-			}
+//			if (entry != null) {
+//				sink.newSpan();
+//				sink.op(new AnchorOp(entry));
+//			}
 			break;
 		}
 		case 5: {
 			TOCEntry entry = state.toc().subsubsection(anchor, null, title);
-			if (entry != null) {
-				sink.newSpan();
-				sink.op(new AnchorOp(entry));
-			}
+//			if (entry != null) {
+//				sink.newSpan();
+//				sink.op(new AnchorOp(entry));
+//			}
 			break;
 		}
 		default:
 			throw new NotImplementedException();
 		}
-	}
-	 */
-
-	@Override
-	public void parseFormats(String tocFormat) {
-		throw new NotImplementedException();		
-	}
-
-	@Override
-	public String format() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return tx;
 	}
 }
