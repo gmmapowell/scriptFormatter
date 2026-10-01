@@ -118,6 +118,11 @@ public class GitPlace implements Place {
 	}
 
 	@Override
+	public void copyBinary(Place to) {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public Date lastModified() {
 		throw new NotImplementedException();
 	}

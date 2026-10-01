@@ -111,6 +111,12 @@ public interface Place {
 	 */
 	void copyTo(Place to);
 
+	/** Copy the binary contents of this place to another place
+	 * 
+	 * @param to the place to copy to
+	 */
+	void copyBinary(Place to);
+
 	URI uri();
 	
 	/** Return the time when the file was last modified

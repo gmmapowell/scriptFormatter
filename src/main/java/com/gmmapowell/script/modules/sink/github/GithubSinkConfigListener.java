@@ -88,12 +88,12 @@ public class GithubSinkConfigListener implements ConfigListener {
 			String pdf = vars.remove("pdf");
 			if (pdf != null) {
 				Place topdf = region.ensurePlace(pdf);
-				r.place(pdf).copyTo(topdf);
+				r.place(pdf).copyBinary(topdf);
 			}
 			String epub = vars.remove("epub");
 			if (epub != null) {
 				Place toepub = region.ensurePlace(epub);
-				r.place(epub).copyTo(toepub);
+				r.place(epub).copyBinary(toepub);
 			}
 			fromCss.places(x -> {
 				Place p = css.ensurePlace(x.name());

@@ -164,8 +164,31 @@ public class LFSPlace implements Place {
 	}
 
 	@Override
+	public void copyBinary(Place to) {
+		try {
+			try (OutputStream w = to.stream()) {
+				this.streamTo(w);
+			}
+		} catch (Exception ex) {
+			throw new GeoFSException(ex);
+		}
+	}
+
+	@Override
 	public void binary(BinaryBlockListener lsnr) {
-		throw new NotImplementedException();
+		InputStream is = this.input();
+		try {
+			byte[] blk = new byte[1000];
+			int cnt;
+			while ((cnt = is.read(blk, 0, 1000)) > 0) {
+				int k = lsnr.block(blk, cnt);
+				if (k != cnt) {
+					throw new CantHappenException("didn't process all of block");
+				}
+			}
+		} catch (IOException ex) {
+			throw WrappedException.wrap(ex);
+		}
 	}
 
 	@Override
@@ -207,6 +230,27 @@ public class LFSPlace implements Place {
 			}
 		} catch (IOException e) {
 			throw WrappedException.wrap(e);
+		}
+	}
+
+
+	public void streamTo(OutputStream to) {
+		this.binary(new BinaryBlockListener() {
+			@Override
+			public int block(byte[] block, int count) {
+				try {
+					to.write(block, 0, count);
+					return count;
+				} catch (IOException ex) {
+					throw WrappedException.wrap(ex);
+				}
+			}
+			
+		});
+		try {
+			to.close();
+		} catch (IOException ex) {
+			throw WrappedException.wrap(ex);
 		}
 	}
 
