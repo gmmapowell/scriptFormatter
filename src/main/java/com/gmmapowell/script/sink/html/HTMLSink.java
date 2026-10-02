@@ -58,14 +58,9 @@ public class HTMLSink implements Sink {
 				}
 				proc.endSection();
 			}
-//			writer.close();
-//			if (saveAs != null) {
-//				Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
-//				html.store(sw.toString());
-////				FileUtils.cat(GeoFSUtils.file(html));
-//			}
 		}
 	}
+
 	@Override
 	public void showFinal() {
 	}

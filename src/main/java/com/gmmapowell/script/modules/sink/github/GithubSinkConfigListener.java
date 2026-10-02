@@ -75,15 +75,6 @@ public class GithubSinkConfigListener implements ConfigListener {
 		IndexPageCreator ipc = new IndexPageCreator(region.ensurePlace("index.html"), idxprep, idxpostp);
 		ModuleConfigListener m = this.state.module("github");
 		((GithubModuleConfigListener)m).addLO(ipc);
-//		state.config.
-//		String meta = vars.remove("meta");
-//		if (meta == null)
-//			throw new ConfigException("meta file was not defined");
-//		String show = vars.remove("show");
-//		boolean wantShow = false;
-//		if ("true".equals(show))
-//			wantShow = true;
-//		String upload = vars.remove("upload");
 		try {
 			String pdf = vars.remove("pdf");
 			if (pdf != null) {

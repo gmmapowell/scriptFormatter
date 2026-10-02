@@ -159,20 +159,15 @@ public class HTMLTokenProcessor implements CursorClient {
 			}
 			Place html = storeInto.ensureRegionAndPlace(saveAs + ".html");
 			if (ipg != null) {
-				ipg.haveFile(html.name());
+				ipg.haveFile(html);
 			}
 			html.store(sw.toString());
-//			FileUtils.cat(GeoFSUtils.file(html));
 		}
 	}
 
 	private String transition(List<String> cf, String last, StyledToken tok) {
 		if (tok.styles.isEmpty())
 			return last;
-//		if (last.equals("text") && tok.styles.get(0).equals("text") && !haveBreak) {
-//			writer.println("<br/>");
-//			haveBreak = true;
-//		}
 		String moveTo = tok.styles.get(0);
 		if ("section-title".equals(moveTo))
 			moveTo = "h2";
