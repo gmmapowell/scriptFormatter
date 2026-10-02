@@ -82,7 +82,7 @@ public class ScannerAtState {
 	public void outlineEntry(int level, String tocFormat, String text, String style, String anchor) {
 		olstate.parseFormats(tocFormat);
 		for (DocumentOutline e : outline) {
-			e.entry(level, olstate.format(level, text, style, anchor), text, style, anchor);
+			e.entry(level, olstate.format(level, text, style, anchor), text, anchor);
 		}
 	}
 }

@@ -30,7 +30,7 @@ public class TableOfContents {
 	private Place metafile;
 	private final JSONObject meta = new JSONObject();
 	private final JSONObject anchors;
-	private final JSONObject heads;
+//	private final JSONObject heads;
 	private final JSONArray toc;
 	private final Map<String, PDPage> anchorPages = new TreeMap<>();
 	private ListMap<String, PDAnnotationLink> anchorWaiting = new ListMap<>();
@@ -43,8 +43,8 @@ public class TableOfContents {
 		try {
 			anchors = new JSONObject();
 			meta.put("anchors", anchors);
-			heads = new JSONObject();
-			meta.put("headings", heads);
+//			heads = new JSONObject();
+//			meta.put("headings", heads);
 			toc = new JSONArray();
 			meta.put("toc", toc);
 		} catch (JSONException ex) {
@@ -52,35 +52,19 @@ public class TableOfContents {
 		}
 	}
 
-	public TOCEntry chapter(String anchor, String number, String title) {
-		return heading("chapter", anchor, number, title);
-	}
-
-	public TOCEntry section(String anchor, String number, String title) {
-		return heading("section", anchor, number, title);
-	}
-
-	public TOCEntry subsection(String anchor, String number, String title) {
-		return heading("subsection", anchor, number, title);
-	}
-	
-	public TOCEntry subsubsection(String anchor, String number, String title) {
-		return heading("subsubsection", anchor, number, title);
-	}
-	
-	private TOCEntry heading(String type, String anchor, String number, String title) {
+	public TOCEntry heading(int level, String anchor, String number, String title) {
 		try {
 			JSONObject h = new JSONObject();
-			h.put("type", type);
+			h.put("level", level);
 			h.put("title", title);
 			if (number != null) {
 				h.put("number", number);
-				heads.put(number, h);
-				toc.put(number);
-			} else {
-				toc.put(h);
+//				heads.put(number, h);
+//				toc.put(number);
+//			} else {
 			}
-			String header = spaces(type) + (number == null ? "": number + " ") + title;
+			toc.put(h);
+			String header = spaces(level) + (number == null ? "": number + " ") + title;
 			if (anchor != null) {
 				h.put("anchor", anchor);
 				anchors.put(anchor, h);
@@ -93,17 +77,12 @@ public class TableOfContents {
 		}
 	}
 
-	private String spaces(String type) {
-		switch (type) {
-		case "chapter":
-			return "";
-		case "section":
-			return "  ";
-		case "subsection":
-			return "    ";
-		default:
-			return "      ";
+	private String spaces(int level) {
+		StringBuilder sb = new StringBuilder();
+		for (int i=1;i<level;i++) {
+			sb.append("  ");
 		}
+		return sb.toString();
 	}
 
 	public void recordPage(JSONObject entry, PDPage page, String name) {
