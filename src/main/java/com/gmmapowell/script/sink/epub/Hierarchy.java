@@ -37,6 +37,19 @@ public class Hierarchy implements Contents {
 		}
 	}
 
+	public class EntityContents implements Contents {
+		private final String entity;
+
+		public EntityContents(String text) {
+			this.entity = text;
+		}
+		
+		@Override
+		public void addTo(XMLElement ctag) {
+			ctag.addEntity(entity);
+		}
+	}
+
 	private Hierarchy parent;
 	
 	// The only things that should be in styles here are the ones that parent *doesn't* have.
@@ -171,6 +184,10 @@ public class Hierarchy implements Contents {
 	
 	public void insert(XMLElement xhtml) {
 		this.contents.add(new XMLContents(xhtml));
+	}
+	
+	public void entity(String entity) {
+		this.contents.add(new EntityContents(entity));
 	}
 	
 	@Override

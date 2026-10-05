@@ -12,10 +12,10 @@ public class XHTMLCollector {
 	private final XMLElement head;
 	private final XMLElement body;
 	private Hierarchy hierarchy;
-//	private XMLElement ctag;
 	
 	public XHTMLCollector() {
-		xml = XML.createNS("1.0", "html", "http://www.w3.org/1999/xhtml");
+		xml = XML.createNSwithDTD("1.0", "html", "http://www.w3.org/1999/xhtml", "xhtml", "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
+//		xml.addPI("DOCTYPE", "html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"");
 		head = xml.top().addElement("head");
 		body = xml.top().addElement("body");
 	}
@@ -43,6 +43,10 @@ public class XHTMLCollector {
 
 	public void insert(XMLElement xhtml) {
 		hierarchy.insert(xhtml);
+	}
+
+	public void entity(String entity) {
+		hierarchy.entity(entity);
 	}
 
 	// write the close tag of the current para tag

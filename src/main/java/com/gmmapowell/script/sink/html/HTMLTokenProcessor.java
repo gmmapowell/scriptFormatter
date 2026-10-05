@@ -85,6 +85,12 @@ public class HTMLTokenProcessor implements CursorClient {
 			else
 				writer.print(" ");
 		} else if (tok.it instanceof NonBreakingSpace) {
+			if (haveBreak) {
+				if (!last.equals("blockquote") && !last.equals("as-div")) {
+					writer.print("<p>");
+				}
+				haveBreak = false;
+			}
 			writer.println("&nbsp;");
 		} else if (tok.it instanceof ParaBreak) {
 			if (hadBreak) // ignore multiple consecutive BRKs
@@ -109,10 +115,10 @@ public class HTMLTokenProcessor implements CursorClient {
 				break; // it happens automatically
 				
 			case "chapter-title":
-				System.out.println(last);
+				writer.print("</p>");
 				break;
 			case "footnote":
-				System.out.println(last);
+				writer.print("</p>");
 				break;
 			case "locate-place":
 				writer.print("</p>");
@@ -121,7 +127,7 @@ public class HTMLTokenProcessor implements CursorClient {
 				writer.print("</p>");
 				break;
 			case "poetry":
-				System.out.println(last);
+				writer.print("</p>");
 				break;
 			default:
 				throw new CantHappenException("cannot handle BRKPara in " + last);

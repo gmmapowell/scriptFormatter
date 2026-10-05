@@ -104,12 +104,9 @@ public class BloggerSink implements Sink {
 	@Override
 	public void render() throws IOException {
 		for (Flow f : flows) {
-//			System.out.println("Flow " + f.name);
 			this.sw = new StringWriter();
 			writer = new PrintWriter(sw);
-//			int sno = 1;
 			for (Section s : f.sections) {
-//				System.out.println("Section " + (sno++) + ": " + s.format);
 				Cursor c = new Cursor(f.name, s);
 				String last = "text";
 				List<String> cf = new ArrayList<>();
@@ -123,10 +120,7 @@ public class BloggerSink implements Sink {
 					if (tok.it instanceof TextSpanItem)
 						writer.print(entitify(((TextSpanItem)tok.it).text));
 					else if (tok.it instanceof BreakingSpace) {
-//						if (last.equals("blockquote"))
-//							writer.print("&nbsp;");
-//						else
-							writer.print(" ");
+						writer.print(" ");
 					} else if (tok.it instanceof NonBreakingSpace) {
 						writer.print("&nbsp;");
 					} else if (tok.it instanceof ParaBreak) {

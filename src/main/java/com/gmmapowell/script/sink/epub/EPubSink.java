@@ -172,9 +172,9 @@ public class EPubSink implements Sink, CursorClient {
 		coll.styles(tok.styles);
 		if (tok.it instanceof TextSpanItem) {
 			coll.text(((TextSpanItem)tok.it).text);
-		} else if (tok.it instanceof NonBreakingSpace)
-			coll.text("&nbsp;");
-		else if (tok.it instanceof BreakingSpace)
+		} else if (tok.it instanceof NonBreakingSpace) {
+			coll.entity("nbsp");
+		} else if (tok.it instanceof BreakingSpace)
 			coll.text(" ");
 		else if (tok.it instanceof ParaBreak)
 			coll.closePara();
