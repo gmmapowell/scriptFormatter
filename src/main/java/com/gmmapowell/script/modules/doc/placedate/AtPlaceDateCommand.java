@@ -35,9 +35,9 @@ public class AtPlaceDateCommand implements AtCommandHandler {
 		sink.newSection("main", "placedate");
 		sink.newPara("locate-place");
 		sink.processText(p);
+		sink.endPara();
 		sink.newPara("locate-date");
 		sink.processText(d);
 		sink.endPara();
 	}
-
 }

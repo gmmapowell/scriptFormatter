@@ -115,10 +115,10 @@ public class HTMLTokenProcessor implements CursorClient {
 				System.out.println(last);
 				break;
 			case "locate-place":
-				System.out.println(last);
+				writer.print("</p>");
 				break;
 			case "locate-date":
-				System.out.println(last);
+				writer.print("</p>");
 				break;
 			case "poetry":
 				System.out.println(last);
