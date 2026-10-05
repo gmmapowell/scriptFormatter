@@ -36,13 +36,8 @@ public class AtTOCCommand implements AtCommandHandler {
 		List<LinkFromTOC> links = new ArrayList<>();
 		try {
 			JSONArray order = toc.currentMeta().getJSONArray("toc");
-//			JSONObject headings = toc.currentMeta().getJSONObject("headings");
 			for (int i=0;i<order.length();i++) {
 				JSONObject entry = (JSONObject) order.get(i);
-//				if (e instanceof String)
-//					e = headings.getJSONObject((String)e);
-//				JSONObject entry = (JSONObject) e;
-//				String type = entry.getString("type");
 				state.newPara("text"); // "tocline", "toc-" + type
 				if (entry.has("number")) {
 					state.newSpan(); // tocnumber

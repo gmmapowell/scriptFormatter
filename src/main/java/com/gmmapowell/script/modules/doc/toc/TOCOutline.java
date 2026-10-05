@@ -16,12 +16,14 @@ public class TOCOutline implements DocumentOutline {
 
 	@Override
 	public void entry(int level, String tocFormat, String title, String anchor) {
-		if (tocFormat != null && tocFormat.length() > 0) {
+		if (tocFormat != null) {
 			TOCEntry entry = state.toc().heading(level, anchor, tocFormat, title);
 			sink.newSpan();
 			sink.op(new AnchorOp(entry));
-			sink.processText(tocFormat);
-			sink.processText(" ");
+			if (tocFormat.length() > 0) {
+				sink.processText(tocFormat);
+				sink.processText(" ");
+			}
 		}
 	}
 }

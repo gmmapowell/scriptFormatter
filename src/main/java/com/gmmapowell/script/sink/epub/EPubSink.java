@@ -38,27 +38,23 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 public class EPubSink implements Sink, CursorClient {
-//	private final StyleCatalog styles;
 	private final Place output;
 	private final boolean wantOpen;
 	private final String upload;
 	private final boolean debug;
 	private final String sshid;
 	private final List<Flow> flows = new ArrayList<>();
-//	private final Stock stock;
 	private final String bookId;
 	private final String title;
 	private final String identifier;
 	private final String author;
 
 	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
-//		this.styles = styles;
 		this.debug = debug;
 		this.sshid = sshid;
 		this.output = root.ensurePlace(output);
 		this.wantOpen = wantOpen;
 		this.upload = upload;
-//		String stockName = null;
 		if (!vars.containsKey("bookid")) {
 			throw new ConfigException("must specify a bookid");
 		}
@@ -75,8 +71,6 @@ public class EPubSink implements Sink, CursorClient {
 		title = vars.remove("title");
 		identifier = vars.remove("identifier");
 		author = vars.remove("author");
-//		stockName = options.remove("stock");
-//		stock = styles.getStock(stockName);
 	}
 
 	public void prepare() {
@@ -102,7 +96,6 @@ public class EPubSink implements Sink, CursorClient {
 			FlowCursor c = new FlowCursor(flows);
 			c.run(this); // TODO: I feel that actually it should be a newly created object ...
 
-//			extracted(zos, opf, toc);
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));
 			FileUtils.writeToStream(opf.makePackage(), zos);
 			zos.putNextEntry(new ZipEntry("OPS/toc.ncx"));
@@ -162,16 +155,6 @@ public class EPubSink implements Sink, CursorClient {
 	@Override
 	public boolean processToken(CursorFeedback cursor, StyledToken tok) throws IOException {
 		if (tok.it instanceof YieldToFlow) {
-//			suspended.add(c);
-//			Cursor en = findFlow(suspended, sections, ((YieldToFlow)tok.it).yieldTo());
-//			if (en == c) {
-//				throw new CantHappenException("can't enable the one you're suspending");
-//			}
-//			active.add(en);
-//			sections.add(en);
-//			active.remove(c);
-//			sections.remove(c);
-//			continue whileActive;
 			cursor.suspend(tok, ((YieldToFlow) tok.it).yieldTo());
 			return false;
 		}

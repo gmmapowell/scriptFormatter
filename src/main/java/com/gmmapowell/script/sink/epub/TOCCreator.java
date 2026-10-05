@@ -8,7 +8,7 @@ public class TOCCreator {
 	private final XMLElement ncx;
 	private final XMLElement map;
 	private final XMLElement html;
-	private final XMLElement ol;
+	private final XMLElement ul;
 
 	public TOCCreator(String identifier, String title) {
 		XML xml = XML.createNS("1.0", "ncx", "http://www.daisy.org/z3986/2005/ncx/");
@@ -32,7 +32,7 @@ public class TOCCreator {
 		XMLElement hnav = body.addElement("nav");
 		hnav.setAttribute("id", "toc");
 		hnav.setAttribute(epub.attr("type"), "toc");
-		ol = hnav.addElement("ol");
+		ul = hnav.addElement("ul");
 	}
 
 	public void addEntry(String title, String file, int idx) {
@@ -47,7 +47,8 @@ public class TOCCreator {
 		XMLElement npc = point.addElement("content");
 		npc.setAttribute("src", "Files/" + href);
 		
-		XMLElement li = ol.addElement("li");
+		XMLElement li = ul.addElement("li");
+		li.setAttribute("style", "list-style-type: none;");
 		XMLElement link = li.addElement("a");
 		link.setAttribute("href", href);
 		link.addText(title);
