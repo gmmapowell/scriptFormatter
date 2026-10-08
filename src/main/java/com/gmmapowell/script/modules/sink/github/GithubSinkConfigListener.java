@@ -33,10 +33,6 @@ public class GithubSinkConfigListener implements ConfigListener {
 		case "idxpost":
 		case "epub":
 		case "pdf":
-//		case "meta":
-//		case "show":
-//		case "open":
-//		case "upload":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;

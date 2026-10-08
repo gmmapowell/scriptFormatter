@@ -25,6 +25,7 @@ public class OutlineNumberState implements OutlineNumbering {
 	}
 
 	private final List<TitleElement> elts = new ArrayList<>();
+	private boolean useBlank = false;
 
 	public OutlineNumberState(TOCState state) {
 	}
@@ -43,13 +44,15 @@ public class OutlineNumberState implements OutlineNumbering {
 	}
 	
 	public void parseFormats(String tocFormat) {
+		this.useBlank = false;
 		if (tocFormat == null) {
 			update();
 			return;
 		}
 		
 		if (tocFormat.length() == 0) {
-			elts.clear();
+			this.useBlank = true;
+//			elts.clear();
 			return;
 		}
 		
@@ -114,6 +117,9 @@ public class OutlineNumberState implements OutlineNumbering {
 	}
 
 	public String format(int level, String text, String style, String anchor) {
+		if (useBlank ) {
+			return "";
+		}
 		StringBuilder sb = new StringBuilder();
 		for (TitleElement e : elts) {
 			sb.append(e.encoder.render(e.currNo));

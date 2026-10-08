@@ -125,6 +125,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 			for (String s : errors) {
 				System.out.println("  " + s);
 			}
+			throw new CantHappenException("encountered " + errors.size() + " errors");
 		}
 	}
 

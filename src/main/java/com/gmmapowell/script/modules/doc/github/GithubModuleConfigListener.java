@@ -35,12 +35,10 @@ public class GithubModuleConfigListener implements ModuleConfigListener {
 	
 	@Override
 	public void complete() throws Exception {
-		System.out.println("Completing " + this);
 	}
 	
 	@Override
 	public void activate(ProcessorConfig proc) throws ConfigException {
-		System.out.println("Activating " + proc);
 		proc.global().requireState(GHGlobal.class);
 		Region r = state.universe().ensureRegionPath(inputs);
 		proc.lifecycleObserver(new CopyFile(r));
