@@ -49,6 +49,11 @@ public class Outlet {
 			callback.populate(regions.get(currentRegion));
 		return ++currentRegion < regions.size();
 	}
+	
+	public void close() throws IOException {
+		if (callback != null)
+			callback.populate(regions.get(currentRegion));
+	}
 
 	public Outlet borrowFrom() throws IOException {
 		return new BorrowOutlet(this);

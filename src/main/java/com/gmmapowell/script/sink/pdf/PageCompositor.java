@@ -13,5 +13,6 @@ public interface PageCompositor {
 
 	Acceptance token(StyledToken next) throws IOException;
 	boolean nextRegions() throws IOException;
+	void close() throws IOException;
 
 }

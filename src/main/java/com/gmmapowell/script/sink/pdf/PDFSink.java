@@ -156,7 +156,8 @@ public class PDFSink implements Sink, CursorClient {
 	}
 
 	@Override
-	public void endSection() {
+	public void endSection() throws IOException {
+		page.close();
 	}
 
 	@Override

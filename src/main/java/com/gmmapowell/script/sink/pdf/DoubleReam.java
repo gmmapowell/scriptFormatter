@@ -14,6 +14,7 @@ public class DoubleReam extends CommonReam implements Ream {
 	private final PDRectangle size;
 	private PDPage meta;
 	private PDPageContentStream stream;
+	private int lr = 0;
 	
 	public DoubleReam(float swid, float ht) {
 		this.swid = swid;
@@ -23,16 +24,21 @@ public class DoubleReam extends CommonReam implements Ream {
 	
 	@Override
 	public PageCompositor newPage(PageStyle left, PageStyle right) throws IOException {
-		if (pageNo % 2 == 0) {
+		if (lr % 2 == 0) {
 			if (stream != null)
 				stream.close();
 			meta = new PDPage(size);
 			doc.addPage(meta);
 			stream = new PDPageContentStream(doc, meta);
 		}
-		if (pageNo % 2 == 0 && left == null)
-			pageNo++;
-		SimplePageCompositor ret = new SimplePageCompositor(this, styles, meta, stream, Integer.toString(pageNo), new PDRectangle(pageNo%2*swid, 0, swid, ht), pageNo%2 == 0 ? left : right);
+		if (lr % 2 == 0 && left == null) {
+			if (lr > 0) {
+				pageNo++;
+			}
+			lr++;
+		}
+		SimplePageCompositor ret = new SimplePageCompositor(this, styles, meta, stream, Integer.toString(pageNo), new PDRectangle(lr%2*swid, 0, swid, ht), lr%2 == 0 ? left : right);
+		lr++;
 		pageNo++;
 		return ret;
 	}

@@ -102,4 +102,11 @@ public class SimplePageCompositor implements PageCompositor {
 		}
 		return ret;
 	}
+	
+	@Override
+	public void close() throws IOException {
+		for (Outlet o : outlets.values()) {
+			o.close();
+		}
+	}
 }
