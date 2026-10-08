@@ -1,8 +1,5 @@
 package com.gmmapowell.script.styles.page;
 
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-
 import com.gmmapowell.script.styles.PageStyle;
 
 public class DefaultPageStyle implements PageStyle {
@@ -63,8 +60,8 @@ public class DefaultPageStyle implements PageStyle {
 	}
 
 	@Override
-	public PDFont getPageNumberFont() {
-		return PDType1Font.COURIER;
+	public String getPageNumberFont() {
+		return "courier";
 	}
 
 	@Override

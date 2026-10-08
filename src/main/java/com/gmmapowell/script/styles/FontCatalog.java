@@ -18,6 +18,14 @@ public abstract class FontCatalog implements StyleCatalog {
 	public PDFont getFont(String font, Boolean italic, Boolean bold) {
 		if (font == null)
 			return null;
+		String fn = font;
+		if (bold)
+			fn += "-bold";
+		if (italic)
+			fn += "-italic";
+		PDFont ret = fonts.get(fn);
+		if (ret != null)
+			return ret;
 		switch (font) {
 		case "courier":
 		case "monospace":
@@ -39,15 +47,7 @@ public abstract class FontCatalog implements StyleCatalog {
 			else
 				return PDType1Font.HELVETICA;
 		default:
-			String fn = font;
-			if (bold)
-				fn += "-bold";
-			if (italic)
-				fn += "-italic";
-			PDFont ret = fonts.get(fn);
-			if (ret == null)
-				throw new RuntimeException("No such font: " + fn);
-			return ret;
+			throw new RuntimeException("No such font: " + fn);
 		}
 	}
 

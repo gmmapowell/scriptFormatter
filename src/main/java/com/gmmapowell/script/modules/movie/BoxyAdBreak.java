@@ -55,7 +55,8 @@ public class BoxyAdBreak implements Break, SpanItem {
 
 	@Override
 	public PDFont textFont(StyleCatalog styles, PageStyle pageStyle) {
-		return pageStyle.getPageNumberFont();
+		String font = pageStyle.getPageNumberFont();
+		return styles.getFont(font, false, false);
 	}
 
 	@Override

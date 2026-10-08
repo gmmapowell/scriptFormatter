@@ -1,7 +1,5 @@
 package com.gmmapowell.script.styles;
 
-import org.apache.pdfbox.pdmodel.font.PDFont;
-
 public interface PageStyle {
 
 	Float getPageWidth();
@@ -13,7 +11,7 @@ public interface PageStyle {
 	Boolean wantPageNumbers();
 	Float pageNumberCenterX();
 	Float pageNumberBaselineY();
-	PDFont getPageNumberFont();
+	String getPageNumberFont();
 	Float getPageNumberFontSize();
 	Boolean wantHeader();
 	Boolean wantFooter();

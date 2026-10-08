@@ -1,7 +1,5 @@
 package com.gmmapowell.script.styles.page;
 
-import org.apache.pdfbox.pdmodel.font.PDFont;
-
 import com.gmmapowell.script.styles.PageStyle;
 
 public class ConfigurablePageStyle implements PageStyle {
@@ -14,7 +12,7 @@ public class ConfigurablePageStyle implements PageStyle {
 	private Boolean wantPageNumbers;
 	private Float pageNumberCenterX;
 	private Float pageNumberBaselineY;
-	private PDFont pageNumberFont;
+	private String pageNumberFont;
 	private Float pageNumberFontSize;
 	private Boolean wantHeader;
 	private Boolean wantFooter;
@@ -65,7 +63,7 @@ public class ConfigurablePageStyle implements PageStyle {
 	}
 
 	@Override
-	public PDFont getPageNumberFont() {
+	public String getPageNumberFont() {
 		return pageNumberFont;
 	}
 
@@ -120,7 +118,7 @@ public class ConfigurablePageStyle implements PageStyle {
 		this.pageNumberBaselineY = pageNumberBaselineY;
 	}
 
-	public void setPageNumberFont(PDFont pageNumberFont) {
+	public void setPageNumberFont(String pageNumberFont) {
 		this.pageNumberFont = pageNumberFont;
 	}
 
