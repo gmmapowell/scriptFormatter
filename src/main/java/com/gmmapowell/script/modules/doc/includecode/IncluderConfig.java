@@ -6,7 +6,6 @@ public class IncluderConfig {
 	private Region samples;
 
 	public void setSamples(Region samples) {
-		System.out.println("samples at " + samples);
 		this.samples = samples;
 	}
 

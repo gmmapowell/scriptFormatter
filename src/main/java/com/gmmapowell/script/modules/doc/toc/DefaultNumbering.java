@@ -5,22 +5,26 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.script.modules.processors.doc.OutlineNumbering;
 
 public class DefaultNumbering implements OutlineNumbering {
-//	private final ConfiguredState sink;
 	private final TOCState state;
+	private boolean ignoreMe;
 
 	public DefaultNumbering(TOCState state) {
 		this.state = state;
-//		this.sink = sas.state();
-//		state = sas.global().requireState(TOCState.class);
 	}
 
 	@Override
 	public void parseFormats(String tocFormat) {
+		System.out.println("format: " + tocFormat);
+		ignoreMe = (tocFormat != null && tocFormat.equalsIgnoreCase("ignoreMe"));
 	}
 
 	@Override
 	public String format(int level, String title, String style, String anchor) {
 		String tx = null;
+		
+		if (ignoreMe) {
+			return tx;
+		}
 
 		switch (level) {
 		case 1: { /* chapter */
