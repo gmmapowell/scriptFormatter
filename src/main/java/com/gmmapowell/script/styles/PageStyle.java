@@ -13,6 +13,7 @@ public interface PageStyle {
 	Float pageNumberBaselineY();
 	String getPageNumberFont();
 	Float getPageNumberFontSize();
+	String getPageNumberJust();
 	Boolean wantHeader();
 	Boolean wantFooter();
 

@@ -1,7 +1,8 @@
 package com.gmmapowell.script.sink.pdf;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,8 +50,13 @@ public class SimplePageCompositor implements PageCompositor {
 					);
 			outlets.put("header", new Outlet(styles, pageStyle, meta, currentPage, header).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
-					r.place(new StyledToken("header", new CursorIndex(), Arrays.asList("text"), new TextSpanItem("Page " + ream.currentPageNo())));
-					r.place(new StyledToken("header", new CursorIndex(), Arrays.asList("text"), new ParaBreak()));
+					List<String> fmts = new ArrayList<>();
+					fmts.add("text");
+					if (pageStyle.getPageNumberJust() != null) {
+						fmts.add(pageStyle.getPageNumberJust());
+					}
+					r.place(new StyledToken("header", new CursorIndex(), fmts, new TextSpanItem(ream.currentPageNo())));
+					r.place(new StyledToken("header", new CursorIndex(), fmts, new ParaBreak()));
 				}
 			}));
 		}
@@ -61,8 +67,13 @@ public class SimplePageCompositor implements PageCompositor {
 					);
 			outlets.put("footer", new Outlet(styles, pageStyle, meta, currentPage, footer).bindCallback(new HFCallback() {
 				public void populate(Region r) throws IOException {
-					r.place(new StyledToken("footer", new CursorIndex(), Arrays.asList("pageno"), new TextSpanItem("Page " + ream.currentPageNo())));
-					r.place(new StyledToken("footer", new CursorIndex(), Arrays.asList("pageno"), new ParaBreak()));
+					List<String> fmts = new ArrayList<>();
+					fmts.add("text");
+					if (pageStyle.getPageNumberJust() != null) {
+						fmts.add(pageStyle.getPageNumberJust());
+					}
+					r.place(new StyledToken("footer", new CursorIndex(), fmts, new TextSpanItem(ream.currentPageNo())));
+					r.place(new StyledToken("footer", new CursorIndex(), fmts, new ParaBreak()));
 				}
 			}));
 		}

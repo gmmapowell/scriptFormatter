@@ -68,4 +68,9 @@ public class DefaultPageStyle implements PageStyle {
 	public Float getPageNumberFontSize() {
 		return 12f;
 	}
+
+	@Override
+	public String getPageNumberJust() {
+		return "leftJust";
+	}
 }

@@ -56,9 +56,9 @@ public class Line {
 		Style baseStyle = styles.getOptional(bsname);
 		if (baseStyle == null)
 			throw new RuntimeException("no style found for " + bsname);
-		if (isNew)
-			just = baseStyle.getJustification();
 		Style style = baseStyle.apply(token.styles.subList(1, token.styles.size()));
+		if (isNew)
+			just = style.getJustification();
 		Justification cellJust = style.getJustification();
 		Float cellWidth = style.getWidth();
 		PDFont font = style.getFont();
@@ -77,12 +77,6 @@ public class Line {
 				System.out.println("line overflowed with " + token);
 				overflow = true;
 			} else {
-//				System.out.println("pending=" + pending.size() + " contents = " + contents.size());
-//				if (pending.size() >= contents.size()) {
-//					System.out.println("overflowed " + width + " with no breaks");
-//					contents.add(new Item(pageStyle, style, adjust(xpos, cellJust, cellWidth, wid), bbox, font, sz, si));
-//					return new AcceptToken(style.getOverflowNewLine(), new ArrayList<>());
-//				}
 				for (int i=0;i<pending.size()-1;i++)
 					contents.remove(contents.size()-1);
 				return new AcceptToken(style.getOverflowNewLine(), pending);
@@ -147,6 +141,10 @@ public class Line {
 
 	public float require() {
 		return Math.max(height(), requireBeyond);
+	}
+	
+	public Justification getJustification() {
+		return just;
 	}
 
 	public void shove(PDPage meta, PDPageContentStream page, float x, float y) throws IOException {

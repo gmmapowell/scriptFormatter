@@ -37,9 +37,9 @@ public class DoubleReam extends CommonReam implements Ream {
 			}
 			lr++;
 		}
+		pageNo++;
 		SimplePageCompositor ret = new SimplePageCompositor(this, styles, meta, stream, Integer.toString(pageNo), new PDRectangle(lr%2*swid, 0, swid, ht), lr%2 == 0 ? left : right);
 		lr++;
-		pageNo++;
 		return ret;
 	}
 	

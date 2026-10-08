@@ -16,6 +16,7 @@ public class ConfigurablePageStyle implements PageStyle {
 	private Float pageNumberFontSize;
 	private Boolean wantHeader;
 	private Boolean wantFooter;
+	private String pageNumberJust;
 
 	@Override
 	public Float getPageWidth() {
@@ -73,6 +74,11 @@ public class ConfigurablePageStyle implements PageStyle {
 	}
 
 	@Override
+	public String getPageNumberJust() {
+		return pageNumberJust;
+	}
+
+	@Override
 	public Boolean wantHeader() {
 		return wantHeader;
 	}
@@ -126,6 +132,10 @@ public class ConfigurablePageStyle implements PageStyle {
 		this.pageNumberFontSize = pageNumberFontSize;
 	}
 
+	public void setPageNumberJust(String pageNumberJust) {
+		this.pageNumberJust = pageNumberJust;
+	}
+
 	public void setWantHeader(boolean wantHeader) {
 		this.wantHeader = wantHeader;
 	}
@@ -157,6 +167,8 @@ public class ConfigurablePageStyle implements PageStyle {
 			this.setPageNumberFont(from.getPageNumberFont());
 		if (from.getPageNumberFontSize() != null)
 			this.setPageNumberFontSize(from.getPageNumberFontSize());
+		if (from.getPageNumberJust() != null)
+			this.setPageNumberJust(from.getPageNumberJust());
 		if (from.wantHeader() != null)
 			this.setWantHeader(from.wantHeader());
 		if (from.wantFooter() != null)
