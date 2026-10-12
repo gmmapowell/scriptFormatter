@@ -59,7 +59,6 @@ public class OutlineNumberState implements OutlineNumbering {
 		List<TitleElement> es = new ArrayList<>();
 		String[] ses = tocFormat.split("\\.");
 		for (String s: ses) {
-			System.out.println("have " + s);
 			es.add(parseOneFormat(s));
 		}
 		

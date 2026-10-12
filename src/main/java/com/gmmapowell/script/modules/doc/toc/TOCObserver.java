@@ -12,7 +12,6 @@ public class TOCObserver implements LifecycleObserver {
 
 	@Override
 	public void allDone(GlobalState state) {
-		System.out.println("saving toc");
 		toc.save();
 	}
 }

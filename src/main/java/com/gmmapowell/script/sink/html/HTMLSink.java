@@ -46,7 +46,6 @@ public class HTMLSink implements Sink {
 
 	@Override
 	public void render() throws IOException {
-		System.out.println("render() from HTMLSink");
 		for (Flow f : flows) {
 			HTMLTokenProcessor proc = new HTMLTokenProcessor(storeInto, pre, post, ipg);
 			for (Section s : f.sections) {

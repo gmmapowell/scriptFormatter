@@ -83,7 +83,6 @@ public class EPubSink implements Sink, CursorClient {
 	
 	@Override
 	public void render() throws IOException {
-		System.out.println("render() from EPubSink");
 		try (ZipOutputStream zos = new ZipOutputStream(GeoFSUtils.saveStreamTo(output))) {
 			this.zos = zos;
 			makeMimetype(zos);

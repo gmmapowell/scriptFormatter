@@ -102,10 +102,8 @@ public class HTMLTokenProcessor implements CursorClient {
 				break;
 			case "text":
 				writer.print("</p>");
-//				writer.print("<br/>");
 				break;
 			case "blockquote":
-//				writer.print("</p>");
 				writer.print("<br/>");
 				break;
 			case "h1":
@@ -144,11 +142,11 @@ public class HTMLTokenProcessor implements CursorClient {
 		} else if (tok.it instanceof SaveAs) {
 			saveAs = ((SaveAs) tok.it).name();
 		} else if (tok.it instanceof YieldToFlow || tok.it instanceof ReleaseFlow || tok.it instanceof SyncAfterFlow) {
-			System.out.println("cannot handle token " + tok.it);
+			System.out.println("htmltp cannot handle token " + tok.it);
 		} else if (tok.it instanceof AnchorOp || tok.it instanceof LinkFromTOC) {
-			System.out.println("cannot handle token " + tok.it);
+//			System.out.println("htmltp cannot handle token " + tok.it);
 		} else if (tok.it.toString().equals("SectionBreak")) {
-			System.out.println("cannot handle token " + tok.it);
+//			System.out.println("htmltp cannot handle token " + tok.it);
 		} else
 			throw new NotImplementedException("cannot handle token " + tok.it);
 		return true;

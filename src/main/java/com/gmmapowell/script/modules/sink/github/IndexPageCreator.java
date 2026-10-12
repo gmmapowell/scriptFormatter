@@ -62,7 +62,6 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 
 	@Override
 	public void entry(int level, String tocFormat, String title, String anchor) {
-		System.out.println("entry " + title + " format = " + tocFormat);
 		titles.add(new Title(tocFormat, title));
 	}
 

@@ -28,7 +28,6 @@ public class Fluency {
 	}
 	
 	public void switchToFlow(String flow) {
-		System.out.println("Switching to flow " +flow);
 		currFlow = global.flow(flow);
 		if (currFlow == null) {
 			throw new CantHappenException("there is no flow " + flow);
@@ -43,7 +42,6 @@ public class Fluency {
 	}
 	
 	public void newSection(String flow, String format) {
-		System.out.println("new section for " + flow);
 		currFlow = global.flow(flow);
 		currSection = new Section(format);
 		currFlow.sections.add(currSection);
