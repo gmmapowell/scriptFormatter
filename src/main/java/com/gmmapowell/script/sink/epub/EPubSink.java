@@ -29,6 +29,7 @@ import com.gmmapowell.script.flow.FlowCursor;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
 import com.gmmapowell.script.flow.StyledToken;
+import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.flow.TextSpanItem;
 import com.gmmapowell.script.flow.YieldToFlow;
 import com.gmmapowell.script.sink.Sink;
@@ -48,6 +49,7 @@ public class EPubSink implements Sink, CursorClient {
 	private final String title;
 	private final String identifier;
 	private final String author;
+	private int footNote = 1;
 
 	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
 		this.debug = debug;
@@ -142,6 +144,7 @@ public class EPubSink implements Sink, CursorClient {
 	private OPFCreator opf;
 	private TOCCreator toc;
 	int chapNo = 0;
+	private XMLElement hasFN;
 	
 	@Override
 	public void beginSection(Set<Cursor> cursors) {
@@ -154,6 +157,7 @@ public class EPubSink implements Sink, CursorClient {
 	@Override
 	public boolean processToken(CursorFeedback cursor, StyledToken tok) throws IOException {
 		if (tok.it instanceof YieldToFlow) {
+			coll.closePara();
 			cursor.suspend(tok, ((YieldToFlow) tok.it).yieldTo());
 			return false;
 		}
@@ -163,14 +167,26 @@ public class EPubSink implements Sink, CursorClient {
 				titleBuilder.append(tsi.text);
 			} else if (tok.it instanceof ParaBreak) {
 				coll.title(titleBuilder.toString());
-//				System.out.println("title: " + title);
 			} else if (tok.it instanceof BreakingSpace || tok.it instanceof NonBreakingSpace) {
 				titleBuilder.append(" ");
 			}
 		}
 		coll.styles(tok.styles);
 		if (tok.it instanceof TextSpanItem) {
-			coll.text(((TextSpanItem)tok.it).text);
+			if (tok.styles.contains("footnote-number")) {
+				if (hasFN == null) {
+					hasFN = coll.newElement("a");
+					hasFN.setAttribute("href", "#footnote-" + footNote++);
+					this.coll.epubAttribute(hasFN, "type", "noteref");
+					this.coll.insert(hasFN);
+				}
+				hasFN.addText(((TextSpanItem)tok.it).text);
+			} else {
+				if (hasFN != null) {
+					hasFN = null;
+				}
+				coll.text(((TextSpanItem)tok.it).text);
+			}
 		} else if (tok.it instanceof NonBreakingSpace) {
 			coll.entity("nbsp");
 		} else if (tok.it instanceof BreakingSpace)
@@ -179,8 +195,11 @@ public class EPubSink implements Sink, CursorClient {
 			coll.closePara();
 		else if (tok.it instanceof EPubAware)
 			((EPubAware)tok.it).handle(coll);
-		else {
-			System.out.println("processToken cannot handle " + tok.it.getClass());
+		else if (tok.it instanceof SyncAfterFlow) {
+			System.out.println("epub processToken cannot handle SyncAfterFlow: " + tok.it);
+			cursor.resumeAtEnd(((SyncAfterFlow) tok.it).yieldTo());
+		} else {
+			System.out.println("epub processToken cannot handle " + tok.it);
 		}
 		return true;
 	}

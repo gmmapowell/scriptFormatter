@@ -18,4 +18,6 @@ public interface CursorFeedback {
 
 	void suspend(StyledToken lastAccepted, String enable);
 
+	void resumeAtEnd(String flow);
+
 }

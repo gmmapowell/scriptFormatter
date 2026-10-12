@@ -6,20 +6,28 @@ import java.util.zip.ZipOutputStream;
 import org.zinutils.utils.FileUtils;
 import org.zinutils.xml.XML;
 import org.zinutils.xml.XMLElement;
+import org.zinutils.xml.XMLNamespace;
 
 public class XHTMLCollector {
 	private final XML xml;
 	private final XMLElement head;
 	private final XMLElement body;
 	private Hierarchy hierarchy;
+	private XMLNamespace epub;
 	
 	public XHTMLCollector() {
 		xml = XML.createNSwithDTD("1.0", "html", "http://www.w3.org/1999/xhtml", "xhtml", "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
 //		xml.addPI("DOCTYPE", "html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"");
+		epub = xml.namespace("epub", "http://www.idpf.org/2007/ops");
 		head = xml.top().addElement("head");
 		body = xml.top().addElement("body");
 	}
-	
+
+
+	public XMLElement newElement(String tag) {
+		return xml.addElement(tag);
+	}
+
 	public void styles(List<String> styles) {
 		if (hierarchy == null)
 			hierarchy = new Hierarchy(styles);
@@ -55,6 +63,10 @@ public class XHTMLCollector {
 			hierarchy.flush(body);
 			hierarchy = null;
 		}
+	}
+
+	public void epubAttribute(XMLElement applyTo, String attr, String value) {
+		applyTo.setAttribute(epub.attr(attr), value);
 	}
 
 	public void write(ZipOutputStream zos) {

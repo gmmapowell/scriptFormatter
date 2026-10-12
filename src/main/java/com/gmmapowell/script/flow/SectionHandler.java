@@ -19,6 +19,7 @@ public class SectionHandler implements CursorFeedback {
 	Set<Cursor> active;
 	List<Suspension> suspended;
 	private Set<Cursor> cursors;
+	private List<String> resumen = new ArrayList<>();
 
 	public SectionHandler(CursorClient cc) {
 		this.cc = cc;
@@ -45,8 +46,10 @@ public class SectionHandler implements CursorFeedback {
 					if (en == c) {
 						throw new CantHappenException("can't enable the one you're suspending");
 					}
-					active.add(en);
-					cursors.add(en);
+					if (en != null) {
+						active.add(en);
+						cursors.add(en);
+					}
 				} else {
 					if (!cc.processToken(this, tok))
 						break;
@@ -56,6 +59,12 @@ public class SectionHandler implements CursorFeedback {
 				cursors.remove(c);
 				active.remove(c);
 			}
+		}
+		if (!resumen.isEmpty()) {
+			System.out.println("have resumen: " + resumen);
+			Cursor en = findFlow(suspended, cursors, resumen.remove(0));
+			active.add(en);
+			cursors.add(en);
 		}
 	}
 	
@@ -91,11 +100,17 @@ public class SectionHandler implements CursorFeedback {
 		Cursor en = findFlow(suspended, cursors, enable);
 		if (en == c) {
 			throw new CantHappenException("can't enable the one you're suspending");
+		} else if (en != null) {
+			active.add(en);
+			cursors.add(en);
 		}
-		active.add(en);
-		cursors.add(en);
 		active.remove(c);
 		cursors.remove(c);
+	}
+	
+	@Override
+	public void resumeAtEnd(String flow) {
+		resumen.add(flow);
 	}
 
 	private Cursor firstActive() {
@@ -113,6 +128,6 @@ public class SectionHandler implements CursorFeedback {
 			if (c.isFlow(enable))
 				return c;
 		}
-		throw new CantHappenException("could not enable flow " + enable + " because it did not exist");
+		return null;
 	}
 }
