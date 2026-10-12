@@ -49,7 +49,6 @@ public class EPubSink implements Sink, CursorClient {
 	private final String title;
 	private final String identifier;
 	private final String author;
-	private int footNote = 1;
 
 	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
 		this.debug = debug;
@@ -173,14 +172,27 @@ public class EPubSink implements Sink, CursorClient {
 		}
 		coll.styles(tok.styles);
 		if (tok.it instanceof TextSpanItem) {
-			if (tok.styles.contains("footnote-number")) {
+			if (tok.styles.contains("footnote")) {
+				String tx = ((TextSpanItem)tok.it).text;
+				if (hasFN == null) {
+					hasFN = coll.newElement("aside");
+					hasFN.setAttribute("id", "footnote-" + tx.trim());
+					this.coll.epubAttribute(hasFN, "type", "footnote");
+					this.coll.insert(hasFN);
+					hasFN = hasFN.addElement("p");
+					hasFN.setAttribute("class", "footnote");
+				} 
+				hasFN.addText(tx);
+			} else if (tok.styles.contains("footnote-number")) {
+				String noteNo = ((TextSpanItem)tok.it).text;
 				if (hasFN == null) {
 					hasFN = coll.newElement("a");
-					hasFN.setAttribute("href", "#footnote-" + footNote++);
+					hasFN.setAttribute("href", "#footnote-" + noteNo.trim());
+					hasFN.setAttribute("class", "footnote-ref");
 					this.coll.epubAttribute(hasFN, "type", "noteref");
 					this.coll.insert(hasFN);
 				}
-				hasFN.addText(((TextSpanItem)tok.it).text);
+				hasFN.addText(noteNo);
 			} else {
 				if (hasFN != null) {
 					hasFN = null;
@@ -189,14 +201,17 @@ public class EPubSink implements Sink, CursorClient {
 			}
 		} else if (tok.it instanceof NonBreakingSpace) {
 			coll.entity("nbsp");
-		} else if (tok.it instanceof BreakingSpace)
-			coll.text(" ");
-		else if (tok.it instanceof ParaBreak)
+		} else if (tok.it instanceof BreakingSpace) {
+			if (hasFN != null) {
+				hasFN.addText(" ");
+			} else {
+				coll.text(" ");
+			}
+		} else if (tok.it instanceof ParaBreak)
 			coll.closePara();
 		else if (tok.it instanceof EPubAware)
 			((EPubAware)tok.it).handle(coll);
 		else if (tok.it instanceof SyncAfterFlow) {
-			System.out.println("epub processToken cannot handle SyncAfterFlow: " + tok.it);
 			cursor.resumeAtEnd(((SyncAfterFlow) tok.it).yieldTo());
 		} else {
 			System.out.println("epub processToken cannot handle " + tok.it);

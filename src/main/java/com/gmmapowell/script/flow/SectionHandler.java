@@ -61,7 +61,6 @@ public class SectionHandler implements CursorFeedback {
 			}
 		}
 		if (!resumen.isEmpty()) {
-			System.out.println("have resumen: " + resumen);
 			Cursor en = findFlow(suspended, cursors, resumen.remove(0));
 			active.add(en);
 			cursors.add(en);

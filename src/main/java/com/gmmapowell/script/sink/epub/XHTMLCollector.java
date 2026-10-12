@@ -23,9 +23,8 @@ public class XHTMLCollector {
 		body = xml.top().addElement("body");
 	}
 
-
 	public XMLElement newElement(String tag) {
-		return xml.addElement(tag);
+		return xml.createElement(tag);
 	}
 
 	public void styles(List<String> styles) {

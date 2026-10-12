@@ -85,10 +85,17 @@ public class Hierarchy implements Contents {
 			return;
 		} else {
 			XMLElement ctag;
+			boolean addClass = true;
 			if (styles.contains("chapter-title"))
 				ctag = body.addElement("h1");
-			else
+			else if (styles.contains("footnote")) {
+				ctag = body;
+				addClass = false;
+			} else
 				ctag = body.addElement("p");
+			if (addClass) {
+				ctag.setAttribute("class", String.join(" ", styles));
+			}
 			addTo(ctag);
 		}
 	}
@@ -102,7 +109,6 @@ public class Hierarchy implements Contents {
 		case "italic":
 			return "i";
 		default:
-//			System.out.println("unknown style: " + s);
 			return null;
 		}
 	}
@@ -157,6 +163,7 @@ public class Hierarchy implements Contents {
 		willNeed.retainAll(styles);
 		top.parent = new Hierarchy(willNeed);
 		top.styles.removeAll(willNeed);
+		top.parent.contents.add(top);
 		return top.parent;
 	}
 
