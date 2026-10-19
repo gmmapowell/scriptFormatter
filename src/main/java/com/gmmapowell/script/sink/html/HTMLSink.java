@@ -7,10 +7,8 @@ import java.util.List;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
-import com.gmmapowell.script.flow.Cursor;
 import com.gmmapowell.script.flow.Flow;
-import com.gmmapowell.script.flow.Section;
-import com.gmmapowell.script.flow.StyledToken;
+import com.gmmapowell.script.flow.FlowCursor;
 import com.gmmapowell.script.modules.sink.github.IndexPageCreator;
 import com.gmmapowell.script.sink.Sink;
 
@@ -46,18 +44,9 @@ public class HTMLSink implements Sink {
 
 	@Override
 	public void render() throws IOException {
-		for (Flow f : flows) {
-			HTMLTokenProcessor proc = new HTMLTokenProcessor(storeInto, pre, post, ipg);
-			for (Section s : f.sections) {
-				proc.beginSection(null);
-				Cursor c = new Cursor(f.name, s);
-				StyledToken tok;
-				while ((tok = c.next()) != null) {
-					proc.processToken(null, tok);
-				}
-				proc.endSection();
-			}
-		}
+		FlowCursor fc = new FlowCursor(flows);
+		HTMLTokenProcessor proc = new HTMLTokenProcessor(storeInto, pre, post, ipg);
+		fc.run(proc);
 	}
 
 	@Override

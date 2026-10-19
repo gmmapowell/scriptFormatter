@@ -76,7 +76,7 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 		title.storedIn = place;
 		this.places.add(title);
 		if (title.title != null) {
-			idx.println("<li><a href='html/" + name + "'>" + (title.sno.length() > 0 ? title.sno + " " : "") + title.title + "</a>");
+			idx.println("<li class='chapter-bullet'><a href='html/" + name + "'>" + (title.sno.length() > 0 ? title.sno + " " : "") + title.title + "</a>");
 		}
 	}
 
@@ -128,6 +128,7 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 					line = line.substring(0, match.outerfrom) + replaceVar(match.var) + line.substring(match.outerto);
 				}
 				sw.append(line);
+				sw.append('\n');
 			}
 
 			private boolean haveVar(String var) {

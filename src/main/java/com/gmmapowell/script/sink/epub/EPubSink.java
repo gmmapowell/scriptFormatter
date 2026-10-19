@@ -28,6 +28,7 @@ import com.gmmapowell.script.flow.Flow;
 import com.gmmapowell.script.flow.FlowCursor;
 import com.gmmapowell.script.flow.NonBreakingSpace;
 import com.gmmapowell.script.flow.ParaBreak;
+import com.gmmapowell.script.flow.SaveAs;
 import com.gmmapowell.script.flow.StyledToken;
 import com.gmmapowell.script.flow.SyncAfterFlow;
 import com.gmmapowell.script.flow.TextSpanItem;
@@ -213,6 +214,8 @@ public class EPubSink implements Sink, CursorClient {
 			((EPubAware)tok.it).handle(coll);
 		else if (tok.it instanceof SyncAfterFlow) {
 			cursor.resumeAtEnd(((SyncAfterFlow) tok.it).yieldTo());
+		} else if (tok.it instanceof SaveAs) {
+			// nothing to do here...
 		} else {
 			System.out.println("epub processToken cannot handle " + tok.it);
 		}

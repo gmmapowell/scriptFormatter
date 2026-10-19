@@ -131,7 +131,7 @@ public interface Place {
 	 */
 	long size();
 
-	/** Writer the contents of this place to a writer.
+	/** Write the contents of this place to a writer.
 	 * 
 	 * @param writer - the writer to writer to (will not be closed)
 	 */

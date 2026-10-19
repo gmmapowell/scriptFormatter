@@ -1,13 +1,9 @@
 package com.gmmapowell.script.sink.html;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
-import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
@@ -34,14 +30,14 @@ import com.gmmapowell.script.modules.sink.github.IndexPageCreator;
 public class HTMLTokenProcessor implements CursorClient {
 	private final Region storeInto;
 	private StringWriter sw;
-	private PrintWriter writer;
 	private String saveAs = null;
-	private boolean haveBreak = true;
+//	private boolean haveBreak = true;
 	private String last = "text";
-	private List<String> cf = new ArrayList<>();
+//	private List<String> cf = new ArrayList<>();
 	private Place pre;
 	private Place post;
 	private IndexPageCreator ipg;
+	private TokenStack stack;
 	
 	public HTMLTokenProcessor(Region storeInto, Place pre, Place post, IndexPageCreator ipg) {
 		this.storeInto = storeInto;
@@ -53,9 +49,9 @@ public class HTMLTokenProcessor implements CursorClient {
 	@Override
 	public void beginSection(Set<Cursor> cursors) {
 		this.sw = new StringWriter();
-		this.writer = new PrintWriter(sw);
-		this.write(pre);
-		haveBreak = true;
+		stack = new TokenStack(sw);
+		stack.write(pre);
+//		haveBreak = true;
 		last = "text";
 		saveAs = null;
 	}
@@ -63,86 +59,96 @@ public class HTMLTokenProcessor implements CursorClient {
 	@Override
 	public boolean processToken(CursorFeedback cursor, StyledToken tok) throws IOException {
 //		System.out.println("TOK: " + tok);
-		last = transition(cf, last, tok);
-		boolean hadBreak = haveBreak;
-		figureStyles(cf, tok.styles);
-		cf = new ArrayList<>(tok.styles);
+		if (tok.it instanceof YieldToFlow) {
+			cursor.suspend(tok, ((YieldToFlow) tok.it).yieldTo());
+			return false;
+		}
+
+		stack.styles(tok.styles);
+//		last = transition(cf, last, tok);
+//		boolean hadBreak = haveBreak;
+//		if (haveBreak) {
+//			stack.beginPara();
+//			if (!last.equals("blockquote") && !last.equals("as-div")) {
+//				stack.print("<p>");
+//			}
+//			haveBreak = false;
+//		}
+//		figureStyles(cf, tok.styles);
+//		cf = new ArrayList<>(tok.styles);
 		if (ipg != null) {
 			ipg.processToken(tok);
 		}
 		if (tok.it instanceof TextSpanItem) {
-			if (haveBreak) {
-				if (!last.equals("blockquote") && !last.equals("as-div")) {
-					writer.print("<p>");
-				}
-			}
-			writer.print(entitify(((TextSpanItem) tok.it).text));
-			haveBreak = false;
+			stack.print(entitify(((TextSpanItem) tok.it).text));
 		} else if (tok.it instanceof NothingOp) {
 		} else if (tok.it instanceof BreakingSpace) {
 			if (last.equals("blockquote"))
-				writer.println("&nbsp;");
+				stack.print("&nbsp;");
 			else
-				writer.print(" ");
+				stack.print(" ");
 		} else if (tok.it instanceof NonBreakingSpace) {
-			if (haveBreak) {
-				if (!last.equals("blockquote") && !last.equals("as-div")) {
-					writer.print("<p>");
-				}
-				haveBreak = false;
-			}
-			writer.println("&nbsp;");
+			stack.print("&nbsp;");
 		} else if (tok.it instanceof ParaBreak) {
-			if (hadBreak) // ignore multiple consecutive BRKs
-				return true;
-			switch (last) {
-			case "bullet":
-				writer.print("</p>");
-				last = "needli";
-				break;
-			case "text":
-				writer.print("</p>");
-				break;
-			case "blockquote":
-				writer.print("<br/>");
-				break;
-			case "h1":
-			case "h2":
-			case "h3":
-			case "as-div":
-				break; // it happens automatically
-				
-			case "chapter-title":
-				writer.print("</p>");
-				break;
-			case "footnote":
-				writer.print("</p>");
-				break;
-			case "locate-place":
-				writer.print("</p>");
-				break;
-			case "locate-date":
-				writer.print("</p>");
-				break;
-			case "poetry":
-				writer.print("</p>");
-				break;
-			default:
-				throw new CantHappenException("cannot handle BRKPara in " + last);
-			}
-			writer.println();
-			haveBreak = true;
+//			if (hadBreak) // ignore multiple consecutive BRKs
+//				return true;
+			stack.closePara();
+//			switch (last) {
+//			case "bullet":
+//				stack.print("</p>");
+//				last = "needli";
+//				break;
+//			case "text":
+//				stack.print("</p>");
+//				break;
+//			case "blockquote":
+//				stack.print("<br/>");
+//				break;
+//			case "h1":
+//			case "h2":
+//			case "h3":
+//			case "as-div":
+//				break; // it happens automatically
+//				
+//			case "chapter-title":
+//				stack.print("</CTspan>");
+//				stack.print("</p>");
+//				break;
+//			case "footnote-number":
+//				stack.print("</FNspan>");
+//				stack.print("</p>");
+//				break;
+//			case "footnote":
+//				stack.print("</p>");
+//				break;
+//			case "locate-place":
+//				stack.print("</p>");
+//				break;
+//			case "locate-date":
+//				stack.print("</p>");
+//				break;
+//			case "poetry":
+//				stack.print("</p>");
+//				break;
+//			default:
+//				throw new CantHappenException("cannot handle BRKPara in " + last);
+//			}
+//			stack.println();
+//			haveBreak = true;
 		} else if (tok.it instanceof ImageOp) {
-			writer.print("<img border='0' src=\'" + ((ImageOp) tok.it).uri + "' />");
+			stack.print("<img border='0' src=\'" + ((ImageOp) tok.it).uri + "' />");
 		} else if (tok.it instanceof LinkOp) {
 			LinkOp l = (LinkOp) tok.it;
-			writer.print("<a href='" + l.lk + "'>");
-			writer.print(l.tx);
-			writer.print("</a>");
+			stack.print("<a href='" + l.lk + "'>");
+			stack.print(l.tx);
+			stack.print("</a>");
 		} else if (tok.it instanceof SaveAs) {
 			saveAs = ((SaveAs) tok.it).name();
-		} else if (tok.it instanceof YieldToFlow || tok.it instanceof ReleaseFlow || tok.it instanceof SyncAfterFlow) {
+		} else if (tok.it instanceof ReleaseFlow) {
 			System.out.println("htmltp cannot handle token " + tok.it);
+		} else if (tok.it instanceof SyncAfterFlow) {
+			System.out.println("htmltp cannot handle token " + tok.it);
+			cursor.resumeAtEnd(((SyncAfterFlow) tok.it).yieldTo());
 		} else if (tok.it instanceof AnchorOp || tok.it instanceof LinkFromTOC) {
 //			System.out.println("htmltp cannot handle token " + tok.it);
 		} else if (tok.it.toString().equals("SectionBreak")) {
@@ -154,9 +160,10 @@ public class HTMLTokenProcessor implements CursorClient {
 
 	@Override
 	public void endSection() throws IOException {
-		transition(cf, last, "text");
-		this.write(post);
-		writer.close();
+		stack.popAll();
+//		transition(cf, last, "text");
+		stack.write(post);
+		stack.flush();
 		if (saveAs != null) {
 			if (saveAs.endsWith(".txt")) {
 				saveAs = saveAs.replaceFirst(".txt$", "");
@@ -168,7 +175,7 @@ public class HTMLTokenProcessor implements CursorClient {
 			html.store(sw.toString());
 		}
 	}
-
+/*
 	private String transition(List<String> cf, String last, StyledToken tok) {
 		if (tok.styles.isEmpty())
 			return last;
@@ -185,28 +192,28 @@ public class HTMLTokenProcessor implements CursorClient {
 			return last;
 
 		if (last.equals("blockquote")) {
-			writer.println("</blockquote>");
+			stack.println("</blockquote>");
 		}
 		if (last.equals("needli") && !next.equals("bullet"))
-			writer.println("</ul>");
+			stack.println("</ul>");
 		if (last.startsWith("h")) {
-			writer.println("</" + last + ">");
+			stack.println("</" + last + ">");
 		}
 		drawDownTo(cf, 1);
 		if (next.startsWith("h")) {
-			writer.print("<" + next + ">");
+			stack.print("<" + next + ">");
 		}
 		if (next.equals("bullet")) {
 			if (!last.equals("needli"))
-				writer.println("<ul>");
-			writer.print("<li>");
+				stack.println("<ul>");
+			stack.print("<li>");
 		}
 		if (next.equals("blockquote")) {
-			writer.println("<blockquote class='article_blockquote'>");
+			stack.println("<blockquote class='article_blockquote'>");
 		}
 		return next;
 	}
-
+*/
 	private String entitify(String text) {
 		StringBuilder sb = new StringBuilder(text);
 		int spaces = 0;
@@ -237,11 +244,13 @@ public class HTMLTokenProcessor implements CursorClient {
 		}
 		return sb.toString();
 	}
+	
+	/*
 
 	private void figureStyles(List<String> cf, List<String> styles) {
 		if (styles != null) {
 			drawDownTo(cf, styles.size());
-			for (int i = 1; i < styles.size(); i++) {
+			for (int i = 0; i < styles.size(); i++) {
 				String sty = styles.get(i);
 				if (cf.size() > i && cf.get(i).equals(sty))
 					continue;
@@ -251,19 +260,22 @@ public class HTMLTokenProcessor implements CursorClient {
 				if ("link".equals(sty) || "endlink".equals(sty))
 					; // don't print these
 				else {
-					writer.print("<" + mapStyle(sty, true) + ">");
+					stack.print("<" + mapStyle(sty, true) + ">");
 					cf.add(sty);
 				}
 			}
 		}
 	}
-
+*/
+	/*
 	private void drawDownTo(List<String> cf, int to) {
 		while (cf.size() > to) {
-			writer.print("</" + mapStyle(cf.remove(cf.size() - 1), false) + ">");
+			stack.print("</" + mapStyle(cf.remove(cf.size() - 1), false) + ">");
 		}
 	}
+	*/
 
+	/*
 	private String mapStyle(String sty, boolean open) {
 		if (sty.startsWith("div-")) {
 			if (!open) {
@@ -274,6 +286,11 @@ public class HTMLTokenProcessor implements CursorClient {
 				return "div class='" + classes + "'";
 			}
 			return "div";
+		} else if (sty.equals("footnote-number") || sty.equals("chapter-title")) {
+			if (!open) {
+				return "span";
+			}
+			return "span class='" + sty + "'";
 		}
 		switch (sty) {
 		case "italic":
@@ -284,11 +301,5 @@ public class HTMLTokenProcessor implements CursorClient {
 			return sty;
 		}
 	}
-
-	public void write(Place from) {
-		if (from == null) {
-			return;
-		}
-		from.writeTo(writer);
-	}
+	*/
 }

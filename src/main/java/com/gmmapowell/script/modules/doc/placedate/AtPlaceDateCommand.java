@@ -27,11 +27,11 @@ public class AtPlaceDateCommand implements AtCommandHandler {
 		String d = cmd.arg("date").trim();
 		sink.newSection("footnotes", "placedate");
 		sink.newSection("main", "placedate");
-		sink.newPara("locate-place", "chapter-title");
+		sink.newPara("chapter-title", "locate-place");
 		sas.outlineEntry(1, tocFormat, p + " " + d, null, null);
 		sink.processText(p);
 		sink.endPara();
-		sink.newPara("locate-date", "chapter-title");
+		sink.newPara("chapter-title", "locate-date");
 		sink.processText(d);
 		sink.endPara();
 	}
