@@ -91,6 +91,16 @@ public class OPFCreator {
 		ir.setAttribute("idref", name);
 	}
 	
+	public void addCss(String name) {
+		XMLElement item = man.addElement("item");
+		item.setAttribute("id", "css-" + name);
+		item.setAttribute("href", "css/" + name + ".css");
+		item.setAttribute("media-type", "text/css");
+		
+		XMLElement ir = spine.addElement("itemref");
+		ir.setAttribute("idref", "css-" + name);
+	}
+	
 	public String makePackage() {
 		return pkg.serialize();
 	}

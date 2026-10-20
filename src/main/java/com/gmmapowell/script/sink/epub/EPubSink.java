@@ -116,6 +116,7 @@ public class EPubSink implements Sink, CursorClient {
 					String name = x.name();
 					String copyTo = "OPS/css/" + name;
 					cssFiles.add(copyTo);
+					this.opf.addCss(name.replace(".css", ""));
 					try {
 						zos.putNextEntry(new ZipEntry(copyTo));
 						x.copyBinary(new StreamPlace(new NoCloseStream(zos)));
