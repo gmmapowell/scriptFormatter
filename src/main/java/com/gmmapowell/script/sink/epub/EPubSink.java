@@ -208,8 +208,12 @@ public class EPubSink implements Sink, CursorClient {
 					this.coll.insert(hasFN);
 					hasFN = hasFN.addElement("p");
 					hasFN.setAttribute("class", "footnote");
-				} 
-				hasFN.addText(tx);
+					XMLElement fn = hasFN.addElement("span");
+					fn.setAttribute("class", "footnote-number");
+					fn.addText(tx);
+				} else {
+					hasFN.addText(tx);
+				}
 			} else if (tok.styles.contains("footnote-number")) {
 				String noteNo = ((TextSpanItem)tok.it).text;
 				if (hasFN == null) {

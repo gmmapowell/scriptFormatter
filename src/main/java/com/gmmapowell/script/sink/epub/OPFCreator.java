@@ -49,17 +49,12 @@ public class OPFCreator {
 		XMLElement titleElt = md.addElement(dc.tag("title"));
 		titleElt.setAttribute("id", "title");
 		titleElt.addText(title);
-//		XMLElement date = md.addElement(dc.tag("date"));
-//		DateFormat df = new SimpleDateFormat("YYYY-MM-dd");
-//		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-//		date.addText(df.format(new Date()));
 		XMLElement creator = md.addElement(dc.tag("creator"));
 		creator.addText(author);
 		XMLElement lang = md.addElement(dc.tag("language"));
 		lang.addText("en-US");
 		XMLElement modified = md.addElement("meta");
 		modified.setAttribute("property", "dcterms:modified");
-//		modified.setAttribute(opf.attr("event"), "modification");
 
 		DateFormat iso = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss'Z'");
 		iso.setTimeZone(TimeZone.getTimeZone("UTC"));
