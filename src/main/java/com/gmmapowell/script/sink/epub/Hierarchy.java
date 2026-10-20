@@ -51,6 +51,7 @@ public class Hierarchy implements Contents {
 	}
 
 	private Hierarchy parent;
+	private boolean wantPara = true;
 	
 	// The only things that should be in styles here are the ones that parent *doesn't* have.
 	private final List<String> styles;
@@ -88,7 +89,7 @@ public class Hierarchy implements Contents {
 			boolean addClass = true;
 			if (styles.contains("chapter-title"))
 				ctag = body.addElement("h1");
-			else if (styles.contains("footnote")) {
+			else if (styles.contains("footnote") || !wantPara) {
 				ctag = body;
 				addClass = false;
 			} else
@@ -197,9 +198,12 @@ public class Hierarchy implements Contents {
 		this.contents.add(new EntityContents(entity));
 	}
 	
+	public void noPara() {
+		this.wantPara = false;
+	}
+	
 	@Override
 	public String toString() {
 		return "H{" + this.styles + ":" + contents + "}";
-	}
-	
+	}	
 }

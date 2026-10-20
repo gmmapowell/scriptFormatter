@@ -80,4 +80,9 @@ public class XHTMLCollector {
 	public void write(ZipOutputStream zos) {
 		FileUtils.writeToStream(xml.asString(false), zos);
 	}
+
+
+	public void noPara() {
+		hierarchy.noPara();
+	}
 }
