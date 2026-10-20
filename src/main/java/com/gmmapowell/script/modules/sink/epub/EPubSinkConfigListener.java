@@ -31,6 +31,7 @@ public class EPubSinkConfigListener implements ConfigListener {
 		case "title":
 		case "author":
 		case "identifier":
+		case "css":
 		{
 			vars.put(cmd.depth(), cmd.name(), cmd.line().readArg());
 			return null;

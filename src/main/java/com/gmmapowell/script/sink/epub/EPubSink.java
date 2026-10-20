@@ -17,6 +17,8 @@ import org.zinutils.xml.XMLElement;
 
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
+import com.gmmapowell.geofs.stream.NoCloseStream;
+import com.gmmapowell.geofs.stream.StreamPlace;
 import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.config.VarMap;
@@ -50,6 +52,17 @@ public class EPubSink implements Sink, CursorClient {
 	private final String title;
 	private final String identifier;
 	private final String author;
+	private final Region css;
+
+	private Map<String, String> current = new TreeMap<>();
+	private StringBuilder titleBuilder = new StringBuilder();
+	private XHTMLCollector coll = new XHTMLCollector();
+	private ZipOutputStream zos;
+	private OPFCreator opf;
+	private TOCCreator toc;
+	private int chapNo = 0;
+	private XMLElement hasFN;
+	private List<String> cssFiles = new ArrayList<>();
 
 	public EPubSink(Region root, StyleCatalog styles, String output, boolean wantOpen, String upload, boolean debug, String sshid, VarMap vars) throws IOException, ConfigException {
 		this.debug = debug;
@@ -73,6 +86,12 @@ public class EPubSink implements Sink, CursorClient {
 		title = vars.remove("title");
 		identifier = vars.remove("identifier");
 		author = vars.remove("author");
+		if (vars.containsKey("css")) {
+			String cssDir = vars.remove("css");
+			css = root.subregion(cssDir);
+		} else {
+			css = null;
+		}
 	}
 
 	public void prepare() {
@@ -92,6 +111,20 @@ public class EPubSink implements Sink, CursorClient {
 			FileUtils.writeToStream(makeContainer(), zos);
 			this.opf = new OPFCreator(bookId, identifier, author, title);
 			this.toc = new TOCCreator(identifier, title);
+			if (css != null) {
+				css.places(x -> {
+					String name = x.name();
+					String copyTo = "OPS/css/" + name;
+					cssFiles.add(copyTo);
+					try {
+						zos.putNextEntry(new ZipEntry(copyTo));
+						x.copyBinary(new StreamPlace(new NoCloseStream(zos)));
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+				});
+	
+			}
 			// TODO: encryption?
 
 			FlowCursor c = new FlowCursor(flows);
@@ -136,15 +169,6 @@ public class EPubSink implements Sink, CursorClient {
 		toc.addEntry(title, file, cnt);
 		zos.putNextEntry(new ZipEntry("OPS/Files/" + file + ".xhtml"));
 	}
-
-	Map<String, String> current = new TreeMap<>();
-	StringBuilder titleBuilder = new StringBuilder();
-	XHTMLCollector coll = new XHTMLCollector();
-	private ZipOutputStream zos;
-	private OPFCreator opf;
-	private TOCCreator toc;
-	int chapNo = 0;
-	private XMLElement hasFN;
 	
 	@Override
 	public void beginSection(Set<Cursor> cursors) {
@@ -152,6 +176,9 @@ public class EPubSink implements Sink, CursorClient {
 			current.put(c.flowName(), c.format());
 		}
 		++chapNo;
+		for (String css : cssFiles) {
+			coll.addCss(css);
+		}
 	}
 
 	@Override

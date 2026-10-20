@@ -16,11 +16,20 @@ public class XHTMLCollector {
 	private XMLNamespace epub;
 	
 	public XHTMLCollector() {
-		xml = XML.createNSwithDTD("1.0", "html", "http://www.w3.org/1999/xhtml", "xhtml", "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
+		xml = XML.createNSwithDTD("1.0", "html", "http://www.w3.org/1999/xhtml", "xhtml", null, null);
 //		xml.addPI("DOCTYPE", "html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"");
 		epub = xml.namespace("epub", "http://www.idpf.org/2007/ops");
 		head = xml.top().addElement("head");
 		body = xml.top().addElement("body");
+	}
+
+
+	public void addCss(String css) {
+		XMLElement cssElt = newElement("link");
+		cssElt.setAttribute("rel", "stylesheet");
+		cssElt.setAttribute("type", "text/css");
+		cssElt.setAttribute("href", "../css/main.css");
+		head.addElement(cssElt);
 	}
 
 	public XMLElement newElement(String tag) {
