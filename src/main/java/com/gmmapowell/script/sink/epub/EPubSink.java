@@ -192,9 +192,7 @@ public class EPubSink implements Sink, CursorClient {
 			if (tok.it instanceof TextSpanItem) {
 				TextSpanItem tsi = (TextSpanItem) tok.it;
 				titleBuilder.append(tsi.text);
-			} else if (tok.it instanceof ParaBreak) {
-				coll.title(titleBuilder.toString());
-			} else if (tok.it instanceof BreakingSpace || tok.it instanceof NonBreakingSpace) {
+			} else if (tok.it instanceof ParaBreak || tok.it instanceof BreakingSpace || tok.it instanceof NonBreakingSpace) {
 				titleBuilder.append(" ");
 			}
 		}
@@ -228,7 +226,7 @@ public class EPubSink implements Sink, CursorClient {
 				coll.text(((TextSpanItem)tok.it).text);
 			}
 		} else if (tok.it instanceof NonBreakingSpace) {
-			coll.entity("nbsp");
+			coll.text(String.valueOf((char)160));
 		} else if (tok.it instanceof BreakingSpace) {
 			if (hasFN != null) {
 				hasFN.addText(" ");
@@ -251,7 +249,8 @@ public class EPubSink implements Sink, CursorClient {
 
 	@Override
 	public void endSection() throws IOException {
-		addFile(zos, opf, toc, chapNo, titleBuilder.toString());
+		coll.title(titleBuilder.toString().trim());
+		addFile(zos, opf, toc, chapNo, titleBuilder.toString().trim());
 		titleBuilder = new StringBuilder();
 		coll.write(zos);
 		coll = new XHTMLCollector();

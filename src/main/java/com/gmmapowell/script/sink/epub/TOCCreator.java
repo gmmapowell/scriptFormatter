@@ -32,7 +32,7 @@ public class TOCCreator {
 		XMLElement hnav = body.addElement("nav");
 		hnav.setAttribute("id", "toc");
 		hnav.setAttribute(epub.attr("type"), "toc");
-		ul = hnav.addElement("ul");
+		ul = hnav.addElement("ol");
 	}
 
 	public void addEntry(String title, String file, int idx) {
