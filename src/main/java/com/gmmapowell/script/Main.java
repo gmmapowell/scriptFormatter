@@ -22,6 +22,7 @@ public class Main {
 			cfg.generate(files);
 //			cfg.dump();
 			cfg.sink();
+			cfg.flush();
 			cfg.show();
 			cfg.upload();
 			cfg.finish();

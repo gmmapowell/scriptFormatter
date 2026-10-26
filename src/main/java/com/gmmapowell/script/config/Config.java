@@ -15,6 +15,7 @@ public interface Config {
 	void generate(FilesToProcess files) throws IOException;
 	void dump() throws IOException;
 	void sink() throws IOException;
+	void flush() throws IOException;
 	void show() throws IOException;
 	void upload() throws Exception;
 	void finish() throws Exception;

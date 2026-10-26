@@ -8,6 +8,7 @@ public interface Sink {
 	void prepare() throws Exception;
 	void flow(Flow flow);
 	void render() throws IOException;
+	default void flush() throws IOException {};
 	void showFinal();
 	void upload() throws Exception;
 	void finish() throws Exception;

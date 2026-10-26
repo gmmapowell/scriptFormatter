@@ -113,6 +113,13 @@ public class ScriptConfig implements Config {
 	}
 
 	@Override
+	public void flush() throws IOException {
+		for (Sink s : sinks) {
+			s.flush();
+		}
+	}
+
+	@Override
 	public void show() throws IOException {
 		for (Sink s : sinks)
 			s.showFinal();

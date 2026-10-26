@@ -73,15 +73,7 @@ public class GithubSinkConfigListener implements ConfigListener {
 		((GithubModuleConfigListener)m).addLO(ipc);
 		try {
 			String pdf = vars.remove("pdf");
-			if (pdf != null) {
-				Place topdf = region.ensurePlace(pdf);
-				r.place(pdf).copyBinary(topdf);
-			}
 			String epub = vars.remove("epub");
-			if (epub != null) {
-				Place toepub = region.ensurePlace(epub);
-				r.place(epub).copyBinary(toepub);
-			}
 			fromCss.places(x -> {
 				Place p = css.ensurePlace(x.name());
 				x.copyTo(p);
@@ -89,6 +81,8 @@ public class GithubSinkConfigListener implements ConfigListener {
 			HTMLSink hs = new HTMLSink(r, html, prep, postp, ipc);
 			state.config.sink(hs);
 			state.config.extensions().bindExtensionPoint(DocumentOutline.class, ipc);
+			GithubSink ghs = new GithubSink(region, r, pdf, epub);
+			state.config.sink(ghs);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ConfigException("Error creating PresenterSink: " + ex.getMessage());
