@@ -64,6 +64,7 @@ public class InstallArticleModule implements ConfigListener {
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, BoldAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ItalicAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, TTAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, DollarHandler.class);
 	}
 
 	// & commands that appear in the line rather than at the start
