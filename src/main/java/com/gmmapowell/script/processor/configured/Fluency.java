@@ -178,7 +178,6 @@ public class Fluency {
 	}
 
 	public void ensureFlow(String flow) {
-		System.out.println("Creating flow " + flow);
 		global.flows().flow(flow);
 		currFlow = global.flow(flow);
 	}

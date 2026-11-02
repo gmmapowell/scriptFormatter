@@ -56,6 +56,15 @@ public class SolidGlobalState implements GlobalState {
 		return flows.get(flow);
 	}
 
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T optionalState(Class<T> clz) {
+		if (configs.containsKey(clz))
+			return (T) configs.get(clz);
+		return null;
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T existingState(Class<T> clz) {

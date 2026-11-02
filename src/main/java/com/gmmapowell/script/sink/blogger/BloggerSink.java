@@ -82,7 +82,7 @@ public class BloggerSink implements Sink {
 		this.index = new PostIndex();
 	}
 	
-	public void prepare() throws Exception {
+	public void prepare(boolean separately) throws Exception {
 		index.readFrom(postsFile);
 		if (!localOnly) {
 			try {

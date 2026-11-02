@@ -164,6 +164,7 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 		return sb.toString().trim();
 	}
 
+	@Override
 	public boolean separately() {
 		return separately;
 	}

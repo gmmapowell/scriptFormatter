@@ -16,8 +16,8 @@ public class CaptureSinkInFile implements Sink {
 	}
 
 	@Override
-	public void prepare() throws Exception {
-		sink.prepare();
+	public void prepare(boolean separately) throws Exception {
+		sink.prepare(separately);
 	}
 
 	public void flow(Flow flow) {

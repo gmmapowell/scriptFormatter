@@ -14,7 +14,7 @@ public interface GlobalState {
 	ExtensionPointRepo extensions();
 
 	<T> T existingState(Class<T> clz);
-	
+	<T> T optionalState(Class<T> clz);	
 	<T> T requireState(Class<T> clz);
 
 	FlowMap flows();
@@ -26,5 +26,6 @@ public interface GlobalState {
 	Region getRoot();
 
 	void addFinisher(Finisher f);
+
 
 }

@@ -64,7 +64,7 @@ public class PDFSink implements Sink, CursorClient {
 	}
 
 	@Override
-	public void prepare() throws Exception {
+	public void prepare(boolean separately) throws Exception {
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class PDFSink implements Sink, CursorClient {
 	public void render() throws IOException {
 		if (outputDir == null) {
 			stock.newDocument(styles);
-			FlowCursor c = new FlowCursor(flows);
+			FlowCursor c = new FlowCursor(flows, false);
 			c.run(this); // TODO: I feel that actually it should be a newly created object ...
 			stock.close(output);
 		} else {
@@ -84,7 +84,7 @@ public class PDFSink implements Sink, CursorClient {
 				if (f.isMain()) {
 					List<Flow> tmp = buildTmpFlows(f);
 					stock.newDocument(styles);
-					FlowCursor c = new FlowCursor(tmp);
+					FlowCursor c = new FlowCursor(tmp, false);
 					this.current = new TreeMap<>();
 					this.page = null;
 					this.newSection = false;
@@ -92,6 +92,7 @@ public class PDFSink implements Sink, CursorClient {
 					stock.close(outputDir.ensurePlace(f.name + ".pdf"));
 				}
 			}
+			throw new CantHappenException("I don't see where this is used - but I think that it should probably use the FlowCursor separately = true flag");
 		}
 	}
 	

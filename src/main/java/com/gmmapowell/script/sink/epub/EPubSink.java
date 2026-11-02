@@ -94,7 +94,7 @@ public class EPubSink implements Sink, CursorClient {
 		}
 	}
 
-	public void prepare() {
+	public void prepare(boolean separately) {
 	}
 	
 	@Override
@@ -128,7 +128,7 @@ public class EPubSink implements Sink, CursorClient {
 			}
 			// TODO: encryption?
 
-			FlowCursor c = new FlowCursor(flows);
+			FlowCursor c = new FlowCursor(flows, false);
 			c.run(this); // TODO: I feel that actually it should be a newly created object ...
 
 			zos.putNextEntry(new ZipEntry("OPS/package.opf"));

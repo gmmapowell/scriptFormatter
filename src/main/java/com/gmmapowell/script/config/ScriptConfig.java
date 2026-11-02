@@ -59,8 +59,9 @@ public class ScriptConfig implements Config {
 	public void prepare() throws Exception {
 //		loader.prepare();
 //		processor.prepare();
-		for (Sink s : sinks)
-			s.prepare();
+		for (Sink s : sinks) {
+			s.prepare(processor.separately());
+		}
 	}
 	
 	@Override

@@ -23,7 +23,12 @@ public class ScannerAtState {
 		this.state = state;
 		this.handlers = state.extensions().forPointByName(AtCommandHandler.class, this);
 		this.outline = state.extensions().forPoint(DocumentOutline.class, this);
-		this.olstate = state.global().existingState(TOCState.class).toc.outlineNumbering;
+		TOCState ts = state.global().optionalState(TOCState.class);
+		if (ts != null) {
+			this.olstate = ts.toc.outlineNumbering;
+		} else {
+			this.olstate = null;
+		}
 	}
 	
 	public ConfiguredState state() {
@@ -80,9 +85,11 @@ public class ScannerAtState {
 	}
 	
 	public void outlineEntry(int level, String tocFormat, String text, String style, String anchor) {
-		olstate.parseFormats(tocFormat);
-		for (DocumentOutline e : outline) {
-			e.entry(level, olstate.format(level, text, style, anchor), text, anchor);
+		if (olstate != null) {
+			olstate.parseFormats(tocFormat);
+			for (DocumentOutline e : outline) {
+				e.entry(level, olstate.format(level, text, style, anchor), text, anchor);
+			}
 		}
 	}
 }

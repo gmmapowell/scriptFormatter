@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Set;
 
+import org.zinutils.exceptions.CantHappenException;
 import org.zinutils.exceptions.NotImplementedException;
 
 import com.gmmapowell.geofs.Place;
@@ -65,17 +66,6 @@ public class HTMLTokenProcessor implements CursorClient {
 		}
 
 		stack.styles(tok.styles);
-//		last = transition(cf, last, tok);
-//		boolean hadBreak = haveBreak;
-//		if (haveBreak) {
-//			stack.beginPara();
-//			if (!last.equals("blockquote") && !last.equals("as-div")) {
-//				stack.print("<p>");
-//			}
-//			haveBreak = false;
-//		}
-//		figureStyles(cf, tok.styles);
-//		cf = new ArrayList<>(tok.styles);
 		if (ipg != null) {
 			ipg.processToken(tok);
 		}
@@ -90,51 +80,7 @@ public class HTMLTokenProcessor implements CursorClient {
 		} else if (tok.it instanceof NonBreakingSpace) {
 			stack.print("&nbsp;");
 		} else if (tok.it instanceof ParaBreak) {
-//			if (hadBreak) // ignore multiple consecutive BRKs
-//				return true;
 			stack.closePara();
-//			switch (last) {
-//			case "bullet":
-//				stack.print("</p>");
-//				last = "needli";
-//				break;
-//			case "text":
-//				stack.print("</p>");
-//				break;
-//			case "blockquote":
-//				stack.print("<br/>");
-//				break;
-//			case "h1":
-//			case "h2":
-//			case "h3":
-//			case "as-div":
-//				break; // it happens automatically
-//				
-//			case "chapter-title":
-//				stack.print("</CTspan>");
-//				stack.print("</p>");
-//				break;
-//			case "footnote-number":
-//				stack.print("</FNspan>");
-//				stack.print("</p>");
-//				break;
-//			case "footnote":
-//				stack.print("</p>");
-//				break;
-//			case "locate-place":
-//				stack.print("</p>");
-//				break;
-//			case "locate-date":
-//				stack.print("</p>");
-//				break;
-//			case "poetry":
-//				stack.print("</p>");
-//				break;
-//			default:
-//				throw new CantHappenException("cannot handle BRKPara in " + last);
-//			}
-//			stack.println();
-//			haveBreak = true;
 		} else if (tok.it instanceof ImageOp) {
 			stack.print("<img border='0' src=\'" + ((ImageOp) tok.it).uri + "' />");
 		} else if (tok.it instanceof LinkOp) {
@@ -143,6 +89,9 @@ public class HTMLTokenProcessor implements CursorClient {
 			stack.print(l.tx);
 			stack.print("</a>");
 		} else if (tok.it instanceof SaveAs) {
+			if (saveAs != null) {
+				throw new CantHappenException("cannot set saveAs twice in the same flow section");
+			}
 			saveAs = ((SaveAs) tok.it).name();
 		} else if (tok.it instanceof ReleaseFlow) {
 			System.out.println("htmltp cannot handle token " + tok.it);

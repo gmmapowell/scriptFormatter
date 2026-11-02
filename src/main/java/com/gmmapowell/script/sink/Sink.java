@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.gmmapowell.script.flow.Flow;
 
 public interface Sink {
-	void prepare() throws Exception;
+	void prepare(boolean separately) throws Exception;
 	void flow(Flow flow);
 	void render() throws IOException;
 	default void flush() throws IOException {};

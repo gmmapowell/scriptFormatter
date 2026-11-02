@@ -9,4 +9,6 @@ public interface Processor {
 	void process(FilesToProcess files) throws IOException;
 
 	void allDone() throws Exception;
+
+	boolean separately();
 }

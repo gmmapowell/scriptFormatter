@@ -78,13 +78,23 @@ public class TokenStack {
 				writer.print("<i>");
 				closers.add(new Closer(needAlso, "</i>"));
 				break;
+			case "tt":
+				writer.print("<tt>");
+				closers.add(new Closer(needAlso, "</tt>"));
+				break;
 			case "bold":
 				writer.print("<b>");
 				closers.add(new Closer(needAlso, "</b>"));
 				break;
-			default:
+			default: {
+				if (needAlso.startsWith("div-")) {
+					writer.print("<div>");
+					closers.add(new Closer(needAlso, "</div>"));
+					break;
+				}
 				throw new NotImplementedException("need " + needAlso);
 //				break;
+			}
 			}
 		}
 		writer.print(text);

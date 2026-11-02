@@ -21,6 +21,7 @@ public class HTMLSink implements Sink {
 	private final Region storeInto;
 	private Place post, pre;
 	private IndexPageCreator ipg;
+	private boolean separately;
 
 	public HTMLSink(Region root, String storeInto) throws IOException, GeneralSecurityException {
 		this.storeInto = root.ensureSubregion(storeInto);
@@ -34,7 +35,8 @@ public class HTMLSink implements Sink {
 	}
 
 	@Override
-	public void prepare() throws Exception {
+	public void prepare(boolean separately) throws Exception {
+		this.separately = separately;
 	}
 
 	@Override
@@ -44,7 +46,7 @@ public class HTMLSink implements Sink {
 
 	@Override
 	public void render() throws IOException {
-		FlowCursor fc = new FlowCursor(flows);
+		FlowCursor fc = new FlowCursor(flows, separately);
 		HTMLTokenProcessor proc = new HTMLTokenProcessor(storeInto, pre, post, ipg);
 		fc.run(proc);
 	}

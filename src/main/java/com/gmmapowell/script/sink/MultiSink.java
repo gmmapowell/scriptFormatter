@@ -13,9 +13,9 @@ public class MultiSink implements Sink {
 	}
 
 	@Override
-	public void prepare() throws Exception {
+	public void prepare(boolean separately) throws Exception {
 		for (Sink s : sinks)
-			s.prepare();
+			s.prepare(separately);
 	}
 	
 	@Override

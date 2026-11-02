@@ -21,7 +21,7 @@ public class GithubSink implements Sink {
 	}
 
 	@Override
-	public void prepare() throws Exception {
+	public void prepare(boolean separately) throws Exception {
 	}
 
 	@Override
