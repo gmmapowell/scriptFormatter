@@ -20,5 +20,9 @@ public class AtSpotter implements ProcessingScanner {
 			
 		return false;
 	}
-
+	
+	@Override
+	public void placeDone() {
+		ats.closeAts(null);
+	}
 }

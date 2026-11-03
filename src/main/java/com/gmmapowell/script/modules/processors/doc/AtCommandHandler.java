@@ -11,6 +11,8 @@ public interface AtCommandHandler extends NamedExtensionPoint {
 	
 	default void onEnd(AtCommand cmd) {}
 
-	default boolean canContain(AtCommandHandler nested) { return true; }
+	default boolean canContain(AtCommandHandler nested) {
+		return nested != null;
+	}
 
 }

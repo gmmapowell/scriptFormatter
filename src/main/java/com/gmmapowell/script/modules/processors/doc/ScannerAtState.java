@@ -55,6 +55,13 @@ public class ScannerAtState {
 		AtCommandHandler handler = handlers.get(cmd.name);
 		if (handler == null)
 			throw new CantHappenException("there is no handler for " + cmd.name + " at " + state.inputLocation());
+		closeAts(handler);
+		handler.invoke(cmd);
+		cmdstack.add(0, new EndDispatcher(handler, this.cmd));
+		this.cmd = null;
+	}
+
+	public void closeAts(AtCommandHandler handler) {
 		while (!cmdstack.isEmpty()) {
 			EndDispatcher c0 = cmdstack.get(0);
 			if (!c0.handler.canContain(handler))
@@ -62,9 +69,6 @@ public class ScannerAtState {
 			else
 				break;
 		}
-		handler.invoke(cmd);
-		cmdstack.add(0, new EndDispatcher(handler, this.cmd));
-		this.cmd = null;
 	}
 	
 	public void popAtCommand() {
