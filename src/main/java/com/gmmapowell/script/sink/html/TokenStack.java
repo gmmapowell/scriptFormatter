@@ -71,6 +71,7 @@ public class TokenStack {
 			case "locate-place":
 			case "locate-date":
 			case "footnote-number":
+			case "now-date-text":
 				writer.print("<span class='" + needAlso + "'>");
 				closers.add(new Closer(needAlso, "</span>"));
 				break;
