@@ -91,9 +91,6 @@ public class OPFCreator {
 		item.setAttribute("id", "css-" + name);
 		item.setAttribute("href", "css/" + name + ".css");
 		item.setAttribute("media-type", "text/css");
-		
-		XMLElement ir = spine.addElement("itemref");
-		ir.setAttribute("idref", "css-" + name);
 	}
 	
 	public String makePackage() {
