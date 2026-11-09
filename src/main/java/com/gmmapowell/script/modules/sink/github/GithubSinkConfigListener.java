@@ -81,6 +81,8 @@ public class GithubSinkConfigListener implements ConfigListener {
 			HTMLSink hs = new HTMLSink(r, html, prep, postp, ipc);
 			state.config.sink(hs);
 			state.config.extensions().bindExtensionPoint(DocumentOutline.class, ipc);
+			ipc.pdf(pdf);
+			ipc.epub(epub);
 			GithubSink ghs = new GithubSink(region, r, pdf, epub);
 			state.config.sink(ghs);
 		} catch (Exception ex) {

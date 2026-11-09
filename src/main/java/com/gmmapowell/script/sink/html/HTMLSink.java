@@ -49,6 +49,9 @@ public class HTMLSink implements Sink {
 		FlowCursor fc = new FlowCursor(flows, separately);
 		HTMLTokenProcessor proc = new HTMLTokenProcessor(storeInto, pre, post, ipg);
 		fc.run(proc);
+		if (ipg != null) {
+			ipg.endUL();
+		}
 	}
 
 	@Override

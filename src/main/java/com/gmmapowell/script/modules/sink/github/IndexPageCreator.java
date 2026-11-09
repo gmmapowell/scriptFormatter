@@ -52,12 +52,26 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 	private final List<Title> places = new ArrayList<>();
 	private final PrintWriter idx;
 	private Place idxpostp;
+	private boolean haveUL;
 	
 	public IndexPageCreator(Place plc, Place idxprep, Place idxpostp) {
 		this.idxpostp = idxpostp;
 		Writer w = plc.writer();
 		idx = new PrintWriter(w);
 		idxprep.writeTo(idx);
+	}
+
+
+	public void epub(String epub) {
+		if (epub != null) {
+			idx.println("<a href='" + epub + "'>EPUB</a>");
+		}
+	}
+
+	public void pdf(String pdf) {
+		if (pdf != null) {
+			idx.println("<a href='" + pdf + "'>PDF</a>");
+		}
 	}
 
 	@Override
@@ -71,6 +85,10 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 	}
 
 	public void haveFile(Place place) {
+		if (!haveUL) {
+			idx.println("<ul>");
+			haveUL = true;
+		}
 		String name = place.name();
 		Title title = titles.remove(0);
 		title.storedIn = place;
@@ -78,6 +96,11 @@ public class IndexPageCreator implements DocumentOutline, Creator<IndexPageCreat
 		if (title.title != null) {
 			idx.println("<li class='chapter-bullet'><a href='html/" + name + "'>" + (title.sno.length() > 0 ? title.sno + " " : "") + title.title + "</a>");
 		}
+	}
+	
+
+	public void endUL() {
+		idx.println("</ul>");
 	}
 
 	public void processToken(StyledToken tok) {

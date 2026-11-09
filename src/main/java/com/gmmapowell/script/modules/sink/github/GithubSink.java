@@ -36,7 +36,6 @@ public class GithubSink implements Sink {
 	public void showFinal() {
 	}
 
-	
 	@Override
 	public void flush() throws IOException {
 		if (pdf != null) {
