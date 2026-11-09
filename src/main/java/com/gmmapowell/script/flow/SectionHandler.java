@@ -71,7 +71,6 @@ public class SectionHandler implements CursorFeedback {
 		cc.endSection();
 	}
 	
-
 	@Override
 	public void allProcessed(PageCompositor page) {
 		for (AnchorOp anch : records) {

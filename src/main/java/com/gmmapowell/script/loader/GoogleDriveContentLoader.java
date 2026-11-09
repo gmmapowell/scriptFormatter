@@ -13,7 +13,7 @@ import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.intf.FilesToProcess;
 import com.gmmapowell.script.loader.Index.Status;
 
-public class ContentLoader implements Loader {
+public class GoogleDriveContentLoader implements Loader {
 	private final String have_internet = System.getenv("HAVE_INTERNET");
 	private final boolean LOAD_FROM_REMOTE = have_internet == null || ("true".equals(have_internet));
 	private final String folder;
@@ -25,7 +25,7 @@ public class ContentLoader implements Loader {
 	private final Universe u;
 	private boolean recursive;
 
-	public ContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean recursive, boolean debug) throws ConfigException {
+	public GoogleDriveContentLoader(Universe u, Region root, Region downloads, Place indexFile, String folder, boolean recursive, boolean debug) throws ConfigException {
 		this.u = u;
 		this.folder = folder;
 		this.indexFile = indexFile;

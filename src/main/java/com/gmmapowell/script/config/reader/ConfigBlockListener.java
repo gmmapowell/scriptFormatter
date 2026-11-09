@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import org.zinutils.exceptions.WrappedException;
 
+import com.gmmapowell.geofs.utils.GeoFSUtils;
 import com.gmmapowell.script.config.ConfigException;
 import com.gmmapowell.script.utils.Command;
 import com.gmmapowell.script.utils.LineArgsParser;
@@ -56,7 +57,7 @@ public class ConfigBlockListener implements ConfigListener {
 				break;
 			}
 			case "workdir": {
-				state.workdir = state.root.regionPath(value);
+				state.workdir = GeoFSUtils.ensureRegionPath(state.root, value);
 				break;
 			}
 			default: {

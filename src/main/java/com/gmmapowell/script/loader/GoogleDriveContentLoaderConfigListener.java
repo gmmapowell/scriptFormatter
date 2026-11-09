@@ -11,11 +11,11 @@ import com.gmmapowell.script.config.reader.ConfigListener;
 import com.gmmapowell.script.config.reader.ReadConfigState;
 import com.gmmapowell.script.utils.Command;
 
-public class ContentLoaderConfigListener implements ConfigListener {
+public class GoogleDriveContentLoaderConfigListener implements ConfigListener {
 	private ReadConfigState state;
 	private VarMap vars = new VarMap();
 
-	public ContentLoaderConfigListener(ReadConfigState state) {
+	public GoogleDriveContentLoaderConfigListener(ReadConfigState state) {
 		this.state = state;
 	}
 	
@@ -63,7 +63,7 @@ public class ContentLoaderConfigListener implements ConfigListener {
 		} catch (Exception ex) {
 			throw new ConfigException(ex.toString());
 		}
-		state.config.loader(new ContentLoader(universe, state.root, state.workdir, state.index, folder, isRecursive, state.debug));
+		state.config.loader(new GoogleDriveContentLoader(universe, state.root, state.workdir, state.index, folder, isRecursive, state.debug));
 
 	}
 
