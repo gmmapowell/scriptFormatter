@@ -11,6 +11,7 @@ import com.gmmapowell.script.modules.processors.doc.BoldAmp;
 import com.gmmapowell.script.modules.processors.doc.ChapterCommand;
 import com.gmmapowell.script.modules.processors.doc.CommentCommand;
 import com.gmmapowell.script.modules.processors.doc.CommentaryCommand;
+import com.gmmapowell.script.modules.processors.doc.DateAmp;
 import com.gmmapowell.script.modules.processors.doc.DocProcessorConfigListener;
 import com.gmmapowell.script.modules.processors.doc.FlowByNameCommand;
 import com.gmmapowell.script.modules.processors.doc.FootnoteCommand;
@@ -83,6 +84,7 @@ public class InstallDocModule implements ConfigListener {
 		
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, LinkAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, SpaceAmp.class);
+		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, DateAmp.class);
 
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, BoldAmp.class);
 		this.config.extensions().bindExtensionPoint(AmpCommandHandler.class, ItalicAmp.class);

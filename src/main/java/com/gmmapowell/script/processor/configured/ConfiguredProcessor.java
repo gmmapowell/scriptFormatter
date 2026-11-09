@@ -99,13 +99,16 @@ public class ConfiguredProcessor implements Processor, ProcessorConfig {
 					for (ProcessingScanner scanner : all)
 						scanner.closeIfNotContinued(scanner.wantTrimmed() ? trimmed : s);
 					if (debug)
-						System.out.print("# " + n + ": " + (s + "...........").substring(0, 10) + ":: ");
+						System.out.print("# " + n + ": " + (s + ".............").substring(0, 12) + ":: ");
 					for (ProcessingScanner scanner : all) {
 						if (scanner.handleLine(scanner.wantTrimmed() ? trimmed : s))
 							return;
 					}
 					throw new CantHappenException("the default scanner at least should have fired");
 				});
+				if (debug) {
+					System.out.println();
+				}
 				for (ProcessingScanner scanner : all)
 					scanner.closeIfNotContinued(null);
 				for (ProcessingScanner scanner : all)
