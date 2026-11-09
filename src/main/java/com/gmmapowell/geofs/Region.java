@@ -99,6 +99,12 @@ public interface Region {
 	 */
 	Region parent();
 
+	/** Get the containing world
+	 * 
+	 * @return the world in which this region exists
+	 */
+	World getWorld();
+
 	/** Get the overall Universe
 	 * 
 	 * @return the Universe where this Region is ultimately located

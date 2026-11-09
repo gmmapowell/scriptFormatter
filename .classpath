@@ -12,7 +12,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
-	<classpathentry kind="var" path="ZINIKI_ROOT/Tools/utils/qbout/utils.jar" sourcepath="/ZINIKI_ROOT/Tools/utils/src/main/java"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/ZiWSH/intf/qbout/ZiWSH.intf.jar"/>
 	<classpathentry exported="true" kind="var" path="ZINIKI_ROOT/FLAS2/bin" sourcepath="/ZINIKI_ROOT/FLAS2/src/main/java"/>
 	<classpathentry kind="var" path="ZINIKI_ROOT/ziniki-paas/server/qbout/ziniki_paas.server.jar" sourcepath="/ZINIKI_ROOT/ziniki-paas/server/src/main/java"/>
@@ -25,5 +24,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Logging"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Playwright"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commonsio"/>
+	<classpathentry kind="lib" path="/projects-qb/libs/ZinUtils.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

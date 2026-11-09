@@ -104,7 +104,7 @@ public class GeoFSUtils {
 	}
 
 	public static Region regionPath(World world, Region region, String path) {
-		RegionName rn = obtainParentRegion(world, region, path);
+		RegionName rn = obtainParentRegion(world, region, path, Mode.EXISTS);
 		if (rn.n == null)
 			return rn.r;
 		else
@@ -112,12 +112,12 @@ public class GeoFSUtils {
 	}
 
 	public static Region newRegionPath(World world, Region region, String path) {
-		RegionName rn = obtainParentRegion(world, region, path);
+		RegionName rn = obtainParentRegion(world, region, path, Mode.NEW);
 		return rn.r.newSubregion(rn.n);
 	}
 
 	public static Region ensureRegionPath(World world, Region region, String path) {
-		RegionName rn = obtainParentRegion(world, region, path);
+		RegionName rn = obtainParentRegion(world, region, path, Mode.ENSURE);
 		return rn.r.ensureSubregion(rn.n);
 	}
 
@@ -127,13 +127,13 @@ public class GeoFSUtils {
 		}
 	}
 	
-	public static Region ensureRegionPath(Region root, String string) {
-		throw new NotImplementedException();
+	public static Region ensureRegionPath(Region root, String path) {
+		return ensureRegionPath(root.getWorld(), root, path);
 	}
 
-	private static RegionName obtainParentRegion(World world, Region region, String path) {
+	private static RegionName obtainParentRegion(World world, Region region, String path, Mode mode) {
 		WorldPath wp = WorldPath.parse(world, path);
-		Region r = figureParentPath(wp, region);
+		Region r = figureParentPath(wp, region, mode);
 		return new RegionName(r, wp.childSegment());
 	}
 
@@ -154,13 +154,13 @@ public class GeoFSUtils {
 
 	public static Place findPlace(World world, Region region, String path, BiFunction<Region, String, Place> resolve) {
 		WorldPath wp = WorldPath.parse(world, path);
-		Region r = figureParentPath(wp, region);
+		Region r = figureParentPath(wp, region, Mode.EXISTS);
 		if (wp.childSegment() == null)
 			throw new GeoFSNoPlaceException(path);
 		return resolve.apply(r, wp.childSegment());
 	}
 
-	private static Region figureParentPath(WorldPath wp, Region region) {
+	private static Region figureParentPath(WorldPath wp, Region region, Mode mode) {
 		Region r;
 		if (wp.isAbsolute()) {
 			r = wp.root();
@@ -170,12 +170,12 @@ public class GeoFSUtils {
 				throw new GeoFSNoRegionException(null);
 			r = region;
 		}
-		return findRelative(r, wp.parentSegments());
+		return findRelative(r, wp.parentSegments(), mode);
 	}
 
-	private static Region findRelative(Region region, List<String> segments) {
+	private static Region findRelative(Region region, List<String> segments, Mode mode) {
 		for (String s : segments)
-			region = region.subregion(s);
+			region = mode.sub(region, s);
 		return region;
 	}
 	

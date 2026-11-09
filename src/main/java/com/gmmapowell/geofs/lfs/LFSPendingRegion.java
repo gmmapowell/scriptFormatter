@@ -8,9 +8,9 @@ import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 
 public class LFSPendingRegion extends LFSRegion {
 
-	public LFSPendingRegion(LocalFileSystem world, File file) {
+	public LFSPendingRegion(LocalFileSystem world, File file, LFSRegion parent) {
 		super(world, file, true);
-		if (!file.getParentFile().exists()) {
+		if (!file.getParentFile().exists() && !(parent instanceof LFSPendingRegion)) {
 			throw new GeoFSNoRegionException(file.getParent());
 		}
 	}

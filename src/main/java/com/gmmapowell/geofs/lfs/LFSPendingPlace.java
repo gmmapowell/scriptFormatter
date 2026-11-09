@@ -11,6 +11,9 @@ public class LFSPendingPlace extends LFSPlace {
 
 	public LFSPendingPlace(LocalFileSystem world, LFSRegion region, File file) {
 		super(world, region, file, true);
+		if (file.exists()) {
+			throw new GeoFSPlaceExistsException(file.getPath());
+		}
 	}
 
 	@Override
@@ -25,7 +28,8 @@ public class LFSPendingPlace extends LFSPlace {
 	@Override
 	protected void createFile() {
 		if (file.exists()) {
-			throw new GeoFSPlaceExistsException(file.getPath());
+			// nothing to see here ...
+			return;
 		}
 		if (!file.getParentFile().exists())
 			throw new GeoFSNoRegionException(file.getParent());

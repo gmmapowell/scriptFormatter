@@ -211,7 +211,8 @@ public class LFSPlace implements Place {
 
 	@Override
 	public Date lastModified() {
-		throw new NotImplementedException();
+		long lm = file.lastModified();
+		return new Date(lm);
 	}
 	
 	@Override

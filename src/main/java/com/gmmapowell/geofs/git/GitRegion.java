@@ -8,6 +8,7 @@ import org.zinutils.exceptions.NotImplementedException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSNoPlaceException;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
@@ -109,6 +110,11 @@ public class GitRegion implements Region {
 		throw new NotImplementedException("GitWorld is read only");
 	}
 
+	@Override
+	public World getWorld() {
+		throw new NotImplementedException();
+	}
+	
 	@Override
 	public void places(PlaceListener lsnr) {
 		root.listChildren(myPath, (type, name) -> {

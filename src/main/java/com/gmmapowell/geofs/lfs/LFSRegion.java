@@ -7,6 +7,7 @@ import org.zinutils.exceptions.CantHappenException;
 import com.gmmapowell.geofs.Place;
 import com.gmmapowell.geofs.Region;
 import com.gmmapowell.geofs.Universe;
+import com.gmmapowell.geofs.World;
 import com.gmmapowell.geofs.exceptions.GeoFSNoRegionException;
 import com.gmmapowell.geofs.listeners.PlaceListener;
 import com.gmmapowell.geofs.listeners.RegionListener;
@@ -54,7 +55,7 @@ public class LFSRegion implements Region {
 
 	@Override
 	public Region newSubregion(String name) {
-		LFSPendingRegion ret = new LFSPendingRegion(world, new File(file, name));
+		LFSPendingRegion ret = new LFSPendingRegion(world, new File(file, name), this);
 		ret.create();
 		return ret;
 	}
@@ -96,7 +97,7 @@ public class LFSRegion implements Region {
 			if (dir.isDirectory())
 				r = new LFSRegion(world, dir);
 			else
-				r = new LFSPendingRegion(world, dir);
+				r = new LFSPendingRegion(world, dir, this);
 			return new LFSPendingPlace(world, r, f);
 		}
 	}
@@ -109,7 +110,7 @@ public class LFSRegion implements Region {
 		else if (f.isFile())
 			throw new GeoFSNoRegionException(f.getPath());
 		else
-			return new LFSPendingRegion(world, f);
+			return new LFSPendingRegion(world, f, this);
 	}
 
 	@Override
@@ -127,6 +128,11 @@ public class LFSRegion implements Region {
 		return GeoFSUtils.ensurePlacePath(world, this, path);
 	}
 
+	@Override
+	public World getWorld() {
+		return world;
+	}
+	
 	public File getFile() {
 		return file;
 	}
