@@ -16,7 +16,7 @@ public class DateAmp implements AmpCommandHandler {
 
 	@Override
 	public void invoke(AmpCommand cmd) {
-		String dt = cmd.args.readArg().trim();
+		String dt = cmd.args.asString().trim();
 		sink.newPara("locate-date");
 		sink.processText(dt);
 		sink.endPara();
